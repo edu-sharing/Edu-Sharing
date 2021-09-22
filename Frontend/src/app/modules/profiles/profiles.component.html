@@ -83,7 +83,8 @@
       </div>
       <div class="statsBackground">
         <div class="stats">
-          <div>
+          <div [class.stat-link]="canActivateLinks()"
+               (click)="canActivateLinks() && navigateTo('workspace')" >
             <div class="stat">
               {{'PROFILES.STATS.MATERIALS' | translate}}
             </div>
@@ -91,7 +92,8 @@
               {{ userStats.nodeCount }}
             </div>
           </div>
-          <div>
+          <div [class.stat-link]="canActivateLinks()"
+               (click)="canActivateLinks() && navigateTo('collections')" >
             <div class="stat">
               {{'PROFILES.STATS.COLLECTIONS' | translate}}
             </div>
@@ -99,7 +101,8 @@
               {{ userStats.collectionCount }}
             </div>
           </div>
-          <div>
+          <div [class.stat-link]="canActivateLinks()"
+               (click)="canActivateLinks() && navigateTo('search')" >
             <div class="stat">
               {{'PROFILES.STATS.MATERIALS_CC' | translate}}
             </div>

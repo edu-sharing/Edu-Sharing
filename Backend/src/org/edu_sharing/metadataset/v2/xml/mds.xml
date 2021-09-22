@@ -961,6 +961,7 @@
 					<multiple>true</multiple>
 					<multiplejoin>OR</multiplejoin>
 				</property>
+				<property name="ccm:creator" />
 			</query>
 			<query join="AND" id="sharedToMe">
 				<basequery>(TYPE:"ccm:io" OR TYPE:"ccm:map") AND NOT ASPECT:"ccm:collection_io_reference" AND NOT ASPECT:"ccm:collection"</basequery>

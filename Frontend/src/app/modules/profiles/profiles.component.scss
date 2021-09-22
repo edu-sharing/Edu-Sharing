@@ -255,9 +255,18 @@ $path:'../../../assets/images/';
         color: $textLight;
       }
 
-      .value {
-        font-size: 30pt;
-      }
+        .value {
+            font-size: 30pt;
+        }
+
+        .stat-link {
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .stat-link:hover {
+            background-color: $buttonHoverBackground;
+        }
     }
 
     .authorityName {

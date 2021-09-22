@@ -63,4 +63,5 @@ public class Values implements Serializable {
 	@XmlElement	public ConfigRemote remote;
 	@XmlElement	public String customCSS;
 	@XmlElement	public ConfigPrivacy privacy;
+	@XmlElement	public Boolean activateProfileLinks;  // Activate links in profile section
 }
