@@ -15,11 +15,13 @@ import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.restservices.shared.MdsQueryCriteria;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
+import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.service.search.SearchServiceImpl;
 import org.edu_sharing.service.search.Suggestion;
 import org.edu_sharing.service.search.model.SharedToMeType;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.sql.Connection;
@@ -32,6 +34,7 @@ import java.util.regex.Pattern;
 public class MetadataSearchHelper {
 	
 	static Logger logger = Logger.getLogger(MetadataSearchHelper.class);
+	private static MetadataQueryPreprocessor preprocessor = new MetadataQueryPreprocessor(MetadataReader.QUERY_SYNTAX_LUCENE);
 
 	public static Map<String, String[]> convertCriterias(List<MdsQueryCriteria> criterias){
 		Map<String,String[]> criteriasMap=new HashMap<>();
@@ -86,35 +89,44 @@ public class MetadataSearchHelper {
 						throw new InvalidParameterException("Trying to search for multiple values of a non-multivalue field "+parameter.getName());
 					}
 					else{
-						if("workspace".equals(query.getId()) && parameter.getName().equals("parent")
-								&& values[0].startsWith("-to_me_shared_files")){
-
-							try {
-								if("-to_me_shared_files_personal-".equals(values[0]) ){
-									queryString += SearchServiceImpl.getFilesSharedToMeLucene(SharedToMeType.Private);
-								}else if("-to_me_shared_files-".equals(values[0])){
-									queryString += SearchServiceImpl.getFilesSharedToMeLucene(SharedToMeType.All);
-								}else{
-									logger.error("unknown SharedToMeType:"+values[0]);
-								}
-							} catch (Exception e) {
-								logger.error(e.getMessage(),e);
-							}
-						}else if("workspace".equals(query.getId()) && parameter.getName().equals("parent")
-								&& values[0].startsWith("-my_shared_files")){
-							try {
-								queryString += SearchServiceImpl.getFilesSharedByMeLucene();
-							} catch (Exception e) {
-								logger.error(e.getMessage(),e);
-							}
-						}else {
+						String sharedFilesResult =null;
+						if("workspace".equals(query.getId()) && parameter.getName().equals("parent") && parameter.getPreprocessor().equals("node_path")) {
+							sharedFilesResult = handleSharedFilesSearch(new SearchServiceImpl(ApplicationInfoList.getHomeRepository().getAppId()), parameter, values);
+						}
+						if(sharedFilesResult == null) {
 							queryString += replaceCommonQueryVariables(getStatmentForValue(parameter, values[0]));
+						} else {
+							queryString += sharedFilesResult;
 						}
 					}
 					queryString+=")";
 				}
 				return queryString;
 			
+	}
+
+	@Nullable
+	protected static String handleSharedFilesSearch(SearchService searchService, MetadataQueryParameter parameter, String[] values) {
+		if(values[0].startsWith("-to_me_shared_files")){
+			try {
+				if("-to_me_shared_files_personal-".equals(values[0]) ){
+					return SearchServiceImpl.getFilesSharedToMeLucene(SharedToMeType.Private);
+				}else if("-to_me_shared_files-".equals(values[0])){
+					return SearchServiceImpl.getFilesSharedToMeLucene(SharedToMeType.All);
+				}else{
+					logger.error("unknown SharedToMeType:"+values[0]);
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage(),e);
+			}
+		} else if(values[0].startsWith("-my_shared_files")) {
+			try {
+				return SearchServiceImpl.getFilesSharedByMeLucene();
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -160,7 +172,7 @@ public class MetadataSearchHelper {
 
 		// invoke any preprocessors for this value
 		try {
-			value = MetadataQueryPreprocessor.run(parameter, value);
+			value = preprocessor.run(parameter, value);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException(e);

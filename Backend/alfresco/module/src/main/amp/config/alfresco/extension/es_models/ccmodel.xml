@@ -893,7 +893,7 @@
 				</property>
 				<property name="ccm:university">
 					<type>d:text</type>
-					<multiple>false</multiple>
+					<multiple>true</multiple>
 					<index enabled="true">
 	                  <atomic>true</atomic>
 	                  <stored>false</stored>

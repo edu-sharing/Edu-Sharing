@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.edu_sharing</groupId>
     <artifactId>edu_sharing-super-pom</artifactId>
-    <version>develop-SNAPSHOT</version>
+    <version>21</version>
     <relativePath/>
   </parent>
 
@@ -37,7 +34,7 @@
     <alfresco.sdk.version>4.7.0</alfresco.sdk.version>
 
     <!-- release-1 -->
-    <bom.repository-repackaged.version>${project.version}</bom.repository-repackaged.version>
+    <bom.repository-repackaged.version>9.0.0-RC1</bom.repository-repackaged.version>
 
     <java.version.range>[11,)</java.version.range>
 
@@ -51,6 +48,11 @@
     <tomcat.version>10.1.17</tomcat.version>
     <jackson.version>2.15.2</jackson.version>
     <mongodb.version>4.11.1</mongodb.version>
+    <spring.version>6.0.14</spring.version>
+    <!--
+      do not update to 6.2.2 cause it breaks openidconnect backchannel logout
+      https://github.com/spring-projects/spring-security/issues/14553
+    -->
     <spring-security.version>6.2.1</spring-security.version>
 
   </properties>
@@ -796,7 +798,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-aspects</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
@@ -893,49 +895,49 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-tx</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-aop</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-expression</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>6.0.14</version>
+        <version>${spring.version}</version>
       </dependency>
 
       <dependency>

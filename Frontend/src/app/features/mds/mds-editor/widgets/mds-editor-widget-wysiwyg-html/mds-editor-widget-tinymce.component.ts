@@ -8,7 +8,7 @@ import {
 import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
 import { TranslateService } from '@ngx-translate/core';
 import { MdsEditorInstanceService } from '../../mds-editor-instance.service';
-import { EditorComponent } from '@tinymce/tinymce-angular';
+import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { EventObj } from '@tinymce/tinymce-angular/editor/Events';
 import { PlatformLocation } from '@angular/common';
 import { MdsEditorWidgetContainerComponent } from '../mds-editor-widget-container/mds-editor-widget-container.component';
@@ -17,6 +17,15 @@ import { MdsEditorWidgetContainerComponent } from '../mds-editor-widget-containe
     selector: 'es-mds-editor-widget-checkbox',
     templateUrl: './mds-editor-widget-tinymce.component.html',
     styleUrls: ['./mds-editor-widget-tinymce.component.scss'],
+    providers: [
+        {
+            provide: TINYMCE_SCRIPT_SRC,
+            useFactory: (platformLocation: PlatformLocation) => {
+                return platformLocation.getBaseHrefFromDOM() + 'tinymce/tinymce.min.js';
+            },
+            deps: [PlatformLocation],
+        },
+    ],
 })
 export class MdsEditorWidgetTinyMCE extends MdsEditorWidgetBase implements OnInit, AfterViewInit {
     @ViewChild(EditorComponent) editorComponent: EditorComponent;
@@ -26,8 +35,7 @@ export class MdsEditorWidgetTinyMCE extends MdsEditorWidgetBase implements OnIni
     private editorConfigDefault = {
         branding: false,
         height: 200,
-        base_url: this.platformLocation.getBaseHrefFromDOM() + 'tinymce',
-        suffix: '.min',
+        apiKey: '',
         menubar: false,
         statusbar: false,
         resize: true,

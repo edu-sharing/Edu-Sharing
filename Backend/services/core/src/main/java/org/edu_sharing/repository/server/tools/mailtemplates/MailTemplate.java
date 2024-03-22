@@ -1,5 +1,6 @@
 package org.edu_sharing.repository.server.tools.mailtemplates;
 
+import jakarta.servlet.ServletContext;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthorityType;
@@ -23,7 +24,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import jakarta.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -104,7 +104,10 @@ public class MailTemplate {
 
 	public static void addContentLinks(ApplicationInfo appInfo,String nodeId, Map<String, String> target, String keyName) throws Throwable{
 		NodeService nodeService=NodeServiceFactory.getNodeService(appInfo.getAppId());
-		String mime=MimeTypesV2.getMimeType(nodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId));
+		String mime=MimeTypesV2.getMimeType(
+				nodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId),
+				nodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId)
+		);
 		if(MimeTypesV2.MIME_DIRECTORY.equals(mime)){
 			if(nodeService.hasAspect(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId,CCConstants.CCM_ASPECT_COLLECTION)){
 				target.put(keyName, URLTool.getNgComponentsUrl() + "collections/?id="+nodeId);

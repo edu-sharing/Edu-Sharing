@@ -95,7 +95,9 @@
 	</bean>
 
 	<bean id="mediacenterLicenseProvider" class="org.edu_sharing.service.mediacenter.MediacenterLicenseProviderImpl"/>
-	<bean id="ratingService" class="org.edu_sharing.service.rating.RatingServiceImpl" init-method="init" lazy-init="true"/>
+	<bean id="ratingService" class="org.edu_sharing.service.rating.RatingServiceAdapter">
+		<constructor-arg index="0" value="notused"/>
+	</bean>
 	<bean id="relationService" class="org.edu_sharing.service.relations.RelationServiceDefaultImpl"/>
 	<bean id="notificationServiceFactory" class="org.edu_sharing.service.notification.NotificationServiceFactoryImpl"/>
 	<bean id="permissionChecking" class="org.edu_sharing.service.permission.PermissionChecking"/>

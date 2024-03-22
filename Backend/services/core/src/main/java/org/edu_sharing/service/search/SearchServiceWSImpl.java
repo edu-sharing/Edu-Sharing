@@ -1,11 +1,5 @@
 package org.edu_sharing.service.search;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.repository.client.rpc.EduGroup;
@@ -17,6 +11,10 @@ import org.edu_sharing.service.search.model.SearchResult;
 import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SharedToMeType;
 import org.edu_sharing.service.search.model.SortDefinition;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SearchServiceWSImpl extends SearchServiceAdapter {
 	
@@ -72,7 +70,7 @@ public class SearchServiceWSImpl extends SearchServiceAdapter {
 	}
 
 	@Override
-	public List<NodeRef> getWorkflowReceive(String fullyAuthenticatedUser) {
+	public SearchResultNodeRef getWorkflowReceive(String fullyAuthenticatedUser, SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) {
 		return null;
 	}
 

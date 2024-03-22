@@ -9,7 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class CallSourceHelper {
-    enum CallSource {
+    public enum CallSource {
         Search,
         Render,
         Preview,

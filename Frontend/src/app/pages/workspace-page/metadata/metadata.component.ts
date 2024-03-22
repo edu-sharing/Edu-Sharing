@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfigService } from 'ngx-edu-sharing-api';
+import { ConfigService, NodeService, NodeVersion, NodeVersionEntries } from 'ngx-edu-sharing-api';
 import {
     DurationHelper,
     FormatDatePipe,
@@ -37,14 +37,22 @@ import {
     RestUsageService,
     Usage,
     UsageList,
-    Version,
 } from '../../../core-module/core.module';
 import { NodeHelperService } from '../../../services/node-helper.service';
 import { UIHelper } from '../../../core-ui-module/ui-helper';
-import { NodeService, NodeVersionEntries, NodeVersion } from 'ngx-edu-sharing-api';
+import {
+    BarController,
+    BarElement,
+    CategoryScale,
+    Chart,
+    ChartType,
+    LinearScale,
+    PointElement,
+    Tooltip,
+    Title,
+} from 'chart.js';
 
-// Charts.js
-declare var Chart: any;
+Chart.register(BarController, BarElement, CategoryScale, PointElement, Tooltip, LinearScale, Title);
 
 interface Stats {
     labels: string[];
@@ -60,6 +68,7 @@ interface Stats {
 })
 export class WorkspaceMetadataComponent implements OnInit {
     private _canvas: ElementRef<HTMLCanvasElement>;
+    private currentChart: Chart<ChartType, number[], string>;
     @ViewChild('canvas')
     get canvas(): ElementRef<HTMLCanvasElement> {
         return this._canvas;
@@ -418,9 +427,16 @@ export class WorkspaceMetadataComponent implements OnInit {
         }
         const ctx = canvas.getContext('2d');
         // FontFamily
-        Chart.defaults.global.defaultFontFamily = 'open_sansregular';
+        // Chart.defaults.global.defaultFontFamily = 'open_sansregular';
         const statsMax = Math.max(...this.stats.points);
-        const myChart = new Chart(ctx, {
+        if (!this.stats.labels?.length) {
+            return;
+        }
+        if (this.currentChart) {
+            this.currentChart.destroy();
+        }
+        console.log(this.stats);
+        this.currentChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: this.stats.labels,
@@ -433,11 +449,14 @@ export class WorkspaceMetadataComponent implements OnInit {
                 ],
             },
             options: {
-                responsive: false,
-                legend: {
-                    display: false,
+                indexAxis: 'x',
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {},
                 },
-                mode: 'index',
+                responsive: false,
                 layout: {
                     padding: {
                         left: 0,
@@ -447,21 +466,16 @@ export class WorkspaceMetadataComponent implements OnInit {
                     },
                 },
                 scales: {
-                    xAxes: [
-                        {
-                            ticks: {
-                                display: false,
-                            },
+                    x: {
+                        ticks: {
+                            display: false,
                         },
-                    ],
-                    yAxes: [
-                        {
-                            ticks: {
-                                beginAtZero: true,
-                                max: Math.max(Math.round(statsMax * 1.25), 6),
-                            },
-                        },
-                    ],
+                    },
+                    y: {
+                        type: 'linear',
+                        beginAtZero: true,
+                        max: Math.max(Math.round(statsMax * 1.25), 6),
+                    },
                 },
             },
         });

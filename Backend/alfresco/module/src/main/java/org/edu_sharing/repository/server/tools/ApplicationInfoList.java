@@ -27,13 +27,12 @@
  */
 package org.edu_sharing.repository.server.tools;
 
-import java.util.*;
-
 import org.alfresco.repo.cache.SimpleCache;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
+
+import java.util.*;
 
 
 public class ApplicationInfoList {
@@ -111,7 +110,25 @@ public class ApplicationInfoList {
 	 *
 	 * @return Map with AppId, ApplicationInfo
 	 */
+	public static Collection<String> getAppInfoIds(){
+		initAppInfoCache();
+		return Collections.unmodifiableCollection(appInfos.getKeys());
+	}
+	/**
+	 *
+	 * @return Map with AppId, ApplicationInfo
+	 */
 	public static Map<String, ApplicationInfo> getApplicationInfos(){
+		initAppInfoCache();
+		/**
+		 * @TODO refactor calls to this methode so that hashmap building is not needed
+		 */
+		HashMap<String, ApplicationInfo> result = new HashMap<>();
+		appInfos.getKeys().forEach(appId -> result.put(appId,appInfos.get(appId)));
+		return Collections.synchronizedMap(result);
+	}
+
+	private static void initAppInfoCache() {
 		if(appInfos.getKeys().size() == 0){
 			logger.debug("appInfos size is 0");
 			synchronized(appInfos) {
@@ -120,16 +137,8 @@ public class ApplicationInfoList {
 		}else{
 			logger.debug("appInfos size not 0");
 		}
-
-		/**
-		 * @TODO refactor calls to this methode so that hashmap building is not needed
-		 */
-		HashMap<String, ApplicationInfo> result = new HashMap<>();
-		appInfos.getKeys().forEach(appId -> result.put(appId,appInfos.get(appId)));
-
-		return Collections.synchronizedMap(result);
 	}
-	
+
 	/**
 	 * synchronized to prevent errors when multithreads call this static method
 	 */

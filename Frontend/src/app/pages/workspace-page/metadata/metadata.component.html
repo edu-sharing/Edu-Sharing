@@ -118,19 +118,22 @@
           </div>
           <div class="versionDate">{{ version.modifiedAt | formatDate }}</div>
           <div class="versionComment">{{ version | versionComment }}</div>
-          <button mat-button (click)="displayVersion(version)">
-            <i [esIcon]="'remove_red_eye'"></i>
-            {{ 'WORKSPACE.METADATA.VIEW_VERSION' | translate }}
-          </button>
-          <button
-            *ngIf="!isCurrentVersion(version)"
-            mat-button
-            [class.disabled]="!canRevert()"
-            (click)="restoreVersion(version)"
-          >
-            <i [esIcon]="'restore'"></i>
-            {{ 'WORKSPACE.METADATA.RESTORE' | translate }}
-          </button>
+          <div class="button-actions">
+            <button mat-flat-button color="primary" (click)="displayVersion(version)">
+              <i [esIcon]="'remove_red_eye'"></i>
+              {{ 'WORKSPACE.METADATA.VIEW_VERSION' | translate }}
+            </button>
+            <button
+              *ngIf="!isCurrentVersion(version)"
+              mat-flat-button
+              color="warn"
+              [class.disabled]="!canRevert()"
+              (click)="restoreVersion(version)"
+            >
+              <i [esIcon]="'restore'"></i>
+              {{ 'WORKSPACE.METADATA.RESTORE' | translate }}
+            </button>
+          </div>
         </div>
       </div>
     </ng-template>

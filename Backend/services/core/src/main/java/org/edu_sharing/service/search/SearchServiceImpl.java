@@ -36,17 +36,12 @@ import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.LogTime;
 import org.edu_sharing.restservices.shared.MdsQueryCriteria;
-
 import org.edu_sharing.restservices.shared.NodeSearch;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.permission.PermissionServiceFactory;
-import org.edu_sharing.service.search.model.SearchResult;
-import org.edu_sharing.service.search.model.SearchToken;
-import org.edu_sharing.service.search.model.SearchVCard;
-import org.edu_sharing.service.search.model.SharedToMeType;
-import org.edu_sharing.service.search.model.SortDefinition;
+import org.edu_sharing.service.search.model.*;
 import org.edu_sharing.service.toolpermission.ToolPermissionService;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.edu_sharing.service.util.AlfrescoDaoHelper;
@@ -85,65 +80,13 @@ public class SearchServiceImpl implements SearchService {
 
 	@Override
 	public SearchResultNodeRef getFilesSharedByMe(SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) throws Exception {
-		String username = AuthenticationUtil.getFullyAuthenticatedUser();
-
-		SearchToken token=new SearchToken();
-		token.setFrom(skipCount);
-		token.setMaxResult(maxItems);
-		token.setSortDefinition(sortDefinition);
-		token.setContentType(contentType);
-		token.setLuceneString(SearchServiceImpl.getFilesSharedByMeLucene());
-		return search(token);
+		throw new NotImplementedException("Method not supported for solr");
 	}
 
 
 	@Override
 	public SearchResultNodeRef getFilesSharedToMe(SharedToMeType type, SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) throws Exception {
-
-		SearchToken token=new SearchToken();
-		token.setFrom(skipCount);
-		token.setMaxResult(maxItems);
-		token.setSortDefinition(sortDefinition);
-		token.setContentType(contentType);
-
-		token.setLuceneString(SearchServiceImpl.getFilesSharedToMeLucene(type));
-		return search(token);
-
-		// Done via solr ccm:ph_invited now
-		/*
-		return LogTime.log("Validating node permissions ("+result.size()+")",()-> AuthenticationUtil.runAsSystem(()->{
-				List<NodeRef> refs = new ArrayList<>(result.size());
-				for (NodeRef node : result) {
-					if (refs.contains(node))
-						continue;
-					if (node.getId().equals(homeFolder))
-						continue;
-					try {
-						// this is expensive: it also fetches all user + group props we do not need here
-						// takes almost 15x of the time instead of direct service call
-						//ACE[] permissions = baseClient.getPermissions(node.getId()).getAces();
-						Set<AccessPermission> permSet = serviceRegistry.getPermissionService().getAllSetPermissions(node);
-						if (permSet != null && permSet.size() > 0) {
-							boolean add = false;
-							for (AccessPermission perm : permSet) {
-								if (!perm.isInherited() && (perm.getAuthority().equals(username) || memberships.contains(perm.getAuthority()))) {
-									add = true;
-									break;
-								}
-							}
-							if (add)
-								refs.add(node);
-						}
-					}catch(Throwable t) {
-						logger.info("Error fetching permissions for node "+node.getId()+". It's may deleted or the user has no more permissions");
-						t.printStackTrace();
-					}
-
-				}
-				return refs;
-			}
-		));
-		*/
+		throw new NotImplementedException("Method not supported for solr");
 	}
 
 	public static String getFilesSharedToMeLucene(SharedToMeType type) throws Exception{
@@ -861,28 +804,8 @@ public class SearchServiceImpl implements SearchService {
 
 
 	@Override
-	public List<NodeRef> getWorkflowReceive(String user) {
-		SearchParameters parameters = new SearchParameters();
-		parameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-		parameters.setLanguage(org.alfresco.service.cmr.search.SearchService.LANGUAGE_LUCENE);
-		parameters.setMaxItems(Integer.MAX_VALUE);
-		parameters.addAllAttribute(CCConstants.CCM_PROP_AUTHORITYCONTAINER_EDUHOMEDIR);
-
-		
-		
-		Set<String> authoritiesForUser = serviceRegistry.getAuthorityService().getAuthorities();
-		// Do not display io_references + published copies
-		String query = "(TYPE:\"" + CCConstants.CCM_TYPE_IO + "\") AND (ISUNSET:\"" + CCConstants.CCM_PROP_IO_PUBLISHED_ORIGINAL + "\" OR ISNULL:\"" + CCConstants.CCM_PROP_IO_PUBLISHED_ORIGINAL + "\") AND NOT ASPECT:\"" + CCConstants.CCM_ASPECT_COLLECTION_IO_REFERENCE + "\" AND (@ccm\\:wf_receiver:\""+QueryParser.escape(user)+"\"";
-		for(String authority : authoritiesForUser) {
-			query+=" OR @ccm\\:wf_receiver:\"" + authority + "\"";
-		}
-		query+=")";
-		
-		parameters.setQuery(query);
-		
-
-		ResultSet resultSet = searchService.query(parameters);
-		return resultSet.getNodeRefs();
+	public SearchResultNodeRef getWorkflowReceive(String user, SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) throws Exception {
+		throw new NotImplementedException("Method not supported for solr");
 	}
 
 	@Override

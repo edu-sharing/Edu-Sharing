@@ -9,6 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
@@ -41,10 +45,6 @@ import org.edu_sharing.service.share.ShareService;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.JSONObject;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -879,7 +879,7 @@ public class NodeApi  {
 				response = searchResultToResponse(NodeDao.getFilesSharedByMe(repoDao, filter, propFilter, sortDefinition, skipCount, maxItems));
 			}
 	    	else if("-workflow_receive-".equals(node)){
-	    		children = NodeDao.getWorkflowReceive(repoDao,filter,sortDefinition);
+				response = searchResultToResponse(NodeDao.getWorkflowReceive(repoDao,filter,sortDefinition, skipCount, maxItems));
 	    	}
 	    	else if("-to_me_shared_files-".equals(node)){
 				response = searchResultToResponse(NodeDao.getFilesSharedToMe(repoDao, SharedToMeType.All, filter, propFilter,sortDefinition,skipCount,maxItems));

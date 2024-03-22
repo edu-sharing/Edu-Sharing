@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ItemsCap } from './items-cap';
-import { Node, GenericAuthority, Pagination } from 'ngx-edu-sharing-api';
+import { GenericAuthority, Node, Pagination } from 'ngx-edu-sharing-api';
 import { Helper } from '../util/helper';
 
 export type LoadingState =
@@ -130,7 +130,9 @@ export class NodeDataSource<T extends Node | GenericAuthority> extends DataSourc
     }
 
     getTotal() {
-        return this.pagination$.value?.total ?? this.dataStream.value?.length ?? 0;
+        return this.pagination$.value?.total
+            ? Math.max(this.pagination$.value?.total, this.getData()?.length || 0)
+            : this.dataStream.value?.length ?? 0;
     }
 
     isFullyLoaded() {

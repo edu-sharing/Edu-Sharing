@@ -9,7 +9,7 @@ public class MetadataGroup implements Serializable {
 		angular
 	};
 	private String id;
-	private Rendering rendering = Rendering.legacy;
+	private Rendering rendering = Rendering.angular;
 	public String getId() {
 		return id;
 	}

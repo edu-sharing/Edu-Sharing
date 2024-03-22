@@ -1,16 +1,16 @@
 package org.edu_sharing.service.mime;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.edu_sharing.alfresco.action.RessourceInfoExecuter;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.Theme;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.URLTool;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MimeTypesV2 {
 
@@ -101,7 +101,13 @@ public class MimeTypesV2 {
 		}
 		
 	}
-	public static boolean isDirectory(Map<String,Object> properties){
+	public static boolean isDirectory(Map<String,Object> properties, String nodeType){
+		if(Arrays.asList(CCConstants.CCM_TYPE_MAP, CCConstants.CM_TYPE_FOLDER, CCConstants.SYS_STORE_ROOT).contains(CCConstants.getValidGlobalName(nodeType))) {
+			return true;
+		}
+
+		// @deprecated
+		// old behaviour for McAlfrescoApiClient
 		String type=(String) properties.get(CCConstants.NODETYPE);
 		if(type == null) return false;
 		return type.equals(CCConstants.CCM_TYPE_MAP) 
@@ -196,7 +202,7 @@ public class MimeTypesV2 {
 	public static String getNodeType(String nodeType,Map<String,Object> properties,List<String> aspects){
 		if(isCollection(aspects, properties))
 			return "collection";
-		if(isDirectory(properties)) {
+		if(isDirectory(properties, nodeType)) {
 			if(aspects.contains(CCConstants.CCM_ASPECT_MAP_REF)){
 				return "folder-link";
 			}
@@ -226,7 +232,7 @@ public class MimeTypesV2 {
 			//return "link";
 			fallback="link";
 		}
-		return getTypeFromMimetype(getMimeType(properties),properties,fallback);
+		return getTypeFromMimetype(getMimeType(properties, nodeType),properties,fallback);
 	}
 	public static String getTypeFromMimetype(String mimetype) {
 		return getTypeFromMimetype(mimetype,null,"file");
@@ -436,8 +442,8 @@ public static HashMap<String, String> getExtensionMimeMap() {
 	 * If it won't find an alfresco mime type, it will guess it by the file ending
 	 * @return
 	 */
-	public static String getMimeType(Map<String, Object> properties) {
-		if(isDirectory(properties))
+	public static String getMimeType(Map<String, Object> properties, String nodeType) {
+		if(isDirectory(properties, nodeType))
 			return MIME_DIRECTORY;
 		String mimeType=(String) properties.get(CCConstants.LOM_PROP_TECHNICAL_FORMAT);
 		

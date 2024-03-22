@@ -1,21 +1,16 @@
 package org.edu_sharing.repository.server.connector;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.service.connector.Connector;
+import org.edu_sharing.alfresco.service.connector.ConnectorFileType;
+import org.edu_sharing.alfresco.service.connector.ConnectorService;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
@@ -23,13 +18,9 @@ import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.security.Encryption;
-
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authentication.oauth2.TokenService;
 import org.edu_sharing.service.authentication.oauth2.TokenService.Token;
-import org.edu_sharing.alfresco.service.connector.Connector;
-import org.edu_sharing.alfresco.service.connector.ConnectorFileType;
-import org.edu_sharing.alfresco.service.connector.ConnectorService;
 import org.edu_sharing.service.connector.ConnectorServiceFactory;
 import org.edu_sharing.service.editlock.EditLockService;
 import org.edu_sharing.service.editlock.EditLockServiceFactory;
@@ -43,6 +34,13 @@ import org.edu_sharing.service.permission.PermissionServiceFactory;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationContext;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class ConnectorServlet extends HttpServlet  {
@@ -159,7 +157,7 @@ public class ConnectorServlet extends HttpServlet  {
 				jsonObject.put("endpoint",connector.getUrl());
 				jsonObject.put("tool", connector.getConnectorId()!=null ? connector.getConnectorId() : connector.getId());
 				jsonObject.put("defaultCreateElement", connector.getDefaultCreateElement());
-				String mimetype = MimeTypesV2.getMimeType(properties);
+				String mimetype = MimeTypesV2.getMimeType(properties, null);
 				jsonObject.put("mimetype",mimetype);
 				for(ConnectorFileType filetype : connector.getFiletypes()){
 					if(filetype.getMimetype().equals(mimetype))

@@ -1,22 +1,21 @@
 package org.edu_sharing.service.toolpermission;
 
-import java.util.*;
-
 import jakarta.servlet.http.HttpSession;
-
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionBaseService;
-import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.connector.Connector;
 import org.edu_sharing.alfresco.service.connector.ConnectorList;
-import org.edu_sharing.restservices.RestConstants;
+import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionBaseService;
+import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.AuthenticationToolAPI;
+import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.connector.ConnectorServiceFactory;
+
+import java.util.*;
 
 public class ToolPermissionService extends ToolPermissionBaseService {
 	private Logger logger = Logger.getLogger(ToolPermissionService.class);
@@ -53,6 +52,13 @@ public class ToolPermissionService extends ToolPermissionBaseService {
 		else
 			scope="_"+scope;
 		return hasToolPermission(CCConstants.CCM_VALUE_TOOLPERMISSION_CONNECTOR_PREFIX + connectorId+scope);
+	}
+
+	public boolean hasToolPermissionForRepository(String repositoryId){
+		if(!ApplicationInfoList.getAppInfoIds().contains(repositoryId)) {
+			throw new IllegalArgumentException("Repository with id " + repositoryId + " is unknown");
+		}
+		return hasToolPermission(CCConstants.CCM_VALUE_TOOLPERMISSION_REPOSITORY_PREFIX + repositoryId);
 	}
 
 	public void init(){

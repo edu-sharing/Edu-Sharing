@@ -1,24 +1,19 @@
 
 package org.edu_sharing.service.search;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.restservices.shared.MdsQueryCriteria;
 import org.edu_sharing.service.InsufficientPermissionException;
-import org.edu_sharing.service.search.model.SearchResult;
-import org.edu_sharing.service.search.model.SearchToken;
-import org.edu_sharing.service.search.model.SharedToMeType;
-import org.edu_sharing.service.search.model.SearchVCard;
-import org.edu_sharing.service.search.model.SortDefinition;
+import org.edu_sharing.service.search.model.*;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface SearchService {
 	public static enum ContentType{
@@ -53,7 +48,7 @@ public interface SearchService {
 
 	SearchResultNodeRef getFilesSharedToMe(SharedToMeType type, SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) throws Exception;
 	
-	List<NodeRef> getWorkflowReceive(String fullyAuthenticatedUser);
+	SearchResultNodeRef getWorkflowReceive(String fullyAuthenticatedUser, SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) throws Exception;
 
 	SearchResult<String> searchGroupMembers(String groupName, String pattern,
 			String authorityType, int skipCount, int maxValues, SortDefinition sort);

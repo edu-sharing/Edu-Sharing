@@ -39,7 +39,7 @@
     </docker.edu_sharing.community.common.alfresco.search.service.name>
 
     <docker.edu_sharing.community.common.alfresco.search.service.tag>
-      2.0.8.2-3
+      2.0.8.2-5
     </docker.edu_sharing.community.common.alfresco.search.service.tag>
 
     <docker.edu_sharing.community.common.postgresql.name>
@@ -103,7 +103,7 @@
     </docker.from.openjdk.17.liberica.debian>
 
     <docker.from.edu_sharing.community.common.alfresco.repository>
-      ${docker.registry}/${docker.common}/edu_sharing-community-common-docker-alfresco-repository:23.2.0-A9_2
+      ${docker.registry}/${docker.common}/edu_sharing-community-common-docker-alfresco-repository:23.2.0-A9_3
     </docker.from.edu_sharing.community.common.alfresco.repository>
 
     <helm.kube.version>&gt;= 1.20.0</helm.kube.version>

@@ -35,8 +35,16 @@ import { NodeHelperService } from '../../../services/node-helper.service';
 import { Toast } from '../../../services/toast';
 import { AuthorityNamePipe } from '../../../shared/pipes/authority-name.pipe';
 
-// Charts.js
-declare var Chart: any;
+Chart.register(
+    BarController,
+    BarElement,
+    CategoryScale,
+    PointElement,
+    Tooltip,
+    Legend,
+    LinearScale,
+    Title,
+);
 
 type GroupTemplate = {
     name: string;
@@ -406,7 +414,7 @@ export class AdminStatisticsComponent implements OnInit {
                 datasets: [
                     {
                         label: this.translate.instant('ADMIN.STATISTICS.VIEWS'),
-                        yAxisID: 'y-axis-view',
+                        // yAxisID: 'y-axis-view',
                         backgroundColor: 'rgb(30,52,192)',
                         data: dataNode.map((stat) =>
                             stat.counts.VIEW_MATERIAL ? stat.counts.VIEW_MATERIAL : 0,
@@ -414,7 +422,7 @@ export class AdminStatisticsComponent implements OnInit {
                     },
                     {
                         label: this.translate.instant('ADMIN.STATISTICS.VIEWS_EMBEDDED'),
-                        yAxisID: 'y-axis-view-collection',
+                        // yAxisID: 'y-axis-view-collection',
                         backgroundColor: 'rgb(117,48,192)',
                         data: dataNode.map((stat) =>
                             stat.counts.VIEW_MATERIAL_EMBEDDED
@@ -424,7 +432,7 @@ export class AdminStatisticsComponent implements OnInit {
                     },
                     {
                         label: this.translate.instant('ADMIN.STATISTICS.VIEWS_COLLECTION'),
-                        yAxisID: 'y-axis-view-embedded',
+                        // yAxisID: 'y-axis-view-embedded',
                         backgroundColor: 'rgb(55,166,154)',
                         data: dataNode.map((stat) =>
                             stat.counts.VIEW_COLLECTION ? stat.counts.VIEW_COLLECTION : 0,
@@ -432,7 +440,7 @@ export class AdminStatisticsComponent implements OnInit {
                     },
                     {
                         label: this.translate.instant('ADMIN.STATISTICS.OPEN_EXTERNAL_LINK'),
-                        yAxisID: 'y-axis-view-embedded',
+                        // yAxisID: 'y-axis-view-embedded',
                         backgroundColor: 'rgb(197,96,73)',
                         data: dataNode.map((stat) =>
                             stat.counts.OPEN_EXTERNAL_LINK ? stat.counts.OPEN_EXTERNAL_LINK : 0,
@@ -440,7 +448,7 @@ export class AdminStatisticsComponent implements OnInit {
                     },
                     {
                         label: this.translate.instant('ADMIN.STATISTICS.DOWNLOADS'),
-                        yAxisID: 'y-axis-download',
+                        // yAxisID: 'y-axis-download',
                         backgroundColor: 'rgb(40,146,192)',
                         data: dataNode.map((stat) =>
                             stat.counts.DOWNLOAD_MATERIAL ? stat.counts.DOWNLOAD_MATERIAL : 0,
@@ -448,7 +456,7 @@ export class AdminStatisticsComponent implements OnInit {
                     },
                     {
                         label: this.translate.instant('ADMIN.STATISTICS.VIEWS_PLAY_MEDIA'),
-                        yAxisID: 'y-axis-download',
+                        // yAxisID: 'y-axis-download',
                         backgroundColor: 'rgb(192,173,40)',
                         data: dataNode.map((stat) =>
                             stat.counts.VIEW_MATERIAL_PLAY_MEDIA
@@ -464,83 +472,59 @@ export class AdminStatisticsComponent implements OnInit {
                 datasets: [],
             };
         }
-        const axes = [
-            {
+        /*const axes: {[key in string]: Partial<ScaleOptionsByType<keyof CartesianScaleTypeRegistry>>} = {
+            'y-axis-view': {
                 type: 'linear',
                 display: true,
                 position: 'left',
-                id: 'y-axis-view',
-                ticks: {
-                    beginAtZero: true,
-                    max,
-                    min: 0,
-                },
             },
-            {
+            'y-axis-view-embedded': {
                 type: 'linear',
                 display: false,
-                id: 'y-axis-view-embedded',
-                ticks: {
-                    beginAtZero: true,
-                    max,
-                    min: 0,
-                },
             },
-            {
+            'y-axis-view-collection': {
                 type: 'linear',
                 display: false,
-                id: 'y-axis-view-collection',
-                ticks: {
-                    beginAtZero: true,
-                    max,
-                    min: 0,
-                },
             },
-            {
+            'y-axis-download': {
                 type: 'linear',
                 display: false,
-                id: 'y-axis-download',
-                ticks: {
-                    beginAtZero: true,
-                    max,
-                    min: 0,
-                },
             },
-        ];
+        };*/
         if (dataUser) {
             chartGroupedData.datasets.push({
                 label: this.translate.instant('ADMIN.STATISTICS.USER_LOGINS'),
-                yAxisID: 'y-axis-user',
+                // yAxisID: 'y-axis-user',
                 backgroundColor: 'rgb(22,192,73)',
                 data: dataUser.map((stat) =>
                     stat.counts.LOGIN_USER_SESSION ? stat.counts.LOGIN_USER_SESSION : 0,
                 ),
             });
-            axes.push({
+            /*axes['y-axis-user'] = {
                 type: 'linear',
                 display: false,
-                id: 'y-axis-user',
-                ticks: {
-                    beginAtZero: true,
-                    max,
-                    min: 0,
-                },
-            });
+            };*/
         }
 
-        Chart.defaults.global.defaultFontFamily = 'inherit';
+        // Chart.defaults.global.defaultFontFamily = 'inherit';
         return new Chart(ctx, {
             type: 'bar',
             data: chartGroupedData,
             options: {
                 responsive: true,
                 aspectRatio: 3,
-                legend: {
-                    display: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                    },
+                    tooltip: {},
                 },
-                mode: 'index',
                 scales: {
-                    yAxes: axes,
+                    y: {
+                        type: 'linear',
+                        max,
+                    },
+                    // ...axes
                 },
             },
         });

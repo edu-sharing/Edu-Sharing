@@ -48,7 +48,9 @@ public class ConfigServiceFactory {
 		return getCurrentDomain(Context.getCurrentInstance().getRequest());
 	}
 	public static String getCurrentDomain(ServletRequest req) {
-		return new RequestHelper(req).getServerName();
+		String domain = new RequestHelper(req).getServerName();
+		logger.debug("current domain:" + domain);
+		return domain;
 	}
 
 	public static List<KeyValuePair> getLanguageData(List<Language> languages,String language) {

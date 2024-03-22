@@ -1,17 +1,8 @@
 package org.edu_sharing.metadataset.v2.tools;
 
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
-import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
-import co.elastic.clients.elasticsearch._types.aggregations.AggregationVariant;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.json.JsonpUtils;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.edu_sharing.metadataset.v2.*;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
@@ -55,6 +46,7 @@ class MetadataElasticSearchHelperTest {
         query.setBasequery(new HashMap<>() {{
             put(null, basequery);
         }});
+        query.setId("ngsearch");
         query.setJoin("AND");
         query.setSyntax(MetadataReader.QUERY_SYNTAX_DSL);
         queries = new MetadataQueries();

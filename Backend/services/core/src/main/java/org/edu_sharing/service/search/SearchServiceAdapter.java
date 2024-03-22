@@ -1,16 +1,11 @@
 package org.edu_sharing.service.search;
 
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.service.InsufficientPermissionException;
-import org.edu_sharing.service.search.model.SearchResult;
-import org.edu_sharing.service.search.model.SearchToken;
-import org.edu_sharing.service.search.model.SearchVCard;
-import org.edu_sharing.service.search.model.SharedToMeType;
-import org.edu_sharing.service.search.model.SortDefinition;
+import org.edu_sharing.service.search.model.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -63,7 +58,7 @@ public class SearchServiceAdapter implements SearchService {
 	}
 
 	@Override
-	public List<NodeRef> getWorkflowReceive(String fullyAuthenticatedUser) {
+	public SearchResultNodeRef getWorkflowReceive(String fullyAuthenticatedUser, SortDefinition sortDefinition, ContentType contentType, int skipCount, int maxItems) {
 		return null;
 	}
 

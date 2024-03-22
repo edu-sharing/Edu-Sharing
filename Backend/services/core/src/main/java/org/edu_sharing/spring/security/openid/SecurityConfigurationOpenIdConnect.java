@@ -10,6 +10,7 @@ import org.edu_sharing.repository.client.tools.UrlTool;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.edu_sharing.spring.security.basic.EduAuthSuccsessHandler;
+import org.edu_sharing.spring.security.basic.EduWebSecurityCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
@@ -35,11 +37,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.lang.reflect.Field;
 
 @Profile("openidEnabled")
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity()
 @Configuration
 public class SecurityConfigurationOpenIdConnect {
 
     Config config = LightbendConfigLoader.get();
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return EduWebSecurityCustomizer.webSecurityCustomizer();
+    }
 
     @Bean
     SecurityFilterChain app(HttpSecurity http) throws Exception {
@@ -119,7 +126,7 @@ public class SecurityConfigurationOpenIdConnect {
                         String idpRedirectUrl = "";
                         String successTarget = "/shibboleth";
                         try {
-                            successTarget = ConfigServiceFactory.getCurrentConfig().getValue("logout.next", successTarget);
+                            successTarget = ConfigServiceFactory.getCurrentConfig(request).getValue("logout.next", successTarget);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }

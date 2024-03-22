@@ -84,7 +84,7 @@
       <id rel="graphql">lom.general.keyword</id>
       <type>multivalueSuggestBadges</type>
       <caption>lom_prop_general_keyword</caption>
-			<placeholder>lom_prop_general_keyword_placeholder_search</placeholder>
+      <placeholder>lom_prop_general_keyword_placeholder_search</placeholder>
       <template>search</template>
     </widget>
     <widget>
@@ -570,7 +570,7 @@
               		<div class="row">
 	              		<div class="col s6"><ccm:tool_category></div>
 	              		<div class="col s6"><ccm:tool_producer></div>
-              		</div>             
+              		</div>
 				]]></html>
     </template>
     <template>
@@ -582,7 +582,7 @@
 				<div class="row">
 					<div class="col s6"><ccm:tool_instance_key></div>
 					<div class="col s6"><ccm:tool_instance_secret></div>
-				</div>				
+				</div>
 				]]></html>
     </template>
     <template>
@@ -1264,7 +1264,71 @@
       }}
     </basequery>
     <allowSearchWithoutCriteria>true</allowSearchWithoutCriteria>
-
+    <query join="AND" id="sharedToMe">
+      <basequery>
+        {"bool":{
+        "should":[
+        {"match":{"type":"ccm:io"}},
+        {"match":{"type":"ccm:map"}}
+        ],
+        "minimum_should_match": 1,
+        "must_not":[
+        {"match":{"aspects":"ccm:collection_io_reference"}},
+        {"match":{"aspects":"ccm:collection"}}
+        ]
+        }}
+      </basequery>
+    </query>
+    <query join="AND" id="sharedByMe">
+      <basequery>{"bool":{
+        "should":[
+        {"match":{"type":"ccm:io"}},
+        {"match":{"type":"ccm:map"}}
+        ],
+        "minimum_should_match": 1,
+        "must_not":[
+        {"match":{"aspects":"ccm:collection_io_reference"}},
+        {"match":{"aspects":"ccm:collection"}}
+        ]
+        }}
+      </basequery>
+    </query>
+    <query join="AND" id="workflowReceive">
+      <basequery/>
+    </query>
+    <query join="AND" id="workspace">
+      <property name="ngsearchword">
+        <statement>
+          {"bool": {
+          "must_not": [
+          {"match":{"type":"ccm:notify"}},
+          {"match":{"aspects":"ccm:collection_io_reference"}}
+          ],
+          "should":[
+          {"wildcard":{"nodeRef.id": {"value": "${value}", "case_insensitive": true}}},
+          {"wildcard":{"content.fulltext": {"value": "${value}", "case_insensitive": true}}},
+          {"wildcard":{"properties.cm:name.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.cclom:title.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.cclom:general_description.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.cclom:general_keyword.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.ccm:learninggoal.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.ccm:guidanceteachers.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.ccm:guidancestudents.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"i18n.de_DE.ccm:educationallearningresourcetype.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"i18n.de_DE.ccm:educationalcontext.keyword": {"value": "*${value}*", "case_insensitive": true}}}
+          ],
+          "minimum_should_match": 1
+          }}
+        </statement>
+        <multiple>true</multiple>
+        <multiplejoin>AND</multiplejoin>
+      </property>
+      <property name="parent">
+        <statement>{"wildcard":{"fullpath":"${valueRaw}*"}}</statement>
+        <preprocessor>node_path</preprocessor>
+        <mandatory>false</mandatory>
+      </property>
+    </query>
     <query join="AND" id="collections">
       <basequery propertyNull="ngsearchword">
         {"bool":{

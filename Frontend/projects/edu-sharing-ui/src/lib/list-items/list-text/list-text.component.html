@@ -72,8 +72,13 @@
     *ngSwitchCase="'ccm:wf_status'"
     [matTooltip]="provideLabel ? (getI18n(item) | translate) : null"
   >
-    <span *ngIf="provideLabel" class="cdk-visually-hidden">{{ getI18n(item) | translate }}:</span>
-    {{ 'WORKFLOW.' + getWorkflowStatus().id | translate }}
+    <es-list-node-workflow
+      [item]="item"
+      [node]="node"
+      [provideLabel]="false"
+    ></es-list-node-workflow>
+    <!--<span *ngIf="provideLabel" class="cdk-visually-hidden">{{ getI18n(item) | translate }}:</span>
+    {{ 'WORKFLOW.' + getWorkflowStatus().id | translate }}-->
   </span>
   <span
     *ngSwitchCase="'cm:creator'"

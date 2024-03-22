@@ -106,8 +106,11 @@ multistage:
 #            application:
 #              common: ""
 #    - name: green
-#      config: 
-#        common: ""
+#      spec:
+#        config:
+#          override:
+#            application:
+#              common: ""
 
 ########################################################################################################################
 

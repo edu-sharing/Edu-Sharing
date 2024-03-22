@@ -1,150 +1,166 @@
 <metadataset id="default" label="default" hidden="false">
-		<name>Sample MDS</name>
-		<i18n>mds</i18n>
-		<inherit>mds_special_inherit</inherit>
-		<create>
-			<onlyMetadata>true</onlyMetadata>
-		</create>
-		<widgets>
-			<widget>
-				<id>ccm:classification_purpose</id>
-				<type>defaultvalue</type>
-				<defaultvalue>TP exist</defaultvalue>
-				<condition type="TOOLPERMISSION">TOOLPERMISSION_CONFIDENTAL</condition>
-			</widget>
-			<widget>
-				<id>ccm:classification_purpose</id>
-				<caption>Klassifikation (TOOLPERMISSION_CONFIDENTIAL existiert nicht)</caption>
-				<placeholder>z.B. Hochschule</placeholder>
-				<type>singleoption</type>
-				<valuespaceClient>true</valuespaceClient>
-				<extended>false</extended>
-				<defaultvalue>${test}</defaultvalue>
-				<condition type="TOOLPERMISSION" negate="true">TOOLPERMISSION_CONFIDENTAL</condition>
-				<values>
-					<value cap="Text">text</value>
-					<value cap="Video">video</value>
-					<value cap="Audio">audio</value>
-				</values>
-			</widget>
-			<widget>
-				<id>ccm:taxonid</id>
-				<caption>Bildungsbereich/-sektor</caption>
-				<placeholder>z.B. Physik</placeholder>
-				<type>multivalueTree</type>
-				<values>
-					<value cap="Mathematik">mathematics</value>
-					<value cap="Physik">physics</value>
-				</values>
-			</widget>
-			<widget>
-				<id>ccm:educationaltypicalagerange</id>
-				<caption>Altersgruppe</caption>
-				<unit>J.</unit>
-				<min>0</min>
-				<max>99</max>
-				<type>range</type>
-			</widget>
-			<widget>
-				<id>ccm:duration</id>
-				<caption>Dauer</caption>
-				<unit>Min</unit>
-				<min>0</min>
-				<max>300</max>
-				<step>10</step>
-				<type>range</type>
-			</widget>
-		</widgets>
-		<templates>
-			<template>
-				<id>search</id>
-				<html><![CDATA[
+	<name>Sample MDS</name>
+	<i18n>mds</i18n>
+	<inherit>mds_special_inherit</inherit>
+	<create>
+		<onlyMetadata>false</onlyMetadata>
+	</create>
+	<widgets>
+		<widget>
+			<id>cclom:general_description</id>
+			<id rel="graphql">lom.general.description</id>
+			<type>tinyMCE</type>
+			<configuration><![CDATA[
+					{
+						"toolbar" : "h1 h2 h3 | undo redo"
+					}
+				]]>
+			</configuration>
+			<caption>lom_prop_educational_description</caption>
+			<placeholder>lom_prop_educational_description_placeholder</placeholder>
+			<hideIfEmpty>true</hideIfEmpty>
+		</widget>
+		<widget>
+			<id>ccm:classification_purpose</id>
+			<type>defaultvalue</type>
+			<defaultvalue>TP exist</defaultvalue>
+			<condition type="TOOLPERMISSION">TOOLPERMISSION_CONFIDENTAL</condition>
+		</widget>
+		<widget>
+			<id>ccm:classification_purpose</id>
+			<caption>Klassifikation (TOOLPERMISSION_CONFIDENTIAL existiert nicht)</caption>
+			<placeholder>z.B. Hochschule</placeholder>
+			<type>singleoption</type>
+			<valuespaceClient>true</valuespaceClient>
+			<extended>false</extended>
+			<defaultvalue>${test}</defaultvalue>
+			<condition type="TOOLPERMISSION" negate="true">TOOLPERMISSION_CONFIDENTAL</condition>
+			<values>
+				<value cap="Text">text</value>
+				<value cap="Video">video</value>
+				<value cap="Audio">audio</value>
+			</values>
+		</widget>
+		<widget>
+			<id>ccm:taxonid</id>
+			<caption>Bildungsbereich/-sektor</caption>
+			<placeholder>z.B. Physik</placeholder>
+			<type>multivalueTree</type>
+			<values>
+				<value cap="Mathematik">mathematics</value>
+				<value cap="Physik">physics</value>
+			</values>
+		</widget>
+		<widget>
+			<id>ccm:educationaltypicalagerange</id>
+			<caption>Altersgruppe</caption>
+			<unit>J.</unit>
+			<min>0</min>
+			<max>99</max>
+			<type>range</type>
+		</widget>
+		<widget>
+			<id>ccm:duration</id>
+			<caption>Dauer</caption>
+			<unit>Min</unit>
+			<min>0</min>
+			<max>300</max>
+			<step>10</step>
+			<type>range</type>
+		</widget>
+	</widgets>
+	<templates>
+		<template>
+			<id>search</id>
+			<html><![CDATA[
               <cclom:general_keyword>
               <ccm:classification_purpose extended="false">
               <ccm:taxonid extended="true">
               <ccm:educationaltypicalagerange extended="true">
 				]]></html>
-			</template>
-			<template>
-				<id>node_general</id>
-				<caption>dialog_upload_tab_basic</caption>
-				<icon>description</icon>
-				<html><![CDATA[
+		</template>
+		<template>
+			<id>node_general</id>
+			<caption>dialog_upload_tab_basic</caption>
+			<icon>description</icon>
+			<html><![CDATA[
 				<ccm:wwwurl>
               <cclom:title>
 			  <preview>
               <cclom:general_description>
 				]]></html>
-			</template>
-			<template>
-				<id>node_extended</id>
-				<caption>Erweitert</caption>
-				<icon>help_outline</icon>
-				<html><![CDATA[
+		</template>
+		<template>
+			<id>node_extended</id>
+			<caption>Erweitert</caption>
+			<icon>help_outline</icon>
+			<html><![CDATA[
 				Overriden:
               <ccm:group_test>
               <ccm:taxonid>
               <ccm:educationaltypicalagerange extended="true">
 				]]></html>
-			</template>
-		</templates>
-		<groups>
-			<group>
-				<id>ngsearch</id>
-				<views>
-					<view>search</view>
-					<view>search_suggestions</view>
-				</views>
-			</group>
-			<group>
-				<id>io</id>
-				<views>
-					<view>node_general</view>
-					<view>node_extended</view>
-				</views>
-			</group>
-		</groups>
-		<lists>
-			<list>
-				<id>search</id>
-				<columns>
-					<column>cm:title</column>
-					<column>cm:creator</column>
-					<column>ccm:commonlicense_key</column>
-					<column>ccm:replicationsource</column>				
-				</columns>
-			</list>
-		</lists>
-		<queries>
-			<basequery>-TYPE:"{http://www.campuscontent.de/model/1.0}toolpermission" AND NOT @cm\:name:"._*" AND NOT @cm\:name:".DS_Store*"</basequery>
-			
-			<query join="AND"  id="ngsearch">
-				<property name="ngsearchword">
-					<statement>(@sys\:node-uuid:"${value}" OR TEXT:"${value}" OR @cm\:name:"*${value}*" OR @cclom\:title:"*${value}*" OR @cclom\:general_description:"*${value}*" OR @cclom\:general_keyword:"*${value}*" OR @ccm\:taxonentry:"*${value}*" OR @ccm\:classification_keyword:"*${value}*" OR @ccm\:educationallearningresourcetype:"*${value}*" OR @ccm\:educationalcontext:"*${value}*" OR @ccm\:learninggoal:"*${value}*" OR @ccm\:guidanceteachers:"*${value}*" OR @ccm\:guidancestudents:"*${value}*")</statement>
-					<multiple>true</multiple>
-					<multiplejoin>AND</multiplejoin>
-					<init_by_get_param>p_searchtext</init_by_get_param>
-				</property>
-				<property name="cclom:general_keyword">
-					<statement>@cclom\:general_keyword:"${value}"</statement>
-					<multiple>true</multiple>
-					<multiplejoin>AND</multiplejoin>
-				</property>
-				<property name="cm:name" />
-				<property name="ccm:educationaltypicalagerange_from">
-					<statement>@ccm\:educationaltypicalagerange_from:[${value} TO 99]</statement>
-				</property>
-				<property name="ccm:educationaltypicalagerange_to">
-					<statement>@ccm\:educationaltypicalagerange_to:[1 TO ${value}]</statement>
-				</property>
-				<property name="ccm:classification_purpose">
-					<multiple>true</multiple>	
-					<multiplejoin>OR</multiplejoin>	
-				</property>
-				<property name="ccm:taxonid">
-					<multiple>true</multiple>	
-					<multiplejoin>OR</multiplejoin>	
-				</property>
-			</query>
-		</queries>
+		</template>
+	</templates>
+	<groups>
+		<group>
+			<id>ngsearch</id>
+			<rendering>angular</rendering>
+			<views>
+				<view>search</view>
+				<view>search_suggestions</view>
+			</views>
+		</group>
+		<group>
+			<id>io</id>
+			<rendering>angular</rendering>
+			<views>
+				<view>node_general</view>
+				<view>node_extended</view>
+			</views>
+		</group>
+	</groups>
+	<lists>
+		<list>
+			<id>search</id>
+			<columns>
+				<column>cm:title</column>
+				<column>cm:creator</column>
+				<column>ccm:commonlicense_key</column>
+				<column>ccm:replicationsource</column>
+			</columns>
+		</list>
+	</lists>
+	<queries>
+		<basequery>-TYPE:"{http://www.campuscontent.de/model/1.0}toolpermission" AND NOT @cm\:name:"._*" AND NOT @cm\:name:".DS_Store*"</basequery>
+
+		<query join="AND"  id="ngsearch">
+			<property name="ngsearchword">
+				<statement>(@sys\:node-uuid:"${value}" OR TEXT:"${value}" OR @cm\:name:"*${value}*" OR @cclom\:title:"*${value}*" OR @cclom\:general_description:"*${value}*" OR @cclom\:general_keyword:"*${value}*" OR @ccm\:taxonentry:"*${value}*" OR @ccm\:classification_keyword:"*${value}*" OR @ccm\:educationallearningresourcetype:"*${value}*" OR @ccm\:educationalcontext:"*${value}*" OR @ccm\:learninggoal:"*${value}*" OR @ccm\:guidanceteachers:"*${value}*" OR @ccm\:guidancestudents:"*${value}*")</statement>
+				<multiple>true</multiple>
+				<multiplejoin>AND</multiplejoin>
+				<init_by_get_param>p_searchtext</init_by_get_param>
+			</property>
+			<property name="cclom:general_keyword">
+				<statement>@cclom\:general_keyword:"${value}"</statement>
+				<multiple>true</multiple>
+				<multiplejoin>AND</multiplejoin>
+			</property>
+			<property name="cm:name" />
+			<property name="ccm:educationaltypicalagerange_from">
+				<statement>@ccm\:educationaltypicalagerange_from:[${value} TO 99]</statement>
+			</property>
+			<property name="ccm:educationaltypicalagerange_to">
+				<statement>@ccm\:educationaltypicalagerange_to:[1 TO ${value}]</statement>
+			</property>
+			<property name="ccm:classification_purpose">
+				<multiple>true</multiple>
+				<multiplejoin>OR</multiplejoin>
+			</property>
+			<property name="ccm:taxonid">
+				<multiple>true</multiple>
+				<multiplejoin>OR</multiplejoin>
+			</property>
+		</query>
+	</queries>
 </metadataset>

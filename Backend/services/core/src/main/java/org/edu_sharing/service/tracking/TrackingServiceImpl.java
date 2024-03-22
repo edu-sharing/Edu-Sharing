@@ -1,5 +1,6 @@
 package org.edu_sharing.service.tracking;
 
+import jakarta.servlet.http.HttpSession;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -8,6 +9,7 @@ import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.policy.GuestCagePolicy;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.ConnectionDBAlfresco;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
 
 public class TrackingServiceImpl extends TrackingServiceDefault{
     private static final List<String> EXISTING_FIELDS = Arrays.asList("authority","authority_organization","authority_mediacenter");
+    private static final String SESSION_AUTHORITY_MEDIACENTERS = "SESSION_AUTHORITY_MEDIACENTERS";
+    private static final String SESSION_AUTHORITY_ORGANIZATIONS = "SESSION_AUTHORITY_ORGANIZATIONS";
     public static Logger logger = Logger.getLogger(TrackingServiceImpl.class);
 
     public static String TRACKING_NODE_TABLE_ID = "edu_tracking_node";
@@ -217,14 +221,32 @@ public class TrackingServiceImpl extends TrackingServiceDefault{
         });
     }
 
+    private static HttpSession getSession() {
+        if(Context.getCurrentInstance() != null && Context.getCurrentInstance().getRequest() != null) {
+            return Context.getCurrentInstance().getRequest().getSession();
+        }
+        return null;
+    }
     @NotNull
     private static Object[] getAuthorityMediacenters() throws Exception {
         if(ContextManagementFilter.accessTool.get() == null || ContextManagementFilter.accessTool.get().getUserId() == null) {
             // use the fully authenticated user since the current runAs user might be system
-            return AuthenticationUtil.runAs(
-                    () ->SearchServiceFactory.getLocalService().getAllMediacenters(true).toArray(),
+            HttpSession session = getSession();
+            Object[] result;
+            if(session != null) {
+                result = (Object[]) session.getAttribute(SESSION_AUTHORITY_MEDIACENTERS);
+                if(result != null) {
+                    return result;
+                }
+            }
+            result = AuthenticationUtil.runAs(
+                    () -> SearchServiceFactory.getLocalService().getAllMediacenters(true).toArray(),
                     AuthenticationUtil.getFullyAuthenticatedUser()
             );
+            if(session != null) {
+                session.setAttribute(SESSION_AUTHORITY_MEDIACENTERS, result);
+            }
+            return result;
         } else {
             return AuthenticationUtil.runAs(
                     () -> SearchServiceFactory.getLocalService().getAllMediacenters(true).toArray(),
@@ -237,10 +259,22 @@ public class TrackingServiceImpl extends TrackingServiceDefault{
     private static Object[] getAuthorityOrganizations() throws Exception {
         if(ContextManagementFilter.accessTool.get() == null || ContextManagementFilter.accessTool.get().getUserId() == null) {
             // use the fully authenticated user since the current runAs user might be system
-            return AuthenticationUtil.runAs(
+            HttpSession session = getSession();
+            Object[] result;
+            if(session != null) {
+                result = (Object[]) session.getAttribute(SESSION_AUTHORITY_ORGANIZATIONS);
+                if(result != null) {
+                    return result;
+                }
+            }
+            result = AuthenticationUtil.runAs(
                     () -> SearchServiceFactory.getLocalService().getAllOrganizations(true).getData().stream().map(EduGroup::getGroupname).toArray(),
                     AuthenticationUtil.getFullyAuthenticatedUser()
             );
+            if(session != null) {
+                session.setAttribute(SESSION_AUTHORITY_ORGANIZATIONS, result);
+            }
+            return result;
         } else {
             return AuthenticationUtil.runAs(
                     () -> SearchServiceFactory.getLocalService().getAllOrganizations(true).getData().stream().map(EduGroup::getGroupname).toArray(),

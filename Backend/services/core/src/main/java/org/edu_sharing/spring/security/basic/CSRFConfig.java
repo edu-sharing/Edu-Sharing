@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 public class CSRFConfig {
 
@@ -26,7 +27,9 @@ public class CSRFConfig {
             // default implementation of resolveCsrfTokenValue() from CsrfTokenRequestHandler
             CsrfTokenRequestHandler requestHandler = delegate::handle;
 
-            http.csrf((csrf) -> csrf
+            http.authorizeHttpRequests((authorize) -> authorize
+                    .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+            ).csrf((csrf) -> csrf
                     .csrfTokenRepository(tokenRepository)
                     .csrfTokenRequestHandler(requestHandler)
             );

@@ -1,15 +1,16 @@
 package org.edu_sharing.service.repoproxy;
 
-import java.util.HashMap;
-
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.restservices.RepositoryDao;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
-import org.edu_sharing.service.toolpermission.ToolPermissionHelper;
+import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
+
+import java.util.HashMap;
 
 public abstract class RepoProxyAbstract implements RepoProxy {
 
@@ -19,7 +20,9 @@ public abstract class RepoProxyAbstract implements RepoProxy {
 			repoId = homeRepo;
 		}
 		// validate if user is allowed to access data from this repo
-		ToolPermissionHelper.throwIfToolpermissionMissing(CCConstants.CCM_VALUE_TOOLPERMISSION_REPOSITORY_PREFIX+repoId);
+		if(!ToolPermissionServiceFactory.getInstance().hasToolPermissionForRepository(repoId)) {
+			throw new ToolPermissionException(CCConstants.CCM_VALUE_TOOLPERMISSION_REPOSITORY_PREFIX + repoId);
+		}
 
 		if (homeRepo.equals(repoId)) {
 			return false;

@@ -11,6 +11,7 @@ import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.edu_sharing.spring.security.basic.EduAuthSuccsessHandler;
+import org.edu_sharing.spring.security.basic.EduWebSecurityCustomizer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.saml2.Saml2LogoutConfigurer;
 import org.springframework.security.converter.RsaKeyConverters;
 import org.springframework.security.core.Authentication;
@@ -54,11 +56,16 @@ import java.util.Random;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Profile("samlEnabled")
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity()
 @Configuration
 public class SecurityConfigurationSaml {
 
     Config config = LightbendConfigLoader.get();
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return EduWebSecurityCustomizer.webSecurityCustomizer();
+    }
 
     @Bean
     SecurityFilterChain app(HttpSecurity http) throws Exception {
@@ -135,7 +142,7 @@ public class SecurityConfigurationSaml {
 
             String successTarget = "/shibboleth";
             try {
-                successTarget = ConfigServiceFactory.getCurrentConfig().getValue("logout.next", successTarget);
+                successTarget = ConfigServiceFactory.getCurrentConfig(request).getValue("logout.next", successTarget);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
