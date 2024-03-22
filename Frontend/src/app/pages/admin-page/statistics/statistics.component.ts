@@ -9,6 +9,17 @@ import {
     ViewChild,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import {
+    BarController,
+    BarElement,
+    CategoryScale,
+    Chart,
+    Legend,
+    LinearScale,
+    PointElement,
+    Title,
+    Tooltip,
+} from 'chart.js';
 import { DEFAULT, HOME_REPOSITORY, SearchService } from 'ngx-edu-sharing-api';
 import {
     FormatDatePipe,
