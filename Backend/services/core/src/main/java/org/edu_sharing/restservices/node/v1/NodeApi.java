@@ -2292,5 +2292,36 @@ public class NodeApi  {
 		}
 
 	}
+
+
+	@GET
+	@Path("/nodes/{repository}/{node}/permissions/jwt")
+	@Operation(summary = "Generate a jwt access token of the node.", description = "Generate a jwt access token of the node")
+	@Produces({"application/text"})
+	@ApiResponses(
+			value = {
+					@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = String.class,  format = "byte"))),
+					@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+			})
+	public Response getJWT(
+			@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
+			@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
+			@Context HttpServletRequest req) {
+
+		try {
+//			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
+//			node=NodeDao.mapNodeConstants(repoDao,node);
+//
+//			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
+			return Response.status(Response.Status.OK).entity(NodeDao.getJWT(node)).build();
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+
+	}
 }
 

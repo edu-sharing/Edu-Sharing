@@ -29,6 +29,7 @@ import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.repository.server.tools.*;
 import org.edu_sharing.repository.server.tools.cache.PreviewCache;
+import org.edu_sharing.repository.server.tools.security.JwtTokenUtil;
 import org.edu_sharing.restservices.collection.v1.model.Collection;
 import org.edu_sharing.restservices.collection.v1.model.CollectionReference;
 import org.edu_sharing.restservices.collection.v1.model.CollectionRelationReference;
@@ -40,6 +41,7 @@ import org.edu_sharing.restservices.shared.NodeRef;
 import org.edu_sharing.restservices.shared.*;
 import org.edu_sharing.restservices.shared.NodeSearch.Facet;
 import org.edu_sharing.restservices.shared.NodeSearch.Facet.Value;
+import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityService;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.collection.CollectionService;
@@ -75,6 +77,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
@@ -156,6 +159,21 @@ public class NodeDao {
             }
         }
         return null;
+    }
+
+    public static String getJWT(String nodeId) throws GeneralSecurityException {
+        org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory.getLocalService();
+//        ToolPermissionService toolPermissionService = ToolPermissionServiceFactory.getInstance();
+        String user = AuthenticationUtil.getFullyAuthenticatedUser();
+        List<String> nodePermissions = null;
+        try {
+            nodePermissions = permissionService.getPermissionsForAuthority(nodeId, user);
+        } catch (InsufficientPermissionException e) {
+            throw new RuntimeException(e);
+        }
+//        java.util.Collection<String> toolPermissions = toolPermissionService.getAllToolPermissions(false);
+
+        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions);
     }
 
     public org.edu_sharing.service.model.NodeRef getNodeRef() {
