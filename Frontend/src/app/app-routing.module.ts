@@ -34,7 +34,7 @@ const routes: Routes = [
     {
         path: UIConstants.ROUTER_PREFIX + 'render',
         loadChildren: () =>
-            import('./pages/render-page/render-page.module').then((m) => m.RenderPageModule),
+            import('./pages/render2-page/render2-page.module').then((m) => m.Render2PageModule),
     },
 
     // Apply to LMS
