@@ -3,17 +3,12 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, HostBinding, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from 'ngx-edu-sharing-api';
+import { notNull, Scope, UIAnimation } from 'ngx-edu-sharing-ui';
 import * as rxjs from 'rxjs';
-import { Observable, Subject } from 'rxjs';
-import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Node, Repository, RestConstants } from '../../core-module/core.module';
-import {
-    NodeEntriesWrapperComponent,
-    notNull,
-    Scope,
-    UIAnimation,
-    UIConstants,
-} from 'ngx-edu-sharing-ui';
+import { combineLatest, Observable, Subject } from 'rxjs';
+import { filter, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { Repository, RestConstants, UIConstants } from '../../core-module/core.module';
 import { CardDialogRef } from '../../features/dialogs/card-dialog/card-dialog-ref';
 import { DialogsService } from '../../features/dialogs/dialogs.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
@@ -63,6 +58,7 @@ export class SearchPageComponent implements OnInit, OnDestroy {
         private navigationScheduler: NavigationScheduler,
         private route: ActivatedRoute,
         private searchPage: SearchPageService,
+        private configService: ConfigService,
         private translate: TranslateService,
     ) {
         this.searchPage.init();
@@ -80,6 +76,25 @@ export class SearchPageComponent implements OnInit, OnDestroy {
         this.registerProgressBarIsVisible();
         this.registerFilterDialog();
         this.registerQueryParamsAllRepositories();
+        this.registerConfigBehaviours();
+    }
+
+    registerConfigBehaviours() {
+        combineLatest([
+            this.configService.observeConfig({
+                forceUpdate: false,
+            }),
+            this.isMobileScreen,
+        ])
+            .pipe(take(1))
+            .subscribe(([config, isMobileScreen]) => {
+                if (
+                    config?.searchSidenavMode === 'always' ||
+                    (config?.searchSidenavMode === 'auto' && !isMobileScreen)
+                ) {
+                    this.filterBarIsVisible.setSystemValue(true);
+                }
+            });
     }
 
     ngOnDestroy(): void {

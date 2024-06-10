@@ -19,5 +19,6 @@ import { CollectionProposalsComponent } from './collection-proposals/collection-
         InfobarComponent,
     ],
     imports: [SharedModule, MdsModule, CollectionsPageRoutingModule],
+    exports: [CollectionInfoBarComponent, CollectionContentComponent],
 })
 export class CollectionsPageModule {}

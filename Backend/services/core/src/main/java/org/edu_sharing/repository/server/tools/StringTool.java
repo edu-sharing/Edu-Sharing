@@ -47,7 +47,7 @@ public class StringTool {
 	
 	public static String[] getPhrases(String str) {
 		
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		
 		String[] tokens = str.split(PHRASE_DELIMITER);
 		

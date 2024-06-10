@@ -2,10 +2,7 @@ package org.edu_sharing.repository.server.importer;
 
 import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.client.methods.HttpGet;
@@ -57,7 +54,7 @@ public class WpImporter implements Importer{
 
 		String result = new HttpQueryTool().query(url);
 		
-		List<String> generalKeywords = new ArrayList<String>();
+		List<String> generalKeywords = new ArrayList<>();
 
 	try{ 
 		JSONArray ja = (JSONArray) new JSONParser().parse(result);
@@ -130,7 +127,7 @@ public class WpImporter implements Importer{
 		    	
 				for(int i = 0; i < ja.size(); i++){
 					
-					HashMap<String,Object> eduProps = new HashMap<String,Object>();
+					Map<String,Object> eduProps = new HashMap<>();
 					JSONObject jo = (JSONObject)ja.get(i);
 					
 					eduProps.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE,"wp");
@@ -167,7 +164,7 @@ public class WpImporter implements Importer{
 					
 					eduProps.put(CCConstants.CCM_PROP_IO_COMMONLICENSE_KEY, CCConstants.COMMON_LICENSE_CC_BY_SA);
 					
-					HashMap<String,String> wpContributer = new HashMap<String,String>();
+					Map<String,String> wpContributer = new HashMap<>();
 					wpContributer.put(CCConstants.VCARD_SURNAME, "wordpress");
 					wpContributer.put(CCConstants.VCARD_ORG, "wordpress");
 					

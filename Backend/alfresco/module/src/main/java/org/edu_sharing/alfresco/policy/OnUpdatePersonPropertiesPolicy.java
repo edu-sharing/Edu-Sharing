@@ -1,9 +1,5 @@
 package org.edu_sharing.alfresco.policy;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.UUID;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
@@ -18,8 +14,13 @@ import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.authentication.HttpContext;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.cache.UserCache;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * create the edu-sharing default folders like "documents" and "images"
@@ -35,11 +36,13 @@ public class OnUpdatePersonPropertiesPolicy implements OnCreateNodePolicy, OnUpd
 	ServiceRegistry serviceRegistry;
 	
 	Logger logger = Logger.getLogger(OnUpdatePersonPropertiesPolicy.class);
-	
+	private UserCache userCache;
+
 	public void init(){
 		policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onCreateNode"));
 		policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateNode"));
 		policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateProperties"));
+		userCache = AlfAppContextGate.getApplicationContext().getBean(UserCache.class);
 	}
 	
 	@Override
@@ -72,7 +75,7 @@ public class OnUpdatePersonPropertiesPolicy implements OnCreateNodePolicy, OnUpd
 
 		//NodeRef homefolder = (NodeRef) nodeService.getProperty(personNodeRef, ContentModel.PROP_HOMEFOLDER);
 		String username = (String)after.get(ContentModel.PROP_USERNAME);
-		UserCache.refresh(username);
+		userCache.refresh(username);
 		logger.debug("username:"+username);
 		NodeRef homeFolderNodeRef = (NodeRef)before.get(ContentModel.PROP_HOMEFOLDER);
 

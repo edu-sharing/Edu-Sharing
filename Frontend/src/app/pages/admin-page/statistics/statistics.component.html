@@ -52,12 +52,12 @@
       </mat-select>
     </mat-form-field>
     <div class="groups-button">
-      <button mat-button color="primary" (click)="showModes = !showModes">
+      <button mat-button color="primary" (click)="toggleModes()">
         {{ 'ADMIN.STATISTICS.GROUPS_ADVANCED' | translate }}
         <i esIcon="keyboard_arrow_{{ showModes ? 'up' : 'down' }}"></i>
       </button>
     </div>
-    <div class="modes" *ngIf="showModes" [@dialog]="showModes">
+    <div class="modes" [class.display-none]="!showModes" [@dialog]="showModes">
       <div class="group-multi">
         <div class="group">
           <mat-label>{{ 'ADMIN.STATISTICS.CUSTOM_GROUP_MODE' | translate }}</mat-label>

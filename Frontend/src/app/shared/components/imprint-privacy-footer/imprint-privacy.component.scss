@@ -1,0 +1,10 @@
+@import '../../../core-ui-module/styles/variables';
+
+:host {
+    text-align: center;
+    color: $textLight;
+    font-size: 89%;
+    a {
+        color: $textLight;
+    }
+}

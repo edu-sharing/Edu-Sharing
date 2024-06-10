@@ -8,6 +8,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.JsonpUtils;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.metadataset.v2.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -54,9 +55,9 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
 
         if(parameters != null && parameters.isEmpty()) {
             if(query.isApplyBasequery()){
-                if(queries.findBasequery(parameters.keySet())!=null &&
-                        !queries.findBasequery(parameters.keySet()).isEmpty()) {
-                    result.must(must->must.wrapper(new ReadableWrapperQueryBuilder(queries.findBasequery(parameters.keySet())).build()));
+                String baseQueryParam = queries.findBasequery(parameters.keySet());
+                if(!StringUtils.isEmpty(baseQueryParam)) {
+                    result.must(must->must.wrapper(new ReadableWrapperQueryBuilder(baseQueryParam).build()));
                 }
                 applyCondition(queries, result);
             }
@@ -83,9 +84,9 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
 
             Query queryBuilderParam = null;
             if(query.isApplyBasequery()){
-                if(queries.findBasequery(parameters.keySet())!=null &&
-                        !queries.findBasequery(parameters.keySet()).isEmpty()) {
-                    result.must(must->must.wrapper(new ReadableWrapperQueryBuilder(queries.findBasequery(parameters.keySet())).build()));
+                String baseQueryParam = queries.findBasequery(parameters.keySet());
+                if(!StringUtils.isEmpty(baseQueryParam)) {
+                    result.must(must->must.wrapper(new ReadableWrapperQueryBuilder(baseQueryParam).build()));
                 }
                 applyCondition(queries, result);
             }

@@ -36,7 +36,7 @@ public class ConnectorServiceFactory {
 
 		ConnectorList filteredList = new ConnectorList();
 
-		List<Connector> filteredConnectors = new ArrayList<Connector>();
+		List<Connector> filteredConnectors = new ArrayList<>();
 		for(Connector connector : getConnectorService().getConnectorList().getConnectors()){
 			if(toolPermissionService.hasToolPermissionForConnector(connector.getId())){
 				filteredConnectors.add(connector);

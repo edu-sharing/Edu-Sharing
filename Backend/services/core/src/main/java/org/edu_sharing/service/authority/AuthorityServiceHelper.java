@@ -38,12 +38,7 @@ public class AuthorityServiceHelper {
             Set<String> testUsetAuthorities = (username == null)
                     ? serviceRegistry.getAuthorityService().getAuthorities()
                     : serviceRegistry.getAuthorityService().getAuthoritiesForUser(username);
-            for (String testAuth : testUsetAuthorities) {
-
-                if (testAuth.equals(CCConstants.AUTHORITY_GROUP_ALFRESCO_ADMINISTRATORS)) {
-                    return true;
-                }
-            }
+            return testUsetAuthorities.contains(CCConstants.AUTHORITY_GROUP_ALFRESCO_ADMINISTRATORS);
         } catch (org.alfresco.repo.security.permissions.AccessDeniedException e) {
 
         }

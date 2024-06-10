@@ -1,5 +1,0 @@
-input ClassificationInput {
-    purpose: String!
-    taxon: [RangedValueInput!]
-    description: String
-}

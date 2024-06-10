@@ -91,7 +91,7 @@ public class CrudSoapBindingImpl implements org.edu_sharing.webservices.crud.Cru
 		
 		PostMethod method = new PostMethod(servletUrl);
 
-		ArrayList<Part> partsList = new ArrayList<Part>();
+		ArrayList<Part> partsList = new ArrayList<>();
 		partsList.add(new StringPart(CCConstants.AUTH_USERNAME, username));
 		partsList.add(new StringPart(CCConstants.AUTH_TICKET, ticket));
 		partsList.add(new StringPart(CCConstants.NODETYPE, nodeType));
@@ -165,7 +165,7 @@ public class CrudSoapBindingImpl implements org.edu_sharing.webservices.crud.Cru
 
 		PostMethod method = new PostMethod(servletUrl);
 
-		ArrayList<Part> partsList = new ArrayList<Part>();
+		ArrayList<Part> partsList = new ArrayList<>();
 
 		partsList.add(new StringPart(CCConstants.AUTH_USERNAME, username));
 		partsList.add(new StringPart(CCConstants.AUTH_TICKET, ticket));

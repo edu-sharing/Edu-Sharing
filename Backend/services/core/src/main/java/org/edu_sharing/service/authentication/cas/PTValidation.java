@@ -72,7 +72,7 @@ public class PTValidation  {
 	 * if one callbackurl equals the construktorParam validCallbackUrl than this callbackurl is packed in the reultMap
 	 */
 	public Map<String,String> getCredentials(String proxyTicket){
-		HashMap<String,String> resultMap = null;
+		Map<String,String> resultMap = null;
 		try{
 			url = url+"?ticket="+proxyTicket+"&service="+serviceUrl;
 			logger.info("url:"+url);
@@ -93,7 +93,7 @@ public class PTValidation  {
 				if (rootEle.getName().equals("serviceResponse")) {
 					Element succEle = rootEle.getChild("authenticationSuccess", ns);
 					if (succEle != null) {
-						resultMap = new HashMap<String,String>();
+						resultMap = new HashMap<>();
 						System.out.println(" succEle :" + succEle.getName());
 						Element eleUser = succEle.getChild("user", ns);
 						resultMap.put(PTValidation.USER, eleUser.getValue());

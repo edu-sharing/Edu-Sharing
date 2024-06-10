@@ -54,7 +54,7 @@ public class NetworkApi {
 
         try {
 
-            List<Repo> repos = new ArrayList<Repo>();
+            List<Repo> repos = new ArrayList<>();
             for (RepositoryDao repository : RepositoryDao.getRepositories()) {
                 repos.add(repository.asRepo());
             }

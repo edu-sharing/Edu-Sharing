@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.log4j.Logger;
@@ -24,7 +25,7 @@ public class BinaryHandlerTechnicalLocation implements BinaryHandler{
 	public BinaryHandlerTechnicalLocation()  throws Throwable {
 		ApplicationInfo homeRep = ApplicationInfoList.getHomeRepository();
 		AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeRep.getAppId());
-		HashMap<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
+		Map<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
 		mcAlfrescoAPIClient = (MCAlfrescoAPIClient) RepoFactory.getInstance(homeRep.getAppId(), authInfo);
 	}
 	

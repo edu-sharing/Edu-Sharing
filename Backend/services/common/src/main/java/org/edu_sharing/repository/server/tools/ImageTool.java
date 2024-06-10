@@ -10,18 +10,27 @@ import java.io.*;
 
 import javax.imageio.ImageIO;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.IOUtils;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import org.apache.log4j.Logger;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
+import org.edu_sharing.alfresco.policy.NodeMimetypeValidationException;
+
+import static org.apache.batik.transcoder.SVGAbstractTranscoder.*;
 
 /** 
  * 
@@ -148,18 +157,52 @@ public class ImageTool {
 
 	/**
 	 * checks if given input stream is an image mimetype and throws an exception otherwise
+	 * Will also auto convert svg to remove malicious data and auto rotate jpgs based on exif data
 	 */
-	public static InputStream verifyImage(InputStream is) throws MimeTypeException, IOException {
+	public static VerifyResult verifyAndPreprocessImage(InputStream is, int maxSize) throws MimeTypeException, IOException {
 		byte[] data=IOUtils.toByteArray(is);
 		TikaConfig config = TikaConfig.getDefaultConfig();
 		Detector detector = config.getDetector();
 		TikaInputStream stream = TikaInputStream.get(data);
 		Metadata metadata = new Metadata();
 		MediaType mediaType = detector.detect(stream, metadata);
-		if(!mediaType.getType().equals("image")) {
-			// TODO: convert to NodeMimetypeValidationException after merge of file filter completed
-			throw new MimeTypeException("Invalid mime type for image: " + mediaType.getType() + "/" + mediaType.getSubtype());
+		if(!mediaType.getType().equals("image") && !mediaType.getType().equals("text")) {
+			throw new NodeMimetypeValidationException("Invalid mime type for image: " + mediaType.getType() + "/" + mediaType.getSubtype());
 		}
-		return new ByteArrayInputStream(data);
+		if(mediaType.getType().equals("text") || mediaType.equals(MediaType.image("svg+xml"))) {
+			try {
+				data = convertSvgToPng(new ByteArrayInputStream(data));
+				mediaType = MediaType.image("png");
+			}catch(Throwable t) {
+				Logger.getLogger(ImageTool.class).info("Svg parse error", t);
+				throw new NodeMimetypeValidationException("Given file was no valid svg or could not be converted");
+			}
+		}
+		InputStream result = autoRotateImage(new ByteArrayInputStream(data), ImageTool.MAX_THUMB_SIZE);
+		return new VerifyResult(result, mediaType);
+	}
+
+
+	public static byte[] convertSvgToPng(InputStream data) throws Exception {
+		TranscoderInput input = new TranscoderInput(data);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		TranscoderOutput output = new TranscoderOutput(bos);
+		PNGTranscoder transcoder = new PNGTranscoder();
+		transcoder.addTranscodingHint(KEY_WIDTH, 1024f);
+		// calculated automatically
+		// transcoder.addTranscodingHint(KEY_HEIGHT, 1024f);
+		transcoder.addTranscodingHint(KEY_MAX_HEIGHT, 1024f);
+		transcoder.addTranscodingHint(KEY_ALLOWED_SCRIPT_TYPES, "");
+		transcoder.addTranscodingHint(KEY_ALLOW_EXTERNAL_RESOURCES, false);
+		transcoder.transcode(input, output);
+		return bos.toByteArray();
+	}
+
+
+	@Data
+	@AllArgsConstructor
+	public static class VerifyResult {
+		InputStream inputStream;
+		MediaType mediaType;
 	}
 }

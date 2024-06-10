@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Metadata } from 'ngx-edu-sharing-graphql';
 import { RepoUrlService } from 'ngx-edu-sharing-ui';
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, forkJoin, forkJoin as observableForkJoin, of } from 'rxjs';
@@ -23,19 +22,12 @@ export class MdsEditorWidgetPreviewComponent implements NativeWidgetComponent {
         supportsBulk: false,
         onConstraintFailed: 'hide',
     };
-    static readonly graphqlIds = [
-        'info.preview.url',
-        'info.preview.data',
-        'info.preview.mimetype',
-        'info.preview.type',
-    ];
 
     hasChanges = new BehaviorSubject<boolean>(false);
     src: SafeResourceUrl | string;
     nodeSrc: string;
     file: File;
     node: Node;
-    metadata: Metadata;
     delete = false;
 
     constructor(
@@ -45,23 +37,15 @@ export class MdsEditorWidgetPreviewComponent implements NativeWidgetComponent {
         private repoUrlService: RepoUrlService,
         private sanitizer: DomSanitizer,
     ) {
-        forkJoin([
-            this.mdsEditorValues.nodes$.pipe(take(1)),
-            this.mdsEditorValues.graphqlMetadata$.pipe(take(1)),
-        ])
+        forkJoin([this.mdsEditorValues.nodes$.pipe(take(1))])
             .pipe(takeUntilDestroyed())
-            .subscribe(([nodes, graphqlMetadata]) => {
+            .subscribe(([nodes]) => {
                 if (nodes?.length === 1) {
                     this.node = nodes[0];
                     this.nodeSrc =
                         this.node.preview.url + '&crop=true&width=400&height=300&dontcache=:cache';
-                } else if (graphqlMetadata?.length === 1) {
-                    this.metadata = graphqlMetadata[0];
-                    this.nodeSrc =
-                        this.metadata.info.preview.url +
-                        '&crop=true&width=400&height=300&dontcache=:cache';
                 }
-                if (nodes?.length === 1 || graphqlMetadata?.length === 1) {
+                if (nodes?.length === 1) {
                     this.updateSrc();
                     // we need to reload the image since we don't know if the image (e.g. video file) is still being processed
                     rxjs.interval(5000)
@@ -121,6 +105,6 @@ export class MdsEditorWidgetPreviewComponent implements NativeWidgetComponent {
     }
 
     getType() {
-        return this.node?.preview?.type || this.metadata?.info?.preview?.type;
+        return this.node?.preview?.type;
     }
 }

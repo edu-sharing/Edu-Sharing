@@ -71,7 +71,7 @@ public class EduAuthentication {
     public void authenticateByApp(String applicationId, String userName, String email, String ticket,String host, Boolean createUser) throws AuthenticationException{
     	
     	
-    	HashMap<String,String> params = new HashMap<String,String>();
+    	Map<String,String> params = new HashMap<>();
     	params.put(AuthMethodTrustedRepository.PARAM_EMAIL, email);
     	params.put(AuthMethodTrustedRepository.PARAM_APPLICATIONID, applicationId);
     	params.put(AuthMethodTrustedRepository.PARAM_USERNAME, userName);
@@ -83,7 +83,7 @@ public class EduAuthentication {
     	
     }
     
-    public void authenticateByTrustedApp(HashMap<String,String> params){
+    public void authenticateByTrustedApp(Map<String,String> params){
     	ccauthenticationComponent.authenticate(AuthMethodTrustedApplication.class.getName(), params); 	
     }
     
@@ -96,7 +96,7 @@ public class EduAuthentication {
      */
     public void authenticateByCAS(String userName, String proxyTicket){
     	
-    	HashMap<String,String> params = new HashMap<String,String>();
+    	Map<String,String> params = new HashMap<>();
     	params.put(AuthMethodCAS.PARAM_USERNAME, userName);
     	params.put(AuthMethodCAS.PARAM_PROXYTICKET, proxyTicket);
     	ccauthenticationComponent.authenticate(AuthMethodCAS.class.getName(), params);
@@ -109,7 +109,7 @@ public class EduAuthentication {
      * @param authType
      * @param params
      */
-    public void authenticateBySSO(String authType, HashMap<String,String> params){
+    public void authenticateBySSO(String authType, Map<String,String> params){
     	params.put(SSOAuthorityMapper.PARAM_SSO_TYPE, authType);
     	ccauthenticationComponent.authenticate(AuthMethodSSO.class.getName(),params);
     }
@@ -174,8 +174,8 @@ public class EduAuthentication {
 	
 	
 	
-	public HashMap<String,String> getPersonProperties(String username){
-		HashMap<String,String> result = new HashMap<String,String>();
+	public Map<String,String> getPersonProperties(String username){
+		Map<String,String> result = new HashMap<>();
 		/**
 		 * Attention if you put an username that does not exist, alfresco creates a ne person object without an user object in user store
 		 * watch out for Alfresco class PersonServiceImpl

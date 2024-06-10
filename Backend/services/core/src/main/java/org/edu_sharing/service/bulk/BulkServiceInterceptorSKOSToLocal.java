@@ -21,7 +21,7 @@ public class BulkServiceInterceptorSKOSToLocal implements BulkServiceInterceptor
     /**
      * Preprocess properties before they get stored and post-processed by the bulk service
      */
-    public HashMap<String, Object> preprocessProperties(HashMap<String, Object> properties) {
+    public Map<String, Object> preprocessProperties(Map<String, Object> properties) {
         String mdsId = (String) properties.getOrDefault(CCConstants.CM_PROP_METADATASET_EDU_METADATASET, CCConstants.metadatasetdefault_id);
         try {
             MetadataSet mds = MetadataHelper.getMetadataset(ApplicationInfoList.getHomeRepository(), mdsId);
@@ -48,7 +48,7 @@ public class BulkServiceInterceptorSKOSToLocal implements BulkServiceInterceptor
         return properties;
     }
 
-    protected List<?> getPropertyValue(HashMap<String, Object> properties, String key){
+    protected List<?> getPropertyValue(Map<String, Object> properties, String key){
         Object values = properties.get(key);
         if(values != null) {
             if (values instanceof String) {

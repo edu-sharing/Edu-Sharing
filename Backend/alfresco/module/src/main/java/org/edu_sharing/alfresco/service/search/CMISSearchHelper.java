@@ -116,7 +116,7 @@ public class CMISSearchHelper {
     }
 
     public static List<NodeRef> fetchNodesByTypeAndFilters(String nodeType, Map<String,Object> filters, List<String> aspects, CMISSearchData data, int maxPermissionChecks, StoreRef storeRef){
-    	List<NodeRef> result = new ArrayList<NodeRef>();
+    	List<NodeRef> result = new ArrayList<>();
 
         int from = 0;
 

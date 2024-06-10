@@ -98,7 +98,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     BehaviourFilter policyBehaviourFilter;
 
-    HashMap<String, String> authInfo;
+    Map<String, String> authInfo;
 
     SearchService searchService;
     NodeService nodeService;
@@ -128,7 +128,7 @@ public class CollectionServiceImpl implements CollectionService {
 					|| (guestUn != null
 					&& guestUn.equals(AuthenticationUtil.getFullyAuthenticatedUser()) )) {
                 logger.debug("starting in runas user mode");
-                this.authInfo = new HashMap<String, String>();
+                this.authInfo = new HashMap<>();
                 this.authInfo.put(CCConstants.AUTH_USERNAME, AuthenticationUtil.getRunAsUser());
             } else {
                 this.authInfo = this.authTool.validateAuthentication(Context.getCurrentInstance().getCurrentInstance().getRequest().getSession());
@@ -210,9 +210,9 @@ public class CollectionServiceImpl implements CollectionService {
             }
 			//NodeRef child = nodeService.getChild(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, collectionId, CCConstants.CCM_TYPE_IO, CCConstants.CCM_PROP_IO_ORIGINAL, originalNodeId);
 			if(!allowDuplicate) {
-				List<NodeRef> child = CMISSearchHelper.fetchNodesByTypeAndFilters(CCConstants.CCM_TYPE_IO, new HashMap<String, Object>() {{
-							put(CCConstants.CCM_PROP_IO_ORIGINAL, originalNodeId);
-						}},
+				List<NodeRef> child = CMISSearchHelper.fetchNodesByTypeAndFilters(CCConstants.CCM_TYPE_IO, new HashMap<>() {{
+                            put(CCConstants.CCM_PROP_IO_ORIGINAL, originalNodeId);
+                        }},
 						CMISSearchHelper.CMISSearchData.builder().inFolder(collectionId).build()
 				);
 				if (!child.isEmpty()) {
@@ -363,7 +363,7 @@ public class CollectionServiceImpl implements CollectionService {
             if (getChildrenProposal(collectionId).stream().anyMatch((assoc) -> assoc.getTargetRef().equals(nodeRef))) {
                 throw new DuplicateNodeException("Node id " + nodeRef.getId() + " is already proposed for this collection");
             }
-            HashMap<String, Serializable> props = new HashMap<>();
+            Map<String, Serializable> props = new HashMap<>();
             props.put(CCConstants.CM_NAME, NodeServiceHelper.getProperty(nodeRef, CCConstants.CM_NAME));
             props.put(CCConstants.CCM_PROP_COLLECTION_PROPOSAL_TARGET, new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, finalId));
             props.put(CCConstants.CCM_PROP_COLLECTION_PROPOSAL_STATUS, CCConstants.PROPOSAL_STATUS.PENDING);
@@ -447,7 +447,7 @@ public class CollectionServiceImpl implements CollectionService {
                         parentIdLocal = getHomePath();
                     }
 
-                    HashMap<String, Object> props = asProps(collection);
+                    Map<String, Object> props = asProps(collection);
                     try {
                         new DuplicateFinder().transformToSafeName(client.getChildren(parentIdLocal), props);
                     } catch (Throwable e) {
@@ -511,7 +511,7 @@ public class CollectionServiceImpl implements CollectionService {
                 String parent = client.getParents(toMove, true).keySet().iterator().next();
                 client.moveNode(toCollection, CCConstants.CM_ASSOC_FOLDER_CONTAINS, toMove);
 
-                HashMap<String, HashMap> assocNode = client.getAssocNode(toMove, CCConstants.CM_ASSOC_ORIGINAL);
+                Map<String, Map<String, Object>> assocNode = client.getAssocNode(toMove, CCConstants.CM_ASSOC_ORIGINAL);
                 String originalNodeId = (String) assocNode.entrySet().iterator().next().getValue().get(CCConstants.SYS_PROP_NODE_UID);
 
                 /**
@@ -531,7 +531,7 @@ public class CollectionServiceImpl implements CollectionService {
                 /**
                  * handle level0
                  */
-                HashMap<String, Object> properties = client.getProperties(toMove);
+                Map<String, Object> properties = client.getProperties(toMove);
                 if (Boolean.parseBoolean((String) properties.get(CCConstants.CCM_PROP_MAP_COLLECTIONLEVEL0))) {
                     if (Arrays.asList(client.getAspects(toCollection)).contains(CCConstants.CCM_ASPECT_COLLECTION)) {
                         client.setProperty(toMove, CCConstants.CCM_PROP_MAP_COLLECTIONLEVEL0, "false");
@@ -605,7 +605,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void update(Collection collection) {
-        HashMap<String, Object> props = asProps(collection);
+        Map<String, Object> props = asProps(collection);
         props.remove(CCConstants.CCM_PROP_MAP_COLLECTIONLEVEL0);
         client.updateNode(collection.getNodeId(), props);
     }
@@ -623,8 +623,8 @@ public class CollectionServiceImpl implements CollectionService {
         }
     }
 
-    public HashMap<String, Object> asProps(Collection collection) {
-        HashMap<String, Object> props = new HashMap<String, Object>();
+    public Map<String, Object> asProps(Collection collection) {
+        Map<String, Object> props = new HashMap<>();
         if (collection.getNodeId() != null) {
             props.put(CCConstants.SYS_PROP_NODE_UID, collection.getNodeId());
         }
@@ -647,7 +647,7 @@ public class CollectionServiceImpl implements CollectionService {
         return props;
     }
 
-    public Collection asCollection(HashMap<String, Object> props) {
+    public Collection asCollection(Map<String, Object> props) {
         Collection collection = new Collection();
         collection.setNodeId((String) props.get(CCConstants.SYS_PROP_NODE_UID));
 
@@ -699,7 +699,7 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
 	public Collection get(org.edu_sharing.service.model.NodeRef nodeRef, boolean fetchCounts) {
         try {
-			HashMap<String,Object> props = nodeRef.getProperties() == null ? nodeService.getProperties(nodeRef.getStoreProtocol(),nodeRef.getStoreId(),nodeRef.getNodeId()) : nodeRef.getProperties();
+			Map<String,Object> props = nodeRef.getProperties() == null ? nodeService.getProperties(nodeRef.getStoreProtocol(),nodeRef.getStoreId(),nodeRef.getNodeId()) : nodeRef.getProperties();
 			throwIfNotACollection(nodeRef.getStoreProtocol(),nodeRef.getStoreId(),nodeRef.getNodeId());
 
             Collection collection = asCollection(props);
@@ -858,7 +858,7 @@ public class CollectionServiceImpl implements CollectionService {
                 return returnVal;
             } else {
                 List<ChildAssociationRef> children = nodeService.getChildrenChildAssociationRefAssoc(parentId, null, filter, sortDefinition);
-                List<NodeRef> returnVal = new ArrayList<NodeRef>();
+                List<NodeRef> returnVal = new ArrayList<>();
                 for (ChildAssociationRef child : children) {
                     returnVal.add(child.getChildRef());
                 }
@@ -997,7 +997,7 @@ public class CollectionServiceImpl implements CollectionService {
             throwIfNotACollection(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), collection);
             nodeService.addAspect(collection, CCConstants.CCM_ASPECT_COLLECTION_PINNED);
 
-            HashMap<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             props.put(CCConstants.CCM_PROP_COLLECTION_PINNED_STATUS, true);
             props.put(CCConstants.CCM_PROP_COLLECTION_PINNED_ORDER, order);
             nodeService.updateNodeNative(collection, props);
@@ -1016,14 +1016,10 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void writePreviewImage(String collectionId, InputStream is, String mimeType) throws Exception {
-        //new ImageMagickContentTransformerWorker()
-		is = ImageTool.verifyImage(is);
-        is = ImageTool.autoRotateImage(is, ImageTool.MAX_THUMB_SIZE);
-        client.writeContent(MCAlfrescoAPIClient.storeRef, collectionId, is, mimeType, null, CCConstants.CCM_PROP_MAP_ICON);
+        ImageTool.VerifyResult result = ImageTool.verifyAndPreprocessImage(is, ImageTool.MAX_THUMB_SIZE);
+        client.writeContent(MCAlfrescoAPIClient.storeRef, collectionId, result.getInputStream(), result.getMediaType().toString(), null, CCConstants.CCM_PROP_MAP_ICON);
         ApplicationContext alfApplicationContext = AlfAppContextGate.getApplicationContext();
         ServiceRegistry serviceRegistry = (ServiceRegistry) alfApplicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        ThumbnailService thumbnailService = serviceRegistry.getThumbnailService();
-        org.alfresco.service.cmr.repository.NodeRef ref = new org.alfresco.service.cmr.repository.NodeRef(MCAlfrescoAPIClient.storeRef, collectionId);
         PreviewCache.purgeCache(collectionId);
     }
 
@@ -1038,7 +1034,7 @@ public class CollectionServiceImpl implements CollectionService {
 		List<NodeRef> refs=getChildren(parentId, null, new SortDefinition(),Arrays.asList("files", "folders"));
 		AtomicInteger order=new AtomicInteger(0);
 
-        HashMap<String, Object> collectionProps = new HashMap<>();
+        Map<String, Object> collectionProps = new HashMap<>();
         nodeService.updateNodeNative(parentId, collectionProps);
 
 		if(nodes == null)
@@ -1051,7 +1047,7 @@ public class CollectionServiceImpl implements CollectionService {
                 throw new IllegalArgumentException("Node id " + node + " is not a children of the collection " + parentId);
 
             nodeService.addAspect(node, CCConstants.CCM_ASPECT_COLLECTION_ORDERED);
-            HashMap<String, Object> props = new HashMap<>();
+            Map<String, Object> props = new HashMap<>();
 				props.put(CCConstants.CCM_PROP_COLLECTION_ORDERED_POSITION, order.get());
             nodeService.updateNodeNative(node, props);
 				policyBehaviourFilter.enableBehaviour(ref, ContentModel.ASPECT_AUDITABLE);

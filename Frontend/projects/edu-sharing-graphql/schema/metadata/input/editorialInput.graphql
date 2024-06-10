@@ -1,4 +1,0 @@
-input EditorialInput {
-    state: RangedValueInput
-    checklist: [RangedValueInput!]
-}

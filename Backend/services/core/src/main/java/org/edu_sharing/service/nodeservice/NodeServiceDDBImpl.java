@@ -34,7 +34,7 @@ public class NodeServiceDDBImpl extends NodeServiceAdapterCached{
 	private final XPathFactory pfactory = XPathFactory.newInstance();
 	private final XPath xpath = pfactory.newXPath();
 
-	private final Map<String, String> LICENSE_MAPPINGS = new HashMap<String, String>(){{
+	private final Map<String, String> LICENSE_MAPPINGS = new HashMap<>(){{
 		put("http://creativecommons.org/publicdomain/zero/1.0/", CCConstants.COMMON_LICENSE_CC_ZERO);
 		put("http://creativecommons.org/licenses/by/3.0/", CCConstants.COMMON_LICENSE_CC_BY);
 		put("http://creativecommons.org/licenses/by-sa/4.0/", CCConstants.COMMON_LICENSE_CC_BY_SA);
@@ -50,13 +50,13 @@ public class NodeServiceDDBImpl extends NodeServiceAdapterCached{
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
-		HashMap<String, Object> props = super.getProperties(storeProtocol, storeId, nodeId);
+	public Map<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
+		Map<String, Object> props = super.getProperties(storeProtocol, storeId, nodeId);
 		if(props != null) {
 			return props;
 		}
 
-		HashMap<String,Object> properties = new  HashMap<String,Object>();
+		Map<String,Object> properties = new HashMap<>();
 		properties.put(CCConstants.SYS_PROP_NODE_UID,nodeId);
 		String url = "https://www.deutsche-digitale-bibliothek.de/item/"+nodeId;
 		properties.put(CCConstants.LOM_PROP_TECHNICAL_LOCATION, url);
@@ -64,7 +64,7 @@ public class NodeServiceDDBImpl extends NodeServiceAdapterCached{
 		properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE, "ddb");
 		try{
 			// fetch binary info
-			String all = SearchServiceDDBImpl.httpGet(SearchServiceDDBImpl.DDB_API+"/items/"+nodeId+"?oauth_consumer_key=" + URLEncoder.encode(this.APIKey, "UTF-8"), new HashMap<String, String>() {{
+			String all = SearchServiceDDBImpl.httpGet(SearchServiceDDBImpl.DDB_API+"/items/"+nodeId+"?oauth_consumer_key=" + URLEncoder.encode(this.APIKey, "UTF-8"), new HashMap<>() {{
 				put("Accept", "application/xml");
 				put("Content-Type", "application/xml");
 			}});

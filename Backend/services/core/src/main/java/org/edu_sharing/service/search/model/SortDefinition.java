@@ -29,7 +29,7 @@ public class SortDefinition implements Serializable {
 	transient ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
 	transient ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 	
-	List<SortDefinitionEntry> sortDefinitionEntries = new ArrayList<SortDefinitionEntry>();
+	List<SortDefinitionEntry> sortDefinitionEntries = new ArrayList<>();
 
     public static class SortDefinitionEntry implements Serializable{
 		String property;
@@ -145,7 +145,7 @@ public class SortDefinition implements Serializable {
 					PropertyDefinition propDef = serviceRegistry.getDictionaryService().getProperty(QName.createQName(property));
 					if(propDef != null) {
 						if (Stream.of(DataTypeDefinition.TEXT, DataTypeDefinition.MLTEXT, DataTypeDefinition.DATE, DataTypeDefinition.DATETIME, DataTypeDefinition.BOOLEAN).anyMatch(qName -> qName.equals(propDef.getDataType().getName()))) {
-							addSuffix = "keyword";
+							addSuffix = "sort";
 						} else if (Stream.of(DataTypeDefinition.INT, DataTypeDefinition.LONG, DataTypeDefinition.FLOAT, DataTypeDefinition.DOUBLE).anyMatch(qName -> qName.equals(propDef.getDataType().getName()))) {
 							addSuffix = "number";
 						} else {

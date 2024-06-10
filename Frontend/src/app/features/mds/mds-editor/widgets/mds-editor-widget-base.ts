@@ -1,7 +1,10 @@
-import { FormControl, ValidatorFn, Validators } from '@angular/forms';
+import { FormControl, UntypedFormControl, ValidatorFn, Validators } from '@angular/forms';
 import { InputStatus, MdsWidget, RequiredMode } from '../../types/types';
-import { Directive, EventEmitter } from '@angular/core';
+import { Directive, EventEmitter, OnInit } from '@angular/core';
 import { MdsEditorWidgetCore } from '../mds-editor-widget-core.directive';
+import { SuggestionResponseDto, SuggestionStatus } from 'ngx-edu-sharing-api';
+import { DisplayValue } from './DisplayValues';
+import { AuthorityNamePipe } from '../../../../shared/pipes/authority-name.pipe';
 
 export enum ValueType {
     String,
@@ -78,5 +81,49 @@ export abstract class MdsEditorWidgetBase extends MdsEditorWidgetCore {
     }
     public static mapGraphqlSuggestionId(definition: MdsWidget): string[] {
         return [];
+    }
+}
+
+@Directive()
+/**
+ * used by chips or tree based widget that might show suggestion chips
+ */
+export abstract class MdsEditorWidgetChipsSuggestionBase extends MdsEditorWidgetBase {
+    // holds suggestions from users or automatic generated data
+    chipsSuggestions: SuggestionResponseDto[];
+    chipsControl: UntypedFormControl;
+
+    abstract add(value: DisplayValue): void;
+    abstract toDisplayValue(value: string): DisplayValue;
+    initSuggestions(): void {
+        this.chipsSuggestions =
+            this.widget.getSuggestions()?.filter((s) => s.status === 'PENDING') ?? [];
+    }
+    removeSuggestion(toBeRemoved: SuggestionResponseDto): void {
+        this.updateSuggestionState(toBeRemoved, 'DECLINED');
+    }
+    addSuggestion(suggestion: SuggestionResponseDto) {
+        this.add(this.toDisplayValue(suggestion.value as string));
+        this.updateSuggestionState(suggestion, 'ACCEPTED');
+    }
+    getSuggestionTooltip(suggestion: SuggestionResponseDto): string | null {
+        return `${this.translate.instant('MDS.SUGGESTION_TOOLTIP', {
+            value: this.toDisplayValue(suggestion.value as string).label,
+            // @TODO
+            creator: new AuthorityNamePipe(this.translate).transform(suggestion.createdBy),
+        })}`;
+    }
+    updateSuggestionState(suggestion: SuggestionResponseDto, status: SuggestionStatus) {
+        suggestion.status = status;
+        this.mdsEditorInstance.updateSuggestionState(this.widget.definition.id, suggestion);
+        this.chipsSuggestions.splice(this.chipsSuggestions.indexOf(suggestion), 1);
+        this.widget.markSuggestionChanged();
+    }
+
+    getSuggestions() {
+        // console.log(this.chipsSuggestions, this.chipsControl);
+        return this.chipsSuggestions?.filter(
+            (s) => !this.chipsControl.value.some((s1: DisplayValue) => s1.key === s.value),
+        );
     }
 }

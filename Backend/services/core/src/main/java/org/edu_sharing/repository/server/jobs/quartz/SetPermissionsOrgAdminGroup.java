@@ -64,7 +64,7 @@ public class SetPermissionsOrgAdminGroup extends AbstractJob {
 	public Class[] getJobClasses() {
 		//addJobClass(SetPermissionsOrgAdminGroup.class);
 		
-		ArrayList<Class> al = new ArrayList<Class>(Arrays.asList(allJobs));
+		ArrayList<Class> al = new ArrayList<>(Arrays.asList(allJobs));
 		al.add(SetPermissionsOrgAdminGroup.class);
 		return al.toArray(new Class[0]) ;
 	}

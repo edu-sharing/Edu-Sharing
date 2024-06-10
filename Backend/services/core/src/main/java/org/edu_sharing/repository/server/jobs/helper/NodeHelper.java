@@ -25,8 +25,8 @@ public class NodeHelper {
      * @param startFolder
      * @return map with ccm:replicationSourceId as key and nodeRef as value
      */
-    public HashMap<String, NodeRef> getImportedNodes(String startFolder) {
-        HashMap<String, NodeRef> result = new HashMap<>();
+    public Map<String, NodeRef> getImportedNodes(String startFolder) {
+        Map<String, NodeRef> result = new HashMap<>();
         int processNodes = runTask(startFolder,(ref) -> {
             String replicationSourceId = (String) serviceRegistry.getNodeService().getProperty(ref, QName.createQName(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID));
             if (replicationSourceId != null) {
@@ -42,7 +42,7 @@ public class NodeHelper {
      * @return map with duplicates: ccm:replicationSourceId as key and list of nodeRef as value
      */
     public Map<String, List<NodeRef>> getDuplicatedImportedNodes(String startFolder){
-        Map<String, List<NodeRef>> collect = new HashMap<String, List<NodeRef>>();
+        Map<String, List<NodeRef>> collect = new HashMap<>();
         int processNodes = runTask(startFolder,(ref)->{
             String replicationSourceId = (String) serviceRegistry.getNodeService().getProperty(ref, QName.createQName(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID));
             if (replicationSourceId != null && !replicationSourceId.trim().equals("")) {

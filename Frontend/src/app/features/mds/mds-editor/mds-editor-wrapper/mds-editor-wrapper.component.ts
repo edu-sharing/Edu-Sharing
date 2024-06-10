@@ -195,6 +195,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
      * @deprecated compatibility to legacy `mds` component
      *
      * Use `reInit()` and make sure inputs are prepared before calling.
+     * Does not work properly for the angular based variant!
      */
     loadMds(onlyLegacy = false): void {
         // In case of `SearchComponent`, `currentValues` is not ready when `loadMds` is called. So
@@ -257,7 +258,9 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
                 return;
             }
             const updatedNodes = await this.mdsEditorInstance.save();
-            this.toast.toast(this.toastOnSave);
+            if (this.toastOnSave) {
+                this.toast.toast(this.toastOnSave);
+            }
             this.onDone.emit(updatedNodes);
         } catch (error) {
             if (
@@ -375,7 +378,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
 
     private handleError(error: any): void {
         console.error(error);
-        if (error instanceof UserPresentableError || error.message) {
+        if (error instanceof UserPresentableError) {
             this.toast.error(null, error.message);
         } else {
             this.toast.error(error);

@@ -1,4 +1,0 @@
-type Mutation {
-    addOrUpdateSuggestion(suggestion: SuggestionInput): Boolean!
-    removeSuggestion(nodeId: ID!, suggestionId: ID!): Boolean!
-}

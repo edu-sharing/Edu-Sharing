@@ -73,7 +73,7 @@ public class PreviewCache {
 		ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 		NodeService nodeService = serviceRegistry.getNodeService();
 		
-		ArrayList<String> ids=new ArrayList<String>();
+		ArrayList<String> ids=new ArrayList<>();
 		ids.add(nodeId);
 		
 		//check if node exists to prevent InvalidNodeRefException: Node does not exist when calling nodeService.getType on startup with clean database

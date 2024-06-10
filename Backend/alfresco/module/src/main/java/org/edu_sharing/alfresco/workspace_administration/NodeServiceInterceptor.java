@@ -71,7 +71,7 @@ public class NodeServiceInterceptor implements MethodInterceptor {
 			String currentScope = NodeServiceInterceptor.eduSharingScope.get();
 			logger.info("runAsUser:" + runAsUser + " currentScope:" + currentScope);
 			List<ChildAssociationRef> childAssocs = (List<ChildAssociationRef>) invocation.proceed();
-			List<ChildAssociationRef> childAssocsResult = new ArrayList<ChildAssociationRef>();
+			List<ChildAssociationRef> childAssocsResult = new ArrayList<>();
 			for (ChildAssociationRef childRef : childAssocs) {
 				NodeRef nodeRef = childRef.getChildRef();
 				

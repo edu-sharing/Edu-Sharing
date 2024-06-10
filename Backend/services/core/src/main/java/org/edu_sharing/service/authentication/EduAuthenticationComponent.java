@@ -27,8 +27,8 @@
  */
 package org.edu_sharing.service.authentication;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
@@ -77,7 +77,7 @@ public class EduAuthenticationComponent{
      * @param authClassName
      * @param params
      */
-    public String authenticate(String authClassName, HashMap<String,String> params) throws AuthenticationException{
+    public String authenticate(String authClassName, Map<String,String> params) throws AuthenticationException{
     	
 		String username = null;
 		//only allow classes that are in ccAuthMethod List

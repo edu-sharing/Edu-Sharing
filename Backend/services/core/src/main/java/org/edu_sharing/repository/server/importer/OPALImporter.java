@@ -4,6 +4,7 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -77,7 +78,7 @@ public class OPALImporter {
 				
 				for (Response.RepositoryResource course : data.repositoryResource) {
 					
-					HashMap<String,Object> eduProps = new HashMap<String,Object>();
+					Map<String,Object> eduProps = new HashMap<>();
 					
 					eduProps.put(
 							CCConstants.CCM_PROP_IO_REPLICATIONSOURCE,

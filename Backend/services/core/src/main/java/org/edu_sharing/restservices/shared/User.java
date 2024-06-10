@@ -15,7 +15,7 @@ public class User extends UserSimple {
 
 	
 	private NodeRef homeFolder = null;
-	private List<NodeRef> sharedFolders = new ArrayList<NodeRef>();
+	private List<NodeRef> sharedFolders = new ArrayList<>();
 	private UserQuota quota;
 
 	public User(){super();}

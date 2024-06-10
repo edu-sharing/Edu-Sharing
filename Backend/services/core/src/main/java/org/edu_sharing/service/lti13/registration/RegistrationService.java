@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+import lombok.RequiredArgsConstructor;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.RandomStringUtils;
@@ -33,20 +34,24 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Service
+@RequiredArgsConstructor
 public class RegistrationService {
 
     Logger logger = Logger.getLogger(RegistrationService.class);
-
     public static final long DYNAMIC_REGISTRATION_TOKEN_EXPIRY = TimeUnit.DAYS.toMillis(1);
 
+    private final VersionService versionService;
+
     @NotNull
-    public static OpenIdConfiguration getLtiPlatformOpenIdConfiguration() {
+    public OpenIdConfiguration getLtiPlatformOpenIdConfiguration() {
         ApplicationInfo homeRepository = ApplicationInfoList.getHomeRepository();
         OpenIdConfiguration oidconf = new OpenIdConfiguration();
         oidconf.setIssuer(homeRepository.getClientBaseUrl());
@@ -71,7 +76,7 @@ public class RegistrationService {
         ltiPlatformConfiguration.getMessages_supported().add(msgDeepLink);
         ltiPlatformConfiguration.getMessages_supported().add(msgResourceLink);
         ltiPlatformConfiguration.setProduct_family_code("edu-sharing");
-        ltiPlatformConfiguration.setVersion(VersionService.getVersionNoException(VersionService.Type.REPOSITORY));
+        ltiPlatformConfiguration.setVersion(versionService.getVersionNoException(VersionService.Type.REPOSITORY));
         oidconf.setLtiPlatformConfiguration(ltiPlatformConfiguration);
         return oidconf;
     }
@@ -271,7 +276,7 @@ public class RegistrationService {
                                   String keysetUrl,
                                   String keyId,
                                   String authTokenUrl, DynamicRegistrationToken token) throws Exception{
-        HashMap<String,String> properties = new HashMap<>();
+        Map<String,String> properties = new HashMap<>();
         String appId = new RepoTools().getAppId(platformId,clientId,deploymentId);
         properties.put(ApplicationInfo.KEY_APPID, appId);
         properties.put(ApplicationInfo.KEY_TYPE, ApplicationInfo.TYPE_LTIPLATFORM);
@@ -394,7 +399,7 @@ public class RegistrationService {
     public ApplicationInfo registerTool(String clientId, String initiateLoginUri, String jwksuri,
                                         String targetLinkUri, String redirectUris, String logoUri,
                                         String customParameters, String description, String clientName, String targetLinkUriDeepLink, String toolUrl) throws Exception {
-        HashMap<String,String> properties = new HashMap<>();
+        Map<String,String> properties = new HashMap<>();
 
         /**
          * fallback to required redrect Urls

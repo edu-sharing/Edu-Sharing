@@ -53,7 +53,7 @@ public class ConnectorServlet extends HttpServlet  {
 		String nodeId = req.getParameter("nodeId");
 		
 		
-		HashMap<String,String> auth = new AuthenticationToolAPI().validateAuthentication(req.getSession());
+		Map<String,String> auth = new AuthenticationToolAPI().validateAuthentication(req.getSession());
 		
 		if(auth == null){
 			resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -127,7 +127,7 @@ public class ConnectorServlet extends HttpServlet  {
 			return;
 		}
 
-		HashMap<String, Object> properties=null;
+		Map<String, Object> properties;
 		try {
 			properties = NodeServiceHelper.getPropertiesOriginal(nodeRef);
 		} catch (Throwable e1) {

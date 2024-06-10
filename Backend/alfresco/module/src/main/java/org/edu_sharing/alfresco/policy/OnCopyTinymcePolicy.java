@@ -61,7 +61,7 @@ public class OnCopyTinymcePolicy implements OnCopyCompletePolicy {
 	}
 
 	Map<String, Serializable> transformQNameKeyToString(Map<QName, Serializable> props) {
-		Map<String, Serializable> result = new HashMap<String, Serializable>();
+		Map<String, Serializable> result = new HashMap<>();
 		for (Map.Entry<QName, Serializable> entry : props.entrySet()) {
 			result.put(entry.getKey().toString(), entry.getValue());
 		}

@@ -56,6 +56,13 @@ public class FactualTermDisplayUpdater {
         filter.put(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD, key);
         List<NodeRef> nodeRefs = CMISSearchHelper.fetchNodesByTypeAndFilters(CCConstants.CCM_TYPE_IO,filter,storeRef);
         logger.info("found "+nodeRefs.size() +" io's with classification_keyword:"+ key + " in store:" + storeRef);
+        if(storeRef.equals(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE)
+                || storeRef.equals(StoreRef.STORE_REF_ARCHIVE_SPACESSTORE)){
+            List<NodeRef> nodeRefsMap = CMISSearchHelper.fetchNodesByTypeAndFilters(CCConstants.CCM_TYPE_MAP,filter,storeRef);
+            nodeRefs.addAll(nodeRefsMap);
+            logger.info("found "+nodeRefsMap.size() +" map's with classification_keyword:"+ key + " in store:" + storeRef);
+        }
+
         for(NodeRef nodeRef : nodeRefs){
             List<String> keys = (List<String>) nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD));
             ArrayList<String> displays = new ArrayList<>();

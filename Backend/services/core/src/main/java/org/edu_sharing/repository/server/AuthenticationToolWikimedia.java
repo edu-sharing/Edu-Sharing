@@ -1,6 +1,7 @@
 package org.edu_sharing.repository.server;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -12,12 +13,12 @@ public class AuthenticationToolWikimedia extends AuthenticationToolAbstract {
 	}
 	
 	@Override
-	public HashMap<String, String> createNewSession(String userName, String password) throws Exception {
+	public Map<String, String> createNewSession(String userName, String password) throws Exception {
 		return null;
 	}
 	
 	@Override
-	public HashMap<String, String> getUserInfo(String userName, String ticket) throws Exception {
+	public Map<String, String> getUserInfo(String userName, String ticket) throws Exception {
 		return null;
 	}
 	
@@ -26,8 +27,8 @@ public class AuthenticationToolWikimedia extends AuthenticationToolAbstract {
 	}  
 	
 	@Override
-	public HashMap<String, String> validateAuthentication(HttpSession session) {
-		HashMap<String,String> authInfo = new HashMap<String,String>();
+	public Map<String, String> validateAuthentication(HttpSession session) {
+		Map<String,String> authInfo = new HashMap<>();
 		authInfo.put(CCConstants.AUTH_USERNAME, "wikimedia");
 		authInfo.put(CCConstants.AUTH_TICKET, "wikimedia");
 		return authInfo;

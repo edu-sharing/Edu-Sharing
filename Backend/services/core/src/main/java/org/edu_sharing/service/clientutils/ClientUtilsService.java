@@ -1,15 +1,10 @@
 package org.edu_sharing.service.clientutils;
 
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 import com.typesafe.config.Config;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.commons.validator.routines.DomainValidator;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
@@ -36,8 +31,11 @@ import org.htmlparser.util.NodeList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
+
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class ClientUtilsService {
 	static Logger logger = Logger.getLogger(ClientUtilsService.class);
@@ -52,14 +50,19 @@ public class ClientUtilsService {
 		info.setPage(page);
 		boolean resolveWebsites = LightbendConfigLoader.get().getBoolean("repository.communication.resolveUrlInformation");
 		if (!resolveWebsites) {
-			try {
-				addDuplicateNodes(url, info);
-			} catch (Throwable e) {
-				logger.info(e.getMessage());
-			}
+			defaultHandling(url, info);
 			return info;
 		}
-		try {
+			try {
+
+			URI uri = new URI(url);
+			String domain = uri.getHost();
+			boolean validDomain = DomainValidator.getInstance(false).isValid(domain);
+			if(!validDomain){
+				defaultHandling(url, info);
+			return info;
+		}
+
 			new URL(url);
 			HttpQueryTool httpQuery = new HttpQueryTool();
 			String result = httpQuery.query(url);
@@ -139,11 +142,7 @@ public class ClientUtilsService {
 			return info;
 		} catch (Throwable e) {
 			logger.info(e.getMessage());
-			try {
-				addDuplicateNodes(url, info);
-			} catch (Throwable e2) {
-				logger.info(e2.getMessage());
-			}
+			defaultHandling(url, info);
 			return info;
 		}
 	}
@@ -188,5 +187,13 @@ public class ClientUtilsService {
 				null
 		);
 		info.getDuplicateNodes().addAll(converted);
+	}
+
+	private static void defaultHandling(String url, WebsiteInformation info) {
+		try {
+			addDuplicateNodes(url, info);
+		} catch (Throwable e) {
+			logger.info(e.getMessage());
+		}
 	}
 }

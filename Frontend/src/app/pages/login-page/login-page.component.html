@@ -35,6 +35,7 @@
               type="text"
               matInput
               placeholder="{{ 'LOGIN.PROVIDER_PLACEHOLDER' | translate }}"
+              (keydown.enter)="goToProvider()"
               [formControl]="providerControl"
               [matAutocomplete]="autoProvider"
             />
@@ -53,7 +54,7 @@
                 >
                   <div class="mat-option-primary">{{ option.name }}</div>
                   <div class="mat-option-secondary">
-                    {{ option.url | esUrl : { mode: 'domain' } }}
+                    {{ option.url | esUrl: { mode: 'domain' } }}
                   </div>
                 </mat-option>
               </mat-optgroup>

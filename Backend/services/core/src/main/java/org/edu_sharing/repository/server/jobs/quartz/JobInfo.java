@@ -6,6 +6,8 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.utils.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,12 +15,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class JobInfo implements Serializable {
+    private static final Logger log = LoggerFactory.getLogger(JobInfo.class);
     private final String uniqueId;
     private Class jobClass;
     private Key jobKey;
     private JobDataMap jobDataMap;
     private String jobName;
     private String jobGroup;
+    private long threadId = -1;
 
     public JobInfo(JobDetail jobDetail) {
         uniqueId = UUID.randomUUID().toString();
@@ -56,6 +60,14 @@ public class JobInfo implements Serializable {
 
     public void setWorstLevel(Level level) {
         this.worstLevel = level;
+    }
+
+    public long getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(long threadId) {
+        this.threadId = threadId;
     }
 
     public enum Status{

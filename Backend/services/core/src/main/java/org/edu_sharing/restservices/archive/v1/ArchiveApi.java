@@ -127,7 +127,7 @@ public class ArchiveApi {
 					ArchiveDao.search(repoDao, pattern, skipCount, maxItems, sortProperties, sortAscending) : 
 						ArchiveDao.search(repoDao, pattern,user, skipCount, maxItems, sortProperties, sortAscending);
 			
-			List<Node> data = new ArrayList<Node>();
+			List<Node> data = new ArrayList<>();
 	    	for (NodeRef ref : search.getResult()) {
 	    		
 	    		if(ref.isArchived()){

@@ -3,7 +3,6 @@ import { MdsEditorWidgetBase } from '../mds-editor/widgets/mds-editor-widget-bas
 import { MdsWidget } from 'ngx-edu-sharing-api';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Node } from '../../../core-module/rest/data-object';
-import { Metadata } from 'ngx-edu-sharing-graphql';
 
 export {
     MdsDefinition,
@@ -178,16 +177,13 @@ export type EditorMode = 'nodes' | 'search' | 'form' | 'inline' | 'viewer';
 export interface NativeWidgetComponent {
     hasChanges: BehaviorSubject<boolean>;
     onSaveNode?: (nodes: Node[]) => Promise<Node[]>;
-    getValues?: (values: Values, node: Node | Metadata) => Promise<Values>;
-    getValuesGraphql?: (values: Metadata, node: Metadata) => Promise<Metadata>;
+    getValues?: (values: Values, node: Node) => Promise<Values>;
     status?: Observable<InputStatus>;
     focus?: () => void;
 }
 
 export type NativeWidgetClass = {
     constraints: Constraints;
-    // ids of fields in dot-notation this widget requires for displaying the node data
-    graphqlIds?: string[];
 } & Type<NativeWidgetComponent>;
 
 /**

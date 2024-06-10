@@ -48,7 +48,7 @@ export class NodeEntriesCardComponent<T extends Node> implements OnChanges, OnIn
         public configService: ConfigService,
         public authenticationService: AuthenticationService,
         public templatesService: NodeEntriesTemplatesService,
-        private nodeEntriesGlobalService: NodeEntriesGlobalService,
+        public nodeEntriesGlobalService: NodeEntriesGlobalService,
         @Optional() private toast: Toast,
     ) {}
 

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -77,7 +78,7 @@ public class MoodleImporter {
 				for (int i = 0, c = nodeList.getLength(); i < c; ++i) {
 					
 					Node node = nodeList.item(i);
-					HashMap<String,Object> eduProps = new HashMap<String,Object>();
+					Map<String,Object> eduProps = new HashMap<>();
 					
 					String id = xPath.compile("KEY[@name='id']/VALUE/text()").evaluate(node);
 					

@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class GroupDao {
 
     static Logger logger = Logger.getLogger(GroupDao.class);
-    private final HashMap<String, Object> properties;
+    private final Map<String, Object> properties;
     private final String[] aspects;
     private final ArrayList<EduGroup> parentOrganizations;
     private String userEmail;
@@ -83,7 +83,7 @@ public class GroupDao {
 
         try {
 
-            List<GroupDao> resultset = new ArrayList<GroupDao>();
+            List<GroupDao> resultset = new ArrayList<>();
             for (String groupName : ((MCAlfrescoAPIClient) repoDao.getBaseClient()).searchGroupNames(pattern)) {
 
                 resultset.add(new GroupDao(repoDao, groupName));
@@ -537,7 +537,7 @@ public class GroupDao {
     }
 
     private void notifyGroupSignup(String groupName, NodeRef userRef, String receiver, String messageType) throws Exception {
-        HashMap<String, String> replace = new HashMap<>();
+        Map<String, String> replace =  new HashMap<>();
         replace.put("group", groupName);
         replace.put("firstName", NodeServiceHelper.getProperty(userRef, CCConstants.CM_PROP_PERSON_FIRSTNAME));
         replace.put("lastName", NodeServiceHelper.getProperty(userRef, CCConstants.CM_PROP_PERSON_LASTNAME));

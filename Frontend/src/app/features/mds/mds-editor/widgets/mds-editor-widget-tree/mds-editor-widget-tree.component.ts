@@ -17,7 +17,11 @@ import { startWith } from 'rxjs/operators';
 import { MdsEditorInstanceService } from '../../mds-editor-instance.service';
 import { MdsWidget, MdsWidgetType } from '../../../types/types';
 import { DisplayValue } from '../DisplayValues';
-import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
+import {
+    MdsEditorWidgetBase,
+    MdsEditorWidgetChipsSuggestionBase,
+    ValueType,
+} from '../mds-editor-widget-base';
 import { MdsEditorWidgetTreeCoreComponent } from './mds-editor-widget-tree-core/mds-editor-widget-tree-core.component';
 import { Tree } from './tree';
 import { MatChip, MatChipOption, MatChipRow } from '@angular/material/chips';
@@ -31,9 +35,26 @@ import { UIHelper } from '../../../../../core-ui-module/ui-helper';
     styleUrls: ['./mds-editor-widget-tree.component.scss'],
 })
 export class MdsEditorWidgetTreeComponent
-    extends MdsEditorWidgetBase
+    extends MdsEditorWidgetChipsSuggestionBase
     implements OnInit, AfterViewInit, OnDestroy
 {
+    add(value: DisplayValue): void {
+        const treeNode = this.tree.findById(value.key);
+        // old values are may not available in tree, so check for null
+        if (treeNode) {
+            treeNode.isChecked = true;
+            treeNode.isIndeterminate = false;
+        }
+        const values: DisplayValue[] = this.chipsControl.value;
+        this.chipsControl.setValue([...values, value]);
+        this.preventOverlayOpen = true;
+        setTimeout(() => {
+            this.preventOverlayOpen = false;
+        });
+    }
+    toDisplayValue(value: string): DisplayValue {
+        return this.tree.toDisplayValue(value);
+    }
     @ViewChild(CdkConnectedOverlay) overlay: CdkConnectedOverlay;
     @ViewChild('chipList', { read: ElementRef }) chipList: ElementRef<HTMLElement>;
     @ViewChild('treeRef') treeRef: MdsEditorWidgetTreeCoreComponent;
@@ -46,7 +67,6 @@ export class MdsEditorWidgetTreeComponent
 
     valueType: ValueType;
     tree: Tree;
-    chipsControl: UntypedFormControl;
     indeterminateValues$: BehaviorSubject<string[]>;
     overlayIsVisible = false;
     /**
@@ -98,11 +118,12 @@ export class MdsEditorWidgetTreeComponent
             (await this.widget.getInitalValuesAsync()).jointValues ?? [],
             (await this.widget.getInitalValuesAsync()).individualValues,
         );
+        super.initSuggestions();
         this.chipsControl = new UntypedFormControl(
             [
                 ...((await this.widget.getInitalValuesAsync()).jointValues ?? []),
                 ...((await this.widget.getInitalValuesAsync()).individualValues ?? []),
-            ].map((value) => this.tree.idToDisplayValue(value)),
+            ].map((value) => this.tree.toDisplayValue(value)),
             this.getStandardValidators(),
         );
         this.indeterminateValues$ = new BehaviorSubject(

@@ -19,7 +19,6 @@ import {
     EduSharingApiConfigurationParams,
     EduSharingApiModule,
 } from 'ngx-edu-sharing-api';
-import { EduSharingGraphqlModule } from 'ngx-edu-sharing-graphql';
 import {
     AppService as AppServiceAbstract,
     EduSharingUiModule,
@@ -66,7 +65,6 @@ const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
         DialogsModule,
         DragDropModule,
         EduSharingApiModule.forRoot(),
-        EduSharingGraphqlModule,
         EduSharingUiModule.forRoot({ production: environment.production }),
         extensionImports,
         HttpClientModule,
@@ -89,7 +87,7 @@ const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
             useFactory: (errorHandler: ErrorHandlerService) =>
                 ({
                     onError: (err, req) => errorHandler.handleError(err, req),
-                } as EduSharingApiConfigurationParams),
+                }) as EduSharingApiConfigurationParams,
         },
         {
             provide: APOLLO_OPTIONS,

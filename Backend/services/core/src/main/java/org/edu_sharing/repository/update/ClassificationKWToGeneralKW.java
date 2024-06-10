@@ -87,7 +87,7 @@ public class ClassificationKWToGeneralKW {
     }
 
     private void writeToGeneralKeyword(NodeRef nodeRef, List<MLText> generalKeyWordList, List<MLText> classificationKeywordList, boolean test) {
-        ArrayList<MLText> newKeywordsList = new ArrayList<MLText>();
+        ArrayList<MLText> newKeywordsList = new ArrayList<>();
 
         if (generalKeyWordList != null) {
             newKeywordsList.addAll(generalKeyWordList);

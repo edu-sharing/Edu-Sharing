@@ -1,9 +1,15 @@
 package org.alfresco.repo.webdav.auth;
 
+import com.typesafe.config.Config;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.web.filter.beans.DependencyInjectedFilter;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -25,10 +31,6 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.UserTransaction;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -41,7 +43,7 @@ import java.util.*;
 /**
  * Servlet Filter implementation class CockpitAuthenticationFilter
  */
-public class LDAPAuthenticationFilter implements Filter {
+public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilter {
 
 	private static final String CONTEXT = LDAPAuthenticationFilter.class.getCanonicalName();
 	private static final String RELEASE = "$Revision: 1422 $";
@@ -50,15 +52,22 @@ public class LDAPAuthenticationFilter implements Filter {
 
 	// init params
 
-	private static final String INIT_LDAP_URI      = "ldap.uri";
-	private static final String INIT_LDAP_BASE     = "ldap.base";
-	private static final String INIT_LDAP_SEC_AUTH = "ldap.sec.auth";
-	private static final String INIT_LDAP_SEC_USER = "ldap.sec.user";
-	private static final String INIT_LDAP_SEC_PWD  = "ldap.sec.pwd";
+	private static final String INIT_CONFIG_BASE = "repository.webdav.authentication.";
 
-	private static final String INIT_LDAP_FROM     = "ldap.from";
-	private static final String INIT_LDAP_TO       = "ldap.to";
-	private static final String INIT_LDAP_UID 	   = "ldap.uid";
+	private static final String INIT_LDAP_URI      = INIT_CONFIG_BASE + "ldap.uri";
+	private static final String INIT_LDAP_BASE     = INIT_CONFIG_BASE + "ldap.base";
+	private static final String INIT_LDAP_SEC_AUTH = INIT_CONFIG_BASE +"ldap.sec.auth";
+	private static final String INIT_LDAP_SEC_USER = INIT_CONFIG_BASE +"ldap.sec.user";
+	private static final String INIT_LDAP_SEC_PWD  = INIT_CONFIG_BASE + "ldap.sec.pwd";
+
+	private static final String INIT_LDAP_FROM     = INIT_CONFIG_BASE +"ldap.from";
+	private static final String INIT_LDAP_TO       = INIT_CONFIG_BASE + "ldap.to";
+	private static final String INIT_LDAP_UID 	   = INIT_CONFIG_BASE + "ldap.uid";
+
+	/**
+	 * edu-sharing customization
+	 */
+	private static final String INIT_USE_ALFRESCO_AUTHENTICATION_COMPONENT = INIT_CONFIG_BASE + "ldap.alfrescoAuthComponent";
 	
 
 	// Allow an authentication ticket to be passed as part of a request to bypass authentication
@@ -69,6 +78,8 @@ public class LDAPAuthenticationFilter implements Filter {
 
 
 	private static final Log logger = LogFactory.getLog(LDAPAuthenticationFilter.CONTEXT);
+
+	Config eduConfig = LightbendConfigLoader.get();
 
 	// Servlet context
 
@@ -86,12 +97,7 @@ public class LDAPAuthenticationFilter implements Filter {
 	private String ldapFrom;
 	private String ldapTo;
 
-	/**
-	 * edu-sharing customization
-	 */
-	
-	private static final String INIT_USE_ALFRESCO_AUTHENTICATION_COMPONENT = "alfresco.auth.comp";
-	private boolean useAlfrescoAuthenticationConponent = true;
+	private boolean useAlfrescoAuthenticationComponent = false;
 	private String ldapBase = null;
 	
 	//rember the env global
@@ -118,7 +124,7 @@ public class LDAPAuthenticationFilter implements Filter {
     
     static
     {
-        Map<String, CharsetDecoder> decoders = new LinkedHashMap<String, CharsetDecoder>(ENCODINGS.length * 2);
+        Map<String, CharsetDecoder> decoders = new LinkedHashMap<>(ENCODINGS.length * 2);
         for (String encoding : ENCODINGS)
         {
             if (!decoders.containsKey(encoding))
@@ -161,46 +167,23 @@ public class LDAPAuthenticationFilter implements Filter {
 		//this.m_personService = (PersonService) ctx.getBean("PersonService");   // transactional and permission-checked
 		this.m_personService = (PersonService) context.getBean("PersonService");   // transactional and permission-checked
 
-		Properties properties = new Properties();
-		try {
-			properties.load(getClass().getClassLoader().getResourceAsStream("ldap.properties"));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		this.ldapBase = properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_BASE);
-		
+
+		this.ldapBase = eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_BASE);
+		this.ldapUrl = eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_URI);
+		this.ldapFrom = eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_FROM);
+		this.ldapTo = eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_TO);
+		this.ldapUidProp = eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_UID);
+		if(this.ldapUidProp == null || this.ldapUidProp.trim().equals("")) this.ldapUidProp = "uid";
+
 		env = new Properties();
 		env.put(Context.INITIAL_CONTEXT_FACTORY,
 				"com.sun.jndi.ldap.LdapCtxFactory");
-
-		
-		this.ldapUrl = properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_URI);
-		env.put(Context.PROVIDER_URL, this.ldapUrl + "/" + this.ldapBase);
-		env.put(Context.SECURITY_AUTHENTICATION, properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_SEC_AUTH));
-		env.put(Context.SECURITY_PRINCIPAL, properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_SEC_USER));
-		env.put(Context.SECURITY_CREDENTIALS, properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_SEC_PWD));
-		
 		//edu-sharing
-		String useAlfAuthComp = properties.getProperty(LDAPAuthenticationFilter.INIT_USE_ALFRESCO_AUTHENTICATION_COMPONENT);
-		if(useAlfAuthComp != null && !useAlfAuthComp.trim().equals("") ){
-			useAlfrescoAuthenticationConponent = new Boolean(useAlfAuthComp);
-		}
-
-		try {
-
-			this.jndi = new InitialDirContext(env);
-
-		} catch (NamingException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServletException(e);
-		}
-
-		this.ldapFrom = properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_FROM);
-		this.ldapTo = properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_TO);
-		this.ldapUidProp = properties.getProperty(LDAPAuthenticationFilter.INIT_LDAP_UID);
-		if(this.ldapUidProp == null || this.ldapUidProp.trim().equals("")) this.ldapUidProp = "uid";
-		
+		useAlfrescoAuthenticationComponent = eduConfig.getBoolean(LDAPAuthenticationFilter.INIT_USE_ALFRESCO_AUTHENTICATION_COMPONENT);
+		env.put(Context.PROVIDER_URL, this.ldapUrl + "/" + this.ldapBase);
+		env.put(Context.SECURITY_AUTHENTICATION, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_AUTH));
+		env.put(Context.SECURITY_PRINCIPAL, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_USER));
+		env.put(Context.SECURITY_CREDENTIALS, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_PWD));
 	}
 
 	/**
@@ -220,6 +203,10 @@ public class LDAPAuthenticationFilter implements Filter {
 		}
 	}
 
+	@Override
+	public void doFilter(ServletContext servletContext, ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+		doFilter(servletRequest, servletResponse, filterChain);
+	}
 	/**
 	 * Run the authentication filter
 	 * 
@@ -233,10 +220,18 @@ public class LDAPAuthenticationFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
 	ServletException
 	{
-		
-		logger.debug("called!!!");
-		// Assume it's an HTTP request
+		if(this.jndi == null){
+			try {
 
+				this.jndi = new InitialDirContext(env);
+
+			} catch (NamingException e) {
+				logger.error(e.getMessage(), e);
+				throw new ServletException(e);
+			}
+		}
+
+		// Assume it's an HTTP request
 		HttpServletRequest httpReq = (HttpServletRequest) req;
 		HttpServletResponse httpResp = (HttpServletResponse) resp;
 
@@ -589,7 +584,7 @@ public class LDAPAuthenticationFilter implements Filter {
 
 			}
 
-			if(useAlfrescoAuthenticationConponent){
+			if(useAlfrescoAuthenticationComponent){
 				this.m_authService.authenticate(username, password.toCharArray());
 			}else{
 				
@@ -668,4 +663,5 @@ public class LDAPAuthenticationFilter implements Filter {
 		}
 		throw new AuthenticationException("LDAPAuthenticationFilter env seems to be null");
 	}
+
 }

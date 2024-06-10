@@ -71,8 +71,8 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 	List<NodeRef> allNodesInImportfolder = null;
 
 	//
-	HashMap<String, String> replIdTimestampMap = null;
-	HashMap<String, NodeRef> replIdMap = null;
+	Map<String, String> replIdTimestampMap = null;
+	Map<String, NodeRef> replIdMap = null;
 
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss");
 
@@ -145,7 +145,7 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 	}
 
 	public String safe(RecordHandlerInterfaceBase recordHandler, String cursor, String set) throws Throwable {
-		HashMap<String, Object> newNodeProps = recordHandler.getProperties();
+		Map<String, Object> newNodeProps = recordHandler.getProperties();
 		String replicationId = (String) newNodeProps.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID);
 		String lomCatalogId = (String) newNodeProps.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE);
 
@@ -162,18 +162,18 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 
 
 		// watch out if object was already imported
-		// HashMap<String, HashMap<String, Object>> alfResult =
+		// Map<String, Map<String, Object>> alfResult =
 		// mcAlfrescoBaseClient.search("@ccm\\:replicationsourceid:"+replicationId+" AND @ccm\\:replicationsource:"+lomCatalogId,
 		// CCConstants.CCM_TYPE_IO);
 		// HashMap searchProps = new HashMap();
 		// searchProps.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE, lomCatalogId);
 		// searchProps.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replicationId);
-		// HashMap<String,Object> childProps = mcAlfrescoBaseClient.getChildRecursive(oaiImportBasefolder, CCConstants.CCM_TYPE_IO, searchProps);
+		// Map<String,Object> childProps = mcAlfrescoBaseClient.getChildRecursive(oaiImportBasefolder, CCConstants.CCM_TYPE_IO, searchProps);
 		String nodeReplId=lomCatalogId+":"+replicationId;
-		HashMap<String, Object> filter = new HashMap<String, Object>() {{
-			put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE, lomCatalogId);
-			put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replicationId);
-		}};
+		Map<String, Object> filter = new HashMap<>() {{
+            put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE, lomCatalogId);
+            put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replicationId);
+        }};
 		NodeRef childId = getNodeIfExists(filter);
 		getLogger().debug("child id "+nodeReplId+": "+childId);
 
@@ -249,9 +249,9 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 			return importFolderCursorIds.get(searchId);
 
 		String folderId=importFolderId;
-		HashMap<String, Object> setChild = mcAlfrescoBaseClient.getChild(folderId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME, set);
+		Map<String, Object> setChild = mcAlfrescoBaseClient.getChild(folderId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME, set);
 		if (setChild == null) {
-			HashMap newimportFolderProps = new HashMap();
+			Map<String, Object> newimportFolderProps = new HashMap<>();
 			newimportFolderProps.put(CCConstants.CM_NAME, set);
 			newimportFolderProps.put(CCConstants.CM_PROP_C_TITLE, set);
 			getLogger().info("Folder for set "+set+" does not yet exists, will be created");
@@ -262,9 +262,9 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 
 
 
-		HashMap<String, Object> cursorChild = mcAlfrescoBaseClient.getChild(folderId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME, cursor);
+		Map<String, Object> cursorChild = mcAlfrescoBaseClient.getChild(folderId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME, cursor);
 		if (cursorChild == null) {
-			HashMap newimportFolderProps = new HashMap();
+			Map<String, Object> newimportFolderProps = new HashMap<>();
 			newimportFolderProps.put(CCConstants.CM_NAME, cursor);
 			newimportFolderProps.put(CCConstants.CM_PROP_C_TITLE, cursor);
 			getLogger().info("Folder for set "+set+" with cursor "+cursor+" does not yet exists, will be created");
@@ -279,11 +279,11 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 	public static String prepareImportFolder() throws Throwable {
 		MCAlfrescoAPIClient mcAlfrescoBaseClient = new MCAlfrescoAPIClient();
 		String companyHomeId = mcAlfrescoBaseClient.getCompanyHomeNodeId();
-		HashMap<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
+		Map<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
 				OAIPMHLOMImporter.FOLDER_NAME_IMPORTED_OBJECTS);
 		String importFolderId;
 		if (importFolderProps == null) {
-			HashMap newimportFolderProps = new HashMap();
+			Map<String, Object> newimportFolderProps = new HashMap<>();
 			newimportFolderProps.put(CCConstants.CM_NAME, OAIPMHLOMImporter.FOLDER_NAME_IMPORTED_OBJECTS);
 			newimportFolderProps.put(CCConstants.CM_PROP_C_TITLE, OAIPMHLOMImporter.FOLDER_NAME_IMPORTED_OBJECTS);
 			importFolderId = mcAlfrescoBaseClient.createNode(companyHomeId, CCConstants.CCM_TYPE_MAP, newimportFolderProps);
@@ -374,13 +374,13 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 	public void updateNode(String nodeId, Map props, List<String> propertiesToRemove) throws Throwable {
 		// idea first delete all childs and create them new
 		synchronized (this) {
-			HashMap children = mcAlfrescoBaseClient.getChildren(nodeId);
+			Map<String, Map<String,Object>> children = mcAlfrescoBaseClient.getChildren(nodeId);
 			for (Object key : children.keySet()) {
 				mcAlfrescoBaseClient.removeNode((String) key, nodeId, false);
 			}
 		}
-		HashMap<String, Object> simpleProps = new HashMap<String, Object>();
-		HashMap<String, Object> nodeProps = new HashMap<String, Object>();
+		Map<String, Object> simpleProps = new HashMap<>();
+		Map<String, Object> nodeProps = new HashMap<>();
 		for (Object key : props.keySet()) {
 			String propKey = (String) key;
 			if (propKey.startsWith("TYPE#")) {
@@ -414,7 +414,7 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 		createChildobjects(nodeId, nodeProps);
 	}
 
-	private void createChildobjects(String nodeId, HashMap<String, Object> nodeProps) throws Throwable {
+	private void createChildobjects(String nodeId, Map<String, Object> nodeProps) throws Throwable {
 		if(importer!=null && !importer.getRecordHandler().createSubobjects()){
 			return;
 		}
@@ -439,12 +439,12 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 		}
 	}
 
-	public String createNode(String parentId, String type, String association, Map props) throws Throwable {
-		HashMap<String, Object> simpleProps = new HashMap<String, Object>();
-		HashMap<String, Object> nodeProps = new HashMap<String, Object>();
+	public String createNode(String parentId, String type, String association, Map<String, Object> props) throws Throwable {
+		Map<String, Object> simpleProps = new HashMap<>();
+		Map<String, Object> nodeProps = new HashMap<>();
 		String[] aspects=null;
-		for (Object key : props.keySet()) {
-			String propKey = (String) key;
+		for (String key : props.keySet()) {
+			String propKey = key;
 			if(propKey.equals("ASPECTS")){
 				aspects=(String[])props.get(propKey);
 			}
@@ -474,11 +474,11 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 		return newNodeId;
 	}
 
-	public HashMap<String, NodeRef> getReplIdMap() {
+	public Map<String, NodeRef> getReplIdMap() {
 		return replIdMap;
 	}
 
-	public HashMap<String, String> getReplicationIdTimestampMap() {
+	public Map<String, String> getReplicationIdTimestampMap() {
 		if(!hasTimestampMap) {
 			replIdMap = new HashMap<>();
 			replIdTimestampMap=new HashMap<>();
@@ -589,7 +589,7 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 	private String getOldTimestamp(String replId) {
 		if(!hasTimestampMap) {
 			try {
-				NodeRef node = getNodeIfExists(new HashMap<String, Object>() {{
+				NodeRef node = getNodeIfExists(new HashMap<>() {{
 						put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replId);
 					}});
 				return NodeServiceHelper.getProperty(node, CCConstants.CCM_PROP_IO_REPLICATIONSOURCETIMESTAMP);

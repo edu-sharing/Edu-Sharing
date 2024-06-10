@@ -18,7 +18,7 @@ public class ImportFactualTermsFromFileSax implements ContentHandler  {
 
     String currentValue = null;
     Attributes currentAtts = null;
-    List<String> openedElements = new ArrayList<String>();
+    List<String> openedElements = new ArrayList<>();
 
     String currentDatafieldTag = null;
 
@@ -176,7 +176,7 @@ public class ImportFactualTermsFromFileSax implements ContentHandler  {
                     }
 
                     @Override
-                    public HashMap<String, Object> getProperties() {
+                    public Map<String, Object> getProperties() {
                         return currentProperties;
                     }
                 },"","");

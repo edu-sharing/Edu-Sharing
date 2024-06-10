@@ -105,7 +105,7 @@ public class SearchServiceYouTubeImpl extends SearchServiceAdapter{
 				searchResultNodeRef.setSearchCriterias(rc);
 				
 				
-				HashMap<String, HashMap<String, Object>> resultData = new HashMap<String, HashMap<String, Object>>();
+				Map<String, Map<String, Object>> resultData = new HashMap<>();
 				searchResultNodeRef.setStartIDX(token.getFrom());
 				searchResultNodeRef.setNodeCount(searchResponse.getPageInfo()==null ? 0 : searchResponse.getPageInfo().getTotalResults());
 				Iterator<SearchResult> iteratorSearchResults = searchResultList.iterator();
@@ -122,7 +122,7 @@ public class SearchServiceYouTubeImpl extends SearchServiceAdapter{
 						// Confirm that the result represents a video.
 						// Otherwise, the item will not contain a video ID.
 						if (rId.getKind().equals("youtube#video")) {
-							HashMap<String, Object> esResult = NodeServiceYouTube.getPropsByVideoEntry(repositoryId,singleVideo);
+							Map<String, Object> esResult = NodeServiceYouTube.getPropsByVideoEntry(repositoryId,singleVideo);
 							//resultData.put((String) esResult.get(CCConstants.SYS_PROP_NODE_UID), esResult);
 							
 							org.edu_sharing.service.model.NodeRef enr = new org.edu_sharing.service.model.NodeRefImpl(this.repositoryId, 

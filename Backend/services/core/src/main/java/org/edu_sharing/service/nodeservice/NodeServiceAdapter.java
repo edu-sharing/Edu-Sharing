@@ -2,10 +2,7 @@ package org.edu_sharing.service.nodeservice;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.alfresco.service.cmr.repository.*;
@@ -30,7 +27,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public void updateNode(String nodeId, HashMap<String, String[]> props) throws Throwable {
+	public void updateNode(String nodeId, Map<String, String[]> props) throws Throwable {
 	}
 
 	@Override
@@ -39,12 +36,12 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public String createNode(String parentId, String nodeType, HashMap<String, String[]> props) throws Throwable {
+	public String createNode(String parentId, String nodeType, Map<String, String[]> props) throws Throwable {
 		return null;
 	}
 
 	@Override
-	public String createNodeBasic(String parentID, String nodeTypeString, HashMap<String, ?> _props) {
+	public String createNodeBasic(String parentID, String nodeTypeString, Map<String, ?> _props) {
 		return null;
 	}
 
@@ -64,7 +61,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public HashMap<String, String[]> getNameProperty(String name) {
+	public Map<String, String[]> getNameProperty(String name) {
 		return null;
 	}
 
@@ -111,17 +108,17 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
-		return new HashMap<String,Object>();
+	public Map<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
+		return new HashMap<>();
 	}
 
 	@Override
-	public HashMap<String, Object> getPropertiesDynamic(String storeProtocol, String storeId, String nodeId) throws Throwable {
-		return new HashMap<String,Object>();
+	public Map<String, Object> getPropertiesDynamic(String storeProtocol, String storeId, String nodeId) throws Throwable {
+		return new HashMap<>();
 	}
 
 	@Override
-	public HashMap<String, Object> getPropertiesPersisting(String storeProtocol, String storeId, String nodeId) throws Throwable {
+	public Map<String, Object> getPropertiesPersisting(String storeProtocol, String storeId, String nodeId) throws Throwable {
 		return getProperties(storeProtocol, storeId, nodeId);
 	}
 
@@ -149,7 +146,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 	
 	@Override
-	public HashMap<String, HashMap<String, Object>> getVersionHistory(String nodeId) throws Throwable {
+	public Map<String, Map<String, Object>> getVersionHistory(String nodeId) throws Throwable {
 		return null;
 	}
 
@@ -160,7 +157,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	private List<String> getPropertyValues(ValueTool vt,Object value) {
-		List<String> values = new ArrayList<String>();
+		List<String> values = new ArrayList<>();
 		if (value != null ){
 			for (String mv : vt.getMultivalue(value.toString())) {
 				values.add(mv);
@@ -169,9 +166,9 @@ public class NodeServiceAdapter implements NodeService {
 		return values;
 	}
 	
-	private HashMap<String,String[]> convertProperties(HashMap<String,Object> propsIn){
+	private Map<String,String[]> convertProperties(Map<String,Object> propsIn){
 		ValueTool vt = new ValueTool();
-		HashMap<String,String[]> properties = new HashMap<String,String[]>();
+		Map<String,String[]> properties = new HashMap<>();
 		for (Entry<String, Object> entry : propsIn.entrySet()) {
 			List<String> values = getPropertyValues(vt, entry.getValue());
 			properties.put(entry.getKey(), values.toArray(new String[values.size()]));
@@ -197,7 +194,7 @@ public class NodeServiceAdapter implements NodeService {
 	 */
 	@Override
 	public String importNode(String nodeId,String localParent) throws Throwable {
-		HashMap<String, Object> props = getProperties(null, null, nodeId);
+		Map<String, Object> props = getProperties(null, null, nodeId);
 		String mimetype=null;
 		if(props.containsKey(CCConstants.LOM_PROP_TECHNICAL_FORMAT))
 			mimetype= (String) props.get(CCConstants.LOM_PROP_TECHNICAL_FORMAT);
@@ -239,7 +236,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public String createNode(String parentId, String nodeType, HashMap<String, String[]> props, String childAssociation)
+	public String createNode(String parentId, String nodeType, Map<String, String[]> props, String childAssociation)
 			throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
@@ -280,7 +277,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public void updateNodeNative(String nodeId, HashMap<String, ?> _props) {
+	public void updateNodeNative(String nodeId, Map<String, ?> _props) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -293,7 +290,7 @@ public class NodeServiceAdapter implements NodeService {
 
 	@Override
 	public String createNodeBasic(StoreRef store, String parentID, String nodeTypeString, String childAssociation,
-			HashMap<String, ?> _props) {
+								  Map<String, ?> _props) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -321,7 +318,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public void setTemplateProperties(String nodeId, HashMap<String, String[]> stringHashMap) throws Throwable {
+	public void setTemplateProperties(String nodeId, Map<String, String[]> properties) throws Throwable {
 
 	}
 
@@ -362,7 +359,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public GetPreviewResult getPreview(String storeProtocol, String storeIdentifier, String nodeId, HashMap<String, Object> nodeProps, String version) {
+	public GetPreviewResult getPreview(String storeProtocol, String storeIdentifier, String nodeId, Map<String, Object> nodeProps, String version) {
 	    try {
 			String previewURL = URLTool.getBaseUrl(true);
 			previewURL += "/preview?nodeId="+URLEncoder.encodeUriComponent(nodeId)+"&repository="+

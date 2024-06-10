@@ -27,11 +27,11 @@
  */
 package org.edu_sharing.service.authentication;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import org.alfresco.repo.security.authentication.AuthenticationException;
 
 public interface AuthMethodInterface {
 	
-	public String authenticate(HashMap<String,String> params) throws AuthenticationException;
+	String authenticate(Map<String, String> params) throws AuthenticationException;
 }

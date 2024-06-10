@@ -74,7 +74,7 @@ public class ProtocolDiffDBSolrJob extends AbstractJob{
         logger.info("collection db nodes");
         List<NodeRef> nodesInDb = new NodeHelper().getNodes(startFolder);
 
-        List<NodeRef> diff = new ArrayList<NodeRef>(nodesInDb);
+        List<NodeRef> diff = new ArrayList<>(nodesInDb);
         diff.removeAll(nodesInSolr);
         if(diff.size() == 0){
             logger.info("no diff between database and solr in this folder " + startFolder);

@@ -230,7 +230,7 @@ class PermissionCheckingTest {
         // given
         String authority = "Muster";
         NodeRefImpl nodeA = new NodeRefImpl("1");
-        nodeA.setPermissions(new HashMap<String, Boolean>(){{
+        nodeA.setPermissions(new HashMap<>(){{
             put("someNodePermission", false);
         }});
 
@@ -256,7 +256,7 @@ class PermissionCheckingTest {
         // given
         String authority = "Muster";
         NodeRefImpl nodeA = new NodeRefImpl("1");
-        nodeA.setPermissions(new HashMap<String, Boolean>(){{
+        nodeA.setPermissions(new HashMap<>(){{
             put("someNodePermission", true);
         }});
 

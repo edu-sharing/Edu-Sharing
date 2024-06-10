@@ -12,15 +12,12 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.forms.VCardTool;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.NodeRefVersion;
-import org.edu_sharing.repository.server.tools.cache.PersonCache;
 import org.edu_sharing.service.license.LicenseService;
-import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +38,7 @@ public class LRMITool {
     public static JSONObject getLRMIJson(NodeRefVersion node) throws Throwable {
         JSONObject lrmi=new JSONObject();
         // TODO: This probably has to work for remote repos in future
-        HashMap<String, Object> props = NodeServiceHelper.getPropertiesVersion(node.getNodeRef(), node.getVersion());
+        Map<String, Object> props = NodeServiceHelper.getPropertiesVersion(node.getNodeRef(), node.getVersion());
         Config lrmiProps = getMappingFile();
         lrmi.put("@context","http://schema.org/");
         lrmi.put("@type",new String[]{"CreativeWork","MediaObject"});
@@ -98,13 +95,13 @@ public class LRMITool {
         }
     }
 
-    private static Object getFromVCard(String key,HashMap<String,Object> props) throws JSONException {
+    private static Object getFromVCard(String key,Map<String,Object> props) throws JSONException {
         if(props.get(key)==null)
             return null;
         String[] values=new ValueTool().getMultivalue(props.get(key).toString());
         JSONArray result=new JSONArray();
         for(String v: values) {
-            HashMap<String, Object> vcard = VCardConverter.getVCardHashMap(null, key, v);
+            Map<String, Object> vcard = VCardConverter.getVCardMap(null, key, v);
             if (vcard == null || vcard.size() == 0)
                 return null;
 
@@ -139,7 +136,7 @@ public class LRMITool {
      * @param keys
      * @return
      */
-    private static Object getPropertyCombined(HashMap<String, Object> props, List<List<String>> keys) {
+    private static Object getPropertyCombined(Map<String, Object> props, List<List<String>> keys) {
         for(List<String> keyArray : keys){
             List<Object> result=new ArrayList<>();
             for(String key : keyArray) {
@@ -166,7 +163,7 @@ public class LRMITool {
         }
         return null;
     }
-    private static Object getProperty(HashMap<String, Object> props, List<String> keys) {
+    private static Object getProperty(Map<String, Object> props, List<String> keys) {
         return getPropertyCombined(props,Collections.singletonList(keys));
     }
 
@@ -222,7 +219,7 @@ public class LRMITool {
      *   },
      */
     private static String asVCard(JSONObject object) throws JSONException {
-        HashMap<String, String> map=new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         String type = object.getString("@type");
         if(type.equals("Person")){
             map.put(CCConstants.VCARD_GIVENNAME, object.getString("givenName"));

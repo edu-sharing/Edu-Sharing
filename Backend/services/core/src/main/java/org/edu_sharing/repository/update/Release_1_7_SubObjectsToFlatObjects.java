@@ -185,7 +185,7 @@ public class Release_1_7_SubObjectsToFlatObjects {
 
         List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(ioNodeRef);
 
-        Map<QName, Serializable> ioPropsToAdd = new HashMap<QName, Serializable>();
+        Map<QName, Serializable> ioPropsToAdd = new HashMap<>();
 
         for (ChildAssociationRef childAssoc : childAssocs) {
             if (nodeService.getType(childAssoc.getChildRef()).equals(QName.createQName(CCConstants.LOM_TYPE_CLASSIFICATION))) {
@@ -242,7 +242,7 @@ public class Release_1_7_SubObjectsToFlatObjects {
                     QName qnameProperty = QName.createQName(contributerProperty);
                     if (allPropertiesInAlf.contains(qnameProperty)) {
                         ArrayList<String> entities = (ArrayList<String>) ioPropsToAdd.get(qnameProperty);
-                        if (entities == null) entities = new ArrayList<String>();
+                        if (entities == null) entities = new ArrayList<>();
                         entities.add(entity.getDefaultValue());
                         ioPropsToAdd.put(qnameProperty, entities);
                     } else {

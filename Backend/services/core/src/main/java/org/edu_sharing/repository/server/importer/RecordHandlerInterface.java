@@ -31,7 +31,7 @@ import org.w3c.dom.Node;
 
 public interface RecordHandlerInterface extends RecordHandlerInterfaceBase {
 
-	public void handleRecord(Node nodeRecord,String cursor,String set) throws Throwable;
+	void handleRecord(Node nodeRecord, String cursor, String set) throws Throwable;
 
     /**
      * override this in any Record Handler to control if the peristent handler shall create subojects later

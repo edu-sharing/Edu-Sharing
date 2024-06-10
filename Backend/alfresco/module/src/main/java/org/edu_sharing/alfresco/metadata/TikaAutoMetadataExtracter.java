@@ -55,7 +55,7 @@ public class TikaAutoMetadataExtracter //extends org.alfresco.transformer.metada
 //         */
 //
 //
-//        SUPPORTED_MIMETYPES = new ArrayList<String>();
+//        SUPPORTED_MIMETYPES = new ArrayList<>();
 //        for(MediaType mt : parser.getParsers().keySet())
 //        {
 //            // Add the canonical mime type

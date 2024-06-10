@@ -76,8 +76,8 @@ public class SystemFolderNameToDisplayName {
 			for (String user : users) {
 
 				String homefolderId = mcAlfrescoBaseClient.getHomeFolderID(user);
-				HashMap<String, HashMap<String, Object>> children = mcAlfrescoBaseClient.getChildren(homefolderId);
-				for (Map.Entry<String, HashMap<String, Object>> entry : children.entrySet()) {
+				Map<String, Map<String, Object>> children = mcAlfrescoBaseClient.getChildren(homefolderId);
+				for (Map.Entry<String, Map<String, Object>> entry : children.entrySet()) {
 					String name = (String) entry.getValue().get(CCConstants.CM_NAME);
 					String type = (String) entry.getValue().get(CCConstants.NODETYPE);
 					String folderId = (String) entry.getValue().get(CCConstants.SYS_PROP_NODE_UID);
@@ -121,9 +121,9 @@ public class SystemFolderNameToDisplayName {
 		log.info("nr of updated objects:" + counter);
 	}
 
-	private void updateFolder(String folderId, HashMap suroundingNodes, String mapType, String displayName, boolean test) throws Exception {
+	private void updateFolder(String folderId, Map<String,Map<String,Object>> suroundingNodes, String mapType, String displayName, boolean test) throws Exception {
 
-		HashMap newProps = new HashMap();
+		Map<String,Object> newProps = new HashMap<>();
 
 		String uniqueValue = new DuplicateFinder().getUniqueValue(suroundingNodes, folderId, CCConstants.CM_NAME, displayName);
 		newProps.put(CCConstants.CM_NAME, uniqueValue);

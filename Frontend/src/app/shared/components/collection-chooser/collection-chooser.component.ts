@@ -152,6 +152,8 @@ export class CollectionChooserComponent implements OnInit {
                     contentType: 'COLLECTIONS',
                     metadataset: DEFAULT,
                     query: 'collections',
+                    skipCount: this.dataSourceLatest.getData().length,
+                    maxItems: RestConnectorService.DEFAULT_NUMBER_PER_REQUEST,
                     body: { criteria },
                 })
                 .subscribe(

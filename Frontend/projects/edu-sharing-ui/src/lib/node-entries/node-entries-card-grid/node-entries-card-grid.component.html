@@ -123,6 +123,7 @@
               esNodesDrag
               (cdkDragStarted)="onDragStarted(node)"
               (cdkDragEnded)="onDragEnded()"
+              [class.card-import-blocked]="isBlocked(node)"
               [class.selected-when-dragging]="
                 isDragging && entriesService.selection.isSelected(node)
               "

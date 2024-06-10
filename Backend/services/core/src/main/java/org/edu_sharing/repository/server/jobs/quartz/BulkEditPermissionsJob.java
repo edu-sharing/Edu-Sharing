@@ -15,6 +15,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,9 +29,10 @@ public class BulkEditPermissionsJob extends AbstractJobMapAnnotationParams{
 	private String startFolder;
 	@JobFieldDescription(description = "Lucene query to fetch the nodes that shall be processed. When used, the 'startFolder' parameter is ignored")
 	private String lucene;
+
 	@JobFieldDescription(description = "Mode to use")
 	private Mode mode;
-	@JobFieldDescription(description = "Authority name, only if mode == RemoveAuthority")
+	@JobFieldDescription(description = "Authority name, only if mode == RemoveAuthority or mode == AddCCPublish")
 	private String authorityName;
 
 	@JobFieldDescription(description = "Element types to process, e.g. ccm:map,ccm:io")
@@ -74,6 +76,24 @@ public class BulkEditPermissionsJob extends AbstractJobMapAnnotationParams{
 				} else if(mode.equals(Mode.Remove)) {
 					logger.info("Node " + ref.getId() + ": all local permissions will be removed");
 					permissionService.deletePermissions(ref);
+				} else if(mode.equals(Mode.AddCCPublish)) {
+					Set<AccessPermission> permissions = permissionService.getAllSetPermissions(ref);
+					permissions.stream().filter(p ->
+							// authority name equals given authority or do for all
+							(StringUtils.isBlank(authorityName) || p.getAuthority().equals(authorityName)) &&
+									// only apply for explicit permissions
+									!p.isInherited() &&
+									p.getAccessStatus().equals(AccessStatus.ALLOWED) &&
+									Arrays.asList(CCConstants.PERMISSION_READ, CCConstants.PERMISSION_CONSUMER).contains(p.getPermission())
+					).forEach(p -> {
+						// if CCPublish is already present for this user, do nothing
+						if (permissions.stream().anyMatch(p2 -> p.getAuthority().equals(p2.getAuthority()) && p2.getPermission().equals(CCConstants.PERMISSION_CC_PUBLISH) && p2.getAccessStatus().equals(AccessStatus.ALLOWED))) {
+							return;
+						}
+						permissionService.setPermission(ref, p.getAuthority(), CCConstants.PERMISSION_CC_PUBLISH, true);
+						logger.info("Added CCPublish for user " + p.getAuthority() + " on node " + ref);
+					});
+
 				}
 			}catch (Exception e){
 				logger.error(e.getMessage(),e);
@@ -94,10 +114,12 @@ public class BulkEditPermissionsJob extends AbstractJobMapAnnotationParams{
 
 	}
 
-    public enum Mode {
+	public enum Mode {
 		@JobFieldDescription(description = "remove all local set permissions")
 		Remove,
 		@JobFieldDescription(description = "remove a given authority from the list (will do nothing if this authority was not invited on the node)")
-		RemoveAuthority
+		RemoveAuthority,
+		@JobFieldDescription(description = "Add the CCPublish permission for all users that already have at least Consumer/Read permissions")
+		AddCCPublish
 	}
 }

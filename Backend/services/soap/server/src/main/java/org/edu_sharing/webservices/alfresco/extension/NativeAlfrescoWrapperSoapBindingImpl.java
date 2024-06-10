@@ -277,7 +277,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 	
 	Map<QName, Serializable> transformKeysToQName(HashMap map){
 		try {
-			Map<QName, Serializable> result = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> result = new HashMap<>();
 			for (Object key : map.keySet()) {
 				result.put(QName.createQName((String) key), (Serializable) map.get(key));
 			}
@@ -290,7 +290,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 
 	Map<QName, Serializable> transformPropMap(HashMap map) {
 		try {
-			Map<QName, Serializable> result = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> result = new HashMap<>();
 			for (Object key : map.keySet()) {
 				String value = (String) map.get(key);
 				// test if its xml
@@ -386,7 +386,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 		logger.info("found " + resultSet.length() + " nodes");
 		List<NodeRef> resultNodeRefs = resultSet.getNodeRefs();
 
-		List<String> nodeIds = new ArrayList<String>();
+		List<String> nodeIds = new ArrayList<>();
 
 		for (NodeRef nodeRef : resultNodeRefs) {
 			if (permission != null && !permission.trim().equals("")) {
@@ -428,7 +428,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 			StoreRef storeRef = new StoreRef(store);
 			String[] nodeIds = this.search(store, luceneQuery, permission);
 
-			List<RepositoryNode> searchResults = new ArrayList<RepositoryNode>();
+			List<RepositoryNode> searchResults = new ArrayList<>();
 			if (nodeIds != null) {
 				MCAlfrescoAPIClient mcAlfrescoAPIClient = new MCAlfrescoAPIClient();
 
@@ -437,7 +437,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 
 					RepositoryNode rn = new RepositoryNode();
 					rn.setNodeId(nodeId);
-					List<KeyValue> resultProps = new ArrayList<KeyValue>();
+					List<KeyValue> resultProps = new ArrayList<>();
 
 					if (propertiesToReturn != null && propertiesToReturn.length > 0) {
 
@@ -523,10 +523,10 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 			
 			if(nativeResult != null){
 				SearchResult remoteResult = new SearchResult();
-				HashMap<String, HashMap<String, Object>> nodes = nativeResult.getData();
+				Map<String, HashMap<>> nodes = nativeResult.getData();
 				RepositoryNode[] remoteNodes = new RepositoryNode[nodes.size()];
 				int i = 0;
-				for(HashMap<String, Object> localProps : nodes.values() ){
+				for(Map<String, Object> localProps : nodes.values() ){
 					String nodeId = (String)localProps.get(CCConstants.SYS_PROP_NODE_UID);
 					KeyValue[] remoteProps = new KeyValue[localProps.size()];
 					int j = 0;
@@ -545,7 +545,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 				
 				if(nativeFacettes != null){
 				
-					List<Facette> remoteFacettes = new ArrayList<Facette>();
+					List<Facette> remoteFacettes = new ArrayList<>();
 					
 					for(Map.Entry<String, Map<String, Integer>> entry : nativeFacettes.entrySet()){
 						Facette remoteFacette = new Facette();
@@ -612,12 +612,12 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 		try {
 			
 			MCAlfrescoAPIClient mcAlfrescoAPIClient = new MCAlfrescoAPIClient();
-			HashMap<String,HashMap<String,Object>> versionHistory = mcAlfrescoAPIClient.getVersionHistory(nodeId);
+			Map<String,Map<String,Object>> versionHistory = mcAlfrescoAPIClient.getVersionHistory(nodeId);
 			
-			List<RepositoryNode> result = new ArrayList<RepositoryNode>();
+			List<RepositoryNode> result = new ArrayList<>();
 			if(versionHistory != null){
-				for(Map.Entry<String, HashMap<String,Object>> entry : versionHistory.entrySet()){
-					List<KeyValue> keyValueList = new ArrayList<KeyValue>();
+				for(Map.Entry<String, Map<String,Object>> entry : versionHistory.entrySet()){
+					List<KeyValue> keyValueList = new ArrayList<>();
 					for(Object propKey : entry.getValue().keySet()){
 						keyValueList.add(new KeyValue((String)propKey, (String)entry.getValue().get(propKey)));
 					}
@@ -731,12 +731,12 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 			SearchResult sr = new SearchResult();
 			sr.setStartIDX(apiResult.getStartIDX());
 			sr.setNodeCount(apiResult.getNodeCount());
-			List<RepositoryNode> repoNodes = new ArrayList<RepositoryNode>();
+			List<RepositoryNode> repoNodes = new ArrayList<>();
 			sr.setData(repoNodes.toArray(new RepositoryNode[repoNodes.size()]));
 			for(Group group: apiResult.getData()){
 				RepositoryNode repoNode = new RepositoryNode();
 				repoNode.setNodeId(group.getNodeId());
-				List<KeyValue> props = new ArrayList<KeyValue>();
+				List<KeyValue> props = new ArrayList<>();
 				props.add(new KeyValue(CCConstants.CM_PROP_AUTHORITY_AUTHORITYDISPLAYNAME, group.getDisplayName()));
 				props.add(new KeyValue(CCConstants.CM_PROP_AUTHORITY_AUTHORITYNAME, group.getName()));
 				props.add(new KeyValue(CCConstants.SYS_PROP_NODE_UID, group.getNodeId()));
@@ -770,12 +770,12 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 			SearchResult sr = new SearchResult();
 			sr.setStartIDX(apiResult.getStartIDX());
 			sr.setNodeCount(apiResult.getNodeCount());
-			List<RepositoryNode> repoNodes = new ArrayList<RepositoryNode>();
+			List<RepositoryNode> repoNodes = new ArrayList<>();
 			sr.setData(repoNodes.toArray(new RepositoryNode[repoNodes.size()]));
 			for(User user: apiResult.getData()){
 				RepositoryNode repoNode = new RepositoryNode();
 				repoNode.setNodeId(user.getNodeId());
-				List<KeyValue> props = new ArrayList<KeyValue>();
+				List<KeyValue> props = new ArrayList<>();
 				props.add(new KeyValue(CCConstants.CM_PROP_PERSON_EMAIL, user.getEmail()));
 				props.add(new KeyValue(CCConstants.CM_PROP_PERSON_FIRSTNAME, user.getGivenName()));
 				props.add(new KeyValue(CCConstants.CM_PROP_PERSON_LASTNAME, user.getSurname()));
@@ -800,7 +800,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 			
 			MCAlfrescoAPIClient mcAlfrescoAPIClient = new MCAlfrescoAPIClient();
 			Group group = mcAlfrescoAPIClient.getEduGroupContextOfNode(nodeId);
-			List<KeyValue> props = new ArrayList<KeyValue>();
+			List<KeyValue> props = new ArrayList<>();
 			if(group != null){
 				props.add(new KeyValue(CCConstants.CM_PROP_AUTHORITY_AUTHORITYDISPLAYNAME, group.getDisplayName()));
 				props.add(new KeyValue(CCConstants.CM_PROP_AUTHORITY_AUTHORITYNAME, group.getName()));
@@ -1487,12 +1487,12 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 		try {
 			
 			MCAlfrescoAPIClient mcAlfrescoAPIClient = new MCAlfrescoAPIClient();
-			List<UserDetails> result = new ArrayList<UserDetails>();
+			List<UserDetails> result = new ArrayList<>();
 			for (String userName : userNames) {
 				if (userName == null) {
 					continue;
 				}
-				HashMap<String, String> userInfo = mcAlfrescoAPIClient.getUserInfo(userName);
+				Map<String, String> userInfo = mcAlfrescoAPIClient.getUserInfo(userName);
 				if (userInfo == null) {
 					continue;
 				}
@@ -1521,7 +1521,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 				if (userDetail == null) {
 					continue;
 				}
-				HashMap<String, String> userInfo = new HashMap<String, String>();
+				Map<String, String> userInfo = new HashMap<>();
 				userInfo.put(CCConstants.PROP_USERNAME, userDetail.getUserName());
 				userInfo.put(CCConstants.PROP_USER_FIRSTNAME, userDetail.getFirstName());
 				userInfo.put(CCConstants.PROP_USER_LASTNAME, userDetail.getLastName());
@@ -1572,7 +1572,7 @@ public class NativeAlfrescoWrapperSoapBindingImpl implements org.edu_sharing.web
 		try {
 			
 			MCAlfrescoAPIClient mcAlfrescoAPIClient = new MCAlfrescoAPIClient();		
-			List<GroupDetails> result = new ArrayList<GroupDetails>();
+			List<GroupDetails> result = new ArrayList<>();
 			for (String groupName : groupNames) {
 				if (groupName == null) {
 					continue;

@@ -44,7 +44,7 @@ public class UsageDao {
 	public List<Usage> getUsages(String appId) throws DAOException {
 
 		try {
-			List<Usage> result = new ArrayList<Usage>();
+			List<Usage> result = new ArrayList<>();
 
 			for (org.edu_sharing.service.usage.Usage usage : new Usage2Service().getUsages(appId)) {
 				Usage usageResult = convertUsage(usage, Usage.class);
@@ -114,7 +114,7 @@ public class UsageDao {
 
 	public List<Usage> getUsagesByCourse(String appId, String courseId) throws DAOException {
 		try {
-			List<Usage> result = new ArrayList<Usage>();
+			List<Usage> result = new ArrayList<>();
 			for (org.edu_sharing.service.usage.Usage usage : new Usage2Service().getUsagesByCourse(appId, courseId)) {
 				Usage usageResult = convertUsage(usage, Usage.class);
 				result.add(usageResult);
@@ -178,7 +178,7 @@ public class UsageDao {
 	public List<Usage> getUsagesByNode(String nodeId) throws DAOException {
 		try {
 
-			List<Usage> result = new ArrayList<Usage>();
+			List<Usage> result = new ArrayList<>();
 			for (org.edu_sharing.service.usage.Usage usage : new Usage2Service().getUsageByParentNodeId(null, null,
 					nodeId)) {
 				Usage usageResult = convertUsage(usage, Usage.class);

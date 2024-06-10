@@ -74,10 +74,10 @@ public class EduGroupTool {
 	
 	// Map [PROP_AUTHORITYNAME] --> [NODEREF OF EDUGROUP]
 	// Important: [NAME OF A GROUP] is unique on an Alfresco node  
-	private static HashMap<String, NodeRef>	cachedGroupNameMap = null;
+	private static Map<String, NodeRef>	cachedGroupNameMap = null;
 	
 	// Map [NODEREF OF EDUGROUP (String)] --> [PARENT NODEREF OF EDUGROUP (String)]
-	private static HashMap<String, String>	cachedGroupParentMap = null;	
+	private static Map<String, String>	cachedGroupParentMap = null;
 	
 	// use this object for synchronized code blocks that are working stateful on
 	// cachedGroupNameMap OR cachedGroupParentMap
@@ -105,13 +105,13 @@ public class EduGroupTool {
 	}
 
 	/**
-	 * Loads a cashed HashMap of all edugroups from userStore.
+	 * Loads a cashed Map of all edugroups from userStore.
 	 * Use if a lot requests are performed on Map and its no problem if Map is less than 20 secs old
 	 * 
 	 * KEY 		-> Groupname
 	 * VALUE   	-> NodeRef 
 	 */
-	private static HashMap<String,NodeRef> getCashedEduGroupMap() throws Exception {
+	private static Map<String,NodeRef> getCashedEduGroupMap() throws Exception {
 		
 		// check if map needs refresh
 		synchronized(syncAccessLock) {
@@ -139,8 +139,8 @@ public class EduGroupTool {
 	 * @return
 	 * @throws Exception
 	 */
-	private static HashMap<String, String> createCachedGroupParentMap(NodeService nodeService, HashMap <String,NodeRef> groupMap) throws Exception {
-		HashMap<String, String> result = new HashMap<String, String>();
+	private static Map<String, String> createCachedGroupParentMap(NodeService nodeService, Map <String,NodeRef> groupMap) throws Exception {
+		Map<String, String> result = new HashMap<>();
 		for (String groupName : groupMap.keySet()) {
 			NodeRef nodeRef = groupMap.get(groupName);			
 			if (nodeService.getParentAssocs(nodeRef).size()==1) {
@@ -154,19 +154,16 @@ public class EduGroupTool {
 	}
 	
 	/**
-	 * Loads a fresh HashMap of all edugroups from userStore.
+	 * Loads a fresh Map of all edugroups from userStore.
 	 * KEY 		-> Groupname
 	 * VALUE   	-> NodeRef 
 	 */
-	public static HashMap<String,NodeRef> getEduGroupMap(final NodeService nodeService) throws Exception {
+	public static Map<String,NodeRef> getEduGroupMap(final NodeService nodeService) throws Exception {
 				
-		AuthenticationUtil.RunAsWork<HashMap<String,NodeRef>> runAs = new AuthenticationUtil.RunAsWork<HashMap<String,NodeRef>>() {
-			@Override
-			public HashMap<String,NodeRef> doWork() throws Exception {
-				if (!doneInit) init();
-				return getEduGroupMapFromNodeContainer(nodeService, authorityRootNodeRef, 1);		
-			}
-		};
+		AuthenticationUtil.RunAsWork<Map<String,NodeRef>> runAs = () -> {
+            if (!doneInit) init();
+            return getEduGroupMapFromNodeContainer(nodeService, authorityRootNodeRef, 1);
+        };
 		
 		return AuthenticationUtil.runAs(runAs, ApplicationInfoList.getHomeRepository().getUsername());		
 	}
@@ -232,9 +229,9 @@ public class EduGroupTool {
 	/*
 	 * Recursive traversal of userstore ...
 	 */
-	private static HashMap<String,NodeRef> getEduGroupMapFromNodeContainer(NodeService nodeService, NodeRef node, int recDepth) {
+	private static Map<String,NodeRef> getEduGroupMapFromNodeContainer(NodeService nodeService, NodeRef node, int recDepth) {
 		
-		HashMap<String,NodeRef> results = new HashMap<String, NodeRef>();
+		Map<String,NodeRef> results = new HashMap<>();
 		
 		// to prevent possible infintiv loops in a node graph ... stop at a recursive level of 5 
 		if (recDepth>5) return results;
@@ -426,7 +423,7 @@ public class EduGroupTool {
 			nodeService.setType(homeRef, QNAME_HOMEDIR);
 					
 			// add aspect to group
-			Map<QName, Serializable> params = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> params = new HashMap<>();
 			params.put(QName.createQName(CCM_PROP_EDUGROUP_EDU_HOMEDIR), homeRef);
 			params.put(QName.createQName(CCM_PROP_EDUGROUP_EDU_UNIQUENAME), linkName);
 			nodeService.addAspect(groupRef, QNAME_EDUGROUP, params);

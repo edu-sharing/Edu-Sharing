@@ -213,50 +213,6 @@
         }
       }
     },
-    "edu-sharing-graphql": {
-      "projectType": "library",
-      "root": "projects/edu-sharing-graphql",
-      "sourceRoot": "projects/edu-sharing-graphql/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/edu-sharing-graphql/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/edu-sharing-graphql/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/edu-sharing-graphql/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "projects/edu-sharing-graphql/tsconfig.spec.json",
-            "karmaConfig": "projects/edu-sharing-graphql/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "projects/edu-sharing-graphql/**/*.ts",
-              "projects/edu-sharing-graphql/**/*.html"
-            ],
-            "cache": true
-          }
-        }
-      }
-    },
     "embed": {
       "projectType": "application",
       "schematics": {

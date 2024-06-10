@@ -1,10 +1,7 @@
 package org.edu_sharing.service.search.model;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.log4j.Logger;
 import org.edu_sharing.metadataset.v2.MetadataQueries;
 import org.edu_sharing.metadataset.v2.MetadataQuery;
@@ -12,39 +9,75 @@ import org.edu_sharing.metadataset.v2.MetadataQueryParameter;
 import org.edu_sharing.metadataset.v2.SearchCriterias;
 import org.edu_sharing.metadataset.v2.tools.MetadataSearchHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
-
-
 import org.edu_sharing.service.search.SearchService.ContentType;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SearchToken implements Serializable {
 	static Logger logger = Logger.getLogger(SearchToken.class);
 
+	@Getter
+	@Setter
 	SortDefinition sortDefinition;
 	
+	@Setter
 	String luceneString;
 	
+	@Setter
 	List<String> facets =null;
 
+	@Getter
+	@Setter
 	String storeProtocol = "workspace";
 	
+	@Getter
+	@Setter
 	String storeName = "SpacesStore";
 	
+	@Getter
+	@Setter
 	int from;
 	
+	@Getter
+	@Setter
 	int maxResult;
 	
 	
 	/**
 	 * search in scope of authorities
+	 * -- SETTER --
+	 *  set the scope of authorities
+	 *  security problem (only when admin permissions)
+	 *
+	 * @param authorities
+
 	 */
+	@Getter
+	@Setter
 	List<String> authorityScope;
 
 	private ContentType contentType;
 	private MetadataQueries queries;
+	/**
+	 * -- SETTER --
+	 *  Filter for permissions by the current user
+	 *  Only materials with ALL permissions provided here will be shown for the current user
+	 *  Note: Only supported via ElasticSearch!
+	 */
+	@Getter
+	@Setter
 	private List<String> permissions;
+	@Getter
+	@Setter
 	private boolean resolveCollections = false;
+	@Getter
+	@Setter
 	private boolean returnSuggestion = false;
 
+	@Getter
+	@Setter
 	List<String> excludes = new ArrayList<>();
 
 	public ContentType getContentType(){
@@ -56,38 +89,32 @@ public class SearchToken implements Serializable {
 		this.contentType=contentType;
 		updateSearchCriterias(true);
 	}
-	public int getFacetsMinCount() {
-		return facetsMinCount;
-	}
-
-	public void setFacetsMinCount(int facetsMinCount) {
-		this.facetsMinCount = facetsMinCount;
-	}
 
 
-	
-	public void setFacetLimit(int facetLimit) {
-		this.facetLimit = facetLimit;
-	}
-
+	@Getter
+	@Setter
 	private int facetLimit =50;
+	@Setter
+	@Getter
 	private int facetsMinCount =4;
 
+	@Getter
 	private SearchCriterias searchCriterias;
 
+	/**
+	 * -- SETTER --
+	 *  Get and set query string (for ui purposes/info)
+	 *
+	 * @param queryString
+	 */
+	@Setter
 	private String queryString;
 
+	@Getter
 	private MetadataQuery query;
 
+	@Getter
 	private Map<String, String[]> parameters;
-	
-	public SortDefinition getSortDefinition() {
-		return sortDefinition;
-	}
-
-	public void setSortDefinition(SortDefinition sortDefinition) {
-		this.sortDefinition = sortDefinition;
-	}
 
 	public String getLuceneString() throws IllegalArgumentException {
 		if(query!=null){
@@ -106,60 +133,19 @@ public class SearchToken implements Serializable {
 		return luceneString;
 	}
 
-	public MetadataQuery getQuery() {
-		return query;
-	}
-
 	/**
 	 * Nulls any existing search criterias
 	 */
 	public void disableSearchCriterias() {
 		this.searchCriterias=null;
 	}
-	public void setLuceneString(String luceneString) {
-		this.luceneString = luceneString;
-	}
+
 	public void setMetadataQuery(MetadataQueries queries, String queryId, Map<String, String[]> parameters) {
 		this.queries = queries;
 		this.query = queries.findQuery(queryId);
 		this.parameters = parameters;
 	}
 
-	public Map<String, String[]> getParameters() {
-		return parameters;
-	}
-
-	public String getStoreProtocol() {
-		return storeProtocol;
-	}
-
-	public void setStoreProtocol(String storeProtocol) {
-		this.storeProtocol = storeProtocol;
-	}
-
-	public String getStoreName() {
-		return storeName;
-	}
-
-	public void setStoreName(String storeName) {
-		this.storeName = storeName;
-	}
-
-	public int getFrom() {
-		return from;
-	}
-
-	public void setFrom(int from) {
-		this.from = from;
-	}
-
-	public int getMaxResult() {
-		return maxResult;
-	}
-
-	public void setMaxResult(int maxResult) {
-		this.maxResult = maxResult;
-	}
 	public List<String> getFacets() {
 		if(this.query != null && facets != null) {
 			List<String> combined = new ArrayList<>();
@@ -203,21 +189,9 @@ public class SearchToken implements Serializable {
 		return propsMap;
 	}
 
-	public void setFacets(List<String> facets) {
-		this.facets = facets;
-	}
-
-	public int getFacetLimit() {
-		return facetLimit;
-	}
-
 	public void setSearchCriterias(SearchCriterias searchCriterias) {
 		this.searchCriterias=searchCriterias;
 		updateSearchCriterias(false);
-	}
-
-	public SearchCriterias getSearchCriterias() {
-		return searchCriterias;
 	}
 
 	private void updateSearchCriterias(boolean rebuild) {
@@ -247,60 +221,9 @@ public class SearchToken implements Serializable {
 			searchCriterias.setContentkind(new String[]{CCConstants.CCM_TYPE_COLLECTION_PROPOSAL});
 		}
 	}
-	/**
-	 * Get and set query string (for ui purposes/info)
-	 * @param queryString
-	 */
-	public void setQueryString(String queryString) {
-		this.queryString=queryString;
-	}
+
 	public String getQueryString() throws IllegalArgumentException {
 		return queryString;
 	}
-	
-	/**
-	 * set the scope of authorities
-	 * security problem (only when admin permissions)
-	 * @param authorities
-	 */
-	public void setAuthorityScope(List<String> authorities) {
-		this.authorityScope = authorities;
-	}
-	
-	public List<String> getAuthorityScope() {
-		return authorityScope;
-	}
 
-	/**
-	 * Filter for permissions by the current user
-	 * Only materials with ALL permissions provided here will be shown for the current user
-	 * Note: Only supported via ElasticSearch!
-	 */
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
-    }
-
-    public List<String> getPermissions() {
-        return permissions;
-    }
-
-	public boolean isResolveCollections() {
-		return resolveCollections;
-	}
-
-	public void setResolveCollections(boolean resolveCollections) {
-		this.resolveCollections = resolveCollections;
-	}
-
-	public boolean isReturnSuggestion() { return returnSuggestion; }
-
-	public void setReturnSuggestion(boolean returnSuggestion) {	this.returnSuggestion = returnSuggestion; }
-
-	public List<String> getExcludes() {
-		return excludes;
-	}
-
-	public void setExcludes(List<String> excludes) {
-		this.excludes = excludes;
-	}
 }

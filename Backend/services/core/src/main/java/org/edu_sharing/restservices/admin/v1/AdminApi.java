@@ -240,7 +240,7 @@ public class AdminApi {
 			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	public Response getApplications(@Context HttpServletRequest req) {
 		try {
-			List<Application> result = new ArrayList<Application>();
+			List<Application> result = new ArrayList<>();
 			for (ApplicationInfo appInfo : ApplicationInfoList.getRepositoryInfosOrdered()) {
 				if (appInfo.ishomeNode())
 					continue;
@@ -345,7 +345,7 @@ public class AdminApi {
 			AdminStatistics statistics = new AdminStatistics();
 			AdminService service = AdminServiceFactory.getInstance();
 			statistics.setActiveSessions(service.getActiveSessions());
-			List<Node> locks = new ArrayList<Node>();
+			List<Node> locks = new ArrayList<>();
 			for (NodeRef lock : service.getActiveNodeLocks()) {
 				locks.add(NodeDao.getNode(RepositoryDao.getRepository(RepositoryDao.HOME), lock.getId()).asNode());
 			}
@@ -377,7 +377,7 @@ public class AdminApi {
 			@Parameter(description = "Properties Filename (*.xml)", required = true) @PathParam("xml") String xml) {
 		try {
 			Set<Entry<Object, Object>> set = AdminServiceFactory.getInstance().getPropertiesXML(xml).entrySet();
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, String> map = new HashMap<>();
 			String[] filter = XML_FILTER.get(xml);
 			for (Entry<Object, Object> entry : set) {
 				if (filter != null && Arrays.asList(filter).contains(entry.getKey()))
@@ -451,7 +451,7 @@ public class AdminApi {
 			@Parameter(description = "XML file for app to register", required = true) @FormDataParam("xml") InputStream is,
 			@Context HttpServletRequest req) {
 		try {
-			HashMap<String, String> result = AdminServiceFactory.getInstance().addApplicationFromStream(is);
+			Map<String, String> result = AdminServiceFactory.getInstance().addApplicationFromStream(is);
 			return Response.ok().entity(result).build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);
@@ -473,7 +473,7 @@ public class AdminApi {
 			@Parameter(description = "Remote application metadata url", required = true) @QueryParam("url") String url,
 			@Context HttpServletRequest req) {
 		try {
-			HashMap<String, String> result = AdminServiceFactory.getInstance().addApplication(url);
+			Map<String, String> result = AdminServiceFactory.getInstance().addApplication(url);
 			return Response.ok().entity(result).build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);
@@ -1137,10 +1137,10 @@ public class AdminApi {
 
 	public Response startJob(
 			@Parameter(description = "jobClass", required = true) @PathParam("jobClass") String jobClass,
-			@Parameter(description = "params", required = true) HashMap<String, Serializable> params,
+			@Parameter(description = "params", required = true) Map<String, Serializable> params,
 			@Context HttpServletRequest req) {
 		try {
-			AdminServiceFactory.getInstance().startJob(jobClass, new HashMap<String,Object>(params));
+			AdminServiceFactory.getInstance().startJob(jobClass, new HashMap<>(params));
 			return Response.ok().build();
 		} catch (NotAnAdminException e) {
 			return ErrorResponse.createResponse(e);
@@ -1162,7 +1162,7 @@ public class AdminApi {
 
 	public Response startJobSync(
 			@Parameter(description = "jobClass", required = true) @PathParam("jobClass") String jobClass,
-			@Parameter(description = "params", required = true) HashMap<String, Serializable> params,
+			@Parameter(description = "params", required = true) Map<String, Serializable> params,
 			@Context HttpServletRequest req) {
 		try {
 			Object result = AdminServiceFactory.getInstance().startJobSync(jobClass, new HashMap<>(params));
@@ -1208,7 +1208,7 @@ public class AdminApi {
 			SearchServiceElastic elastic = new SearchServiceElastic(ApplicationInfoList.getHomeRepository().getAppId());
 			SearchResultNodeRefElastic search = elastic.searchDSL(dsl);
 			RepositoryDao repoDao = RepositoryDao.getHomeRepository();
-			List<Node> data = new ArrayList<Node>();
+			List<Node> data = new ArrayList<>();
 			for (org.edu_sharing.service.model.NodeRef ref : search.getData()) {
 				try {
 					data.add(NodeDao.getNode(repoDao, ref).asNode());
@@ -1281,7 +1281,7 @@ public class AdminApi {
 			token.setAuthorityScope(authorityScope);
 			NodeSearch search = NodeDao.search(repoDao, token, false);
 
-			List<Node> data = new ArrayList<Node>();
+			List<Node> data = new ArrayList<>();
 			for (org.edu_sharing.restservices.shared.NodeRef ref : search.getResult()) {
 				data.add(NodeDao.getNode(repoDao, storeRef.getProtocol(), storeRef.getIdentifier(), ref.getId(), filter).asNode());
 			}

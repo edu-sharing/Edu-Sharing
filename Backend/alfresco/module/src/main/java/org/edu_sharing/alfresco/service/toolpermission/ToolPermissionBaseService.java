@@ -1,7 +1,7 @@
 package org.edu_sharing.alfresco.service.toolpermission;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigValue;
+import jakarta.servlet.http.HttpSession;
 import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
@@ -15,14 +15,13 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.I18nServer;
 import org.springframework.context.ApplicationContext;
 
-import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.*;
 
@@ -41,10 +40,8 @@ public class ToolPermissionBaseService {
     protected boolean isAdmin(){
         try {
             Set<String> testUsetAuthorities = serviceRegistry.getAuthorityService().getAuthorities();
-            for (String testAuth : testUsetAuthorities) {
-                if (testAuth.equals("GROUP_ALFRESCO_ADMINISTRATORS")) {
-                    return true;
-                }
+            if(testUsetAuthorities.contains("GROUP_ALFRESCO_ADMINISTRATORS")) {
+                return true;
             }
             return AuthenticationUtil.isRunAsUserTheSystemUser();
         }catch(AuthenticationCredentialsNotFoundException ignored){
@@ -96,14 +93,6 @@ public class ToolPermissionBaseService {
      * @return
      */
     public boolean hasToolPermission(String toolPermission, boolean renew) {
-        try{
-            if(isAdmin()){
-                return true;
-            }
-        }catch(Exception e){
-            logger.error(e.getMessage(),e);
-        }
-
         /**
          * try to use session cache
          */
@@ -144,7 +133,7 @@ public class ToolPermissionBaseService {
     private NodeRef createNewFolder(NodeRef parentRef, String name, String mapType) {
         NodeRef result;
         String folderName = I18nServer.getTranslationDefaultResourcebundle(name);
-        HashMap<QName, Serializable> props  = new HashMap<>();
+        Map<QName, Serializable> props  = new HashMap<>();
         props.put(QName.createQName(CCConstants.CM_NAME), folderName);
 
         MLText i18nTitle = new MLText();
@@ -171,7 +160,7 @@ public class ToolPermissionBaseService {
         AuthenticationUtil.RunAsWork<List<String>> runas = new AuthenticationUtil.RunAsWork<List<String>>() {
             @Override
             public List<String> doWork() throws Exception {
-                List<String> result = new ArrayList<String>();
+                List<String> result = new ArrayList<>();
                 try {
                     List<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(getEdu_SharingToolPermissionsFolder());
                     for(ChildAssociationRef childAssocRef : childAssocRefs) {
@@ -295,7 +284,7 @@ public class ToolPermissionBaseService {
 
     protected NodeRef createToolpermission(String toolPermission) throws Throwable {
         logger.info("ToolPermission" + toolPermission+ " does not exists. will create it.");
-        HashMap<QName, Serializable> props = new HashMap();
+        Map<QName, Serializable> props = new HashMap();
         props.put(QName.createQName(CCConstants.CM_NAME), toolPermission);
 
         NodeRef result = nodeService.createNode(getEdu_SharingToolPermissionsFolder(),
@@ -342,7 +331,7 @@ public class ToolPermissionBaseService {
         return toInit;
     }
     public List<String> getAllPredefinedToolPermissions(){
-        List<String> toInit=new ArrayList<String>();
+        List<String> toInit=new ArrayList<>();
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_FUZZY);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_SHARE);
@@ -379,6 +368,8 @@ public class ToolPermissionBaseService {
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_RATE);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_RATE_WRITE);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_RATE_READ);
+        toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_SUGGESTION_WRITE);
+        toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_SUGGESTION_READ);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_MANAGE_RELATIONS);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_VIDEO_AUDIO_CUT);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_MEDIACENTER_MANAGE);

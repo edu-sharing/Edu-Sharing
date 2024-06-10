@@ -122,7 +122,7 @@ public class SearchServicePixabayImpl extends SearchServiceAdapter{
 		for(int i=0;i<array.length();i++){
 			JSONObject json=array.getJSONObject(i);
 			
-			HashMap<String,Object> properties=new HashMap<>();
+			Map<String,Object> properties=new HashMap<>();
 			properties.put(CCConstants.SYS_PROP_NODE_UID,json.getString("id"));
 			properties.put(CCConstants.CM_PROP_C_MODIFIED,System.currentTimeMillis());
 			properties.put(CCConstants.LOM_PROP_GENERAL_TITLE,json.getString("tags"));

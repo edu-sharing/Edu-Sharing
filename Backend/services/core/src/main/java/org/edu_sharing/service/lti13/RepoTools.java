@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class RepoTools {
@@ -71,11 +72,11 @@ public class RepoTools {
         return applicationId;
     }
 
-    public static String authenticate(HttpServletRequest req, HashMap<String,String> ssoMap){
+    public static String authenticate(HttpServletRequest req, Map<String,String> ssoMap){
         ApplicationContext eduApplicationContext = org.edu_sharing.spring.ApplicationContextFactory.getApplicationContext();
         SSOAuthorityMapper ssoMapper = (SSOAuthorityMapper)eduApplicationContext.getBean("ssoAuthorityMapper");
         AuthenticationToolAPI authTool = new AuthenticationToolAPI();
-        HashMap<String,String> validAuthInfo = authTool.validateAuthentication(req.getSession());
+        Map<String,String> validAuthInfo = authTool.validateAuthentication(req.getSession());
 
         String userName = ssoMap.get(ssoMapper.getSSOUsernameProp());
         if (validAuthInfo != null ) {
@@ -104,10 +105,10 @@ public class RepoTools {
         return userName;
     }
 
-    public static HashMap<String,String> mapToSSOMap(String username, String firstName, String lastName, String email){
+    public static Map<String,String> mapToSSOMap(String username, String firstName, String lastName, String email){
         ApplicationContext eduApplicationContext = org.edu_sharing.spring.ApplicationContextFactory.getApplicationContext();
         SSOAuthorityMapper ssoMapper = (SSOAuthorityMapper)eduApplicationContext.getBean("ssoAuthorityMapper");
-        HashMap<String,String> result = new HashMap<>();
+        Map<String,String> result = new HashMap<>();
         if(firstName != null) result.put(ssoMapper.getUserAttribute(CCConstants.CM_PROP_PERSON_FIRSTNAME),firstName);
         if(username != null) result.put(ssoMapper.getUserAttribute(CCConstants.CM_PROP_PERSON_USERNAME),username);
         if(lastName != null) result.put(ssoMapper.getUserAttribute(CCConstants.CM_PROP_PERSON_LASTNAME),lastName);

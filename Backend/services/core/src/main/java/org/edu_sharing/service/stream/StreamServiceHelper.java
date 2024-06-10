@@ -12,7 +12,7 @@ import java.util.List;
 public class StreamServiceHelper {
     public static List<String> getCurrentAuthorities() {
         AuthorityService authorityService=AuthorityServiceFactory.getLocalService();
-        ArrayList<String> authorities = new ArrayList<String>();
+        ArrayList<String> authorities = new ArrayList<>();
         authorities.add(AuthenticationUtil.getFullyAuthenticatedUser());
         AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
 

@@ -23,6 +23,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +35,12 @@ import java.util.Map;
 public class AboutApi  {
 
 	private static Logger logger = Logger.getLogger(AboutApi.class);
+
+	@Autowired
+	private VersionService versionService;
+
     @GET
-    
     @Operation(summary = "Discover the API.", description = "Get all services provided by this API.")
-    
     @ApiResponses(
     	value = { 
 			@ApiResponse(responseCode="200", description="OK.", content = @Content(schema = @Schema(implementation = About.class))), 
@@ -53,8 +57,8 @@ public class AboutApi  {
 	    	
 	    	version.setMajor(ApiApplication.MAJOR);
 	    	version.setMinor(ApiApplication.MINOR);
-	    	version.setRepository(VersionService.getVersionNoException(VersionService.Type.REPOSITORY));
-	    	version.setRenderservice(VersionService.getVersionNoException(VersionService.Type.RENDERSERVICE));
+	    	version.setRepository(versionService.getVersionNoException(VersionService.Type.REPOSITORY));
+	    	version.setRenderservice(versionService.getVersionNoException(VersionService.Type.RENDERSERVICE));
 	    	
 	    	logger.debug("Request via domain "+ org.edu_sharing.alfresco.repository.server.authentication.Context.getCurrentInstance().getRequest().getServerName());
 	
@@ -64,7 +68,7 @@ public class AboutApi  {
 	    	
 	    	about.setThemesUrl(new MimeTypesV2(ApplicationInfoList.getHomeRepository()).getThemePath());
 	    	
-	    	Map<String, AboutService> services = new HashMap<String, AboutService>();
+	    	Map<String, AboutService> services = new HashMap<>();
 	    	for (Class<?> clazz : ApiApplication.SERVICES) {
 	
 				ApiService rest = clazz.getAnnotation(ApiService.class);
@@ -158,7 +162,7 @@ public class AboutApi  {
 
 	public Response licenses(@Context HttpServletRequest req) {
 		try {
-			Licenses licenses = VersionService.getLicenses();
+			Licenses licenses = versionService.getLicenses();
 
 			return Response.status(Response.Status.OK).entity(licenses).build();
 

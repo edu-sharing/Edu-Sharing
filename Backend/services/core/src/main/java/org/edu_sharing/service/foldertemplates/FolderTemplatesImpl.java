@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,7 +43,7 @@ public class FolderTemplatesImpl implements FolderTemplates {
 	String templatePropertiesFile;
 	Properties properties;
 	Logger logger = Logger.getLogger(FolderTemplatesImpl.class);
-	HashMap<String, Group> subGroupList = new HashMap<String, Group>();
+	Map<String, Group> subGroupList = new HashMap<>();
 	
 	LoggingErrorHandler loggingErrorHandler = new LoggingErrorHandler();
 	
@@ -181,7 +182,7 @@ public class FolderTemplatesImpl implements FolderTemplates {
 				this.repoClient.getAuthenticationInfo());
 		String Sysf = uit.getEdu_SharingTemplateFolder();
 
-		HashMap<String, HashMap<String, Object>> templatelist = this.repoClient.getChildren(Sysf);
+		Map<String, Map<String, Object>> templatelist = this.repoClient.getChildren(Sysf);
 		if (templatelist.isEmpty()) {
 			logger.fatal("no Templates  found");
 			loggingErrorHandler.getMessage().add("no Templates found");
@@ -191,7 +192,7 @@ public class FolderTemplatesImpl implements FolderTemplates {
 		String fileformat = "";
 		String fileNodeId = "";
 
-		for (HashMap<String, Object> tl : templatelist.values()) {
+		for (Map<String, Object> tl : templatelist.values()) {
 
 			filename = (String) tl.get(CCConstants.CM_NAME);
 			fileformat = (String) tl.get(CCConstants.LOM_PROP_TECHNICAL_FORMAT);
@@ -215,14 +216,14 @@ public class FolderTemplatesImpl implements FolderTemplates {
 		}
 
 		// get SubGroups
-		HashMap<String, HashMap<String, Object>> subList = this.repoClient.getChildren(groupNodeId);
+		Map<String, Map<String, Object>> subList = this.repoClient.getChildren(groupNodeId);
 		if (subList.isEmpty()) {
 			logger.fatal("no Subgroups for eduGroup found");
 			this.loggingErrorHandler.getMessage().add("no Subgroups for eduGroup found");
 			return;
 		}
 		
-		for (HashMap<String, Object> gd : subList.values()) {
+		for (Map<String, Object> gd : subList.values()) {
 			String nodeType = (String) gd.get("NodeType");
 
 			if (nodeType.equals("{http://www.alfresco.org/model/content/1.0}authorityContainer")) {
@@ -363,13 +364,13 @@ public class FolderTemplatesImpl implements FolderTemplates {
 					System.out.println(node.getNodeName() + " " + fname);
 					logger.info(node.getNodeName() + " " + fname);
 
-					HashMap<String, Object> eduProps = new HashMap<String, Object>();
+					Map<String, Object> eduProps = new HashMap<>();
 					String name = fname;
 					eduProps.put(CCConstants.CM_NAME, name);
 					eduProps.put(CCConstants.CM_PROP_C_TITLE, name);
 					uid = "";
 					try {
-						HashMap<String, Object> d = this.repoClient.getChild(parentid, CCConstants.CCM_TYPE_MAP,
+						Map<String, Object> d = this.repoClient.getChild(parentid, CCConstants.CCM_TYPE_MAP,
 								CCConstants.CM_NAME, name);
 
 						if (d != null) {

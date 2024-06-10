@@ -172,7 +172,7 @@ public class SOLRAPIClient
         }
         
         JSONArray aclChangeSetsJSON = json.getJSONArray("aclChangeSets");
-        List<AclChangeSet> aclChangeSets = new ArrayList<AclChangeSet>(aclChangeSetsJSON.length());
+        List<AclChangeSet> aclChangeSets = new ArrayList<>(aclChangeSetsJSON.length());
         for (int i = 0; i < aclChangeSetsJSON.length(); i++)
         {
             JSONObject aclChangeSetJSON = aclChangeSetsJSON.getJSONObject(i);
@@ -217,7 +217,7 @@ public class SOLRAPIClient
         
         JSONObject jsonReq = new JSONObject();
         JSONArray aclChangeSetIdsJSON = new JSONArray();
-        List<Long> aclChangeSetIds = new ArrayList<Long>();
+        List<Long> aclChangeSetIds = new ArrayList<>();
         for (AclChangeSet aclChangeSet : aclChangeSets)
         {
             Long aclChangeSetId = aclChangeSet.getId();
@@ -255,7 +255,7 @@ public class SOLRAPIClient
         }
 
         JSONArray aclsJSON = json.getJSONArray("acls");
-        List<Acl> acls = new ArrayList<Acl>(aclsJSON.length());
+        List<Acl> acls = new ArrayList<>(aclsJSON.length());
         for (int i = 0; i < aclsJSON.length(); i++)
         {
             JSONObject aclJSON = aclsJSON.getJSONObject(i);
@@ -285,7 +285,7 @@ public class SOLRAPIClient
         
         JSONObject jsonReq = new JSONObject();
         JSONArray aclIdsJSON = new JSONArray();
-        List<Long> aclIds = new ArrayList<Long>();
+        List<Long> aclIds = new ArrayList<>();
         for (Acl acl : acls)
         {
             Long aclId = acl.getId();
@@ -323,13 +323,13 @@ public class SOLRAPIClient
         }
 
         JSONArray aclsReadersJSON = json.getJSONArray("aclsReaders");
-        List<AclReaders> aclsReaders = new ArrayList<AclReaders>(aclsReadersJSON.length());
+        List<AclReaders> aclsReaders = new ArrayList<>(aclsReadersJSON.length());
         for (int i = 0; i < aclsReadersJSON.length(); i++)
         {
             JSONObject aclReadersJSON = aclsReadersJSON.getJSONObject(i);
             long aclId = aclReadersJSON.getLong("aclId");
             JSONArray readersJSON = aclReadersJSON.getJSONArray("readers");
-            List<String> readers = new ArrayList<String>(aclReadersJSON.length());
+            List<String> readers = new ArrayList<>(aclReadersJSON.length());
             for (int j = 0; j < readersJSON.length(); j++)
             {
                 String readerJSON = readersJSON.getString(j);
@@ -406,7 +406,7 @@ public class SOLRAPIClient
         
         JSONArray jsonTransactions = json.getJSONArray("transactions");
         int numTxns = jsonTransactions.length();
-        List<Transaction> transactions = new ArrayList<Transaction>(numTxns);
+        List<Transaction> transactions = new ArrayList<>(numTxns);
         for(int i = 0; i < numTxns; i++)
         {
             JSONObject solrTxn = jsonTransactions.getJSONObject(i);
@@ -512,7 +512,7 @@ public class SOLRAPIClient
         }
 
         JSONArray jsonNodes = json.getJSONArray("nodes");
-        List<Node> nodes = new ArrayList<Node>(jsonNodes.length());
+        List<Node> nodes = new ArrayList<>(jsonNodes.length());
         for(int i = 0; i < jsonNodes.length(); i++)
         {
             JSONObject jsonNodeInfo = jsonNodes.getJSONObject(i);
@@ -566,7 +566,7 @@ public class SOLRAPIClient
         else if(dataTypeName.equals(DataTypeDefinition.MLTEXT) && (value instanceof JSONArray))
         {
             JSONArray a = (JSONArray)value;
-            Map<Locale, String> mlValues = new HashMap<Locale, String>(a.length());
+            Map<Locale, String> mlValues = new HashMap<>(a.length());
 
             for(int k = 0; k < a.length(); k++)
             {
@@ -751,7 +751,7 @@ public class SOLRAPIClient
         
         JSONArray jsonNodes = json.getJSONArray("nodes");
         
-        List<NodeMetaData> nodes = new ArrayList<NodeMetaData>(jsonNodes.length());
+        List<NodeMetaData> nodes = new ArrayList<>(jsonNodes.length());
         for(int i = 0; i < jsonNodes.length(); i++)
         {
             JSONObject jsonNodeInfo = jsonNodes.getJSONObject(i);
@@ -829,7 +829,7 @@ public class SOLRAPIClient
             if(jsonNodeInfo.has("properties"))
             {
                 JSONObject jsonProperties = jsonNodeInfo.getJSONObject("properties");
-                Map<QName, PropertyValue> properties = new HashMap<QName, PropertyValue>(jsonProperties.length());
+                Map<QName, PropertyValue> properties = new HashMap<>(jsonProperties.length());
                 @SuppressWarnings("rawtypes")
                 Iterator propKeysIterator = jsonProperties.keys();
                 while(propKeysIterator.hasNext())
@@ -859,7 +859,7 @@ public class SOLRAPIClient
             if(jsonNodeInfo.has("parentAssocs"))
             {
                 JSONArray jsonParentAssocs = jsonNodeInfo.getJSONArray("parentAssocs");
-                List<ChildAssociationRef> assocs = new ArrayList<ChildAssociationRef>(jsonParentAssocs.length());
+                List<ChildAssociationRef> assocs = new ArrayList<>(jsonParentAssocs.length());
                 for(int j = 0; j < jsonParentAssocs.length(); j++)
                 {
                     String childAssocRefStr = jsonParentAssocs.getString(j);
@@ -872,7 +872,7 @@ public class SOLRAPIClient
             if(jsonNodeInfo.has("childAssocs"))
             {
                 JSONArray jsonParentAssocs = jsonNodeInfo.getJSONArray("childAssocs");
-                List<ChildAssociationRef> assocs = new ArrayList<ChildAssociationRef>(jsonParentAssocs.length());
+                List<ChildAssociationRef> assocs = new ArrayList<>(jsonParentAssocs.length());
                 for(int j = 0; j < jsonParentAssocs.length(); j++)
                 {
                     String childAssocRefStr = jsonParentAssocs.getString(j);
@@ -885,7 +885,7 @@ public class SOLRAPIClient
             if(jsonNodeInfo.has("childIds"))
             {
                 JSONArray jsonChildIds = jsonNodeInfo.getJSONArray("childIds");
-                List<Long> childIds = new ArrayList<Long>(jsonChildIds.length());
+                List<Long> childIds = new ArrayList<>(jsonChildIds.length());
                 for(int j = 0; j < jsonChildIds.length(); j++)
                 {
                     Long childId = jsonChildIds.getLong(j);
@@ -943,7 +943,7 @@ public class SOLRAPIClient
         url.append(args);
         
         GetRequest req = new GetRequest(url.toString());
-        Map<String, String> headers = new HashMap<String, String>(2);
+        Map<String, String> headers = new HashMap<>(2);
         
         if(modifiedSince != null)
         {
@@ -1043,7 +1043,7 @@ public class SOLRAPIClient
             throw new AlfrescoRuntimeException("GetModelsDiff badly formatted response");
         }
 
-        List<AlfrescoModelDiff> diffs = new ArrayList<AlfrescoModelDiff>(jsonDiffs.length());
+        List<AlfrescoModelDiff> diffs = new ArrayList<>(jsonDiffs.length());
         for(int i = 0; i < jsonDiffs.length(); i++)
         {
             JSONObject jsonDiff = jsonDiffs.getJSONObject(i);

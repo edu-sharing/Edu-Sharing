@@ -1,19 +1,16 @@
 package org.edu_sharing.restservices;
 
 import org.apache.log4j.Logger;
-import org.edu_sharing.restservices.shared.Node;
 import org.edu_sharing.restservices.shared.NodeRelation;
 import org.edu_sharing.restservices.shared.RelationData;
 import org.edu_sharing.restservices.shared.User;
 import org.edu_sharing.service.authority.AuthorityService;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
+import org.edu_sharing.service.relations.InputRelationType;
 import org.edu_sharing.service.relations.RelationService;
 import org.edu_sharing.service.relations.RelationServiceFactory;
-import org.edu_sharing.service.relations.InputRelationType;
 
-import javax.management.relation.Relation;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class RelationDao {
     private static Logger logger = Logger.getLogger(NodeDao.class);
@@ -47,7 +44,9 @@ public class RelationDao {
         try {
             org.edu_sharing.service.relations.NodeRelation nodeRelation = this.relationService.getRelations(sourceNodeId);
             NodeRelation.NodeRelationBuilder nodeRelationBuilder = NodeRelation.builder();
-            nodeRelationBuilder.node(NodeDao.getAnyExistingNode(repoDao, Arrays.asList(NodeDao.ExistingMode.IfNotExists, NodeDao.ExistingMode.IfNoReadPermissions), nodeRelation.getNode()).asNode());
+
+            // TODO we can delete this cause it's unused by the frontend
+            //nodeRelationBuilder.node(NodeDao.getAnyExistingNode(repoDao, Arrays.asList(NodeDao.ExistingMode.IfNotExists, NodeDao.ExistingMode.IfNoReadPermissions), nodeRelation.getNode()).asNode());
             for (org.edu_sharing.service.relations.RelationData relationData : nodeRelation.getRelations()) {
                 try {
                     nodeRelationBuilder.relation(

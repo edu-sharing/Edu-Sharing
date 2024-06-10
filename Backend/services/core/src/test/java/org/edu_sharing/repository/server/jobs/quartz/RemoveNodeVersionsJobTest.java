@@ -39,16 +39,16 @@ class RemoveNodeVersionsJobTest {
 
     public String blocked1Label = RemoveNodeVersionsJob.BLOCKED_VERSION_LABELS.get(0);
     public String blocked2Label = RemoveNodeVersionsJob.BLOCKED_VERSION_LABELS.get(1);
-    private NodeRef node = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "current");
-    private NodeRef nodeV1 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v1");
-    private NodeRef nodeV2 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v2");
-    private NodeRef nodeV3 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v3");
-    private NodeRef nodeV4 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v4");
-    private NodeRef nodeV5 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v5");
-    private NodeRef nodeV6 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v6");
+    private final NodeRef node = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "current");
+    private final NodeRef nodeV1 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v1");
+    private final NodeRef nodeV2 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v2");
+    private final NodeRef nodeV3 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v3");
+    private final NodeRef nodeV4 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v4");
+    private final NodeRef nodeV5 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v5");
+    private final NodeRef nodeV6 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "v6");
 
-    private NodeRef nodeBlocked1 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "blocked1");
-    private NodeRef nodeBlocked2 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "blocked2");
+    private final NodeRef nodeBlocked1 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "blocked1");
+    private final NodeRef nodeBlocked2 = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "blocked2");
 
     @Mock
     private Usage2Service usage2Service;

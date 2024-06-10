@@ -201,7 +201,7 @@ public class AuthenticationFilterPreview implements jakarta.servlet.Filter {
 			
 		} else if (authHdr!=null && authHdr.length() > 5 && authHdr.substring(0, 5).equalsIgnoreCase("BASIC")) {
 			try {
-				HashMap<String, String> authResult = ApiAuthenticationFilter.httpBasicAuth(authHdr);
+				Map<String, String> authResult = ApiAuthenticationFilter.httpBasicAuth(authHdr);
 				if(authResult == null) {
 					throw new Exception("Auth failed");
 				}
@@ -223,7 +223,7 @@ public class AuthenticationFilterPreview implements jakarta.servlet.Filter {
 			 */
 			if(repoId != null && !ApplicationInfoList.getHomeRepository().getAppId().equals(repoId)){
 				
-				HashMap<String,String> localAuthInfo = new HashMap<String,String>();
+				Map<String,String> localAuthInfo = new HashMap<>();
 				localAuthInfo.put(CCConstants.AUTH_TICKET, ticket);
 				localAuthInfo.put(CCConstants.AUTH_USERNAME, authService.getCurrentUserName());
 				try{

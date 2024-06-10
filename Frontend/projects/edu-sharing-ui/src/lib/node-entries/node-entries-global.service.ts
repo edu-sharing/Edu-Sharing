@@ -44,6 +44,7 @@ export class NodeEntriesGlobalService {
     private paginatorSizeOptions: { [key in PaginationScope]?: number[] } = {
         DEFAULT: [25, 50, 75, 100],
     };
+    private customCssClassProvider: (node: Node) => string;
 
     constructor() {}
 
@@ -58,6 +59,20 @@ export class NodeEntriesGlobalService {
     }
     public getPaginatorSizeOptions(scope: Scope) {
         return this.paginatorSizeOptions[scope] ?? this.paginatorSizeOptions['DEFAULT'];
+    }
+    public getCustomCssClass(node: Node) {
+        if (this.customCssClassProvider) {
+            return this.customCssClassProvider(node);
+        }
+        return '';
+    }
+
+    /**
+     * a custom provider for a css class based on a node
+     * it should return the given css class that will be added to each node entry based on the given node
+     */
+    public setCustomCssClassProvider(provider: (node: Node) => string) {
+        this.customCssClassProvider = provider;
     }
     public getCustomFieldTemplate(item: CustomField, node: Node) {
         return this.customFields.filter(

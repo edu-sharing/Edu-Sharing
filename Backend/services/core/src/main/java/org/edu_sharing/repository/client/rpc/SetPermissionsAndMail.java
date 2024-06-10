@@ -29,13 +29,14 @@ package org.edu_sharing.repository.client.rpc;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SetPermissionsAndMail implements Serializable {
 	
 	String nodeId = null;
 	
 	//<authorityname,permissions[]>
-	HashMap<String,String[]> authPerm = null;
+	Map<String,String[]> authPerm = null;
 	
 	Boolean inheritPermissions = null;
 	
@@ -80,14 +81,14 @@ public class SetPermissionsAndMail implements Serializable {
 	/**
 	 * @return the authPerm
 	 */
-	public HashMap<String, String[]> getAuthPerm() {
+	public Map<String, String[]> getAuthPerm() {
 		return authPerm;
 	}
 
 	/**
 	 * @param authPerm the authPerm to set
 	 */
-	public void setAuthPerm(HashMap<String, String[]> authPerm) {
+	public void setAuthPerm(Map<String, String[]> authPerm) {
 		this.authPerm = authPerm;
 	}
 

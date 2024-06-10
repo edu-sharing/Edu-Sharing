@@ -1,19 +1,9 @@
 package org.edu_sharing.alfresco.policy;
 
-import com.typesafe.config.Config;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.apache.tika.mime.MediaType;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
-import org.edu_sharing.repository.server.tools.ApplicationInfo;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationContext;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
@@ -26,12 +16,12 @@ class NodeCustomizationPoliciesTest {
 
     @Test
     void verifyMimetypeByMagicBytes() throws UnsupportedEncodingException {
-        Map<String, byte[]> LIST = new HashMap<String, byte[]>() {{
-            put("image/jpeg", new byte[]{ (byte)0xFF, (byte)0xD8, (byte)0xFF, (byte)0xE0 });
+        Map<String, byte[]> LIST = new HashMap<>() {{
+            put("image/jpeg", new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0});
             put("text/plain", "TEST".getBytes(StandardCharsets.UTF_8));
             put("application/xml", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a></a>".getBytes(StandardCharsets.UTF_8));
             //put("text/xml", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a></a>".getBytes(StandardCharsets.UTF_8));
-            put("application/zip", new byte[]{ (byte)0x50, (byte)0x4B, (byte)0x05, (byte)0x06 });
+            put("application/zip", new byte[]{(byte) 0x50, (byte) 0x4B, (byte) 0x05, (byte) 0x06});
         }};
 
         LIST.forEach((mimetype, magic) -> {
@@ -42,7 +32,7 @@ class NodeCustomizationPoliciesTest {
             );
             String filename = UUID.randomUUID() + "." + mimetype.split("/")[1];
             Mockito.when(contentReader.getMimetype()).thenReturn(mimetype);
-            Map<String, List<String>> allowList = new HashMap<String, List<String>>() {{
+            Map<String, List<String>> allowList = new HashMap<>() {{
                 put(mimetype, Collections.singletonList(mimetype.split("/")[1]));
             }};
             NodeCustomizationPolicies.verifyMimetype(
@@ -50,7 +40,7 @@ class NodeCustomizationPoliciesTest {
                     filename,
                     allowList,
                     false);
-            HashMap<String, List<String>> allowListWrongMimetype = new HashMap<String, List<String>>() {{
+            Map<String, List<String>> allowListWrongMimetype = new HashMap<>() {{
                 put("test/sample", Collections.singletonList(mimetype.split("/")[1]));
             }};
             Mockito.when(contentReader.getContentInputStream()).thenReturn(
@@ -61,7 +51,7 @@ class NodeCustomizationPoliciesTest {
                     filename,
                     allowListWrongMimetype,
                     false));
-            HashMap<String, List<String>> allowListWrongFileExtension = new HashMap<String, List<String>>() {{
+            Map<String, List<String>> allowListWrongFileExtension = new HashMap<>() {{
                 put(mimetype, Collections.singletonList("wrong"));
             }};
             Mockito.when(contentReader.getContentInputStream()).thenReturn(

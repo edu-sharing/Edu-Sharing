@@ -168,7 +168,7 @@ public class PropPatchMethod extends PropFindMethod
             Element rootElement = body.getDocumentElement();
             NodeList childList = rootElement.getChildNodes();
 
-            m_propertyActions = new ArrayList<PropertyAction>();
+            m_propertyActions = new ArrayList<>();
 
             for (int i = 0; i < childList.getLength(); i++)
             {

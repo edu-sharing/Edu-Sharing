@@ -82,6 +82,7 @@ public class GeogebraTransformerWorker extends ContentTransformerHelper implemen
 		return AuthenticationUtil.runAsSystem(() ->
 				(sourceMimetype.equals("application/zip") || sourceMimetype.equals("application/octet-stream"))
 						&& (MimetypeMap.MIMETYPE_IMAGE_PNG.equals(targetMimetype) || MimetypeMap.MIMETYPE_IMAGE_JPEG.equals(targetMimetype) || "text/plain".equals(targetMimetype))
+						&& options.getSourceNodeRef() != null
 						&& RessourceInfoExecuter.CCM_RESSOURCETYPE_GEOGEBRA.equals(nodeService.getProperty(options.getSourceNodeRef(), QName.createQName(RessourceInfoExecuter.CCM_PROP_IO_RESSOURCETYPE)))
 		);
 	}

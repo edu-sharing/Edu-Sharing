@@ -216,7 +216,7 @@ export class SearchPageFilterBarComponent implements OnInit, OnDestroy {
         } else {
             this.mdsInitialized = true;
             const userValues = stripValues(this.searchFilters.getUserValue() ?? {}, values);
-            const defaultValues = getDefaultValues(values, userValues);
+            const defaultValues = this.getDefaultValues(values, userValues);
             // console.log('onMdsInitialValues', { values, defaultValues, userValues });
             this.defaultValues = defaultValues;
             this.searchFilters.setSystemValue(defaultValues);
@@ -239,6 +239,19 @@ export class SearchPageFilterBarComponent implements OnInit, OnDestroy {
             void this.mdsEditor.reInit();
         });
     }
+    getDefaultValues(mergedValues: Values, userValues: Values): Values {
+        const defaultValues = {} as Values;
+        for (const [key, value] of Object.entries(mergedValues)) {
+            if (value.length > 0 && !userValues?.[key]) {
+                const definition =
+                    this.mdsEditor.mdsEditorInstance.getPrimaryWidget(key)?.definition;
+                if (!definition || definition.countDefaultvalueAsFilter !== true) {
+                    defaultValues[key] = value;
+                }
+            }
+        }
+        return defaultValues;
+    }
 }
 
 function getUserValues(mergedValues: Values, defaultValues: Values): Values {
@@ -253,16 +266,6 @@ function getUserValues(mergedValues: Values, defaultValues: Values): Values {
     } else {
         return null;
     }
-}
-
-function getDefaultValues(mergedValues: Values, userValues: Values): Values {
-    const defaultValues = {} as Values;
-    for (const [key, value] of Object.entries(mergedValues)) {
-        if (value.length > 0 && !userValues?.[key]) {
-            defaultValues[key] = value;
-        }
-    }
-    return defaultValues;
 }
 
 function stripValues(values: Values, availableValues: Values): Values {

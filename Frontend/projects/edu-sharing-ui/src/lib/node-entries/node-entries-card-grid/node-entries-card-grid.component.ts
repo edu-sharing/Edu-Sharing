@@ -2,7 +2,9 @@ import { CdkDragEnter, CdkDropList, moveItemInArray } from '@angular/cdk/drag-dr
 import {
     ChangeDetectionStrategy,
     Component,
+    effect,
     ElementRef,
+    HostBinding,
     Input,
     NgZone,
     OnDestroy,
@@ -15,7 +17,7 @@ import {
 import { Sort } from '@angular/material/sort';
 import { Node, RestConstants } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take, takeUntil } from 'rxjs/operators';
 import { GridLayout, NodeEntriesDisplayType } from '../entries-model';
 import { ItemsCap } from '../items-cap';
@@ -90,6 +92,7 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
     readonly itemsCap = new ItemsCap<T>();
     private globalCursorStyle: HTMLStyleElement;
     private destroyed = new Subject<void>();
+    @HostBinding('style.--scroll-gradient-color') scrollGradientColor: string;
 
     constructor(
         public entriesService: NodeEntriesService<T>,
@@ -112,6 +115,7 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
         this.entriesService.dataSource$.pipe(takeUntil(this.destroyed)).subscribe(() => {
             this.updateScrollState();
         });
+        effect(() => (this.scrollGradientColor = this.entriesService.scrollGradientColor()));
     }
 
     ngOnInit(): void {
@@ -267,6 +271,7 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
                     new ListItemSort('NODE', RestConstants.CCM_PROP_COLLECTION_ORDERED_POSITION),
                     new ListItemSort('NODE', RestConstants.CM_PROP_TITLE),
                     new ListItemSort('NODE', RestConstants.CM_NAME),
+                    new ListItemSort('NODE', RestConstants.CM_PROP_C_CREATED),
                     new ListItemSort('NODE', RestConstants.CM_MODIFIED_DATE),
                     new ListItemSort('NODE', RestConstants.CCM_PROP_REPLICATIONMODIFIED),
                     new ListItemSort('NODE', RestConstants.CCM_PROP_REPLICATIONSOURCETIMESTAMP),
@@ -362,5 +367,9 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
 
     isCustomTemplate() {
         return this.entriesService.dataSource instanceof CustomTemplatesDataSource;
+    }
+
+    isBlocked(node: Node) {
+        return node.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true';
     }
 }

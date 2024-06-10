@@ -28,6 +28,7 @@
 package org.edu_sharing.alfresco;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -37,7 +38,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.apache.log4j.Logger;
 
 
-public class HasPermissionsWork implements AuthenticationUtil.RunAsWork<java.util.HashMap<String,Boolean>>{
+public class HasPermissionsWork implements AuthenticationUtil.RunAsWork<java.util.Map<String,Boolean>>{
 	
 	Logger logger = Logger.getLogger( HasPermissionsWork.class);
 	String userId = null;
@@ -55,8 +56,8 @@ public class HasPermissionsWork implements AuthenticationUtil.RunAsWork<java.uti
 		permissionService = _permissionService;
 	}
 	@Override
-	public java.util.HashMap<String,Boolean> doWork() throws Exception {
-		HashMap<String,Boolean> result = new HashMap<String, Boolean>();
+	public Map<String,Boolean> doWork() throws Exception {
+		Map<String,Boolean> result = new HashMap<>();
 		for(String permission:permissions){
 			
 			logger.debug("NEWnodeId:"+nodeId);

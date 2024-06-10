@@ -1,36 +1,28 @@
 package org.edu_sharing.repository.server.oai;
 
-import com.lyncode.xml.XmlReader;
-import com.lyncode.xml.exceptions.XmlReaderException;
-import com.lyncode.xml.exceptions.XmlWriteException;
 import com.typesafe.config.Config;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.namespace.QName;
-import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.dspace.xoai.dataprovider.exceptions.IdDoesNotExistException;
 import org.dspace.xoai.dataprovider.exceptions.OAIException;
 import org.dspace.xoai.dataprovider.handlers.results.ListItemIdentifiersResult;
-import org.dspace.xoai.dataprovider.model.InMemoryItem;
-import org.dspace.xoai.dataprovider.model.Item;
 import org.dspace.xoai.dataprovider.model.ItemIdentifier;
-import org.dspace.xoai.dataprovider.model.Set;
 import org.dspace.xoai.dataprovider.repository.RepositoryConfiguration;
-import org.dspace.xoai.model.oaipmh.*;
-import org.dspace.xoai.model.xoai.Element;
-import org.dspace.xoai.model.xoai.XOAIMetadata;
-import org.dspace.xoai.xml.EchoElement;
-import org.dspace.xoai.xml.XmlWriter;
+import org.dspace.xoai.model.oaipmh.DeletedRecord;
+import org.dspace.xoai.model.oaipmh.Granularity;
+import org.dspace.xoai.model.oaipmh.OAIPMH;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.Mail;
 import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.service.model.NodeRef;
 import org.edu_sharing.service.oai.OAIExporterFactory;
@@ -44,19 +36,9 @@ import org.edu_sharing.xoai.EduItemIdentifier;
 import org.edu_sharing.xoai.EduOai;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.context.ApplicationContext;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,6 +71,7 @@ public class OaiServlet extends HttpServlet{
             Map<String, List<String>> request = mapRequest(req);
             OAIPMH response = oai.handleRequest(request);
             String responseXML = EduOai.responseToXML(response);
+            responseXML = OAIExporterFactory.getOAILOMExporter().postProcessResponse(request, responseXML);
             resp.setHeader("Content-Type","application/xml");
             resp.getOutputStream().write(responseXML.getBytes());
         }
@@ -156,7 +139,7 @@ public class OaiServlet extends HttpServlet{
 
         @Override
         public ListItemIdentifiersResult getIdentifiersFrom(int from, int length, Date date, String set) throws OAIException {
-            HashMap<String, String[]> criterias = new HashMap<>();
+            Map<String, String[]> criterias = new HashMap<>();
             criterias.put("from",new String[]{convertDateSolr(date)});
             return getIdentifiersSolr(from, length,criterias, set);
         }
@@ -167,13 +150,13 @@ public class OaiServlet extends HttpServlet{
 
         @Override
         public ListItemIdentifiersResult getIdentifiersUntil(int from, int length, Date date, String set) throws OAIException {
-            HashMap<String, String[]> criterias = new HashMap<>();
+            Map<String, String[]> criterias = new HashMap<>();
             criterias.put("until",new String[]{convertDateSolr(date)});
             return getIdentifiersSolr(from, length,criterias, set);        }
 
         @Override
         public ListItemIdentifiersResult getIdentifiersFromUntil(int from, int length, Date fromDate, Date untilDate, String set) throws OAIException {
-            HashMap<String, String[]> criterias = new HashMap<>();
+            Map<String, String[]> criterias = new HashMap<>();
             criterias.put("from",new String[]{convertDateSolr(fromDate)});
             criterias.put("until",new String[]{convertDateSolr(untilDate)});
             return getIdentifiersSolr(from, length, criterias, set);

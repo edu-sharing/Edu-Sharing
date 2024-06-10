@@ -56,7 +56,7 @@ public class RenderingServiceImpl implements RenderingService{
 	private final PermissionService permissionService;
 	ApplicationInfo appInfo;
 	
-	HashMap<String,String> authInfo;
+	Map<String,String> authInfo;
 	
 
 	AuthenticationTool authTool;
@@ -79,7 +79,7 @@ public class RenderingServiceImpl implements RenderingService{
 					|| (guestUn != null
 					&& guestUn.equals(AuthenticationUtil.getFullyAuthenticatedUser()) )) {
 				logger.debug("starting in runas user mode");
-				this.authInfo = new HashMap<String,String>();
+				this.authInfo = new HashMap<>();
 				this.authInfo.put(CCConstants.AUTH_USERNAME, AuthenticationUtil.getRunAsUser());
 			}else {
 				this.authInfo = this.authTool.validateAuthentication(Context.getCurrentInstance().getCurrentInstance().getRequest().getSession());

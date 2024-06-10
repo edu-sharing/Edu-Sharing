@@ -2,6 +2,7 @@ package org.edu_sharing.repository.server.jobs.quartz;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -81,7 +82,7 @@ public class TrashcanCleanerJob extends AbstractJob {
 
 			ApplicationInfo homeRep = ApplicationInfoList.getHomeRepository();
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeRep.getAppId());
-			HashMap<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
+			Map<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
 
 			MCAlfrescoAPIClient apiClient = (MCAlfrescoAPIClient) RepoFactory.getInstance(null, authInfo);
 			
@@ -89,7 +90,7 @@ public class TrashcanCleanerJob extends AbstractJob {
 			
 			logger.info("Cleaning trashcan starting (timeToKeep: " + timeToKeep + ", batchSize: " + batchSize +")");
 
-			HashMap<String, HashMap<String, Object>> childrenByAssociation = 
+			Map<String, Map<String, Object>> childrenByAssociation =
 					apiClient.getChildrenByAssociation(
 						storeRef, 
 						apiClient.getRootNode(storeRef), 
@@ -102,7 +103,7 @@ public class TrashcanCleanerJob extends AbstractJob {
 
 				long now = System.currentTimeMillis();
 				
-				for (Entry<String, HashMap<String, Object>> entry : childrenByAssociation.entrySet()) {
+				for (Entry<String, Map<String, Object>> entry : childrenByAssociation.entrySet()) {
 					
 					String archivedDate = (String) entry.getValue().get(PROP_ARCHIVED_DATE);
 					

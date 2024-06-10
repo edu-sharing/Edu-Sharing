@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class RelationTypeUtil {
-    private final static Map<OutputRelationType, OutputRelationType> invertRelationTypeSet = new HashMap<OutputRelationType, OutputRelationType>(){{
+    private final static Map<OutputRelationType, OutputRelationType> invertRelationTypeSet = new HashMap<>(){{
         put(OutputRelationType.isBasisFor, OutputRelationType.isBasedOn);
         put(OutputRelationType.hasPart, OutputRelationType.isPartOf);
         put(OutputRelationType.references, OutputRelationType.references);
@@ -12,7 +12,7 @@ public final class RelationTypeUtil {
         put(OutputRelationType.isPartOf, OutputRelationType.hasPart);
     }};
 
-    private final static Map<InputRelationType, OutputRelationType> convertRelationTypeSet = new HashMap<InputRelationType, OutputRelationType>(){{
+    private final static Map<InputRelationType, OutputRelationType> convertRelationTypeSet = new HashMap<>(){{
         put(InputRelationType.references, OutputRelationType.references);
         put(InputRelationType.isBasedOn, OutputRelationType.isBasedOn);
         put(InputRelationType.isPartOf, OutputRelationType.isPartOf);

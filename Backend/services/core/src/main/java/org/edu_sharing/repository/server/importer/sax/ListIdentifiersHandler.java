@@ -36,7 +36,7 @@ public  class ListIdentifiersHandler extends DefaultHandler {
 
 	Logger logger = Logger.getLogger(ListIdentifiersHandler.class);
 
-	List<String> openedElements = new ArrayList<String>();
+	List<String> openedElements = new ArrayList<>();
 
 	String currentValue = null;
 	String currentResumptionToken = null;

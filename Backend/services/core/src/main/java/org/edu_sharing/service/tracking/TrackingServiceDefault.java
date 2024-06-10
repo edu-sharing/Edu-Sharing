@@ -15,6 +15,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,9 +29,9 @@ public abstract class TrackingServiceDefault implements TrackingService{
     protected org.edu_sharing.service.nodeservice.NodeService nodeService;
     public static Map<EventType,String> EVENT_PROPERTY_MAPPING=new HashMap<>();
 
-    BehaviourFilter policyBehaviourFilter = null;
+    private final TransactionService transactionService;
+    private final BehaviourFilter policyBehaviourFilter;
 
-    TransactionService transactionService = null;
 
     static{
         EVENT_PROPERTY_MAPPING.put(EventType.DOWNLOAD_MATERIAL,CCConstants.CCM_PROP_TRACKING_DOWNLOADS);
@@ -38,12 +39,9 @@ public abstract class TrackingServiceDefault implements TrackingService{
         EVENT_PROPERTY_MAPPING.put(EventType.VIEW_MATERIAL_EMBEDDED,CCConstants.CCM_PROP_TRACKING_VIEWS);
     }
 
-    public TrackingServiceDefault() {
-
-        ApplicationContext appContext = AlfAppContextGate.getApplicationContext();
-        ServiceRegistry serviceRegistry = (ServiceRegistry) appContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        transactionService = serviceRegistry.getTransactionService();
-        policyBehaviourFilter = (BehaviourFilter)appContext.getBean("policyBehaviourFilter");
+    public TrackingServiceDefault(TransactionService transactionService, @Qualifier("policyBehaviourFilter") BehaviourFilter policyBehaviourFilter) {
+        this.transactionService = transactionService;
+        this.policyBehaviourFilter = policyBehaviourFilter;
     }
 
     @Override

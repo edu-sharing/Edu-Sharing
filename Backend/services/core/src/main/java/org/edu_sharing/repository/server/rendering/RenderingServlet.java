@@ -1,19 +1,22 @@
 package org.edu_sharing.repository.server.rendering;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.edu_sharing.repository.server.SecurityHeadersFilter;
 import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.rendering.RenderingService;
 import org.edu_sharing.service.rendering.RenderingServiceFactory;
 import org.edu_sharing.service.rendering.RenderingTool;
 import org.edu_sharing.service.tracking.TrackingService;
 import org.edu_sharing.service.tracking.TrackingServiceFactory;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +43,20 @@ public class RenderingServlet extends HttpServlet {
 
             resp.getWriter().write("<html>");
             resp.getWriter().write("<head>");
-            resp.getWriter().write("<style>");
+            resp.getWriter().write("<style nonce=\"" +SecurityHeadersFilter.ngCspNonce.get() + "\">");
             resp.getWriter().write("body,html{margin:0; padding:0;}");
+            try {
+                String customCSS = ConfigServiceFactory.getCurrentConfig().values.customCSS;
+                if(!StringUtils.isBlank(customCSS)) {
+                    resp.getWriter().write(customCSS);
+                }
+            } catch (Exception e) {
+                logger.warn("Could not resolve config", e);
+            }
+
             resp.getWriter().write("</style>");
             resp.getWriter().write("</head>");
-            resp.getWriter().write("<body>");
+            resp.getWriter().write("<body class= \"eduservlet-render-body\">");
             String response;
             try {
                 response = renderingService.getDetails(node_id, version,DEFAULT_DISPLAY_MODE, params);

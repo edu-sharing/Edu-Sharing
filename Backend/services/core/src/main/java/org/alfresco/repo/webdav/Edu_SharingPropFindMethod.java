@@ -91,14 +91,14 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 	protected ArrayList<WebDAVProperty> m_properties = null;
 
 	// Available namespaces list
-	protected HashMap<String, String> m_namespaces = null;
+	protected Map<String, String> m_namespaces = null;
 
 	/**
 	 * Default constructor
 	 */
 	public Edu_SharingPropFindMethod()
 	{
-		m_namespaces = new HashMap<String, String>();
+		m_namespaces = new HashMap<>();
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 
 			if (m_mode == GET_NAMED_PROPS)
 			{
-				m_properties = new ArrayList<WebDAVProperty>();
+				m_properties = new ArrayList<>();
 				childList = node.getChildNodes();
 
 				for (int i = 0; i < childList.getLength(); i++)
@@ -256,7 +256,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 		if (getDepth() != WebDAV.DEPTH_0 && pathNodeInfo.isFolder())
 		{
 			// Create the initial list of nodes to report
-			List<FileInfo> nodeInfos = new ArrayList<FileInfo>(10);
+			List<FileInfo> nodeInfos = new ArrayList<>(10);
 			nodeInfos.add(pathNodeInfo);
 
 			int curDepth = WebDAV.DEPTH_1;
@@ -268,7 +268,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 			List<FileInfo> nextNodeInfos = null;
 			if (getDepth() > WebDAV.DEPTH_1)
 			{
-				nextNodeInfos = new ArrayList<FileInfo>(10);
+				nextNodeInfos = new ArrayList<>(10);
 			}
 
 			// Loop reporting each level of nodes to the requested depth
@@ -474,7 +474,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 		xml.startElement(WebDAV.DAV_NS, WebDAV.XML_PROPSTAT, WebDAV.XML_NS_PROPSTAT, nullAttr);
 		xml.startElement(WebDAV.DAV_NS, WebDAV.XML_PROP, WebDAV.XML_NS_PROP, nullAttr);
 
-		ArrayList<WebDAVProperty> propertiesNotFound = new ArrayList<WebDAVProperty>();
+		ArrayList<WebDAVProperty> propertiesNotFound = new ArrayList<>();
 
 		TypeConverter typeConv = DefaultTypeConverter.INSTANCE;
 
@@ -1014,7 +1014,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 
 		if (deadProperties != null)
 		{
-			result = new HashMap<QName, String>(deadProperties.size() * 2);
+			result = new HashMap<>(deadProperties.size() * 2);
 
 			for (String deadProperty : deadProperties)
 			{
@@ -1041,7 +1041,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 		}
 		else
 		{
-			result = new HashMap<QName, String>(7);
+			result = new HashMap<>(7);
 		}
 
 		return result;
@@ -1055,7 +1055,7 @@ public class Edu_SharingPropFindMethod extends WebDAVMethod
 	 */
 	protected void persistDeadProperties(NodeRef nodeRef, Map<QName, String> deadProperties)
 	{
-		List<String> listToPersist = new ArrayList<String>(deadProperties.size());
+		List<String> listToPersist = new ArrayList<>(deadProperties.size());
 
 		for (Map.Entry<QName, String> entry: deadProperties.entrySet())
 		{

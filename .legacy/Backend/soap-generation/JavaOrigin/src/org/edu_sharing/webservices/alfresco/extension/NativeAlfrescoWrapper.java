@@ -32,7 +32,7 @@ public class NativeAlfrescoWrapper{
     	return null;
     }
     
-    public HashMap<String, HashMap<String, Object>> getChildrenCheckPermissions(String parentID, String[] permissionsOnChild){
+    public Map<String, Map<String, Object>> getChildrenCheckPermissions(String parentID, String[] permissionsOnChild){
     	return null;
     }
     
@@ -192,11 +192,11 @@ public class NativeAlfrescoWrapper{
 	}
 	
 	
-	public HashMap<String, Boolean> hasAllPermissions(String nodeId, String[] permissions) {
+	public Map<String, Boolean> hasAllPermissions(String nodeId, String[] permissions) {
 		return null;
 	}
 	
-	public HashMap<String, Boolean> hasAllPermissionsExt(String storeProtocol, String storeId, String nodeId,
+	public Map<String, Boolean> hasAllPermissionsExt(String storeProtocol, String storeId, String nodeId,
 			String[] permissions){
 		return null;
 	}
@@ -268,36 +268,36 @@ public class NativeAlfrescoWrapper{
 		return null;
 	}
 	
-	public HashMap getChild(String parentId, String type, String property, String value){
+	public Map<String, Object> getChild(String parentId, String type, String property, String value){
 		return null;
 	}
 	
-	public HashMap<String,HashMap<String,Object>> getChildenByProps(String parentId, String type, HashMap props){
+	public Map<String,Map<String,Object>> getChildenByProps(String parentId, String type, HashMap props){
 		return null;
 	}
 	
-	public HashMap<String, HashMap<String, Object>> getChildrenByType(String nodeId, String type) {
+	public Map<String, Map<String, Object>> getChildrenByType(String nodeId, String type) {
 		return null;
 	}
 
 	
-	public HashMap<String, HashMap<String, Object>> getChildrenByAssociation(String storeString, String nodeId, String association){
+	public Map<String, Map<String, Object>> getChildrenByAssociation(String storeString, String nodeId, String association){
 		return null;
 	}
 	
-	public HashMap<String, HashMap> getParents(String nodeID, boolean primary){
+	public Map<String, Map<String, Object>> getParents(String nodeID, boolean primary){
 		return null;
 	}
 	
-	public HashMap<String, HashMap> getAssocNode(String nodeID, String association) {
+	public Map<String, Map<String, Object>> getAssocNode(String nodeID, String association) {
 		return null;
 	}
 	
-	public HashMap<String, Object> getChildRecursive(String parentId, String type, HashMap props){
+	public Map<String, Object> getChildRecursive(String parentId, String type, HashMap props){
 		return null;
 	}
 	
-	public HashMap<String,HashMap<String,Object>> getChildrenRecursive(String parentId, String type){
+	public Map<String, Map<String,Object>> getChildrenRecursive(String parentId, String type){
 		return null;
 	}
 	
@@ -305,7 +305,7 @@ public class NativeAlfrescoWrapper{
 		return null;
 	}
 	
-	public HashMap<String, String> getUserInfo(String userName){
+	public Map<String, String> getUserInfo(String userName){
 		return null;
 	}
 	

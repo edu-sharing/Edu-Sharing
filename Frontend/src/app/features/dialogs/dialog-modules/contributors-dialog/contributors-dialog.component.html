@@ -1,40 +1,44 @@
-<h4 class="mat-heading-4 lifecycleHeading">
-  {{ 'WORKSPACE.CONTRIBUTOR.LIFECYCLECONTRIBUTOR' | translate }}
-</h4>
-<div *ngFor="let role of rolesLifecycle">
-  <div *ngIf="contributorLifecycle[role] && contributorLifecycle[role].length" class="group">
-    <div class="role">{{ 'WORKSPACE.CONTRIBUTOR.TYPE.' + role.toUpperCase() | translate }}</div>
-    <mat-chip-grid>
-      <mat-chip
-        *ngFor="let vCard of contributorLifecycle[role]; let i = index"
-        class="badge clickable"
-      >
-        <span (click)="editVCard('lifecycle', vCard, role, i)">{{ vCard.getDisplayName() }}</span>
-        <mat-icon matChipRemove (click)="remove(contributorLifecycle[role], i)">cancel</mat-icon>
-      </mat-chip>
-    </mat-chip-grid>
+<div class="contributor-lifecycle">
+  <h4 class="mat-heading-4 lifecycleHeading">
+    {{ 'WORKSPACE.CONTRIBUTOR.LIFECYCLECONTRIBUTOR' | translate }}
+  </h4>
+  <div *ngFor="let role of rolesLifecycle">
+    <div *ngIf="contributorLifecycle[role] && contributorLifecycle[role].length" class="group">
+      <div class="role">{{ 'WORKSPACE.CONTRIBUTOR.TYPE.' + role.toUpperCase() | translate }}</div>
+      <mat-chip-grid>
+        <mat-chip
+          *ngFor="let vCard of contributorLifecycle[role]; let i = index"
+          class="badge clickable"
+        >
+          <span (click)="editVCard('lifecycle', vCard, role, i)">{{ vCard.getDisplayName() }}</span>
+          <mat-icon matChipRemove (click)="remove(contributorLifecycle[role], i)">cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-grid>
+    </div>
   </div>
+  <button mat-raised-button class="btnAdd" (click)="addVCard('lifecycle')">
+    <i esIcon="add"></i> {{ 'ADD' | translate }}
+  </button>
 </div>
-<button mat-raised-button class="btnAdd" (click)="addVCard('lifecycle')">
-  <i esIcon="add"></i> {{ 'ADD' | translate }}
-</button>
-<h4 class="mat-heading-4 metadataHeading">
-  {{ 'WORKSPACE.CONTRIBUTOR.METADATACONTRIBUTOR' | translate }}
-</h4>
-<div *ngFor="let role of rolesMetadata">
-  <div *ngIf="contributorMetadata[role] && contributorMetadata[role].length" class="group">
-    <div class="role">{{ 'WORKSPACE.CONTRIBUTOR.TYPE.' + role.toUpperCase() | translate }}</div>
-    <mat-chip-grid>
-      <mat-chip
-        *ngFor="let vCard of contributorMetadata[role]; let i = index"
-        class="badge clickable"
-      >
-        <span (click)="editVCard('metadata', vCard, role, i)">{{ vCard.getDisplayName() }}</span>
-        <mat-icon matChipRemove (click)="remove(contributorMetadata[role], i)">cancel</mat-icon>
-      </mat-chip>
-    </mat-chip-grid>
+<div class="contributor-metadata">
+  <h4 class="mat-heading-4 metadataHeading">
+    {{ 'WORKSPACE.CONTRIBUTOR.METADATACONTRIBUTOR' | translate }}
+  </h4>
+  <div *ngFor="let role of rolesMetadata">
+    <div *ngIf="contributorMetadata[role] && contributorMetadata[role].length" class="group">
+      <div class="role">{{ 'WORKSPACE.CONTRIBUTOR.TYPE.' + role.toUpperCase() | translate }}</div>
+      <mat-chip-grid>
+        <mat-chip
+          *ngFor="let vCard of contributorMetadata[role]; let i = index"
+          class="badge clickable"
+        >
+          <span (click)="editVCard('metadata', vCard, role, i)">{{ vCard.getDisplayName() }}</span>
+          <mat-icon matChipRemove (click)="remove(contributorMetadata[role], i)">cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-grid>
+    </div>
   </div>
+  <button mat-raised-button class="btnAdd" (click)="addVCard('metadata')">
+    <i esIcon="add"></i> {{ 'ADD' | translate }}
+  </button>
 </div>
-<button mat-raised-button class="btnAdd" (click)="addVCard('metadata')">
-  <i esIcon="add"></i> {{ 'ADD' | translate }}
-</button>

@@ -60,7 +60,7 @@ public class ImporterJobSAX extends ImporterJob  {
 
 	@Override
 	public Class[] getJobClasses() {
-		List<Class> classList = new ArrayList<Class>(Arrays.asList(allJobs));
+		List<Class> classList = new ArrayList<>(Arrays.asList(allJobs));
 		classList.add(ImporterJobSAX.class);
 		return classList.toArray(new Class[classList.size()]);
 	}

@@ -48,7 +48,7 @@ public class PersistenHandlerKeywordsDNBMarc implements PersistentHandlerInterfa
     @Override
     public String safe(RecordHandlerInterfaceBase recordHandler, String cursor, String set) throws Throwable {
 
-        HashMap<String, Object> props = recordHandler.getProperties();
+        Map<String, Object> props = recordHandler.getProperties();
         String id = (String)props.get(RecordHandlerKeywordsDNBMarc.ID);
         if(id == null){
             logger.error("no id provided");
@@ -254,7 +254,7 @@ public class PersistenHandlerKeywordsDNBMarc implements PersistentHandlerInterfa
     }
 
 
-    public List<HashMap<String,Object>> getEntriesByDisplayValue(String value){
+    public List<Map<String,Object>> getEntriesByDisplayValue(String value){
         value = value.trim();
 
         String[] splitted = value.split(" \\(");
@@ -262,7 +262,7 @@ public class PersistenHandlerKeywordsDNBMarc implements PersistentHandlerInterfa
         String tempSyn = (splitted.length > 1) ? splitted[1].replaceAll("\\)","") : null;
         String[] termSyns = (tempSyn != null) ? tempSyn.split(", ") : null;
 
-        List<HashMap<String,Object>> result = new ArrayList<>();
+        List<Map<String,Object>> result = new ArrayList<>();
         Connection con = null;
         PreparedStatement statement = null;
         ConnectionDBAlfresco dbAlf = new ConnectionDBAlfresco();
@@ -291,7 +291,7 @@ public class PersistenHandlerKeywordsDNBMarc implements PersistentHandlerInterfa
 
             java.sql.ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
-                HashMap<String,Object> row = new HashMap<>();
+                Map<String,Object> row = new HashMap<>();
                 int colCount = resultSet.getMetaData().getColumnCount();
                 for(int i = 1; i <= colCount; i++){
                     row.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));

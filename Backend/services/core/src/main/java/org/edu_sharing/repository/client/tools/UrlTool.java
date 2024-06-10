@@ -83,7 +83,7 @@ public class UrlTool {
 		if(!queryPart.contains(param)) return url;
 		
 		String[] params = queryPart.split("\\&");
-		List<String> newParams = new ArrayList<String>();
+		List<String> newParams = new ArrayList<>();
 		for(String p : params){
 			if(!p.contains(param)){
 				newParams.add(p);

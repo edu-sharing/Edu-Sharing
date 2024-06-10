@@ -84,7 +84,7 @@ public class UserDataServiceLDAPImpl extends UserDataServiceAbstract {
 		String[] propsToReturn = attMap.keySet().toArray(new String[attMap.keySet().size()]);
 		Map<String, String> userDirectoryRequestResult = getDirectoryUserProperties(directoryUsernameProp, directoryUsernameValue, propsToReturn);
 
-		Map<QName, Serializable> result = new HashMap<QName, Serializable>();
+		Map<QName, Serializable> result = new HashMap<>();
 
 		for (String ldapProp : propsToReturn) {
 			String repProp = attMap.get(ldapProp);
@@ -127,7 +127,7 @@ public class UserDataServiceLDAPImpl extends UserDataServiceAbstract {
 				, "(" + directoryUsernameProp + "=" + directoryUsernameValue + ")" // query
 				, ctls); //
 
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, String> result = new HashMap<>();
 
 		while (rs.hasMore()) {
 
@@ -168,7 +168,7 @@ public class UserDataServiceLDAPImpl extends UserDataServiceAbstract {
 
 	Map<String, String> getAttributeMapping() {
 		if (attributMapping == null) {
-			attributMapping = new HashMap<String, String>();
+			attributMapping = new HashMap<>();
 			attributMapping.put(firstNameProp, CCConstants.CM_PROP_PERSON_FIRSTNAME);
 			attributMapping.put(lastNameProp, CCConstants.CM_PROP_PERSON_LASTNAME);
 			attributMapping.put(emailProp, CCConstants.CM_PROP_PERSON_EMAIL);

@@ -1,21 +1,9 @@
 package org.edu_sharing.repository.server.authentication;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
@@ -25,11 +13,17 @@ import org.edu_sharing.repository.server.RepoFactory;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.LocaleValidator;
-import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.service.authentication.oauth2.TokenService;
 import org.edu_sharing.service.authentication.oauth2.TokenService.Token;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.springframework.context.ApplicationContext;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AuthenticationFilter implements jakarta.servlet.Filter {
 	
@@ -208,8 +202,6 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
 			log.info(LOGIN_SUCCESS_REDIRECT_URL + ":" + loginSuccessRedirectUrl);
 			req.getSession().setAttribute(LOGIN_SUCCESS_REDIRECT_URL, loginSuccessRedirectUrl);
 		}
-		
-		String allowedAuthTypes = ApplicationInfoList.getHomeRepository().getAllowedAuthenticationTypes();
 
 		// changed in 5.1: We always allow the webapp to load for mobile apps & angular routing
 		boolean allowSSO = false;
@@ -238,31 +230,26 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
 		}
 
 		 */
-		
-		if(allowedAuthTypes != null && !allowedAuthTypes.trim().equals("") && allowSSO){
-			String shibbUrl = URLTool.addSSOPathWhenConfigured(URLTool.getBaseUrl(true)) + ( req.getQueryString() != null ? "?"+req.getQueryString() : "");
-			resp.sendRedirect(shibbUrl);
-		}else{
-			// detect if the error component was requested -> then go ahead
-			// otherwise, go to the angular login page
-			URL requestUrl = new URL(req.getRequestURL().toString());
-			if(requestUrl.getPath().contains(NgServlet.COMPONENTS_ERROR)){
-				addErrorCode(resp, url);
-				// go to the error component
-				chain.doFilter(req, resp);
-			}
-			else {
-				if(requestUrl.getPath().contains("eduservlet/")){
-					resp.sendRedirect("/edu-sharing/shibboleth");
-				} else {
-					// go to angular login
-					RequestDispatcher rp = req.getRequestDispatcher(AuthenticationFilter.PATH_LOGIN_ANGULAR);
-					rp.forward(req, resp);
-				}
-			}
-		}
-	  
-	}
+
+        // detect if the error component was requested -> then go ahead
+        // otherwise, go to the angular login page
+        URL requestUrl = new URL(req.getRequestURL().toString());
+        if(requestUrl.getPath().contains(NgServlet.COMPONENTS_ERROR)){
+            addErrorCode(resp, url);
+            // go to the error component
+            chain.doFilter(req, resp);
+        }
+        else {
+            if(requestUrl.getPath().contains("eduservlet/")){
+                resp.sendRedirect("/edu-sharing/shibboleth");
+            } else {
+                // go to angular login
+                RequestDispatcher rp = req.getRequestDispatcher(AuthenticationFilter.PATH_LOGIN_ANGULAR);
+                rp.forward(req, resp);
+            }
+        }
+
+    }
 
 	private void addErrorCode(HttpServletResponse resp, URL url) {
 		String error=url.getPath().substring(url.getPath().indexOf(NgServlet.COMPONENTS_ERROR) + NgServlet.COMPONENTS_ERROR.length() + 1);
@@ -284,7 +271,7 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
 		}
 		try{
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(null);
-			HashMap<String,String> result = authTool.createNewSession(guestUn, guestPw);
+			Map<String,String> result = authTool.createNewSession(guestUn, guestPw);
 			
 			//save ticket in session
 			HttpSession session = req.getSession();

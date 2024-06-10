@@ -87,7 +87,7 @@ public class ArchiveServiceImpl implements ArchiveService  {
 	
 	@Override
 	public List<RestoreResult> restore(List<String> archivedNodeIds, String toFolder) {
-		List<RestoreResult> result = new ArrayList<RestoreResult>();
+		List<RestoreResult> result = new ArrayList<>();
 		for(String archivedNodeId : archivedNodeIds){
 			result.add(this.restoreNode(archivedNodeId, toFolder));
 		}

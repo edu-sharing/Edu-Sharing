@@ -306,7 +306,7 @@
     "LTI_V13_PLATFORM": {
       "NODE": {
         "CREATE": {
-          "TITLE": "Neues LTI Tool Object erstellen/einbinden",
+          "TITLE": "Neue Datei erstellen/einbinden",
           "NAME": "Tool: {{ltitool}}"
         }
       }

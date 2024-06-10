@@ -222,7 +222,7 @@ public class OrganisationService {
 			throw new Exception("Folder does not exist");
 		}
 
-		Map<QName, Serializable> params = new HashMap<QName, Serializable>();
+		Map<QName, Serializable> params = new HashMap<>();
 		params.put(QName.createQName(CCM_PROP_EDUGROUP_EDU_HOMEDIR), folder);
 		params.put(QName.createQName(CCM_PROP_EDUGROUP_EDU_UNIQUENAME), groupName);
 
@@ -230,7 +230,7 @@ public class OrganisationService {
 	}
 
 	private NodeRef createNode(NodeRef parent, String type, String name) {
-		Map<QName, Serializable> propsOrgFolder = new HashMap<QName, Serializable>();
+		Map<QName, Serializable> propsOrgFolder = new HashMap<>();
 		propsOrgFolder.put(ContentModel.PROP_NAME, name);
 		String assocName = "{" + CCConstants.NAMESPACE_CCM + "}" + name;
 		return nodeService.createNode(parent, ContentModel.ASSOC_CONTAINS, QName.createQName(assocName), QName.createQName(type), propsOrgFolder).getChildRef();
@@ -358,7 +358,7 @@ public class OrganisationService {
 
 	public List<String> getMyOrganisations(boolean scoped){
 		Set<String> authorities = authorityService.getContainingAuthorities(AuthorityType.GROUP, AuthenticationUtil.getFullyAuthenticatedUser(), true);
-		List<String> organisations = new ArrayList<String>();
+		List<String> organisations = new ArrayList<>();
 		for (String authority : authorities) {
 			NodeRef nodeRefAuthority = authorityService.getAuthorityNodeRef(authority);
 			if (nodeService.hasAspect(nodeRefAuthority, QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP))) {

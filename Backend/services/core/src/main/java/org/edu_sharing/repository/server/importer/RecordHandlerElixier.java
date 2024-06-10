@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.server.importer;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -44,7 +45,7 @@ public class RecordHandlerElixier implements RecordHandlerInterface{
 	XPathFactory pfactory = XPathFactory.newInstance();
 	XPath xpath = pfactory.newXPath();
 
-	HashMap<String,Object> toSafeList = new HashMap<String,Object>();
+	Map<String,Object> toSafeList = new HashMap<>();
 	
 	public RecordHandlerElixier() {
 	}
@@ -75,7 +76,7 @@ public class RecordHandlerElixier implements RecordHandlerInterface{
 	}
 	
 	@Override
-	public HashMap<String, Object> getProperties() {
+	public Map<String, Object> getProperties() {
 		return toSafeList;
 	}
 	

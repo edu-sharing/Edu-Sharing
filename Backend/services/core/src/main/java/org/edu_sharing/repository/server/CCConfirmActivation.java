@@ -103,11 +103,11 @@ public class CCConfirmActivation extends HttpServlet {
 		try {
 
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeRepository.getAppId());
-			HashMap<String, String> authInfo = authTool.createNewSession(adminUn, password);
+			Map<String, String> authInfo = authTool.createNewSession(adminUn, password);
 			MCAlfrescoBaseClient mcAlfrescoBaseClient = (MCAlfrescoBaseClient) RepoFactory.getInstance(null, authInfo);
 
 			
-			HashMap<String, HashMap<String, Object>> userResult = mcAlfrescoBaseClient.search("@cm\\:userName:" + repositoryUsername);
+			Map<String, Map<String, Object>> userResult = mcAlfrescoBaseClient.search("@cm\\:userName:" + repositoryUsername);
 			
 			if(userResult.size() > 0){
 				if(userResult.size() > 1){
@@ -115,13 +115,13 @@ public class CCConfirmActivation extends HttpServlet {
 					log.error("UserId:" + repositoryUsername + " is used by more than one users. This is not allowed!!!");
 					return;
 				}else{
-					 HashMap<String, Object> userProps = userResult.get(userResult.keySet().iterator().next());
+					 Map<String, Object> userProps = userResult.get(userResult.keySet().iterator().next());
 					 String nodeId = (String)userProps.get(CCConstants.SYS_PROP_NODE_UID);
-					 HashMap<String, HashMap<String, Object>> childMap = mcAlfrescoBaseClient.getChildrenByType(nodeId,
+					 Map<String, Map<String, Object>> childMap = mcAlfrescoBaseClient.getChildrenByType(nodeId,
 								CCConstants.CM_TYPE_PERSONACCESSELEMENT);
 
-						for (Map.Entry<String, HashMap<String, Object>> entry : childMap.entrySet()) {
-							HashMap<String, Object> childProps = entry.getValue();
+						for (Map.Entry<String, Map<String, Object>> entry : childMap.entrySet()) {
+							Map<String, Object> childProps = entry.getValue();
 							String tmpAppId = (String) childProps.get(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCAPPID);
 							String tmpappUserId = (String) childProps.get(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCUSERID);
 							String tmpActivateKey = (String) childProps.get(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCACTIVATEKEY);
@@ -135,7 +135,7 @@ public class CCConfirmActivation extends HttpServlet {
 								// one retrieved by getChildrenByType
 								// cause there are properties that are not part
 								// of the type definition
-								HashMap<String, Object> propsToSafe = new HashMap<String, Object>();
+								Map<String, Object> propsToSafe = new HashMap<>();
 								propsToSafe.put(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCAPPID, tmpAppId);
 								propsToSafe.put(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCUSERID, tmpappUserId);
 								propsToSafe.put(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCACTIVATEKEY, tmpActivateKey);

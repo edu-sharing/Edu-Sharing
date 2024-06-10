@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AboutService {
   
   private String name = null;
-  private List<ServiceInstance> instances = new ArrayList<ServiceInstance>();
+  private List<ServiceInstance> instances = new ArrayList<>();
 
   
   /**

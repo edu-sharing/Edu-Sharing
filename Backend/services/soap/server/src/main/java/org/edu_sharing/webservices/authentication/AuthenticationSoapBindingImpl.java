@@ -77,7 +77,7 @@ public class AuthenticationSoapBindingImpl implements org.edu_sharing.webservice
 		 * Attention if you put an username that does not exist, alfresco creates a ne person object without an user object in user store
 		 * watch out for Alfresco class PersonServiceImpl
 		 */
-		HashMap<String,String> userProps = eduAuthenticationService.getPersonProperties(eduAuthenticationService.getCurrentUserName());
+		Map<String,String> userProps = eduAuthenticationService.getPersonProperties(eduAuthenticationService.getCurrentUserName());
 		String localemail = userProps.get(CCConstants.CM_PROP_PERSON_EMAIL);
 		String localFirstname = userProps.get(CCConstants.CM_PROP_PERSON_FIRSTNAME);
 		String localLastname = userProps.get(CCConstants.CM_PROP_PERSON_LASTNAME);
@@ -120,7 +120,7 @@ public class AuthenticationSoapBindingImpl implements org.edu_sharing.webservice
 	
 		try{
 			
-			HashMap<String,String> ssoDataMap = new HashMap<String,String>();
+			Map<String,String> ssoDataMap = new HashMap<>();
 			
 			//add sso data
 			for(KeyValue kv : ssoData){
@@ -145,7 +145,7 @@ public class AuthenticationSoapBindingImpl implements org.edu_sharing.webservice
 		 * Attention if you put an username that does not exist, alfresco creates a ne person object without an user object in user store
 		 * watch out for Alfresco class PersonServiceImpl
 		 */
-		HashMap<String,String> userProps = eduAuthenticationService.getPersonProperties(eduAuthenticationService.getCurrentUserName());
+		Map<String,String> userProps = eduAuthenticationService.getPersonProperties(eduAuthenticationService.getCurrentUserName());
 		String localemail = userProps.get(CCConstants.CM_PROP_PERSON_EMAIL);
 		String localFirstname = userProps.get(CCConstants.CM_PROP_PERSON_FIRSTNAME);
 		String localLastname = userProps.get(CCConstants.CM_PROP_PERSON_LASTNAME);

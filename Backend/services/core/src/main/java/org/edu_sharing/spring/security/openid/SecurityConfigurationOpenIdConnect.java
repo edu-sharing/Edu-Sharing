@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.repository.client.tools.UrlTool;
+import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.edu_sharing.spring.security.basic.EduAuthSuccsessHandler;
@@ -72,47 +73,13 @@ public class SecurityConfigurationOpenIdConnect {
                         logout.logoutSuccessHandler(oidcLogoutSuccessHandler()))
                 //backchannel logout
                 .oidcLogout((logout) -> logout
-                        .backChannel(Customizer.withDefaults())
+                        .backChannel((bcLogout) -> bcLogout.logoutUri(ApplicationInfoList.getHomeRepository().getBaseUrl() + "/edu-sharing/logout"))
                 );
 
         CSRFConfig.config(http);
 
         return http.build();
     }
-
-    @Component
-    class Patcher{
-
-        @Autowired
-        SecurityFilterChain securityFilterChain;
-        @PostConstruct
-        public void init(){
-            for(Filter f : securityFilterChain.getFilters()){
-                if(f.getClass().getName().equals("org.springframework.security.config.annotation.web.configurers.oauth2.client.OidcBackChannelLogoutFilter")){
-                    try {
-                        Class c = Class.forName("org.springframework.security.config.annotation.web.configurers.oauth2.client.OidcBackChannelLogoutFilter");
-                        Field fLogoutHandler = c.getDeclaredField("logoutHandler");
-                        fLogoutHandler.setAccessible(true);
-                        Object oidcBackChannelLogoutHandler = fLogoutHandler.get(f);
-
-                        Class c2 = Class.forName("org.springframework.security.config.annotation.web.configurers.oauth2.client.OidcBackChannelLogoutHandler");
-                        Field logoutEndpointName = c2.getDeclaredField("logoutEndpointName");
-                        logoutEndpointName.setAccessible(true);
-                        logoutEndpointName.set(oidcBackChannelLogoutHandler,"/edu-sharing/logout");
-
-                    } catch (ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    } catch (NoSuchFieldException e) {
-                        throw new RuntimeException(e);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    } ;
-
-                }
-            }
-        }
-    }
-
 
     private LogoutSuccessHandler oidcLogoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =

@@ -104,7 +104,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 		String replicationId = null;
 		String lomCatalogId = null;
 
-		List<HashMap<String, Object>> generalIdentifierList = new ArrayList<HashMap<String, Object>>();
+		List<Map<String, Object>> generalIdentifierList = new ArrayList<>();
 		NodeList identifierNodeList = (NodeList) xpath.evaluate("metadata/lom/general/identifier", nodeRecord, XPathConstants.NODESET);
 		for(int i = 0; i < identifierNodeList.getLength(); i++){
 			// general identifier
@@ -116,7 +116,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 				lomCatalogId = tmpLomCatalogId;
 			}
 
-			HashMap<String, Object> generalIdentifierToSafeMap = new HashMap<String, Object>();
+			Map<String, Object> generalIdentifierToSafeMap = new HashMap<>();
 			generalIdentifierToSafeMap.put(CCConstants.LOM_PROP_IDENTIFIER_ENTRY, tmpReplicationId);
 			generalIdentifierToSafeMap.put(CCConstants.LOM_PROP_IDENTIFIER_CATALOG, tmpLomCatalogId);
 
@@ -243,21 +243,21 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 			String lifecycleStatusValue = (String) xpath.evaluate("status/value", lifecycleNode, XPathConstants.STRING);
 
 			// lifecycleContribute
-			ArrayList<HashMap<String, Object>> lifecycleContributes = null;
+			ArrayList<Map<String, Object>> lifecycleContributes;
 
 			/**
 			 * search replication preferred from LOM
 			 */
 
-			HashMap<String,ArrayList<String>> replLifecycleContributer = new HashMap<String,ArrayList<String>>();
+			Map<String,ArrayList<String>> replLifecycleContributer = new HashMap<>();
 			lifecycleContributes = getContributes(lifecycleNode);
 			if(lifecycleContributes != null){
 
-				ArrayList<HashMap<String, Object>> assignedLicenses = new ArrayList<HashMap<String, Object>>();
-				List<String> assignedLicensesAuthorities = new ArrayList<String>();
+				ArrayList<Map<String, Object>> assignedLicenses = new ArrayList<>();
+				List<String> assignedLicensesAuthorities = new ArrayList<>();
 				Date assignedLicenseExpiryDate = null;
 
-				for (HashMap contr : lifecycleContributes) {
+				for (Map<String, Object> contr : lifecycleContributes) {
 
 					String role = (String) contr.get(CCConstants.LOM_PROP_CONTRIBUTE_ROLE);
 					String entity = (String) contr.get(CCConstants.LOM_PROP_CONTRIBUTE_ENTITY);
@@ -268,14 +268,14 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 						String lc_property = CCConstants.getLifecycleContributerProp(role.trim());
 						if(lc_property != null && !lc_property.trim().equals("")){
 							ArrayList<String> tmpLCList = replLifecycleContributer.get(lc_property);
-							if(tmpLCList == null) tmpLCList = new ArrayList<String>();
+							if(tmpLCList == null) tmpLCList = new ArrayList<>();
 
 							/**
 							 * add Date
 							 */
 
 							if(date != null){
-								ArrayList<HashMap<String, Object>> vards = VCardConverter.vcardToHashMap(entity);
+								ArrayList<Map<String, Object>> vards = VCardConverter.vcardToMap(entity);
 								if(vards != null && vards.size() > 0) {
 									vards.get(0).put(CCConstants.VCARD_EXT_LOM_CONTRIBUTE_DATE, date);
 									entity = VCardTool.hashMap2VCard((HashMap)vards.get(0));
@@ -310,7 +310,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 					}
 					if (role != null && role.equals("distributor")) {
 						String vcard =  (String)contr.get(CCConstants.LOM_PROP_CONTRIBUTE_ENTITY);
-						ArrayList<HashMap<String, Object>> vcards =VCardConverter.vcardToHashMap(vcard);
+						ArrayList<Map<String, Object>> vcards =VCardConverter.vcardToHashMap(vcard);
 						if(vcards != null){
 							String mediaCenter = (String)vcards.get(0).get("FN");
 							if(mediaCenter != null && !mediaCenter.trim().equals("")){
@@ -321,9 +321,9 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 				}
 
 				if(assignedLicenseExpiryDate != null){
-					ArrayList<HashMap<String, Object>> assignedLicensesNodes = new ArrayList<HashMap<String, Object>>();
+					ArrayList<Map<String, Object>> assignedLicensesNodes = new ArrayList<Map<String, Object>>();
 					for(String authority : assignedLicensesAuthorities){
-						HashMap<String, Object> props = new HashMap<String, Object>();
+						Map<String, Object> props = new HashMap<>();
 						props.put(CCConstants.CCM_PROP_ASSIGNED_LICENSE_AUTHORITY, AuthorityType.GROUP.getPrefixString() + authority);
 						props.put(CCConstants.CCM_PROP_ASSIGNED_LICENSE_ASSIGNEDLICENSE_EXPIRY, assignedLicenseExpiryDate);
 						//props.put(CCConstants.CCM_PROP_ASSIGNED_LICENSE_ASSIGNEDLICENSE_EXPIRY, new Date(System.currentTimeMillis() + 600000));
@@ -371,15 +371,15 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 			String identifierEntry = (String) xpath.evaluate("identifier/entry", nodeMetaMetadata, XPathConstants.STRING);
 			String language = (String) xpath.evaluate("language", nodeMetaMetadata, XPathConstants.STRING);
 
-			ArrayList<HashMap<String, Object>> metaMetadataContributes = getContributes(nodeMetaMetadata);
+			ArrayList<Map<String, Object>> metaMetadataContributes = getContributes(nodeMetaMetadata);
 
 			// metadata contributer creator als replication attribut
-			ArrayList<String> creatorList = new ArrayList<String>();
+			ArrayList<String> creatorList = new ArrayList<>();
 
 			//metadata contribuiter provider
-			ArrayList<String> providerList = new ArrayList<String>();
+			ArrayList<String> providerList = new ArrayList<>();
 			if (metaMetadataContributes != null) {
-				for (HashMap<String, Object> map : metaMetadataContributes) {
+				for (Map<String, Object> map : metaMetadataContributes) {
 
 					String role = (String) map.get(CCConstants.LOM_PROP_CONTRIBUTE_ROLE);
 					if (role != null && role.trim().equals("creator")) {
@@ -527,7 +527,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 		NodeList nodeEducationalList = (NodeList) xpath.evaluate("metadata/lom/educational", nodeRecord, XPathConstants.NODESET);
 		List educationalToSafeList = new ArrayList();
 		// LOM Replication lists
-		List<String> lomReplicationLearningresourceTypeList = new ArrayList<String>();
+		List<String> lomReplicationLearningresourceTypeList = new ArrayList<>();
 		List lomReplicationEducationalContextList = new ArrayList();
 		List lomReplicationIntendedEndUserList = new ArrayList();
 		List lomReplicationTypicalAgeRangeList = new ArrayList();
@@ -628,7 +628,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 		List lomReplicationTaxonEntry = new ArrayList();
 		List lomReplicationTaxonId = new ArrayList();
 
-		List<String> classificationKeywords = new ArrayList<String>();
+		List<String> classificationKeywords = new ArrayList<>();
 		for (int i = 0; i < nodeClassificationList.getLength(); i++) {
 			Node classificationNode = nodeClassificationList.item(i);
 			String purposeSource = (String) xpath.evaluate("purpose/source", classificationNode, XPathConstants.STRING);
@@ -706,8 +706,8 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 			//
 			//alf5 solr4 don't likes to get null for mltext properties (solr tracking failed). So we put an empty list here
 			//
-			toSafeMap.put(CCConstants.CCM_PROP_IO_REPL_TAXON_ENTRY, new ArrayList<String>());
-			toSafeMap.put(CCConstants.CCM_PROP_IO_REPL_TAXON_ID, new ArrayList<String>());
+			toSafeMap.put(CCConstants.CCM_PROP_IO_REPL_TAXON_ENTRY, new ArrayList<>());
+			toSafeMap.put(CCConstants.CCM_PROP_IO_REPL_TAXON_ID, new ArrayList<>());
 			*/
 			/**
 			 * add them to the remove list, this is better than empty lists
@@ -753,7 +753,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 		 */
 		// getting Thumbnail thru elixier dialect
 
-		ArrayList<String> fach_sachgebietListOriginal = new ArrayList<String>();
+		ArrayList<String> fach_sachgebietListOriginal = new ArrayList<>();
 		String serientitel = null;
 
 		List relationToSafeList = new ArrayList();
@@ -829,7 +829,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 	 * @throws XPathExpressionException
 	 */
 	public ArrayList<String> getMultiLangValueNew(Node node) throws XPathExpressionException {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if (node != null) {
 			NodeList langList = (NodeList) xpath.evaluate("string", node, XPathConstants.NODESET);
 			if(langList.getLength() == 0) langList = (NodeList) xpath.evaluate("langstring", node, XPathConstants.NODESET);
@@ -891,11 +891,11 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 			return null;
 	}
 
-	public ArrayList<HashMap<String, Object>> getContributes(Node parent) throws XPathExpressionException {
-		ArrayList<HashMap<String, Object>> result = new ArrayList<HashMap<String, Object>>();
+	public ArrayList<Map<String, Object>> getContributes(Node parent) throws XPathExpressionException {
+		ArrayList<Map<String, Object>> result = new ArrayList<>();
 		NodeList contributes = (NodeList) xpath.evaluate("contribute", parent, XPathConstants.NODESET);
 		for (int i = 0; i < contributes.getLength(); i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			Map<String, Object> map = new HashMap<>();
 			Node nodeContribute = contributes.item(i);
 			String contributeRoleSource = (String) xpath.evaluate("role/source", nodeContribute, XPathConstants.STRING);
 			String contributeRoleValue = (String) xpath.evaluate("role/value", nodeContribute, XPathConstants.STRING);
@@ -995,7 +995,7 @@ public class RecordHandlerLOM implements RecordHandlerInterface {
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties() {
+	public Map<String, Object> getProperties() {
 		return toSafeMap;
 	}
 

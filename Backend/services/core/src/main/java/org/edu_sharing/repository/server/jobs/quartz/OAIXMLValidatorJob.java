@@ -25,7 +25,7 @@ public class OAIXMLValidatorJob extends ImporterJob{
 	
 	@Override
 	public Class[] getJobClasses() {
-		List<Class> classList = new ArrayList<Class>(Arrays.asList(allJobs));
+		List<Class> classList = new ArrayList<>(Arrays.asList(allJobs));
 		classList.add(OAIXMLValidatorJob.class);
 		return classList.toArray(new Class[classList.size()]);
 	}

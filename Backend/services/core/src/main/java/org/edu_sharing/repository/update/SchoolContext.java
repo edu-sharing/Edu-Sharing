@@ -113,7 +113,7 @@ public class SchoolContext {
 				sysFolderName);
 
 		if (sysFolderNodeRef == null) {
-			Map<QName, Serializable> rootFolderProps = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> rootFolderProps = new HashMap<>();
 			rootFolderProps.put(ContentModel.PROP_NAME, sysFolderName);
 			sysFolderNodeRef = nodeService.createNode(sysFolderParent, ContentModel.ASSOC_CONTAINS,
 					QName.createQName(sysFolderName), QName.createQName(CCConstants.CCM_TYPE_MAP), rootFolderProps)
@@ -129,7 +129,7 @@ public class SchoolContext {
 		NodeRef entityFolderNodeRef = nodeService.getChildByName(sysFolderNodeRef, ContentModel.ASSOC_CONTAINS,
 				entityFolderName);
 		if (entityFolderNodeRef == null) {
-			Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> props = new HashMap<>();
 			props.put(ContentModel.PROP_NAME, entityFolderName);
 			entityFolderNodeRef = nodeService.createNode(sysFolderNodeRef, ContentModel.ASSOC_CONTAINS,
 					QName.createQName(entityFolderName), QName.createQName(CCConstants.CCM_TYPE_MAP), props)
@@ -148,7 +148,7 @@ public class SchoolContext {
 		NodeRef relationsFolderNodeRef = nodeService.getChildByName(sysFolderNodeRef, ContentModel.ASSOC_CONTAINS,
 				relationsFolderName);
 		if (relationsFolderNodeRef == null) {
-			Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> props = new HashMap<>();
 			props.put(ContentModel.PROP_NAME, relationsFolderName);
 			relationsFolderNodeRef = nodeService.createNode(sysFolderNodeRef, ContentModel.ASSOC_CONTAINS,
 					QName.createQName(relationsFolderName), QName.createQName(CCConstants.CCM_TYPE_MAP), props)
@@ -162,7 +162,7 @@ public class SchoolContext {
 
 		try {
 
-			HashMap<String, String> keyNamesMap = new HashMap<String, String>();
+			Map<String, String> keyNamesMap = new HashMap<>();
 			Sheet sheetBL = workbook.getSheetAt(exceltab);
 			logger.info("nr:" + exceltab + " name:" + sheetBL.getSheetName());
 
@@ -216,7 +216,7 @@ public class SchoolContext {
 
 			for (Map.Entry<String, String> keyName : keyNamesMap.entrySet()) {
 
-				Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+				Map<QName, Serializable> props = new HashMap<>();
 
 				if (keyProp != null) {
 					props.put(QName.createQName(keyProp), keyName.getKey());
@@ -257,14 +257,14 @@ public class SchoolContext {
 	public void createRelations(int relationTab, int typeOfSchoolKeyCol, int disciplineKeyCol) {
 		logger.info("start creating relations");
 		// Prepare
-		HashMap<String, NodeRef> typeOfSchoolsMap = new HashMap<String, NodeRef>();
+		Map<String, NodeRef> typeOfSchoolsMap = new HashMap<>();
 		List<NodeRef> typeOfSchools = getNodeRefs(TYPE_TYPEOFSCHOOL);
 		for (NodeRef nodeRef : typeOfSchools) {
 			typeOfSchoolsMap.put((String) nodeService.getProperty(nodeRef, QName.createQName(PROP_TYPEOFSCHOOL_KEY)),
 					nodeRef);
 		}
 
-		HashMap<String, NodeRef> disciplinesMap = new HashMap<String, NodeRef>();
+		Map<String, NodeRef> disciplinesMap = new HashMap<>();
 		List<NodeRef> disciplines = getNodeRefs(TYPE_DISCIPLINE);
 		for (NodeRef nodeRef : disciplines) {
 			disciplinesMap.put((String) nodeService.getProperty(nodeRef, QName.createQName(PROP_DISCIPLINE_KEY)),
@@ -277,7 +277,7 @@ public class SchoolContext {
 		try {
 			NodeRef relationsFolderNodeRef = getRelationsFolder();
 
-			ArrayList<String> processedTosDis = new ArrayList<String>();
+			ArrayList<String> processedTosDis = new ArrayList<>();
 			for (Row row : relationSheet) {
 				// 0 is the header row
 				if (rowCounter == 0){
@@ -312,7 +312,7 @@ public class SchoolContext {
 
 				if (rs.length() == 0 && !processedTosDis.contains(checkProcessed)) {
 
-					Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+					Map<QName, Serializable> props = new HashMap<>();
 
 					props.put(QName.createQName(PROP_REF_TYPEOFSCHOOL), tosNodeRef);
 					props.put(QName.createQName(PROP_REF_DISCIPLINE), dNodeRef);
@@ -350,14 +350,14 @@ public class SchoolContext {
 	 * 
 	 * @param typeOfSchoolDisciplineInclusion
 	 */
-	public void combineTypeOfSchool(HashMap<String, String[]> typeOfSchoolDisciplineInclusion) {
+	public void combineTypeOfSchool(Map<String, String[]> typeOfSchoolDisciplineInclusion) {
 		logger.info("starting");
 		try {
 			NodeRef relationsFolderNodeRef = getRelationsFolder();
 			List<NodeRef> typeOfSchools = getNodeRefs(TYPE_TYPEOFSCHOOL);
 			List<NodeRef> disciplines = getNodeRefs(TYPE_DISCIPLINE);
 
-			ArrayList<String> exclusionsForCommonSchoolTypes = new ArrayList<String>();
+			ArrayList<String> exclusionsForCommonSchoolTypes = new ArrayList<>();
 			for (Map.Entry<String, String[]> entry : typeOfSchoolDisciplineInclusion.entrySet()) {
 				exclusionsForCommonSchoolTypes.addAll(Arrays.asList(entry.getValue()));
 			}
@@ -380,7 +380,7 @@ public class SchoolContext {
 						continue;
 					}
 
-					Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+					Map<QName, Serializable> props = new HashMap<>();
 
 					props.put(QName.createQName(PROP_REF_TYPEOFSCHOOL), typeOfSchool);
 					props.put(QName.createQName(PROP_REF_DISCIPLINE), discipline);
@@ -473,7 +473,7 @@ public class SchoolContext {
 								continue;
 							}
 
-							Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+							Map<QName, Serializable> props = new HashMap<>();
 							props.put(QName.createQName(PROP_REF_FEDERALSTATE), federalState);
 							props.put(QName.createQName(PROP_REF_TYPEOFSCHOOL), typeOfSchool);
 							props.put(QName.createQName(PROP_REF_DISCIPLINE), discipline);
@@ -533,11 +533,11 @@ public class SchoolContext {
 
 	NodeRef getRelationContainer(NodeRef relationRoot, int counter) {
 
-		String foldername = new Integer((int) counter / 1000).toString();
+		String foldername = new Integer(counter / 1000).toString();
 
 		NodeRef result = nodeService.getChildByName(relationRoot, ContentModel.ASSOC_CONTAINS, foldername);
 		if (result == null) {
-			Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> props = new HashMap<>();
 			props.put(ContentModel.PROP_NAME, foldername);
 
 			result = nodeService.createNode(relationRoot, ContentModel.ASSOC_CONTAINS,

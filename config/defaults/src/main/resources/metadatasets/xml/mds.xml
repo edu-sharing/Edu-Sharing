@@ -1314,8 +1314,8 @@
           {"wildcard":{"properties.ccm:learninggoal.keyword": {"value": "*${value}*", "case_insensitive": true}}},
           {"wildcard":{"properties.ccm:guidanceteachers.keyword": {"value": "*${value}*", "case_insensitive": true}}},
           {"wildcard":{"properties.ccm:guidancestudents.keyword": {"value": "*${value}*", "case_insensitive": true}}},
-          {"wildcard":{"i18n.de_DE.ccm:educationallearningresourcetype.keyword": {"value": "*${value}*", "case_insensitive": true}}},
-          {"wildcard":{"i18n.de_DE.ccm:educationalcontext.keyword": {"value": "*${value}*", "case_insensitive": true}}}
+          {"wildcard":{"i18n.de_DE.ccm:educationallearningresourcetype": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"i18n.de_DE.ccm:educationalcontext": {"value": "*${value}*", "case_insensitive": true}}}
           ],
           "minimum_should_match": 1
           }}

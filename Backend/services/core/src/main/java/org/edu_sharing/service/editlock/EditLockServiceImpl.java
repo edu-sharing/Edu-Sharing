@@ -139,7 +139,7 @@ public class EditLockServiceImpl implements EditLockService {
 		logger.debug("clearing session for sessionId:" + sessionId);
 
 		synchronized (EditLockCache.cache) {
-			List<NodeRef> toRemove = new ArrayList<NodeRef>();
+			List<NodeRef> toRemove = new ArrayList<>();
 			for (NodeRef nodeRef : EditLockCache.getKeys()) {
 				LockBy lockBy = EditLockCache.get(nodeRef);
 				if (sessionId.equals(lockBy.getSessionId())) {

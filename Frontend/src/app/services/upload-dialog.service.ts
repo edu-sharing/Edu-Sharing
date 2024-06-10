@@ -4,6 +4,7 @@ import { LocalEventsService } from 'ngx-edu-sharing-ui';
 import * as rxjs from 'rxjs';
 import { ConfigurationService, RestConstants, RestNodeService } from '../core-module/core.module';
 import { Toast } from './toast';
+import { VirtualNode } from 'ngx-edu-sharing-ui';
 import {
     FileData,
     LinkData,
@@ -13,6 +14,7 @@ import { DialogType } from '../features/management-dialogs/management-dialogs.co
 import { BulkBehavior } from '../features/mds/types/types';
 import { merge } from 'rxjs';
 import { filter, map, toArray } from 'rxjs/operators';
+import { MdsEditorDialogResult } from '../features/dialogs/dialog-modules/mds-editor-dialog/mds-editor-dialog-data';
 
 /**
  * Provides high-level methods to allow uploading and saving new material.
@@ -143,12 +145,22 @@ export class UploadDialogService {
             nodes,
             bulkBehavior: BulkBehavior.Replace,
         });
-        const updatedNodes = await dialogRef.afterClosed().toPromise();
-        await this._afterMetadataEditDone(nodes, updatedNodes);
+        let updatedNodes = await dialogRef.afterClosed().toPromise();
+        updatedNodes = (await this._afterMetadataEditDone(nodes, updatedNodes)) as Node[];
         return updatedNodes;
     }
 
-    private async _afterMetadataEditDone(originalNodes: Node[], updatedNodes: Node[] | null) {
+    private async _afterMetadataEditDone(
+        originalNodes: Node[],
+        updatedNodes: MdsEditorDialogResult,
+    ) {
+        // save was triggered but no changes were made - ignoring it
+        if (updatedNodes === 'NO-CHANGES') {
+            return originalNodes.map((n) => {
+                (n as VirtualNode).virtual = true;
+                return n;
+            });
+        }
         if (!updatedNodes) {
             // only delete these original nodes which are actually new
             // to check whether a node is new check that it only has one version:
@@ -170,12 +182,14 @@ export class UploadDialogService {
             this.localEvents.nodesDeleted.emit(nodesToDelete);
         }
         if (updatedNodes) {
-            this.localEvents.nodesChanged.emit(updatedNodes);
+            this.localEvents.nodesChanged.emit(updatedNodes as Node[]);
         }
+        return updatedNodes;
     }
 
     private async _deleteNodes(nodes: Node[]): Promise<void> {
         this.toast.showProgressSpinner();
+        console.log('delete', nodes);
         await rxjs
             .forkJoin(nodes.map((n) => this.nodeService.deleteNode(n.ref.id, false)))
             .toPromise();

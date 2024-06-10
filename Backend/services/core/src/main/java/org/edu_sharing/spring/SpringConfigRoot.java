@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-//@PropertySource("classpath:application.properties")
-@PropertySource(factory = org.edu_sharing.spring.typesafe.TypesafePropertySourceFactory.class,value = "")
 @Import({SecurityConfigurationSaml.class, SecurityConfigurationOpenIdConnect.class, SecurityConfigurationBasic.class})
 public class SpringConfigRoot {
 }

@@ -61,7 +61,7 @@ public class UsageTool {
         }
     }
     public void createUsage(String lmsId, String courseId, String parentNodeId, String resourceId){
-        HashMap<QName, Serializable> properties = new HashMap<>();
+        Map<QName, Serializable> properties = new HashMap<>();
         properties.put(QName.createQName(CCConstants.CCM_PROP_USAGE_APPID), lmsId);
         properties.put(QName.createQName(CCConstants.CCM_PROP_USAGE_COURSEID), courseId);
         properties.put(QName.createQName(CCConstants.CCM_PROP_USAGE_PARENTNODEID), parentNodeId);

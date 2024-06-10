@@ -89,7 +89,7 @@ public class RepositoryDao {
 
 		try {
 			
-			List<RepositoryDao> result = new ArrayList<RepositoryDao>();
+			List<RepositoryDao> result = new ArrayList<>();
 			for (ApplicationInfo appInfo : ApplicationInfoList.getRepositoryInfosOrdered()) {
 				ToolPermissionService tp = ToolPermissionServiceFactory.getInstance();
 				if (ApplicationInfo.TYPE_REPOSITORY.equals(appInfo.getType()) && appInfo.getSearchable()) {

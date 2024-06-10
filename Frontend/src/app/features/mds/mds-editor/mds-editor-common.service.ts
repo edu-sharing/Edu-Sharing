@@ -7,10 +7,12 @@ import {
     RestMdsService,
     RestNodeService,
 } from '../../../core-module/core.module';
-import { MdsDefinition, MdsType, Values } from '../types/types';
-import { Metadata, BaseMetadataFragment } from 'ngx-edu-sharing-graphql';
-import { Meta } from '@angular/platform-browser';
-import { DocumentNode } from '@apollo/client/link/core/types';
+import { MdsType, Values } from '../types/types';
+import {
+    HOME_REPOSITORY,
+    NodeSuggestionResponseDto,
+    SuggestionsV1Service,
+} from 'ngx-edu-sharing-api';
 
 /** Error with a translatable message that is suitable to be shown to the user. */
 export class UserPresentableError extends Error {
@@ -32,7 +34,11 @@ export class UserPresentableError extends Error {
     providedIn: 'root',
 })
 export class MdsEditorCommonService {
-    constructor(private restNode: RestNodeService, private mdsService: RestMdsService) {}
+    constructor(
+        private restNode: RestNodeService,
+        private mdsService: RestMdsService,
+        private suggestionsV1Service: SuggestionsV1Service,
+    ) {}
 
     /**
      * Fetches the up-to-date and complete metadata from the server.
@@ -52,7 +58,6 @@ export class MdsEditorCommonService {
         pairs: Array<{ id?: string; node?: Node; values: Values }>,
         versionComment?: string,
     ): Promise<Node[]> {
-        console.log(pairs);
         return forkJoin(
             pairs.map(({ id, node, values }) => {
                 if (versionComment) {
@@ -64,19 +69,6 @@ export class MdsEditorCommonService {
                         .editNodeMetadata(node?.ref?.id || id, values)
                         .pipe(map((nodeWrapper) => nodeWrapper.node));
                 }
-            }),
-        ).toPromise();
-    }
-    async saveGraphqlMetadata(pairs: Metadata[], versionComment?: string): Promise<Node[]> {
-        return forkJoin(
-            pairs.map((metadata) => {
-                console.log('graphql target metadata', metadata);
-                /*this.apollo.mutate({
-                    variables: {
-                        id
-                    },
-                    mutation: DocumentNode
-                })*/
             }),
         ).toPromise();
     }
@@ -106,16 +98,14 @@ export class MdsEditorCommonService {
      *
      * Throws with a translatable error message if the given nodes cannot be handled by an MDS.
      */
-    getMdsId(nodes: Node[] | BaseMetadataFragment[]): string {
-        const types = nodes.map((node) => (node as Node).type || (node as Metadata).nodeType);
+    getMdsId(nodes: Node[]): string {
+        const types = nodes.map((node) => (node as Node).type);
         if (!areAllEqual(types)) {
             throw new UserPresentableError('MDS.ERROR_INVALID_TYPE_COMBINATION');
         }
         const requestedMdsIds = nodes.map(
-            (node) =>
-                (node as Node).metadataset ||
-                (node as Metadata).info.metadataSet ||
-                RestConstants.DEFAULT,
+            (node) => (node as Node).metadataset,
+            RestConstants.DEFAULT,
         );
         if (!areAllEqual(requestedMdsIds)) {
             throw new UserPresentableError('MDS.ERROR_INVALID_MDS_COMBINATION');
@@ -129,36 +119,6 @@ export class MdsEditorCommonService {
             throw new UserPresentableError('MDS.ERROR_ELEMENT_TYPE_UNSUPPORTED');
         }
         return requestedMdsIds[0];
-    }
-    getGroupIdGraphql(nodes: BaseMetadataFragment[]): MdsType {
-        const node = nodes[0];
-        let nodeGroup: MdsType =
-            node.nodeType === RestConstants.CCM_TYPE_MAP ? MdsType.Map : MdsType.Io;
-        if (node.info.objectType?.id === 'folder-link') {
-            nodeGroup = MdsType.MapRef;
-        }
-        if (node.info.aspects?.indexOf(RestConstants.CCM_ASPECT_IO_CHILDOBJECT) !== -1) {
-            nodeGroup = MdsType.IoChildObject;
-        }
-        if (node.info.aspects?.indexOf(RestConstants.CCM_ASPECT_COLLECTION) !== -1) {
-            nodeGroup = MdsType.Collection;
-        }
-        if (node.info.aspects?.indexOf(RestConstants.CCM_ASPECT_TOOL_DEFINITION) !== -1) {
-            nodeGroup = MdsType.ToolDefinition;
-        }
-        if (node.nodeType === RestConstants.CCM_TYPE_TOOL_INSTANCE) {
-            nodeGroup = MdsType.ToolInstance;
-        }
-        if (node.nodeType === RestConstants.CCM_TYPE_SAVED_SEARCH) {
-            nodeGroup = MdsType.SavedSearch;
-        }
-        if (nodes.length > 1) {
-            if (nodeGroup !== MdsType.Io) {
-                throw new UserPresentableError('MDS.ERROR_INVALID_TYPE_BULK');
-            }
-            nodeGroup = MdsType.IoBulk;
-        }
-        return nodeGroup;
     }
     getGroupId(nodes: Node[]): MdsType {
         const node = nodes[0];
@@ -188,6 +148,73 @@ export class MdsEditorCommonService {
             nodeGroup = MdsType.IoBulk;
         }
         return nodeGroup;
+    }
+
+    async fetchNodesSuggestions(nodes: Node[]): Promise<NodeSuggestionResponseDto[]> {
+        console.log('Read suggestions!');
+        return await forkJoin(
+            nodes.map((n) =>
+                this.suggestionsV1Service.getSuggestionsByNodeId({
+                    repository: HOME_REPOSITORY,
+                    node: n.ref.id,
+                }),
+            ),
+        )
+            .pipe()
+            .toPromise();
+        /*
+        return [
+            {
+                nodeId: nodes[0].ref.id,
+                suggestions: {
+                    'cclom:general_keyword': [
+                        {
+                            value: 'hello world',
+                            createdBy: 'Superschlauer Duper KI' as any,
+                            status: 'PENDING',
+                        },
+                        {
+                            value: 'AB\nDEF',
+                            createdBy: 'Noch schlauerer Redakteur' as any,
+                            status: 'PENDING',
+                        },
+                    ],
+                    'ccm:educationallearningresourcetype': [
+                        {
+                            value: 'exercise',
+                            createdBy: 'test' as any,
+                            status: 'PENDING',
+                        },
+                    ],
+                    'cclom:general_description': [
+                        {
+                            value: 'lorem ipsum\ndolor sit amet',
+                            createdBy: 'Superschlaue Duper KI' as any,
+                            status: 'PENDING',
+                            type: 'AI',
+                        },
+                        {
+                            value: 'AB\nDEF',
+                            createdBy: 'Noch schlauerer Redakteur' as any,
+                            status: 'PENDING',
+                        },
+                    ],
+                    'cclom:title': [
+                        {
+                            value: 'KI Titel super fancy',
+                            createdBy: 'Superschlaue Duper KI' as any,
+                            status: 'PENDING',
+                            type: 'AI',
+                        },
+                        {
+                            value: 'Titel des Redakteurs',
+                            createdBy: 'Noch schlauerer Redakteur' as any,
+                            status: 'PENDING',
+                        },
+                    ],
+                },
+            },
+        ];*/
     }
 }
 

@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @Schema(description = "")
 public class NodeRelation {
-    Node node;
+    Node node; // TODO we can delete this cause it's unused by the frontend
     @Singular
     List<RelationData> relations;
 }

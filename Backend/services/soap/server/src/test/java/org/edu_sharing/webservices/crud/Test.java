@@ -52,7 +52,7 @@ public class Test {
 			
 			
 			Crud crud = locator.getcrud();
-			HashMap<String,String> properties = new HashMap<String,String>();
+			Map<String,String> properties = new HashMap<>();
 	        properties.put(CCConstants.CM_PROP_C_TITLE, "3AddUser.jpg"+System.currentTimeMillis());
 	        properties.put(CCConstants.LOM_PROP_GENERAL_TITLE, "3AddUser.jpg"+System.currentTimeMillis());
 	        properties.put(CCConstants.CCM_PROP_IO_OBJECTTYPE, "0");

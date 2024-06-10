@@ -31,6 +31,7 @@ import { BridgeService } from './services/bridge.service';
 import { LicenseAgreementService } from './services/license-agreement.service';
 import { ScrollPositionRestorationService } from './services/scroll-position-restoration.service';
 import { ThemeService } from './services/theme.service';
+import { PlatformLocation } from '@angular/common';
 
 @Component({
     selector: 'es-app',
@@ -189,16 +190,19 @@ export class AppComponent implements OnInit, DoCheck, AfterViewInit {
      * Redirects the user to the login page in case they don't have a valid session.
      */
     private registerRedirectToLogin(): void {
-        this.authentication.observeLoginInfo().subscribe((loginInfo) => {
-            const router = this.injector.get(Router);
+        this.authentication.observeLoginInfo().subscribe(async (loginInfo) => {
+            // dirty hack: location + router components return null values
+            const route = window.location.pathname.substring(
+                this.injector.get(PlatformLocation).getBaseHrefFromDOM()?.length ?? 0,
+            );
             if (
                 !loginInfo.isValidLogin &&
                 !(
-                    router.url.startsWith('/' + UIConstants.ROUTER_PREFIX + 'login') ||
-                    router.url.startsWith('/' + UIConstants.ROUTER_PREFIX + 'register')
+                    route.startsWith(UIConstants.ROUTER_PREFIX + 'login') ||
+                    route.startsWith(UIConstants.ROUTER_PREFIX + 'register')
                 )
             ) {
-                RestHelper.goToLogin(router, this.configuration);
+                RestHelper.goToLogin(this.injector.get(Router), this.configuration);
             }
         });
     }

@@ -42,12 +42,20 @@
       2.0.8.2-5
     </docker.edu_sharing.community.common.alfresco.search.service.tag>
 
+    <docker.edu_sharing.community.common.alfresco.share.name>
+      edu_sharing-community-common-docker-alfresco-share
+    </docker.edu_sharing.community.common.alfresco.share.name>
+
+    <docker.edu_sharing.community.common.alfresco.share.tag>
+      23.2.1
+    </docker.edu_sharing.community.common.alfresco.share.tag>
+
     <docker.edu_sharing.community.common.postgresql.name>
       edu_sharing-community-common-docker-postgresql
     </docker.edu_sharing.community.common.postgresql.name>
 
     <docker.edu_sharing.community.common.postgresql.tag>
-      13.9.0
+      13.14.0
     </docker.edu_sharing.community.common.postgresql.tag>
 
     <docker.edu_sharing.community.common.postgresql.exporter.name>

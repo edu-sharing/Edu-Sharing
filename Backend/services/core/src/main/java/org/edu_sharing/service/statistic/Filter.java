@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Filter {
 	
-	List<FilterEntry> entries = new ArrayList<FilterEntry>();
+	List<FilterEntry> entries = new ArrayList<>();
 	
 	
 	public List<FilterEntry> getEntries() {

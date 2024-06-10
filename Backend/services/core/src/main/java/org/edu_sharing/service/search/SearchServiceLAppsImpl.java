@@ -108,7 +108,7 @@ public class SearchServiceLAppsImpl extends SearchServiceAdapter{
 			
 			NamedNodeMap map = node.getAttributes();
 			
-			HashMap<String, Object> properties = NodeServiceLAppsImpl.getPropertiesForNode(repositoryId, map);
+			Map<String, Object> properties = NodeServiceLAppsImpl.getPropertiesForNode(repositoryId, map);
 			  						
 			org.edu_sharing.service.model.NodeRef ref = new org.edu_sharing.service.model.NodeRefImpl(repositoryId, 
 					StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(),

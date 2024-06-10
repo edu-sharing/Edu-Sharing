@@ -2,6 +2,7 @@ package org.edu_sharing.repository.server.importer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -25,12 +26,12 @@ public class RecordHandlerDublinCoreDMG implements RecordHandlerInterface {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	
 	String metadataSetId = null;
-	HashMap<String, Object> toSafeMap = new HashMap<String, Object>();
+	Map<String, Object> toSafeMap = new HashMap<>();
 	
 	int counter = 0;
 	
 	@Override
-	public HashMap<String, Object> getProperties() {
+	public Map<String, Object> getProperties() {
 		return toSafeMap;
 	}
 	
@@ -81,7 +82,7 @@ public class RecordHandlerDublinCoreDMG implements RecordHandlerInterface {
 			lomCatalogId = replicationId.substring(0,replicationId.lastIndexOf(":"));
 		}
 		
-		HashMap<String, Object> generalIdentifierToSafeMap = new HashMap<String, Object>();
+		Map<String, Object> generalIdentifierToSafeMap = new HashMap<>();
 		generalIdentifierToSafeMap.put(CCConstants.LOM_PROP_IDENTIFIER_ENTRY, replicationId);
 		generalIdentifierToSafeMap.put(CCConstants.LOM_PROP_IDENTIFIER_CATALOG, lomCatalogId);
 		
@@ -106,7 +107,7 @@ public class RecordHandlerDublinCoreDMG implements RecordHandlerInterface {
 			String keywords = title;
 			keywords = keywords.replaceAll(",", " ");
 			String[] splittetTitle = keywords.split(" ");
-			ArrayList<String> listTitle = new ArrayList<String>();
+			ArrayList<String> listTitle = new ArrayList<>();
 			if(splittetTitle != null && splittetTitle.length > 0){
 				for(String titleEle : splittetTitle){
 					titleEle = titleEle.trim();
@@ -146,11 +147,11 @@ public class RecordHandlerDublinCoreDMG implements RecordHandlerInterface {
 			Node metadataCreatorNode = metadataCreator.item(i);
 			String metadataCreatorString = ((String)xpath.evaluate(".", metadataCreatorNode, XPathConstants.STRING)).trim();
 			if(!metadataCreatorString.equals("")){
-				HashMap<String,String> vcardMap = new HashMap<String,String>();
+				Map<String,String> vcardMap = new HashMap<>();
 				vcardMap.put(CCConstants.VCARD_SURNAME, metadataCreatorString);
 				String vcardString = VCardTool.hashMap2VCard(vcardMap);
 				
-				HashMap<String,Object> contributerMetadataCreator = new HashMap<String,Object>();
+				Map<String,Object> contributerMetadataCreator = new HashMap<>();
 				contributerMetadataCreator.put(CCConstants.LOM_PROP_CONTRIBUTE_ENTITY, vcardString);
 				contributerMetadataCreator.put(CCConstants.LOM_PROP_CONTRIBUTE_ROLE, "creator");
 				toSafeMap.put("TYPE#" + CCConstants.LOM_TYPE_CONTRIBUTE + "#" + CCConstants.LOM_ASSOC_META_METADATA_CONTRIBUTE, contributerMetadataCreator);
@@ -163,11 +164,11 @@ public class RecordHandlerDublinCoreDMG implements RecordHandlerInterface {
 			Node contributerPublisherNode= contributerPublisher.item(i);
 			String contributerPublisherString = ((String)xpath.evaluate(".", contributerPublisherNode, XPathConstants.STRING)).trim();
 			if(!contributerPublisherString.equals("")){
-				HashMap<String,String> vcardMap = new HashMap<String,String>();
+				Map<String,String> vcardMap = new HashMap<>();
 				vcardMap.put(CCConstants.VCARD_SURNAME, contributerPublisherString);
 				String vcardString = VCardTool.hashMap2VCard(vcardMap);
 				
-				HashMap<String,Object> contributerPublisherMap  = new HashMap<String,Object>();
+				Map<String,Object> contributerPublisherMap  = new HashMap<>();
 				contributerPublisherMap.put(CCConstants.LOM_PROP_CONTRIBUTE_ENTITY, vcardString);
 				contributerPublisherMap.put(CCConstants.LOM_PROP_CONTRIBUTE_ROLE, "publisher");
 				toSafeMap.put("TYPE#" + CCConstants.LOM_TYPE_CONTRIBUTE + "#" + CCConstants.LOM_ASSOC_LIFECYCLE_CONTRIBUTE, contributerPublisherMap);

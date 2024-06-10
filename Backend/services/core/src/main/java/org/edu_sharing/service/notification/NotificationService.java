@@ -41,7 +41,7 @@ public interface NotificationService {
 
     @Permission(requiresUser = true)
     default NotificationConfig getConfig() throws Exception {
-        HashMap<String, String> info = new MCAlfrescoAPIClient().getUserInfo(AuthenticationUtil.getFullyAuthenticatedUser());
+        Map<String, String> info = new MCAlfrescoAPIClient().getUserInfo(AuthenticationUtil.getFullyAuthenticatedUser());
         if (!StringUtils.isEmpty(info.get(CCConstants.CCM_PROP_PERSON_NOTIFICATION_PREFERENCES))) {
             return new ObjectMapper().readValue(info.get(CCConstants.CCM_PROP_PERSON_NOTIFICATION_PREFERENCES), NotificationConfig.class);
         }
@@ -50,7 +50,7 @@ public interface NotificationService {
 
     @Permission(requiresUser = true)
     default void setConfig(NotificationConfig config) throws Exception {
-        HashMap<String, Serializable> userInfo = new HashMap<>();
+        Map<String, Object> userInfo = new HashMap<>();
         userInfo.put(CCConstants.PROP_USERNAME, AuthenticationUtil.getFullyAuthenticatedUser());
         userInfo.put(CCConstants.CCM_PROP_PERSON_NOTIFICATION_PREFERENCES, new ObjectMapper().writeValueAsString(config));
         new MCAlfrescoAPIClient().updateUser(userInfo);

@@ -61,7 +61,7 @@ public class MimeTypes {
 
 	//private static final Object[] allMime = {mime_doc, mime_pic, mime_audio, mime_video};
 	
-	static HashMap<String,String> extensionMimeMap = null;
+	static Map<String,String> extensionMimeMap = null;
 	
 	String basePath;
 	
@@ -111,10 +111,10 @@ public class MimeTypes {
 		return result;
 	}
 
-	public static HashMap<String, String> getExtensionMimeMap() {
+	public static Map<String, String> getExtensionMimeMap() {
 		
 		if(extensionMimeMap == null){
-			extensionMimeMap = new HashMap<String,String>();
+			extensionMimeMap = new HashMap<>();
 			extensionMimeMap.put("jpg", "image/jpeg");
 			extensionMimeMap.put("jpeg", "image/jpeg");
 			extensionMimeMap.put("png", "image/png");

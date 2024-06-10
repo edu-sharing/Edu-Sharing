@@ -43,10 +43,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -429,7 +426,7 @@ errors.add( filename+": Has no content" );
 		// inherit the props so childobjects will get all properties
 		// only local nodes are supported right now
 		NodeDao nodeDao = NodeDao.getNode(RepositoryDao.getHomeRepository(), nodeRef.getId());
-		HashMap<String, Object> props = nodeDao.getInheritedPropertiesFromParent();
+		Map<String, Object> props = nodeDao.getInheritedPropertiesFromParent();
 		MetadataTemplateRenderer render = new MetadataTemplateRenderer(
 				MetadataHelper.getMetadataset(nodeRef),
 				nodeRef

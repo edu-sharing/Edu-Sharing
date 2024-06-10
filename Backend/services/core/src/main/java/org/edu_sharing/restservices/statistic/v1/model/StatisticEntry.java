@@ -11,7 +11,7 @@ public class StatisticEntry {
 	
 	String property;
 	
-	List<StatisticEntity> entities = new ArrayList<StatisticEntity>();
+	List<StatisticEntity> entities = new ArrayList<>();
 	
 	@Schema(required = true, description = "")
 	@JsonProperty("property")

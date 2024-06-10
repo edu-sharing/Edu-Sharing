@@ -353,6 +353,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                             RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_SHARE,
                         )
                     ) {
+                        this.editorialGroups.isLoading = true;
                         this.iamService
                             .searchGroups('*', true, RestConstants.GROUP_TYPE_EDITORIAL, '', {
                                 count: RestConstants.COUNT_UNLIMITED,
@@ -364,6 +365,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                                     data.groups as Group[],
                                     data.pagination,
                                 );
+                                this.editorialGroups.isLoading = false;
                             });
                     }
                 });

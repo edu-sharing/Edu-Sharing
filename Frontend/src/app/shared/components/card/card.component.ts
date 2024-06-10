@@ -173,6 +173,10 @@ export class CardComponent implements AfterContentInit, OnDestroy {
 
     private shouldUpdateJumpmarkOnScroll = true;
 
+    /**
+     * @Deprecated
+     * Consider using the new CardDialogService.openDialogs
+     */
     static getNumberOfOpenCards() {
         return CardComponent.modalCards.length;
     }

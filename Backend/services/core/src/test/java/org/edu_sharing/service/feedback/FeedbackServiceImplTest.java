@@ -11,7 +11,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.search.CMISSearchHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
+import org.edu_sharing.service.authority.AuthorityServiceImpl;
 import org.edu_sharing.service.feedback.model.FeedbackData;
 import org.edu_sharing.service.feedback.model.FeedbackResult;
 import org.edu_sharing.service.nodeservice.NodeService;
@@ -49,6 +51,7 @@ class FeedbackServiceImplTest {
     private MockedStatic<AuthorityServiceHelper> authorityServiceHelperMockedStatic;
     private MockedStatic<Context> contextMockedStatic;
     private String sessionId;
+    private MockedStatic<AuthorityServiceFactory> authorityServiceFactoryMockedStatic;
 
     @BeforeEach
     void setUp() {
@@ -60,15 +63,20 @@ class FeedbackServiceImplTest {
         NodeRef userNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, UUID.randomUUID().toString());
         nodeServiceHelperMockedStatic = Mockito.mockStatic(NodeServiceHelper.class);
         authorityServiceHelperMockedStatic = Mockito.mockStatic(AuthorityServiceHelper.class);
+        authorityServiceFactoryMockedStatic = Mockito.mockStatic(AuthorityServiceFactory.class);
+        AuthorityServiceImpl authorityServiceMock = Mockito.mock(AuthorityServiceImpl.class);
+        authorityServiceFactoryMockedStatic.when(AuthorityServiceFactory::getLocalService).thenReturn(authorityServiceMock);
+        Mockito.lenient().when(authorityServiceMock.isGuest()).thenReturn(false);
         authenticationUtilMockedStatic = Mockito.mockStatic(AuthenticationUtil.class);
         contextMockedStatic = Mockito.mockStatic(Context.class);
         Context context = Mockito.mock(Context.class);
         contextMockedStatic.when(Context::getCurrentInstance).thenReturn(context);
         Mockito.lenient().when(Context.getCurrentInstance().getSessionId()).thenReturn(sessionId);
         authorityServiceHelperMockedStatic.when(() -> AuthorityServiceHelper.getAuthorityNodeRef(userId)).thenReturn(userNodeRef);
+        authorityServiceHelperMockedStatic.when(() -> AuthorityServiceHelper.getAuthorityNodeRef(userId)).thenReturn(userNodeRef);
         authenticationUtilMockedStatic.when(AuthenticationUtil::getFullyAuthenticatedUser).thenReturn(userId);
         authenticationUtilMockedStatic.when(AuthenticationUtil.runAsSystem(any())).thenAnswer(invocation ->
-                ((AuthenticationUtil.RunAsWork) invocation.getArgument(0)).doWork()
+                ((AuthenticationUtil.RunAsWork<?>) invocation.getArgument(0)).doWork()
         );
         authenticationUtilMockedStatic.when(
                 (MockedStatic.Verification) AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.SYSTEM_USER_NAME)
@@ -79,20 +87,20 @@ class FeedbackServiceImplTest {
     @AfterEach
     void teardown() {
         authenticationUtilMockedStatic.close();
+        authorityServiceFactoryMockedStatic.close();
         authorityServiceHelperMockedStatic.close();
         nodeServiceHelperMockedStatic.close();
         contextMockedStatic.close();
     }
 
-    @SneakyThrows
     @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
-    void getFeedback() {
+    void getFeedback() throws Throwable {
         String nodeId = UUID.randomUUID().toString();
         Map<String, Map<String, Serializable>> expected = new HashMap<>();
-        HashMap<String, List<String>> expectedData = getSampleData();
-        for(int i = 0; i < 100; i++) {
+        Map<String, List<String>> expectedData = getSampleData();
+        for (int i = 0; i < 100; i++) {
             String childId = UUID.randomUUID().toString();
-            expected.put(childId, new HashMap<String, Serializable>(){{
+            expected.put(childId, new HashMap<>() {{
                 put(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY, UUID.randomUUID().toString());
                 put(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_DATA, new Gson().toJson(expectedData, new TypeToken<HashMap>(){}.getType()));
                 put(CCConstants.CM_PROP_C_CREATED, new Date((long) (Math.random() * Long.MAX_VALUE)));
@@ -121,7 +129,7 @@ class FeedbackServiceImplTest {
         List<Map<String, Serializable>> expectedSorted = expected.values().stream().sorted(
                 (a, b) -> ((Date) b.get(CCConstants.CM_PROP_C_MODIFIED)).compareTo((Date) a.get(CCConstants.CM_PROP_C_MODIFIED))
         ).collect(Collectors.toList());
-        for(int i = 0; i < result.size(); i++) {
+        for (int i = 0; i < result.size(); i++) {
             FeedbackData actual = result.get(i);
             Map<String, Serializable> expectedEntry = expectedSorted.get(i);
             assertEquals(expectedEntry.get(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY), actual.getAuthority());
@@ -131,22 +139,20 @@ class FeedbackServiceImplTest {
         }
     }
 
-    @NotNull
-    private HashMap<String, List<String>> getSampleData() {
-        HashMap<String, List<String>> expectedData = new HashMap<>();
+    private Map<String, List<String>> getSampleData() {
+        Map<String, List<String>> expectedData = new HashMap<>();
         expectedData.put("key1", new ArrayList<>(Arrays.asList("value1", UUID.randomUUID().toString())));
         expectedData.put("key2", new ArrayList<>(Arrays.asList("value1", "value2", UUID.randomUUID().toString())));
         return expectedData;
     }
 
-    @Test
     @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
     void addFeedbackMultiple() {
         String nodeId = UUID.randomUUID().toString();
         String newNodeId = UUID.randomUUID().toString();
-        HashMap<String, List<String>> testData = getSampleData();
+        Map<String, List<String>> testData = getSampleData();
 
-        HashMap<String, Serializable> expectedMap = new HashMap<String, Serializable>() {{
+        Map<String, Serializable> expectedMap = new HashMap<>() {{
             put(
                     CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY,
                     DigestUtils.sha1Hex(userId + userEsId)
@@ -179,14 +185,14 @@ class FeedbackServiceImplTest {
         expectedMap.put(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY, DigestUtils.sha1Hex(sessionId + userEsId));
         assertEquals(new FeedbackResult(newNodeId, false), underTest.addFeedback(nodeId, testData));
     }
-    @Test
+
     @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
     void addFeedbackSingle() {
         String nodeId = UUID.randomUUID().toString();
         NodeRef updateNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, UUID.randomUUID().toString());
-        HashMap<String, List<String>> testData = getSampleData();
+        Map<String, List<String>> testData = getSampleData();
 
-        HashMap<String, Serializable> expectedMap = new HashMap<String, Serializable>() {{
+        Map<String, Serializable> expectedMap = new HashMap<>() {{
             put(
                     CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY,
                     DigestUtils.sha1Hex(userId + userEsId)
@@ -218,16 +224,15 @@ class FeedbackServiceImplTest {
         );
     }
 
-    @Test
     @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
     void deleteUserData() {
         try (MockedStatic<CMISSearchHelper> cmisSearchHelperMockedStatic = Mockito.mockStatic(CMISSearchHelper.class)) {
-            Map<String, Object> filters=new HashMap<String, Object>() {{
+            Map<String, Object> filters = new HashMap<>() {{
                 put(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY, DigestUtils.sha1Hex(userId + userEsId));
             }};
             List<NodeRef> list = new ArrayList<>();
             int randListSize = (int) (1 + Math.random() * 100);
-            for(int i = 0;i < randListSize; i++) {
+            for (int i = 0; i < randListSize; i++) {
                 list.add(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, UUID.randomUUID().toString()));
             }
             cmisSearchHelperMockedStatic.when(() -> CMISSearchHelper.fetchNodesByTypeAndFilters(eq(CCConstants.CCM_TYPE_MATERIAL_FEEDBACK), eq(filters))).thenReturn(
@@ -254,15 +259,15 @@ class FeedbackServiceImplTest {
     void changeUserData() {
         try (MockedStatic<CMISSearchHelper> cmisSearchHelperMockedStatic = Mockito.mockStatic(CMISSearchHelper.class)) {
             String newUserId = UUID.randomUUID().toString();
-            Map<String, Object> filtersObfuscate=new HashMap<String, Object>() {{
+            Map<String, Object> filtersObfuscate = new HashMap<>() {{
                 put(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY, DigestUtils.sha1Hex(userId + userEsId));
             }};
-            Map<String, Object> filtersFull=new HashMap<String, Object>() {{
+            Map<String, Object> filtersFull = new HashMap<>() {{
                 put(CCConstants.CCM_PROP_MATERIAL_FEEDBACK_AUTHORITY, userId);
             }};
             List<NodeRef> list = new ArrayList<>();
             int randListSize = (int) (1 + Math.random() * 100);
-            for(int i = 0;i < randListSize; i++) {
+            for (int i = 0; i < randListSize; i++) {
                 list.add(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, UUID.randomUUID().toString()));
             }
             cmisSearchHelperMockedStatic.when(() -> CMISSearchHelper.fetchNodesByTypeAndFilters(eq(CCConstants.CCM_TYPE_MATERIAL_FEEDBACK), eq(filtersFull))).thenReturn(
@@ -299,6 +304,5 @@ class FeedbackServiceImplTest {
             );
 
         }
-
     }
 }

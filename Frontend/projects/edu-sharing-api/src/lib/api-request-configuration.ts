@@ -27,6 +27,10 @@ export class ApiRequestConfiguration {
         this.authForNextRequest = 'Bearer ' + accessToken;
     }
 
+    setEduTicketAuthForNextRequest(ticket?: string): void {
+        this.authForNextRequest = 'EDU-TICKET ' + ticket;
+    }
+
     /**
      * Applies configuration to the given request.
      *

@@ -30,7 +30,6 @@ package org.edu_sharing.repository.server;
 import java.io.File;
 
 import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
 
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -53,10 +52,9 @@ import org.edu_sharing.repository.server.tracking.buffer.MemoryRingBuffer;
 import org.edu_sharing.repository.server.tracking.buffer.TrackingBuffer;
 import org.edu_sharing.repository.update.KeyGenerator;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
+import org.edu_sharing.spring.context.EduSharingContextInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
-
-import java.io.File;
 
 public class MCAlfrescoManager extends ContextLoaderListener {
 
@@ -87,8 +85,8 @@ public class MCAlfrescoManager extends ContextLoaderListener {
 			AuthenticationToolAPI authTool = new AuthenticationToolAPI();
 			authTool.createNewSession(appInfo.getUsername(), appInfo.getPassword());
 
+			super.setContextInitializers(new EduSharingContextInitializer());
 			super.contextInitialized(servletContextEvent);
-
 			logger.info("load edu groups");
 			
 			/**

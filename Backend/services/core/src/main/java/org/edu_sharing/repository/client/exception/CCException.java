@@ -29,6 +29,7 @@ package org.edu_sharing.repository.client.exception;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CCException extends Exception implements Serializable {
 
@@ -75,7 +76,7 @@ public class CCException extends Exception implements Serializable {
 	public static String SHARE_SERVICE_NOPERMISSIONS = "SHARE_SERVICE_NOPERMISSIONS";
 	public static String SHARE_SERVICE_EXPIRYDATETOOLD = "SHARE_SERVICE_EXPIRYDATETOOLD";
 	
-	HashMap<String,String> messageParams = new HashMap<String,String>();
+	Map<String,String> messageParams = new HashMap<>();
 	
 	String id = null;
 	
@@ -109,7 +110,7 @@ public class CCException extends Exception implements Serializable {
 		messageParams.put(key, val);
 	}
 	
-	public HashMap<String, String> getMessageParams() {
+	public Map<String, String> getMessageParams() {
 		return messageParams;
 	}
 }

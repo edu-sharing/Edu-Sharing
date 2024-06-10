@@ -32,6 +32,8 @@ public interface MediacenterService {
 	 */
 	public void manageNodeLicenses(Date from, Date until);
 
+	List<String> getMediacenterAuthoritiesByNode(String nodeId) throws Exception;
+
 	public boolean isActive(String authorityName);
 
 	public void setActive(boolean active, String authorityName);

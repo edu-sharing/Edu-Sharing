@@ -88,7 +88,7 @@ export class CollectionProposalsComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes.collection.currentValue !== null && changes.canEdit.currentValue !== null) {
+        if (changes.collection?.currentValue !== null && changes.canEdit?.currentValue !== null) {
             this.refreshProposals();
         }
     }

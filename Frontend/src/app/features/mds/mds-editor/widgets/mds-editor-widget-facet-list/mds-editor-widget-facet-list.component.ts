@@ -1,4 +1,5 @@
 import {
+    ApplicationRef,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
@@ -49,6 +50,7 @@ export class MdsEditorWidgetFacetListComponent
         mdsEditorInstance: MdsEditorInstanceService,
         translate: TranslateService,
         private search: SearchService,
+        private ref: ChangeDetectorRef,
         private changeDetectorRef: ChangeDetectorRef,
     ) {
         super(mdsEditorInstance, translate);
@@ -191,5 +193,6 @@ export class MdsEditorWidgetFacetListComponent
             this.facetValuesFiltered = this.facetValuesFiltered.slice(0, this.MAX_FACET_COUNT);
         }
         this.formArray = this.generateFormArray(this.facetValuesFiltered);
+        setTimeout(() => this.ref.detectChanges(), 10000);
     }
 }

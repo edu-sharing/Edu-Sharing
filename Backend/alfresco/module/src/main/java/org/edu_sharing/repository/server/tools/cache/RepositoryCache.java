@@ -127,7 +127,7 @@ public class RepositoryCache implements Cache {
 			
 			// Local Cache over HashMap
 			final Map<String, WeakReference<Map<String,Object>>> localCache = 
-					new HashMap<String, WeakReference<Map<String,Object>>>();
+					new HashMap<>();
 			
 			CACHE = new InternalCache() {
 

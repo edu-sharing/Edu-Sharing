@@ -21,10 +21,7 @@ import java.io.FileReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -42,7 +39,7 @@ public class NetworkServiceImpl implements NetworkService {
                 Collection<StoredService> result=new ArrayList<>();
                 result.add(getOwnService());
                 for(ChildAssociationRef service : services){
-                    HashMap<String, Object> props = nodeService.getProperties(service.getChildRef().getStoreRef().getProtocol(), service.getChildRef().getStoreRef().getIdentifier(), service.getChildRef().getId());
+                    Map<String, Object> props = nodeService.getProperties(service.getChildRef().getStoreRef().getProtocol(), service.getChildRef().getStoreRef().getIdentifier(), service.getChildRef().getId());
                     String data= (String) props.get(CCConstants.CCM_PROP_SERVICE_NODE_DATA);
                     StoredService serviceObject = new Gson().fromJson(data, StoredService.class);
                     serviceObject.setId((String) props.get(CCConstants.CM_NAME));
@@ -100,7 +97,7 @@ public class NetworkServiceImpl implements NetworkService {
                 String parent=new UserEnvironmentTool().getEdu_SharingServiceFolder();
 
                 String id=generateId(service);
-                HashMap<String, String[]> props = generateProps(id,service);
+                Map<String, String[]> props = generateProps(id,service);
                 nodeService.createNode(parent,CCConstants.CCM_TYPE_SERVICE_NODE,props);
                 return new StoredService(id,service);
             }
@@ -115,7 +112,7 @@ public class NetworkServiceImpl implements NetworkService {
         try{
             String parent=new UserEnvironmentTool().getEdu_SharingServiceFolder();
             String node = nodeService.findNodeByName(parent, id);
-            HashMap<String, String[]> props = generateProps(id,service);
+            Map<String, String[]> props = generateProps(id,service);
             nodeService.updateNode(node,props);
             return new StoredService(id,service);
         }
@@ -127,8 +124,8 @@ public class NetworkServiceImpl implements NetworkService {
         return DigestUtils.shaHex(service.getUrl());
     }
 
-    private HashMap<String, String[]> generateProps(String id, Service service) {
-        HashMap<String, String[]> props = new HashMap<>();
+    private Map<String, String[]> generateProps(String id, Service service) {
+        Map<String, String[]> props = new HashMap<>();
         props.put(CCConstants.CM_NAME,new String[]{id});
 
         String json=new Gson().toJson(service);

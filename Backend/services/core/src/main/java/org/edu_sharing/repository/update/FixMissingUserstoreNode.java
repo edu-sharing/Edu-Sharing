@@ -50,7 +50,7 @@ public class FixMissingUserstoreNode {
 
         List<ChildAssociationRef> children = nodeService.getChildAssocs(peopleContainer);
 
-        ArrayList<String> missingUsers = new ArrayList<String>();
+        ArrayList<String> missingUsers = new ArrayList<>();
 
         for (ChildAssociationRef childref : children) {
 

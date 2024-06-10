@@ -130,7 +130,7 @@ public class ImportCleaner {
 		
 		ApplicationInfo homeRep  = ApplicationInfoList.getHomeRepository();
 		AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeRep.getAppId());
-		HashMap<String, String>  authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
+		Map<String, String>  authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
 		MCAlfrescoBaseClient mcAlfrescoBaseClient = (MCAlfrescoBaseClient ) RepoFactory.getInstance(homeRep.getAppId(), authInfo);
 		int countDeletedObjects = 0;
 		if(allNodes != null){
@@ -143,8 +143,8 @@ public class ImportCleaner {
 				boolean nodeExists = nodeExists(importedId, importedKatalog);
 				if(!nodeExists){
 					logger.info("Node with REPLICATIONSOURCEID:"+importedId+" REPLICATIONSOURCE:"+importedKatalog+" seems deleted. Delete the imported Object nodeId:"+alfNodeId);
-					HashMap<String, HashMap> primaryParents = mcAlfrescoBaseClient.getParents(alfNodeId, true);
-					Map.Entry<String, HashMap> primaryParentEntry = primaryParents.entrySet().iterator().next();
+					Map<String, Map<String, Object>> primaryParents = mcAlfrescoBaseClient.getParents(alfNodeId, true);
+					Map.Entry<String, Map<String,Object>> primaryParentEntry = primaryParents.entrySet().iterator().next();
 					mcAlfrescoBaseClient.removeNode(alfNodeId, primaryParentEntry.getKey());
 					countDeletedObjects++;
 				}

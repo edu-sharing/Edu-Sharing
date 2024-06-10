@@ -1,9 +1,0 @@
-input GeneralInput {
-    title: String
-    description: [String!]
-    language:[String!]
-    keyword: [String!]
-    coverage: [String!]
-    structure: RangedValueInput
-    aggregationLevel: RangedValueInput
-}

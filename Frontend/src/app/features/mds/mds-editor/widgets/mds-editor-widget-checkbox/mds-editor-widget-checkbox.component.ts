@@ -21,8 +21,9 @@ export class MdsEditorWidgetCheckboxComponent extends MdsEditorWidgetBase implem
             this.getStandardValidators({ requiredValidator }),
         );
         this.formControl.valueChanges.subscribe((value: boolean) => {
-            this.setValue([value.toString()], this.formControl.dirty);
+            this.setValue([value ? value.toString() : 'false'], this.formControl.dirty);
         });
+        this.registerValueChanges(this.formControl);
     }
 
     onIndeterminateChange(isIndeterminate: boolean): void {

@@ -1,8 +1,8 @@
 import { Component, EventEmitter, NgZone, Output, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MediacenterService } from 'ngx-edu-sharing-api';
+import { Group, MediacenterService, Node } from 'ngx-edu-sharing-api';
 import {
-    CustomOptions,
+    DefaultGroups,
     ElementType,
     InteractionType,
     ListItem,
@@ -15,6 +15,7 @@ import {
     VCard,
 } from 'ngx-edu-sharing-ui';
 import {
+    Mediacenter,
     RequestObject,
     RestConnectorService,
     RestMdsService,
@@ -22,7 +23,6 @@ import {
     RestSearchService,
 } from '../../../core-module/core.module';
 import { CsvHelper } from '../../../core-module/csv.helper';
-import { Group, IamGroup, Mediacenter, Node } from '../../../core-module/rest/data-object';
 import { Helper } from '../../../core-module/rest/helper';
 import { MdsHelper } from '../../../core-module/rest/mds-helper';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
@@ -34,11 +34,13 @@ import { DialogsService } from '../../../features/dialogs/dialogs.service';
 import { MdsEditorWrapperComponent } from '../../../features/mds/mds-editor/mds-editor-wrapper/mds-editor-wrapper.component';
 import { Values } from '../../../features/mds/types/types';
 import { AuthoritySearchMode } from '../../../shared/components/authority-search-input/authority-search-input.component';
+import { OptionsHelperService } from '../../../services/options-helper.service';
 
 @Component({
     selector: 'es-admin-mediacenter',
     templateUrl: 'mediacenter.component.html',
     styleUrls: ['mediacenter.component.scss'],
+    providers: [OptionsHelperService],
 })
 export class AdminMediacenterComponent {
     readonly AuthoritySearchMode = AuthoritySearchMode;
@@ -47,6 +49,7 @@ export class AdminMediacenterComponent {
     readonly InteractionType = InteractionType;
     @ViewChild('mediacenterMds') mediacenterMds: MdsEditorWrapperComponent;
     @ViewChild('nodeEntriesTable') nodeEntriesTable: NodeEntriesWrapperComponent<Node>;
+    @ViewChild('groupEntriesTable') groupEntriesTable: NodeEntriesWrapperComponent<Node>;
     @Output() onOpenNode = new EventEmitter<Node>();
     // @TODO: declare the mediacenter type when it is finalized in backend
     mediacenters: any[];
@@ -56,7 +59,7 @@ export class AdminMediacenterComponent {
     currentMediacenterCopy: Mediacenter;
 
     addGroup: Group;
-    mediacenterGroups: IamGroup[];
+    mediacenterGroups = new NodeDataSource<Group>();
     mediacenterNodesDataSource = new NodeDataSource<Node>();
     mediacenterNodesSearchWord = '';
     mediacenterNodesSort: ListSortConfig = {
@@ -68,21 +71,55 @@ export class AdminMediacenterComponent {
 
     groupColumns: ListItem[];
     nodeColumns: ListItem[];
-    groupActions: CustomOptions = {
-        useDefaultOptions: false,
-    };
     _currentTab = 0;
     get currentTab() {
         return this._currentTab;
     }
     set currentTab(currentTab: number) {
         this._currentTab = currentTab;
-        this.nodeEntriesTable.initOptionsGenerator({
+        this.nodeEntriesTable?.initOptionsGenerator({
             customOptions: {
                 useDefaultOptions: true,
                 supportedOptions: ['OPTIONS.DEBUG', 'OPTIONS.DOWNLOAD'],
             },
         });
+        this.groupEntriesTable?.initOptionsGenerator({
+            customOptions: {
+                useDefaultOptions: false,
+            },
+        });
+        if (this.isAdmin) {
+            const remove = new OptionItem(
+                'ADMIN.MEDIACENTER.GROUPS.REMOVE',
+                'delete',
+                async (a: Group) => {
+                    const authority = this.optionsHelperService.getObjects(
+                        a,
+                        this.groupEntriesTable.optionsHelper.getData(),
+                    )[0];
+                    console.log(authority);
+                    const dialogRef = await this.dialogs.openGenericDialog({
+                        title: 'ADMIN.MEDIACENTER.GROUPS.REMOVE_TITLE',
+                        message: 'ADMIN.MEDIACENTER.GROUPS.REMOVE_MESSAGE',
+                        messageParameters: { name: authority.profile.displayName },
+                        buttons: YES_OR_NO,
+                    });
+                    dialogRef.afterClosed().subscribe((response) => {
+                        if (response === 'YES') {
+                            this.deleteGroup(authority);
+                        }
+                    });
+                },
+            );
+            remove.elementType = [ElementType.Group];
+            remove.group = DefaultGroups.Delete;
+            this.groupEntriesTable?.initOptionsGenerator({
+                customOptions: {
+                    useDefaultOptions: false,
+                    addOptions: [remove],
+                },
+            });
+        }
     }
     isAdmin: boolean;
     hasManagePermissions: boolean;
@@ -97,6 +134,7 @@ export class AdminMediacenterComponent {
         private mediacenterServiceLegacy: RestMediacenterService,
         private mediacenterService: MediacenterService,
         private mdsService: RestMdsService,
+        private optionsHelperService: OptionsHelperService,
         private translate: TranslateService,
         private connector: RestConnectorService,
         private ngZone: NgZone,
@@ -112,33 +150,13 @@ export class AdminMediacenterComponent {
             this.nodeColumns = MdsHelper.getColumns(this.translate, mds, 'mediacenterManaged');
             this.groupColumns = MdsHelper.getColumns(this.translate, mds, 'mediacenterGroups');
         });
-        const remove = new OptionItem(
-            'ADMIN.MEDIACENTER.GROUPS.REMOVE',
-            'delete',
-            async (authority: Group) => {
-                const dialogRef = await this.dialogs.openGenericDialog({
-                    title: 'ADMIN.MEDIACENTER.GROUPS.REMOVE_TITLE',
-                    message: 'ADMIN.MEDIACENTER.GROUPS.REMOVE_MESSAGE',
-                    messageParameters: { name: authority.profile.displayName },
-                    buttons: YES_OR_NO,
-                });
-                dialogRef.afterClosed().subscribe((response) => {
-                    if (response === 'YES') {
-                        this.deleteGroup(authority);
-                    }
-                });
-            },
-        );
-        remove.elementType = [ElementType.Group];
-        if (this.isAdmin) {
-            this.groupActions.addOptions = [remove];
-        }
     }
 
     setMediacenter(mediacenter: any) {
         this.currentMediacenter = mediacenter;
         this.currentMediacenterCopy = Helper.deepCopy(mediacenter);
-        this.mediacenterGroups = null;
+        this.mediacenterGroups.reset();
+        this.mediacenterGroups.isLoading = true;
 
         this.resetMediacenterNodes();
 
@@ -146,7 +164,9 @@ export class AdminMediacenterComponent {
             this.mediacenterServiceLegacy
                 .getManagedGroups(mediacenter.authorityName)
                 .subscribe((groups) => {
-                    this.mediacenterGroups = groups;
+                    console.log(groups);
+                    this.mediacenterGroups.setData(groups as Group[]);
+                    this.mediacenterGroups.isLoading = false;
                 });
             this.mediacenterNodesDataSource.reset();
             UIHelper.waitForComponent(this.ngZone, this, 'mediacenterMds').subscribe(() =>
@@ -312,7 +332,7 @@ export class AdminMediacenterComponent {
             .addManagedGroup(this.currentMediacenterCopy.authorityName, this.addGroup.authorityName)
             .subscribe(
                 (groups) => {
-                    this.mediacenterGroups = groups;
+                    this.mediacenterGroups.setData(groups as Group[]);
                     this.toast.toast('ADMIN.MEDIACENTER.GROUPS.ADDED', {
                         name: this.addGroup.profile.displayName,
                     });
@@ -362,7 +382,7 @@ export class AdminMediacenterComponent {
             .removeManagedGroup(this.currentMediacenterCopy.authorityName, authority.authorityName)
             .subscribe(
                 (groups) => {
-                    this.mediacenterGroups = groups;
+                    this.mediacenterGroups.setData(groups as Group[]);
                     this.toast.toast('ADMIN.MEDIACENTER.GROUPS.REMOVED', {
                         name: authority.profile.displayName,
                     });

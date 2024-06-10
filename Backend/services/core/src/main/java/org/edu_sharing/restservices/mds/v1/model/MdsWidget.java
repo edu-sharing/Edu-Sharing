@@ -2,6 +2,8 @@ package org.edu_sharing.restservices.mds.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.edu_sharing.metadataset.v2.MetadataCondition;
 import org.edu_sharing.metadataset.v2.MetadataKey;
 import org.edu_sharing.metadataset.v2.MetadataWidget;
@@ -98,6 +100,11 @@ public class MdsWidget {
 	private MetadataWidget.Required isRequired;
 	private boolean allowempty;
 	private String defaultvalue;
+
+	@Schema(description = "When true, a set defaultvalue will still trigger the search to show an active filter. When false (default), the defaultvalue will be shown as if no filter is active")
+	@Getter
+	@Setter
+	private boolean countDefaultvalueAsFilter;
 	private boolean isSearchable;
 	private MdsWidgetCondition condition;
 	private int maxlength;
@@ -116,6 +123,7 @@ public class MdsWidget {
 		this.type=widget.getType();
 		this.link=widget.getLink();
 		this.defaultvalue=widget.getDefaultvalue();
+		this.countDefaultvalueAsFilter=widget.getCountDefaultvalueAsFilter();
 		this.placeholder=widget.getPlaceholder();
 		this.maxlength=widget.getMaxlength();
 		this.interactionType=widget.getInteractionType();
@@ -133,7 +141,7 @@ public class MdsWidget {
 		this.allowValuespaceSuggestions =widget.getSuggestionReceiver() != null;
 		this.isExtended=widget.isExtended();
 		this.isHideIfEmpty=widget.isHideIfEmpty();
-		this.isRequired=widget.isRequired();
+		this.isRequired=widget.getRequired();
 		this.allowempty=widget.isAllowempty();
 		this.isSearchable=widget.isSearchable();
 		if(widget.getCondition()!=null) {
@@ -147,14 +155,14 @@ public class MdsWidget {
 		if(widget.getValues()!=null){
 			this.hasValues = true;
 			if(widget.isValuespaceClient()) {
-				values = new ArrayList<MdsValue>();
+				values = new ArrayList<>();
 				for (MetadataKey key : widget.getValues()) {
 					values.add(new MdsValue(key));
 				}
 			}
 		}
 		if(widget.getSubwidgets()!=null){
-			mdsSubwidgets =new ArrayList<MdsSubwidget>();
+			mdsSubwidgets =new ArrayList<>();
 			for(MetadataWidget.Subwidget key : widget.getSubwidgets()){
 				mdsSubwidgets.add(new MdsSubwidget(key));
 			}

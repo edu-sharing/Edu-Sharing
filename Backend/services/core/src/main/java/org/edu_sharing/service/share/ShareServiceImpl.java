@@ -128,7 +128,7 @@ public class ShareServiceImpl implements ShareService {
 		String token=null;
 		for(String email : emails){
 			
-			Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> props = new HashMap<>();
 			
 			props.put(SHARE_PROP_EXPIRYDATE, expiryDate);
 			props.put(SHARE_PROP_SHARE_MAIL, email);
@@ -203,7 +203,7 @@ public class ShareServiceImpl implements ShareService {
 	@Override
 	public void updateShare(Share share) {
 		NodeRef shareNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, share.getNodeId());
-		Map<QName,Serializable> props = new HashMap<QName,Serializable>();
+		Map<QName,Serializable> props = new HashMap<>();
 		props.put(SHARE_PROP_SHARE_TOKEN, share.getToken());
 		props.put(SHARE_PROP_EXPIRYDATE, share.getExpiryDate());
 
@@ -227,7 +227,7 @@ public class ShareServiceImpl implements ShareService {
 		qnameSet.add(SHARE_TYPE);
 		List<ChildAssociationRef> childNodeRefs = serviceRegistry.getNodeService().getChildAssocs(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,nodeId),qnameSet);
 		
-		List<Share> result = new ArrayList<Share>();
+		List<Share> result = new ArrayList<>();
 		for(ChildAssociationRef childRef : childNodeRefs){
 			Map<QName,Serializable> props =  serviceRegistry.getNodeService().getProperties(childRef.getChildRef());
 			Share share = getNodeShareObject(nodeId,childRef.getChildRef());
@@ -261,7 +261,7 @@ public class ShareServiceImpl implements ShareService {
 		return isChild || sharedNode.getId().equals(accessNodeId);
 	}
 	private Share getNodeShareObject(String nodeId, NodeRef shareNodeRef) {
-		HashMap<String, Object> props;
+		Map<String, Object> props;
 		Map<QName, Serializable> propsNative;
 		try {
 			props = NodeServiceFactory.getLocalService().getProperties(shareNodeRef.getStoreRef().getProtocol(),

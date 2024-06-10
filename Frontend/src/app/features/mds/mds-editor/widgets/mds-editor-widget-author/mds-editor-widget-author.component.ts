@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
-import { Metadata } from 'ngx-edu-sharing-graphql';
 import { BehaviorSubject } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
 import { Node } from '../../../../../core-module/rest/data-object';
@@ -33,11 +32,6 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
         requiresNode: false,
         supportsBulk: false,
     };
-    static readonly graphqlIds = [
-        'lom.lifecycle.contribute.role',
-        'lom.lifecycle.contribute.content',
-        'lom.rights.author',
-    ];
     attributes: Attributes;
     @ViewChild(MatTabGroup) tabGroup: MatTabGroup;
     @Input() showContributorDialog = true;
@@ -62,9 +56,6 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
     ngOnInit(): void {
         this.mdsEditorValues.nodes$.pipe(filter((n) => n != null)).subscribe((nodes) => {
             this.updateValues(nodes);
-        });
-        this.mdsEditorValues.graphqlMetadata$.pipe(filter((v) => v != null)).subscribe((values) => {
-            this.updateValuesGraphQL(values);
         });
         this.mdsEditorValues.values$.pipe(filter((v) => v != null)).subscribe((values) => {
             this.updateValues([{ properties: values }] as Node[]);
@@ -109,18 +100,12 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
         this.onChange();
     }
 
-    async getValues(values: Values, node: Node | Metadata = null): Promise<Values> {
-        if (this.mdsEditorValues.graphqlMetadata$.value) {
-            // @TODO: map data to graphql
-            // return values;
-        }
+    async getValues(values: Values, node: Node): Promise<Values> {
         values[RestConstants.CCM_PROP_AUTHOR_FREETEXT] = [this.author.freetext];
         // copy current value from node, replace only first entry (if it has multiple authors)
-        values[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR] =
-            (node as Node)?.properties?.[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR] ||
-            (node as Metadata)?.lom?.lifecycle?.contribute
-                ?.filter((c) => c.role === 'author')
-                .map((c) => c.content);
+        values[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR] = (node as Node)?.properties?.[
+            RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR
+        ];
         if (!values[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR]) {
             values[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR] = [''];
         }
@@ -206,45 +191,6 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
         );
         if (updatedNode) {
             await this.updateValues([updatedNode]);
-        }
-    }
-
-    private async updateValuesGraphQL(values: Metadata[]) {
-        if (values?.length) {
-            let freetext = Array.from(new Set(values.map((n) => n.lom.rights?.author?.[0])));
-            let author = Array.from(
-                new Set(
-                    values.map(
-                        (n) => n.lom.lifecycle?.contribute?.filter((c) => c.role === 'author')?.[0],
-                    ),
-                ),
-            );
-            if (freetext.length !== 1) {
-                freetext = null;
-            }
-            let authorVCard = new VCard();
-            if (author.length !== 1) {
-                author = null;
-            } else {
-                authorVCard = new VCard(author[0]?.content?.[0]);
-            }
-            this.userAuthor =
-                authorVCard?.uid &&
-                authorVCard?.uid === (await this.iamApi.getCurrentUserVCard()).uid;
-            this.author = {
-                freetext: freetext?.[0] ?? '',
-                author: authorVCard,
-            };
-            // switch to author tab if no freetext but author exists
-            if (!this.author.freetext?.trim() && this.author.author?.getDisplayName().trim()) {
-                this.authorTab = 1;
-            }
-            // deep copy the elements to compare state
-            this.initialAuthor = {
-                freetext: this.author.freetext,
-                author: new VCard(this.author.author.toVCardString()),
-            };
-            setTimeout(() => this.tabGroup.realignInkBar());
         }
     }
 }

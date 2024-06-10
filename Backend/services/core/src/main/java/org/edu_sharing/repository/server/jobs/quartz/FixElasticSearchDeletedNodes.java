@@ -196,7 +196,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
             /**
              * remove all collections so that there is no empty collection object left over
              */
-            HashMap<String, JsonData> params = new HashMap<>() {{
+            Map<String, JsonData> params = new HashMap<>() {{
                 put("value", JsonData.of(subArrayName));
             }};
 

@@ -19,7 +19,13 @@ export type ClientConfig = apiModels.Values;
 export type Variables = apiModels.Variables['current'];
 export type TranslationsDict = { [key: string]: string | TranslationsDict };
 
-export type Locale = 'de_DE' | 'en_US';
+export type Locale = 'de_DE' | 'en_US' | 'fr_FR' | 'it_IT';
+export const LANGUAGES: { [key: string]: Locale } = {
+    de: 'de_DE',
+    en: 'en_US',
+    fr: 'fr_FR',
+    it: 'it_IT',
+};
 
 /**
  * Provides system configuration.
@@ -35,7 +41,7 @@ export class ConfigService {
         startWith(void 0 as void),
         switchReplay(() => this.configV1.getConfig1()),
         tap((config) => this.configSubject.next(config.current)),
-        map((config) => config.current ?? null),
+        map((config) => (config.current ? config : null)),
     );
     private readonly variables$ = this.updateTrigger.pipe(
         startWith(void 0 as void),
@@ -72,7 +78,11 @@ export class ConfigService {
         if (forceUpdate) {
             this.updateTrigger.next();
         }
-        return this.config$;
+        return this.config$.pipe(map((c) => c?.current ?? null));
+    }
+
+    observeContextId(): Observable<string | null> {
+        return this.config$.pipe(map((c) => c?.contextId ?? null));
     }
 
     /**

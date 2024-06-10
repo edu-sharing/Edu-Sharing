@@ -74,7 +74,7 @@ public class MP4Parser extends AbstractParser {
         DURATION_FORMAT.applyPattern("0.0#");
     }
     // Ensure this stays in Sync with the entries in tika-mimetypes.xml
-    private static final Map<MediaType,List<String>> typesMap = new HashMap<MediaType, List<String>>();
+    private static final Map<MediaType,List<String>> typesMap = new HashMap<>();
     static {
         // All types should be 4 bytes long, space padded as needed
         typesMap.put(MediaType.audio("mp4"), Arrays.asList(

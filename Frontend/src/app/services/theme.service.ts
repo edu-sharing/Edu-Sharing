@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { MaterialCssVarsService } from 'angular-material-css-vars';
 import { HueValue } from 'angular-material-css-vars/lib/model';
-import { ConfigService } from 'ngx-edu-sharing-api';
+import { ConfigService, ConfigThemeColor } from 'ngx-edu-sharing-api';
 import { EDU_SHARING_UI_CONFIG, EduSharingUiConfiguration } from 'ngx-edu-sharing-ui';
 
 export enum Variable {
@@ -17,16 +17,23 @@ export class ThemeService {
         @Inject(EDU_SHARING_UI_CONFIG) private uiConfig: EduSharingUiConfiguration,
     ) {
         // set defaults
+        this.initWithDefaults();
+    }
+
+    initWithDefaults() {
         this.setColor(Variable.Primary, '#48708e');
         this.setColor(Variable.Accent, '#48708e');
         this.setColor(Variable.Warn, '#cd2457');
+        this.setViaConfig();
+    }
 
+    private setViaConfig() {
         this.configService.observeConfig().subscribe(
             (config) => {
                 const colors = config.themeColors?.color;
                 if (colors) {
                     console.info('apply branding from config', colors);
-                    colors.forEach((c) => this.setColor(c.variable, c.value));
+                    this.applyFromConfigColors(colors);
                 } else {
                     console.info('no branding colors in config, using defaults');
                 }
@@ -39,6 +46,11 @@ export class ThemeService {
             },
         );
     }
+
+    applyFromConfigColors(colors: Array<ConfigThemeColor>) {
+        colors.forEach((c) => this.setColor(c.variable, c.value));
+    }
+
     setColor(variable: Variable | string, color: string) {
         document.documentElement.style.setProperty('--' + variable, color);
         switch (variable) {

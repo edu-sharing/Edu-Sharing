@@ -49,19 +49,19 @@ public class OAILOMWithSubobjectsExporter {
 		
 		String subTagProperty;
 		
-		HashMap<String,String> properties = new HashMap<String,String>();
+		Map<String,String> properties = new HashMap<>();
 		
 		String type;
 		
 		String childAssociation;
 		
-		List<TagDef> subTags = new ArrayList<TagDef>();
+		List<TagDef> subTags = new ArrayList<>();
 		
-		public HashMap<String, String> getProperties() {
+		public Map<String, String> getProperties() {
 			return properties;
 		}
 		
-		public void setProperties(HashMap<String, String> properties) {
+		public void setProperties(Map<String, String> properties) {
 			this.properties = properties;
 		}
 		
@@ -147,7 +147,7 @@ public class OAILOMWithSubobjectsExporter {
 		 */
 		
 		lom.setTag("lom");
-		List<TagDef> lomSubTags = new ArrayList<TagDef>();
+		List<TagDef> lomSubTags = new ArrayList<>();
 		lom.setSubTags(lomSubTags);
 		
 		/**
@@ -223,7 +223,7 @@ public class OAILOMWithSubobjectsExporter {
 		lcContribute.setTag("contribute");
 		lcContribute.setType(CCConstants.LOM_TYPE_CONTRIBUTE);
 		lcContribute.setChildAssociation(CCConstants.LOM_ASSOC_LIFECYCLE_CONTRIBUTE);
-		List<TagDef> lcContributeSubTags = new ArrayList<TagDef>();
+		List<TagDef> lcContributeSubTags = new ArrayList<>();
 		lcContribute.setSubTags(lcContributeSubTags);
 		lcContribute.getProperties().put(CCConstants.LOM_PROP_CONTRIBUTE_ENTITY, "entity");
 		

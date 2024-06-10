@@ -102,7 +102,7 @@
               "
             >
               <h5 class="mat-heading-5 mat-heading-underline">
-                <span>{{ 'ADMIN.MEDIACENTER.DATA.CATALOGS' | translate : { id: i + 1 } }}</span>
+                <span>{{ 'ADMIN.MEDIACENTER.DATA.CATALOGS' | translate: { id: i + 1 } }}</span>
                 <button mat-icon-button color="primary" (click)="removeCatalog(catalog)">
                   <i esIcon="delete"></i>
                 </button>
@@ -159,11 +159,17 @@
             <button *ngIf="addGroup" mat-raised-button color="primary" (click)="addCurrentGroup()">
               <i esIcon="add"></i
               >{{
-                'ADMIN.MEDIACENTER.GROUPS.ADD' | translate : { name: addGroup.profile.displayName }
+                'ADMIN.MEDIACENTER.GROUPS.ADD' | translate: { name: addGroup.profile.displayName }
               }}
             </button>
           </ng-container>
-          TODO
+          <es-node-entries-wrapper
+            #groupEntriesTable
+            [dataSource]="mediacenterGroups"
+            [columns]="groupColumns"
+            [displayType]="NodeEntriesDisplayType.Table"
+            [checkbox]="false"
+          ></es-node-entries-wrapper>
         </div>
       </mat-tab>
       <mat-tab label="{{ 'ADMIN.MEDIACENTER.NODES.TITLE' | translate }}">

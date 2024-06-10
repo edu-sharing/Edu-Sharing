@@ -33,7 +33,7 @@ public class ExcelLOMImporter {
 
 	Logger logger = Logger.getLogger(ExcelLOMImporter.class);
 	
-	HashMap<String,String> excelAlfMap = null; 
+	Map<String,String> excelAlfMap = null;
 	
 	
 	ServiceRegistry serviceRegistry = (ServiceRegistry)AlfAppContextGate.getApplicationContext().getBean(ServiceRegistry.SERVICE_REGISTRY);
@@ -48,7 +48,7 @@ public class ExcelLOMImporter {
 	
 	MCAlfrescoAPIClient apiClient = new MCAlfrescoAPIClient();
 	
-	private HashMap<String, HashMap<String, Object>> currentLevelObjects = null;
+	private Map<String, Map<String, Object>> currentLevelObjects = null;
 
 	private int rowCount;
 	
@@ -68,7 +68,7 @@ public class ExcelLOMImporter {
 		this.is = is;
 		
 		
-		HashMap<Integer,String> IdxColumnMap = new HashMap<Integer,String>();
+		Map<Integer,String> IdxColumnMap = new HashMap<>();
 		
 		try{
 			Workbook workbook = WorkbookFactory.create(this.is);
@@ -85,7 +85,7 @@ public class ExcelLOMImporter {
 				NodeRef currentFolder = nodeService.getChildByName(targetFolderNodeRef, assocTypeContains, folderName);
 				
 				if(currentFolder == null){
-					Map<QName,Serializable> folderProps = new HashMap<QName,Serializable>();
+					Map<QName,Serializable> folderProps = new HashMap<>();
 					folderProps.put(QName.createQName(CCConstants.CM_NAME), folderName);
 					folderProps.put(QName.createQName(CCConstants.CM_PROP_C_TITLE), folderName);
 					parentFolder = nodeService.createNode(targetFolderNodeRef,assocTypeContains, QName.createQName(folderName),  QName.createQName(CCConstants.CCM_TYPE_MAP),folderProps).getChildRef().getId();
@@ -99,10 +99,10 @@ public class ExcelLOMImporter {
 				
 				if(IdxColumnMap.size() > 0){
 					//we got the headers
-					HashMap<QName,Serializable> toSafe = new HashMap<QName,Serializable>();
+					Map<QName,Serializable> toSafe = new HashMap<>();
 					
 					String contentUrl = null;
-					LinkedHashSet<String> collectionsToImportTo = new LinkedHashSet<String>();
+					LinkedHashSet<String> collectionsToImportTo = new LinkedHashSet<>();
 					for(Cell cell : row){
 						
 						int colIdxIdx = cell.getColumnIndex();
@@ -144,7 +144,7 @@ public class ExcelLOMImporter {
 								
 								if(propDef != null) {
 									if(propDef.isMultiValued() && !alfrescoProperty.contains("contributer")){
-										ArrayList<String> multival = new ArrayList<String>();
+										ArrayList<String> multival = new ArrayList<>();
 										
 										//String[] vals = value.split(",");   StringTool.escape(CCConstants.MULTIVALUE_SEPARATOR)
 										String[] vals = value.split(StringTool.escape(CCConstants.MULTIVALUE_SEPARATOR));
@@ -226,7 +226,7 @@ public class ExcelLOMImporter {
 
 	}
 
-	private void addThumbnail(HashMap<QName, Serializable> toSafe, String wwwUrl) {
+	private void addThumbnail(Map<QName, Serializable> toSafe, String wwwUrl) {
 		String thumbnailUrl = (String) toSafe.get(qnameThumbnail);
 		if(thumbnailUrl == null && wwwUrl != null && wwwUrl.contains("youtu")){
 			String youtubeId = getYoutubeId(wwwUrl);
@@ -247,7 +247,7 @@ public class ExcelLOMImporter {
 	 * @param wwwUrl
 	 * @return
 	 */
-	private String addName(HashMap<QName, Serializable> toSafe, String wwwUrl) {
+	private String addName(Map<QName, Serializable> toSafe, String wwwUrl) {
 		if(toSafe.get(qnameTitle) == null && wwwUrl != null && wwwUrl.startsWith("http")){
 			WebsiteInformation websiteInfo = ClientUtilsService.getWebsiteInformation(wwwUrl);
 			if(websiteInfo != null){
@@ -277,7 +277,7 @@ public class ExcelLOMImporter {
 			return null;
 		}
 
-		HashMap<String,Object> eduProps = new HashMap<String,Object>();
+		Map<String,Object> eduProps = new HashMap<>();
 		eduProps.put(CCConstants.CM_NAME, nodeName);
 		eduProps.put(CCConstants.LOM_PROP_GENERAL_TITLE, nodeName);
 		new DuplicateFinder().transformToSafeName(currentLevelObjects, eduProps);
@@ -367,9 +367,9 @@ public class ExcelLOMImporter {
 		}
 	}
 	
-	public HashMap<String, String> getExcelAlfMap() {
+	public Map<String, String> getExcelAlfMap() {
 		if(excelAlfMap == null){
-			excelAlfMap = new HashMap<String, String>();
+			excelAlfMap = new HashMap<>();
 			excelAlfMap.put("catalog", CCConstants.CCM_PROP_IO_REPLICATIONSOURCE);
 			excelAlfMap.put("identifier", CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID);
 			excelAlfMap.put("datestamp", CCConstants.CCM_PROP_IO_REPLICATIONSOURCETIMESTAMP);

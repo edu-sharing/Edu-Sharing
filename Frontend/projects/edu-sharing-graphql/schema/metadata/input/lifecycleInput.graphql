@@ -1,5 +1,0 @@
-input LifecycleInput {
-    version: String
-    status: RangedValueInput
-    contribute: [ContributeInput!]
-}

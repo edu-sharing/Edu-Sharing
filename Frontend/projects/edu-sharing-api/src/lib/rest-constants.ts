@@ -77,6 +77,7 @@ export class RestConstants {
     public static TOOLPERMISSION_MANAGE_RELATIONS = 'TOOLPERMISSION_MANAGE_RELATIONS';
     public static TOOLPERMISSION_CONTROL_RESTRICTED_ACCESS =
         'TOOLPERMISSION_CONTROL_RESTRICTED_ACCESS';
+    public static CCM_PROP_IMPORT_BLOCKED = 'ccm:importblocked';
 
     public static CCM_PROP_LICENSE = 'ccm:commonlicense_key';
     public static CCM_PROP_WF_RECEIVER = 'ccm:wf_receiver';

@@ -73,7 +73,7 @@ public class ShibbolethSessions {
 				writeLock.lock();
 				//check for null again to prevent the Map is created once mor by a waiter on write lock
 				if(shibSessionAlfTicketMap == null){
-					shibSessionAlfTicketMap = Collections.synchronizedMap(new HashMap<String, SessionInfo>());	
+					shibSessionAlfTicketMap = Collections.synchronizedMap(new HashMap<>());
 				}
 				
 			}finally{

@@ -7,17 +7,15 @@ import { JumpMark } from '../../../../services/jump-marks.service';
 import { LocalEventsService } from 'ngx-edu-sharing-ui';
 import { MdsEditorCoreComponent } from '../../../mds/mds-editor/mds-editor-core/mds-editor-core.component';
 import { MdsEditorInstanceService } from '../../../mds/mds-editor/mds-editor-instance.service';
-import { EditorType } from '../../../mds/types/types';
+import { EditorType, UserPresentableError } from '../../../mds/types/types';
 import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config';
 import { JUMP_MARK_POSTFIX } from '../../card-dialog/card-dialog-container/jump-marks-handler.directive';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { FillTypeStatus } from './input-fill-progress/input-fill-progress.component';
 import {
-    hasGraphql,
     hasNodes,
     hasValues,
     MdsEditorDialogData,
-    MdsEditorDialogDataGraphql,
     MdsEditorDialogResult,
 } from './mds-editor-dialog-data';
 
@@ -107,7 +105,9 @@ export class MdsEditorDialogComponent implements OnInit, AfterViewInit {
     private initButtons(): void {
         this.dialogRef.patchConfig({
             buttons: [
-                new DialogButton('CANCEL', { color: 'standard' }, () => this.dialogRef.close(null)),
+                new DialogButton('CANCEL', { color: 'standard' }, () =>
+                    this.dialogRef.close('CANCEL'),
+                ),
                 new DialogButton('SAVE', { color: 'primary' }, () => this.save()),
             ],
         });
@@ -158,19 +158,32 @@ export class MdsEditorDialogComponent implements OnInit, AfterViewInit {
     private async save(): Promise<void> {
         if (this.mdsEditorInstance.getCanSave()) {
             this.dialogRef.patchState({ isLoading: true });
-            const updatedNodesOrValues = await this.mdsEditorInstance.save();
-            this.toast.toast('WORKSPACE.EDITOR.UPDATED');
-            this.dialogRef.close(updatedNodesOrValues);
-            if (hasNodes(this.data)) {
-                this.localEvents.nodesChanged.emit(updatedNodesOrValues as Node[]);
+            try {
+                const updatedNodesOrValues = await this.mdsEditorInstance.save();
+                this.toast.toast('WORKSPACE.EDITOR.UPDATED');
+                this.dialogRef.close(updatedNodesOrValues);
+                if (hasNodes(this.data)) {
+                    this.localEvents.nodesChanged.emit(updatedNodesOrValues as Node[]);
+                }
+            } catch (e) {
+                this.handleError(e);
+                this.dialogRef.patchState({ isLoading: false });
             }
         } else {
             // No changes, behave like close.
             if (this.mdsEditorInstance.getIsValid()) {
-                this.dialogRef.close(null);
+                this.dialogRef.close('NO-CHANGES');
             } else {
                 this.mdsEditorInstance.showMissingRequiredWidgets();
             }
+        }
+    }
+    private handleError(error: any): void {
+        console.error(error);
+        if (error instanceof UserPresentableError) {
+            this.toast.error(null, error.message);
+        } else {
+            this.toast.error(error);
         }
     }
 }
@@ -179,8 +192,11 @@ function mapDict<K extends string, T, R>(
     dict: { [key in K]: T },
     f: (element: T) => R,
 ): { [key in K]: R } {
-    return Object.entries(dict).reduce((acc, [key, value]) => {
-        acc[key as K] = f(value as T);
-        return acc;
-    }, {} as { [key in K]: R });
+    return Object.entries(dict).reduce(
+        (acc, [key, value]) => {
+            acc[key as K] = f(value as T);
+            return acc;
+        },
+        {} as { [key in K]: R },
+    );
 }

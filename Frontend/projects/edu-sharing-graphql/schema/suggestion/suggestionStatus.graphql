@@ -1,6 +1,0 @@
-
-enum SuggestionStatus {
-    ACCEPTED,
-    PENDING,
-    DECLINED
-}

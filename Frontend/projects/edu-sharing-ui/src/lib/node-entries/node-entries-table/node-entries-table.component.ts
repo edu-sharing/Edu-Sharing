@@ -39,7 +39,7 @@ import { UIService } from '../../services/ui.service';
 import { BorderBoxObserverDirective } from '../../directives/border-box-observer.directive';
 import { ListItem } from '../../types/list-item';
 import { CanDrop, DragData } from '../../types/drag-drop';
-import { Node } from 'ngx-edu-sharing-api';
+import { Node, RestConstants } from 'ngx-edu-sharing-api';
 import { Target } from '../../types/option-item';
 import { Toast } from '../../services/abstract/toast.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
@@ -335,5 +335,9 @@ export class NodeEntriesTableComponent<T extends NodeEntriesDataType>
         this.entriesService.selection.clickSource = ClickSource.Dropdown;
         await this.applicationRef.tick();
         this.dropdown.menu.focusFirstItem();
+    }
+
+    isBlocked(node: Node) {
+        return node.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true';
     }
 }

@@ -108,7 +108,7 @@ public class LoginApi  {
        		AuthenticationToolAPI authTool = new AuthenticationToolAPI();
        		ScopeAuthenticationService service = ScopeAuthenticationServiceFactory.getScopeAuthenticationService();
        	
-       		HashMap<String,String> auth = authTool.validateAuthentication(req.getSession());
+       		Map<String,String> auth =  authTool.validateAuthentication(req.getSession());
        		if(auth == null){
        			return Response.ok(new Login(false,null,  null,req.getSession(),Login.STATUS_CODE_PREVIOUS_SESSION_REQUIRED)).build();
        		}
@@ -239,7 +239,7 @@ public class LoginApi  {
 				return Response.status(Response.Status.PRECONDITION_FAILED).entity(msg).build();
 			}
 
-			HashMap<String, String> ssoDataMap = new HashMap<>();
+			Map<String, String> ssoDataMap = new HashMap<>();
 			ssoDataMap.put(ssoMapper.getSSOUsernameProp(), userId);
 
 			//add authByAppData

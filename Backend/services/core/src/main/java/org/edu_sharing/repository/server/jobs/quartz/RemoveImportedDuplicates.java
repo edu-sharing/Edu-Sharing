@@ -86,7 +86,7 @@ public class RemoveImportedDuplicates extends AbstractJob{
                             QName.createQName(CCConstants.CM_NAME)
                     ) + " " + entry.getValue().stream().map(NodeRef::getId).collect(Collectors.joining(","))
             );
-            HashMap<NodeRef, Integer> result = new HashMap<>();
+            Map<NodeRef, Integer> result = new HashMap<>();
             for(NodeRef nodeRef : entry.getValue()){
                 int isInUse = 0;
                 List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef, new HashSet(Arrays.asList(new QName[]{

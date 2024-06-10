@@ -12,11 +12,13 @@ import {
     OnDestroy,
     OnInit,
     Output,
+    signal,
     SimpleChange,
     TemplateRef,
     Type,
     ViewChild,
     ViewContainerRef,
+    WritableSignal,
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { NodeEntriesTemplatesService } from './node-entries-templates.service';
@@ -87,6 +89,13 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
     @Input() sort: ListSortConfig;
     @Input() dragDrop: ListDragGropConfig<T>;
     @Input() gridConfig: GridConfig;
+
+    /**
+     * This color defines the base color of gradients visually limiting a grid in scroll direction.
+     * Defaults to white.
+     */
+    @Input() scrollGradientColor: string = '#fff';
+
     /**
      * this can be set instead of calling initOptionsGenerator()
      */
@@ -196,6 +205,7 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
         this.entriesService.primaryInstance = this.primaryInstance;
         this.entriesService.singleClickHint = this.singleClickHint;
         this.entriesService.disableInfiniteScroll = this.disableInfiniteScroll;
+        this.entriesService.scrollGradientColor.set(this.scrollGradientColor);
 
         if (changes['initConfig']) {
             this.initOptionsGenerator(this.initConfig);

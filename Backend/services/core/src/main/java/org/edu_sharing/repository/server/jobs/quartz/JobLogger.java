@@ -13,22 +13,24 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Plugin(
-    name = "JobLogger",
-    category = Core.CATEGORY_NAME,
-    elementType = Appender.ELEMENT_TYPE)
+        name = "JobLogger",
+        category = Core.CATEGORY_NAME,
+        elementType = Appender.ELEMENT_TYPE)
 public class JobLogger extends AbstractAppender {
     private static final int MAX_LOG_ENTRIES = 5000;
     /**
      * logs are not shared in cluster for performance reasongs
      */
-    private static HashMap<JobInfo, List<LogEntry>> logs = new HashMap<>();
+    private static Map<JobInfo, List<LogEntry>> logs = new ConcurrentHashMap<>();
 
     private final ApplicationContext applicationContext;
 
     public static final List<String> IGNORABLE_JOBS = new ArrayList<>();
-    static{
+
+    static {
         IGNORABLE_JOBS.add(SystemStatisticJob.class.getName());
         IGNORABLE_JOBS.add("org.edu_sharing.repository.server.jobs.quartz.ClusterInfoJob");
     }
@@ -40,15 +42,15 @@ public class JobLogger extends AbstractAppender {
 
     public static void addLog(JobInfo jobInfo, LogEntry entry) {
         List<LogEntry> log = logs.get(jobInfo);
-        if(log == null) {
+        if (log == null) {
             log = new ArrayList<>();
         }
         log.add(entry);
-        if(entry.level.isGreaterOrEqual(jobInfo.getWorstLevel())){
+        if (entry.level.isGreaterOrEqual(jobInfo.getWorstLevel())) {
             jobInfo.setWorstLevel(entry.level);
             JobHandler.refreshJobsCache(jobInfo);
         }
-        if(log.size()>MAX_LOG_ENTRIES){
+        if (log.size() > MAX_LOG_ENTRIES) {
             log.remove(0);
         }
         logs.put(jobInfo, log);
@@ -72,24 +74,28 @@ public class JobLogger extends AbstractAppender {
 
     @Override
     public void append(LogEvent event) {
-        if(event.getLoggerName().equals(JobHandler.class.getName())){
+        if (event.getLoggerName().equals(JobHandler.class.getName())) {
             return;
         }
         try {
-            for(JobInfo job : JobHandler.getInstance(applicationContext).getAllRunningJobs()){
-                if(!job.getStatus().equals(JobInfo.Status.Running))
+            for (JobInfo job : JobHandler.getInstance(applicationContext).getAllRunningJobs()) {
+                if (!job.getStatus().equals(JobInfo.Status.Running))
                     continue;
-                String clazz=job.getJobClass().getName();
-                String message=event.getMessage().getFormattedMessage();
-                if(event.getThrown()!=null){
-                    message+="\n\n" + StringUtils.join(event.getThrown().getStackTrace(),"\n");
+                String clazz = job.getJobClass().getName();
+                String message = event.getMessage().getFormattedMessage();
+                if (event.getThrown() != null) {
+                    message += "\n\n" + StringUtils.join(event.getThrown().getStackTrace(), "\n");
                 }
-                if(clazz.equals(event.getLoggerName())){
-                    JobLogger.addLog(job, new LogEntry(org.apache.log4j.Level.toLevel(event.getLevel().name()),event.getInstant().getEpochMillisecond(),event.getLoggerName(),message));
+
+
+                if (job.getThreadId() == Thread.currentThread().getId()) {
+                    JobLogger.addLog(job, new LogEntry(org.apache.log4j.Level.toLevel(event.getLevel().name()), event.getInstant().getEpochMillisecond(), event.getLoggerName(), message));
+                } else if (clazz.equals(event.getLoggerName())) {
+                    JobLogger.addLog(job, new LogEntry(org.apache.log4j.Level.toLevel(event.getLevel().name()), event.getInstant().getEpochMillisecond(), event.getLoggerName(), message));
                 }
                 // importer job mapping
-                if(clazz.equals(ImporterJob.class.getName()) && event.getLoggerName().startsWith("org.edu_sharing.repository.server.importer")){
-                    JobLogger.addLog(job, new LogEntry(org.apache.log4j.Level.toLevel(event.getLevel().name()),event.getInstant().getEpochMillisecond(),event.getLoggerName(),message));
+                else if (clazz.equals(ImporterJob.class.getName()) && event.getLoggerName().startsWith("org.edu_sharing.repository.server.importer")) {
+                    JobLogger.addLog(job, new LogEntry(org.apache.log4j.Level.toLevel(event.getLevel().name()), event.getInstant().getEpochMillisecond(), event.getLoggerName(), message));
                 }
             }
         } catch (Exception e) {

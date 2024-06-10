@@ -1,6 +1,7 @@
 package org.edu_sharing.service.util;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -30,7 +31,7 @@ public class FillImpObjPropertiesCache implements ApplicationListener<ContextRef
 		
 		MCAlfrescoAPIClient mcAlfrescoBaseClient = new MCAlfrescoAPIClient();
 		String companyHomeId = mcAlfrescoBaseClient.getCompanyHomeNodeId();
-		HashMap<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
+		Map<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
 				OAIPMHLOMImporter.FOLDER_NAME_IMPORTED_OBJECTS);
 		
 		if(importFolderProps == null || importFolderProps.isEmpty()) {
@@ -38,7 +39,7 @@ public class FillImpObjPropertiesCache implements ApplicationListener<ContextRef
 			return;
 		}
 		
-		HashMap params = new HashMap<String,Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("rootFolderId", importFolderProps.get(CCConstants.SYS_PROP_NODE_UID));
 		params.put("sticky", "true");
 		try {

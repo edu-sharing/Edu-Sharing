@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.index.IndexReader;
@@ -63,7 +63,7 @@ public class ESSlaveAlfrescoSolrEventListener extends AlfrescoSolrEventListener 
         OpenBitSet deleted = new OpenBitSet();
         OwnerIdManager ownerIdManager = new OwnerIdManager();
 
-        HashMap<Long, CacheEntry> unmatchedByDBID = new HashMap<Long, CacheEntry>();
+        Map<Long, CacheEntry> unmatchedByDBID = new HashMap<>();
 
         if (currentSearcher != null)
         {
@@ -75,21 +75,21 @@ public class ESSlaveAlfrescoSolrEventListener extends AlfrescoSolrEventListener 
             OwnerIdManager oldOwnerIdManager = (OwnerIdManager) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_OWNER_ID_MANAGER);
             ownerIdManager.addAll(oldOwnerIdManager);
 
-            ConcurrentHashMap<Long, Long> addedLeaves = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_LEAVES);
-            ConcurrentHashMap<Long, Long> addedAux = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_AUX);
-            ConcurrentHashMap<Long, Long> addedAcl = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_ACL);
-            ConcurrentHashMap<Long, Long> addedTx = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_TX);
-            ConcurrentHashMap<Long, Long> addedAclTx = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_ACL_TX);
-            ConcurrentHashMap<Long, Long> updatedLeaves = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_LEAVES);
-            ConcurrentHashMap<Long, Long> updatedAux = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_AUX);
-            ConcurrentHashMap<Long, Long> updatedAcl = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_ACL);
-            ConcurrentHashMap<Long, Long> updatedTx = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_TX);
-            ConcurrentHashMap<Long, Long> updatedAclTx = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_ACL_TX);
-            ConcurrentHashMap<Long, Long> deletedLeaves = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_LEAVES);
-            ConcurrentHashMap<Long, Long> deletedAux = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_AUX);
-            ConcurrentHashMap<Long, Long> deletedAcl = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_ACL);
-            ConcurrentHashMap<Long, Long> deletedTx = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_TX);
-            ConcurrentHashMap<Long, Long> deletedAclTx = (ConcurrentHashMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_ACL_TX);
+            ConcurrentMap<Long, Long> addedLeaves = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_LEAVES);
+            ConcurrentMap<Long, Long> addedAux = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_AUX);
+            ConcurrentMap<Long, Long> addedAcl = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_ACL);
+            ConcurrentMap<Long, Long> addedTx = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_TX);
+            ConcurrentMap<Long, Long> addedAclTx = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_ADDED_ACL_TX);
+            ConcurrentMap<Long, Long> updatedLeaves = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_LEAVES);
+            ConcurrentMap<Long, Long> updatedAux = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_AUX);
+            ConcurrentMap<Long, Long> updatedAcl = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_ACL);
+            ConcurrentMap<Long, Long> updatedTx = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_TX);
+            ConcurrentMap<Long, Long> updatedAclTx = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_UPDATED_ACL_TX);
+            ConcurrentMap<Long, Long> deletedLeaves = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_LEAVES);
+            ConcurrentMap<Long, Long> deletedAux = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_AUX);
+            ConcurrentMap<Long, Long> deletedAcl = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_ACL);
+            ConcurrentMap<Long, Long> deletedTx = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_TX);
+            ConcurrentMap<Long, Long> deletedAclTx = (ConcurrentMap<Long, Long>) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETED_ACL_TX);
             AtomicBoolean deleteAll = (AtomicBoolean) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_DELETE_ALL);
             AtomicBoolean checkCache = (AtomicBoolean) currentSearcher.cacheLookup(ALFRESCO_CACHE, KEY_CHECK_CACHE);
 
@@ -188,7 +188,7 @@ public class ESSlaveAlfrescoSolrEventListener extends AlfrescoSolrEventListener 
 
         // build lookups
 
-        HashMap<Long, AclLookUp> alcLookUp = new HashMap<Long, AclLookUp>();
+        Map<Long, AclLookUp> alcLookUp = new HashMap<>();
 
         AclLookUp currentAclLookUp = null;
         for (int i = 0; i < indexedOderedByAclIdThenDoc.length; i++)
@@ -276,7 +276,7 @@ public class ESSlaveAlfrescoSolrEventListener extends AlfrescoSolrEventListener 
 
         // build lookups
 
-        HashMap<String, OwnerLookUp> ownerLookUp = new HashMap<String, OwnerLookUp>();
+        Map<String, OwnerLookUp> ownerLookUp = new HashMap<>();
 
         OwnerLookUp currentOwnerLookUp = null;
         for (int i = 0; i < indexedOderedByOwnerIdThenDoc.length; i++)

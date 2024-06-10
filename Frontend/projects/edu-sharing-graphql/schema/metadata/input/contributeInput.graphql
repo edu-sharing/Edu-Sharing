@@ -1,4 +1,0 @@
-input ContributeInput {
-    role: String!
-    content:[String!]!
-}

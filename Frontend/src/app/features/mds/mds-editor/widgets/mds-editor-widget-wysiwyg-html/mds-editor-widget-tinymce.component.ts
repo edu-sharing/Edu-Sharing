@@ -1,15 +1,9 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import {
-    AbstractControl,
-    AbstractControlDirective,
-    UntypedFormControl,
-    ValidatorFn,
-} from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
 import { TranslateService } from '@ngx-translate/core';
 import { MdsEditorInstanceService } from '../../mds-editor-instance.service';
 import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
-import { EventObj } from '@tinymce/tinymce-angular/editor/Events';
 import { PlatformLocation } from '@angular/common';
 import { MdsEditorWidgetContainerComponent } from '../mds-editor-widget-container/mds-editor-widget-container.component';
 
@@ -86,8 +80,8 @@ export class MdsEditorWidgetTinyMCE extends MdsEditorWidgetBase implements OnIni
         //this.editorComponent.editor.execCommand('blur');
     }
 
-    ngAfterViewInit(): void {
-        this._html = this.widget.getInitialValues().jointValues[0];
+    async ngAfterViewInit() {
+        this._html = (await this.widget.getInitalValuesAsync()).jointValues[0];
         if (this.widget.definition.configuration) {
             this.editorConfig = {
                 ...this.editorConfigDefault,

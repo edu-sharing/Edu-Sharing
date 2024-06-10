@@ -2,6 +2,7 @@ package org.edu_sharing.repository.server.authentication;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,7 +48,7 @@ public class GuestFilter implements jakarta.servlet.Filter {
 		try {
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(ApplicationInfoList.getHomeRepository().getAppId());
 			HttpSession session = httpRequest.getSession(true);
-			HashMap<String, String> authentication = authTool.validateAuthentication(session);
+			Map<String, String> authentication = authTool.validateAuthentication(session);
 
 			String guestFilterdisabled = req.getParameter(CCConstants.REQUEST_PARAM_DISABLE_GUESTFILTER);
 			String guestFilterHeader=((HttpServletRequest)req).getHeader("DisableGuest");
@@ -63,7 +64,7 @@ public class GuestFilter implements jakarta.servlet.Filter {
 						logger.debug("guest filter disabled for context "+ConfigServiceFactory.getCurrentDomain());
 					}
 					else {
-						HashMap<String, String> authInfoGuest = authTool.createNewSession(guestLogin, guestPW);
+						Map<String, String> authInfoGuest = authTool.createNewSession(guestLogin, guestPW);
 						authTool.storeAuthInfoInSession(authInfoGuest.get(CCConstants.AUTH_USERNAME), authInfoGuest.get(CCConstants.AUTH_TICKET),CCConstants.AUTH_TYPE_DEFAULT, session);
 
 						// prewarm tp session cache

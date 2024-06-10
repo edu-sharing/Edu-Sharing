@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SearchResult {
 
-	private List<Node> nodes = new ArrayList<Node>();
+	private List<Node> nodes = new ArrayList<>();
 	private Pagination pagination = null;
 	private List<Facet> facets = null;
 

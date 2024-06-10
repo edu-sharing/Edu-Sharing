@@ -3,13 +3,12 @@ package org.edu_sharing.service.nodeservice;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.permissions.PermissionReference;
-import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.tools.EduSharingNodeHelper;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
@@ -45,9 +44,6 @@ public class NodeServiceHelper {
 	private static final Map<String, String> cache = new HashMap<>();
 	private static Logger logger=Logger.getLogger(NodeServiceHelper.class);
 
-	private static ApplicationContext alfApplicationContext = AlfAppContextGate.getApplicationContext();
-	private static PermissionModel permissionModel = (PermissionModel) alfApplicationContext.getBean("permissionsModelDAO");
-
 	/**
 	 * Clean the CM_NAME property so it does not cause an org.alfresco.repo.node.integrity.IntegrityException
 	 * @param cmNameReadableName
@@ -65,7 +61,7 @@ public class NodeServiceHelper {
 		new MCAlfrescoAPIClient().setProperty(nodeId, CCConstants.CCM_PROP_IO_CREATE_VERSION, create);
 	}
 	public static <T> Map<String, T> transformLongToShortProperties(Map<String, T> properties) {
-		HashMap<String, T> result = new HashMap<>();
+		Map<String, T> result = new HashMap<>();
 		for(Map.Entry<String, T> prop: properties.entrySet()){
 			if(CCConstants.getValidLocalName(prop.getKey()) != null) {
 				result.put(CCConstants.getValidLocalName(prop.getKey()), prop.getValue());
@@ -73,15 +69,15 @@ public class NodeServiceHelper {
 		}
 		return result;
 	}
-	public static HashMap<String, String[]> transformShortToLongProperties(HashMap<String, String[]> properties) {
+	public static Map<String, String[]> transformShortToLongProperties(Map<String, String[]> properties) {
 
 		/**
 		 * shortNames to long names
 		 */
-		HashMap<String,String[]>  propsLongKeys = (HashMap<String,String[]>)new NameSpaceTool<String[]>()
+		Map<String,String[]>  propsLongKeys = new NameSpaceTool<String[]>()
 				.transformKeysToLongQname(properties);
 
-		HashMap<String, String[]> result = new HashMap<String, String[]>();
+		Map<String, String[]> result = new HashMap<>();
 
 		for (Map.Entry<String,String[]> property : propsLongKeys.entrySet()) {
 			if(result.containsKey(property.getKey())) continue;
@@ -102,7 +98,7 @@ public class NodeServiceHelper {
 		List<ChildAssociationRef> childs=service.getChildrenChildAssociationRefAssoc(nodeId,null,filter,sort);
 		for(ChildAssociationRef child : childs) {
 			NodeRef ref = child.getChildRef();
-			HashMap<String, Object> props = service.getProperties(ref.getStoreRef().getProtocol(),ref.getStoreRef().getIdentifier(),ref.getId());
+			Map<String, Object> props = service.getProperties(ref.getStoreRef().getProtocol(),ref.getStoreRef().getIdentifier(),ref.getId());
 			result.add(props);
 		}
 		return result;
@@ -175,7 +171,7 @@ public class NodeServiceHelper {
 	 */
 	public static Serializable getPropertyNativeWithMapping(NodeRef nodeRef, String key) throws Throwable {
 		if(key.endsWith(CCConstants.DISPLAYNAME_SUFFIX)) {
-			HashMap<String, Object> props = getProperties(nodeRef);
+			Map<String, Object> props = getProperties(nodeRef);
 			MetadataHelper.addVirtualDisplaynameProperties(
 					MetadataHelper.getMetadataset(nodeRef),
 					props
@@ -206,17 +202,17 @@ public class NodeServiceHelper {
 	public static boolean hasAspect(NodeRef nodeRef,String aspect){
 		return NodeServiceFactory.getLocalService().hasAspect(nodeRef.getStoreRef().getProtocol(),nodeRef.getStoreRef().getIdentifier(),nodeRef.getId(),aspect);
 	}
-    public static HashMap<String, Object> getProperties(NodeRef nodeRef) throws Throwable {
+    public static Map<String, Object> getProperties(NodeRef nodeRef) throws Throwable {
         return NodeServiceFactory.getLocalService().getProperties(nodeRef.getStoreRef().getProtocol(),nodeRef.getStoreRef().getIdentifier(),nodeRef.getId());
     }
-	public static HashMap<String, Object> getPropertiesVersion(NodeRef nodeRef, String version) throws Throwable {
+	public static Map<String, Object> getPropertiesVersion(NodeRef nodeRef, String version) throws Throwable {
     	if(version == null){
     		return getProperties(nodeRef);
 		}
-		HashMap<String, HashMap<String, Object>> versionHistory = NodeServiceFactory.getLocalService().getVersionHistory(nodeRef.getId());
+		Map<String, Map<String, Object>> versionHistory = NodeServiceFactory.getLocalService().getVersionHistory(nodeRef.getId());
 
 		if (versionHistory != null) {
-			for (HashMap<String, Object> versionData : versionHistory.values()) {
+			for (Map<String, Object> versionData : versionHistory.values()) {
 				if(version.equals(versionData.get(CCConstants.CM_PROP_VERSIONABLELABEL))){
 					return versionData;
 				}
@@ -256,9 +252,9 @@ public class NodeServiceHelper {
 					/*
 					 * map the permissions to simplified values as stored in the CCM_PROP_RESTRICTED_ACCESS_PERMISSIONS
 					 */
-					HashMap<String, String> permissionsMapped = new HashMap<String, String>() {{
-						put(CCConstants.PERMISSION_READ_PREVIEW, CCConstants.PERMISSION_READ_ALL);
-					}};
+					Map<String, String> permissionsMapped = new HashMap<>() {{
+                        put(CCConstants.PERMISSION_READ_PREVIEW, CCConstants.PERMISSION_READ_ALL);
+                    }};
 					if(Arrays.stream(permissions)
 							.filter((permission) -> !PermissionServiceHelper.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, originalNodeId), permission))
 							.map(permission -> permissionsMapped.getOrDefault(permission, permission))
@@ -304,8 +300,8 @@ public class NodeServiceHelper {
      * @return
      * @throws Throwable
      */
-    public static HashMap<String, String[]> getPropertiesMultivalue(Map<String, ?> properties) {
-        HashMap<String, String[]> propertiesMultivalue = new HashMap<>();
+    public static Map<String, String[]> getPropertiesMultivalue(Map<String, ?> properties) {
+        Map<String, String[]> propertiesMultivalue = new HashMap<>();
         if(properties!=null) {
 			properties.forEach((key, value) -> {
 				String[] result = value==null ? null : ValueTool.getMultivalue(value.toString());
@@ -326,8 +322,8 @@ public class NodeServiceHelper {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static HashMap<String, Object> getPropertiesSinglevalue(Map<String, String[]> properties) {
-		HashMap<String, Object> propertiesMultivalue = new HashMap<>();
+	public static Map<String, Object> getPropertiesSinglevalue(Map<String, String[]> properties) {
+		Map<String, Object> propertiesMultivalue = new HashMap<>();
 		if(properties!=null) {
 			properties.forEach((key, value) -> convertMutlivaluePropToGeneric(value, propertiesMultivalue, key));
 			return propertiesMultivalue;
@@ -370,7 +366,7 @@ public class NodeServiceHelper {
 	public static GetPreviewResult getPreview(NodeRef ref) {
 		return NodeServiceFactory.getLocalService().getPreview(ref.getStoreRef().getProtocol(),ref.getStoreRef().getIdentifier(),ref.getId(), null, null);
 	}
-	public static GetPreviewResult getPreview(NodeRef ref, HashMap<String, Object> nodeProps) {
+	public static GetPreviewResult getPreview(NodeRef ref, Map<String, Object> nodeProps) {
 		return NodeServiceFactory.getLocalService().getPreview(ref.getStoreRef().getProtocol(),ref.getStoreRef().getIdentifier(),ref.getId(), nodeProps, null);
 	}
 	public static GetPreviewResult getPreview(org.edu_sharing.service.model.NodeRef ref) {
@@ -394,6 +390,9 @@ public class NodeServiceHelper {
 
 
 	public static String getContainerId(String rootId, String pattern) {
+		if(StringUtils.isBlank(pattern)) {
+			return rootId;
+		}
 		String result = null;
 		try{
 			MCAlfrescoAPIClient client = new MCAlfrescoAPIClient();
@@ -426,7 +425,7 @@ public class NodeServiceHelper {
 				String key = path.toString();
 				result = cache.get(key);
 				if(result == null){
-					result = new NodeTool().createOrGetNodeByName(client, rootId, items);
+					result = NodeTool.createOrGetNodeByName(rootId, items);
 					cache.put(key, result);
 				}
 			} catch(Throwable e) {
@@ -458,7 +457,7 @@ public class NodeServiceHelper {
 
 	public static String getContainerRootPath(String rootPath) throws Throwable {
 		MCAlfrescoAPIClient client = new MCAlfrescoAPIClient();
-		HashMap<String, HashMap<String, Object>> search = client.search("PATH:\"" + rootPath + "\"", CCConstants.CM_TYPE_FOLDER);
+		Map<String, Map<String, Object>> search = client.search("PATH:\"" + rootPath + "\"", CCConstants.CM_TYPE_FOLDER);
 		String rootId = null;
 		if (search.size() != 1) {
 			if(search.size() > 1) throw new IllegalArgumentException("The path must reference a unique node.");
@@ -474,7 +473,7 @@ public class NodeServiceHelper {
 
 			collectionPath = collectionPath.replaceAll("[a-zA-Z]*:", "");
 			collectionPath = (collectionPath.startsWith("/"))? collectionPath.replaceFirst("/", "") : collectionPath;
-			rootId = new NodeTool().createOrGetNodeByName(client,startAt , collectionPath.split("/"));
+			rootId = NodeTool.createOrGetNodeByName(startAt , collectionPath.split("/"));
 		}else{
 			rootId = search.keySet().iterator().next();
 		}
@@ -486,7 +485,7 @@ public class NodeServiceHelper {
 	 * @param nodeRef
 	 * @return
 	 */
-	public static HashMap<String, Object> getPropertiesOriginal(NodeRef nodeRef) throws Throwable{
+	public static Map<String, Object> getPropertiesOriginal(NodeRef nodeRef) throws Throwable{
 		if(NodeServiceHelper.hasAspect(nodeRef, CCConstants.CCM_ASPECT_COLLECTION_IO_REFERENCE)){
 			if(!PermissionServiceHelper.hasPermission(nodeRef, CCConstants.PERMISSION_READ)){
 				throw new PermissionException(nodeRef.toString(), CCConstants.PERMISSION_READ);
@@ -510,12 +509,12 @@ public class NodeServiceHelper {
 		return NodeServiceHelper.getProperties(nodeRef);
 	}
 
-	public static void convertMutlivaluePropToGeneric(String[] arr, HashMap<String, Object> target, String property) {
+	public static void convertMutlivaluePropToGeneric(String[] arr, Map<String, Object> target, String property) {
 		if(arr != null){
 			if(arr.length==0)
 				target.put(property,null);
 			else if(arr.length > 1)
-				target.put(property,new ArrayList<String>(Arrays.asList(arr)));
+				target.put(property,new ArrayList<>(Arrays.asList(arr)));
 			else
 				target.put(property, arr[0]);
 		}

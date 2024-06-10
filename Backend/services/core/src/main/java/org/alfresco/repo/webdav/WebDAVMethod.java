@@ -90,7 +90,7 @@ public abstract class WebDAVMethod
     // Mapping of User-Agent pattern to response status code
     // used to determine which status code should be returned for AccessDeniedException
 
-    private static final Map<String, Integer> accessDeniedStatusCodes = new LinkedHashMap<String, Integer>();
+    private static final Map<String, Integer> accessDeniedStatusCodes = new LinkedHashMap<>();
     static
     {
         accessDeniedStatusCodes.put("^WebDAVLib/" + VERSION_NUM_PATTERN + "$",
@@ -139,8 +139,8 @@ public abstract class WebDAVMethod
     protected int m_depth = WebDAV.DEPTH_INFINITY;
     
     // request scope
-    protected Map<NodeRef, NodeRef> m_childToParent = new HashMap<NodeRef, NodeRef>();
-    protected Map<NodeRef, LockInfo> m_parentLockInfo = new HashMap<NodeRef, LockInfo>();
+    protected Map<NodeRef, NodeRef> m_childToParent = new HashMap<>();
+    protected Map<NodeRef, LockInfo> m_parentLockInfo = new HashMap<>();
 
     private String siteId;
 
@@ -978,7 +978,7 @@ public abstract class WebDAVMethod
     /**
      * Generates a list of namespace declarations for the response
      */
-    protected String generateNamespaceDeclarations(HashMap<String,String> nameSpaces)
+    protected String generateNamespaceDeclarations(Map<String,String> nameSpaces)
     {
         StringBuilder ns = new StringBuilder();
 

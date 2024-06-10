@@ -34,7 +34,7 @@ public class TrashcanCleanerSolr {
 	
 	private static final int PAGE_SIZE = 100;
 	
-	List<NodeRef> list = new ArrayList<NodeRef>();
+	List<NodeRef> list = new ArrayList<>();
 	
 	public TrashcanCleanerSolr(long timeToKeep, int batchCount) {
 		this.to = new Date(System.currentTimeMillis() - timeToKeep);

@@ -72,14 +72,14 @@ public class PermissionServiceHelper {
 			throw new PermissionException(nodeId,permissionName);
 	}
 
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol,String storeId,String nodeId){
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol,String storeId,String nodeId){
 			return permissionService.hasAllPermissions(storeProtocol, storeId, nodeId, PERMISSIONS);
 		}
-		public HashMap<String, Boolean> hasAllPermissions(String nodeId){
+		public Map<String, Boolean> hasAllPermissions(String nodeId){
 			return hasAllPermissions(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId);
 		}
 		public static List<String> getPermissionsAsString(Map<String,Boolean> hasPermissions){
-			List<String> result = new ArrayList<String>();
+			List<String> result = new ArrayList<>();
 
 			for (String permission : PERMISSIONS) {
 

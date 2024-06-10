@@ -321,7 +321,7 @@ export class SearchFieldComponent implements OnInit, OnDestroy, AfterViewInit {
                 // build up tree if not yet present
                 widget.tree = Tree.generateTree(widget.values);
             }
-            return widget.tree.idToDisplayValue(value.value).hint;
+            return widget.tree.toDisplayValue(value.value).hint;
         }
         return null;
     }

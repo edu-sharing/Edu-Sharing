@@ -10,25 +10,33 @@ import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import org.alfresco.repo.cache.SimpleCache;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.restservices.about.v1.model.Licenses;
 import org.edu_sharing.restservices.about.v1.model.Services;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.rendering.RenderingServiceFactory;
 import org.edu_sharing.service.rendering.RenderingVersionInfo;
+import org.edu_sharing.spring.scope.refresh.RefreshScopeRefreshedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Service;
 
-
-public class VersionService {
+@Service
+public class VersionService implements ApplicationListener<RefreshScopeRefreshedEvent> {
 	static Logger logger = Logger.getLogger(VersionService.class);
 
-	public static SimpleCache<Type, String> versionCache = (SimpleCache<Type, String>) AlfAppContextGate.getApplicationContext().getBean("eduSharingVersionCache");
+	public SimpleCache<Type, String> versionCache = (SimpleCache<Type, String>) AlfAppContextGate.getApplicationContext().getBean("eduSharingVersionCache", SimpleCache.class);
 
-	public static Licenses getLicenses() {
+
+	@Override
+	public void onApplicationEvent(RefreshScopeRefreshedEvent event) {
+		versionCache.clear();
+	}
+
+
+	public Licenses getLicenses() {
 		try {
 			Licenses licenses = new Licenses();
 			String path = System.getProperty("catalina.base") + "/webapps/";
@@ -62,7 +70,7 @@ public class VersionService {
 			throw new RuntimeException(e);
 		}
 	}
-	private static Licenses cleanLicenses(Licenses licenses) {
+	private Licenses cleanLicenses(Licenses licenses) {
 		boolean isAdmin = false;
 		try{
 			isAdmin = AuthorityServiceHelper.isAdmin();
@@ -84,7 +92,7 @@ public class VersionService {
 		throw new SecurityException("license disclosure mode is unknown");
 	}
 
-	private static void cleanupLicenseList(Map<String, String> licenses) {
+	private void cleanupLicenseList(Map<String, String> licenses) {
 		licenses.forEach((key, value) -> {
 			Pattern pattern = Pattern.compile("(\\(.*\\).*\\(.*)@([\\w|\\d|\\.]*)([\\s|\\)].*)");
 			Matcher m = pattern.matcher(value);
@@ -100,15 +108,15 @@ public class VersionService {
 		REPOSITORY,
 		RENDERSERVICE
 	}
-	private static String VERSION_FILE="version.json";
-	public static String getVersionNoException(Type type){
+	private String VERSION_FILE="version.json";
+	public String getVersionNoException(Type type){
 		try {
 			return getVersion(type);
 		}catch(Exception e) {
 			return "unknown";
 		}
 	}
-	public static String getVersion(Type type) throws Exception{
+	public String getVersion(Type type) throws Exception{
 		if(versionCache.getKeys().contains(type)){
 			return versionCache.get(type);
 		}
@@ -123,21 +131,22 @@ public class VersionService {
 		versionCache.put(type,value);
 		return value;
 	}
-	public static void invalidateCache(){
+
+	public void invalidateCache(){
 		versionCache.clear();
 	}
-	private static String getRenderserviceVersion() throws Exception{
+	private String getRenderserviceVersion() throws Exception{
 		RenderingVersionInfo version = RenderingServiceFactory.getLocalService().getVersion();
 		if(version != null) {
 			return version.version;
 		}
 		return null;
 	}
-	private static String getRepositoryVersion() throws Exception{
+	private String getRepositoryVersion() throws Exception{
 		RepositoryVersionInfo.Version version = getRepositoryVersionInfo().version;
 		return version.major + "." + version.minor;
 	}
-	public static RepositoryVersionInfo getRepositoryVersionInfo() throws IOException {
+	public RepositoryVersionInfo getRepositoryVersionInfo() throws IOException {
 		return
 				new Gson().fromJson(
 						String.join(

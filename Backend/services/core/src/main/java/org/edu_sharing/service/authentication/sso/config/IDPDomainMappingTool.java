@@ -3,6 +3,7 @@ package org.edu_sharing.service.authentication.sso.config;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +30,7 @@ public class IDPDomainMappingTool {
 
 	Document docMdSets = null;
 	
-	HashMap<String,String> mapper = new HashMap<String,String>();
+	Map<String,String> mapper = new HashMap<>();
 
 	public IDPDomainMappingTool() {
 		URL url = IDPDomainMappingTool.class.getResource(file);
@@ -100,7 +101,7 @@ public class IDPDomainMappingTool {
 		}
 	}
 	
-	public HashMap<String, String> getMapper() {
+	public Map<String, String> getMapper() {
 		return mapper;
 	}
 }

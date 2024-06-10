@@ -13,16 +13,15 @@
   </mat-form-field>
   <ul *ngIf="formArray" [formGroup]="$any(formArray)" class="checkboxes-group">
     <li *ngFor="let control of formArray.controls; let i = index">
-      <mat-checkbox
-        [formControlName]="i"
-        esCheckTextOverflow=".caption"
-        #text="esCheckTextOverflow"
-        [matTooltip]="text.hasTextOverflow() ? getFacet(i).label : null"
-      >
+      <mat-checkbox [formControlName]="i">
         <span class="label">
           <span
             class="caption"
-            [innerHTML]="getFacet(i).label | escapeHtml | highlight : filter.value"
+            esCheckTextOverflow
+            #text="esCheckTextOverflow"
+            (mouseenter)="text.hasTextOverflow()"
+            [matTooltip]="text.hasTextOverflow() ? getFacet(i).label : null"
+            [innerHTML]="getFacet(i).label | escapeHtml | highlight: filter.value"
           ></span>
           <span class="count">{{ getFacet(i).count }}</span>
         </span>

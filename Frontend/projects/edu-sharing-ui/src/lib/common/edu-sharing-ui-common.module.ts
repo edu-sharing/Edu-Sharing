@@ -26,6 +26,7 @@ import { ReplaceCharsPipe } from '../pipes/replace-chars.pipe';
 import { VCardNamePipe } from '../pipes/vcard-name.pipe';
 import { SortDropdownComponent } from '../sort-dropdown/sort-dropdown.component';
 import { SpinnerComponent } from '../spinner/spinner.component';
+import { PropertySlugPipe } from '../pipes/property-slug.pipe';
 
 @NgModule({
     declarations: [
@@ -38,6 +39,7 @@ import { SpinnerComponent } from '../spinner/spinner.component';
         FormatSizePipe,
         IconDirective,
         InfiniteScrollDirective,
+        PropertySlugPipe,
         NodeIconPipe,
         NodeImagePipe,
         NodeImageSizePipe,
@@ -47,12 +49,12 @@ import { SpinnerComponent } from '../spinner/spinner.component';
         OptionTooltipPipe,
         ReplaceCharsPipe,
         SortDropdownComponent,
-        SpinnerComponent,
         VCardNamePipe,
     ],
     imports: [
         CommonModule,
         MatMenuModule,
+        SpinnerComponent,
         MatButtonModule,
         MatTooltipModule,
         MatRippleModule,
@@ -69,6 +71,7 @@ import { SpinnerComponent } from '../spinner/spinner.component';
         FormatSizePipe,
         IconDirective,
         InfiniteScrollDirective,
+        PropertySlugPipe,
         NodeIconPipe,
         NodeImagePipe,
         NodeImageSizePipe,

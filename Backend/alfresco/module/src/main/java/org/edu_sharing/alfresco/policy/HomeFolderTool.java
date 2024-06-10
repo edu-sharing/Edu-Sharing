@@ -97,7 +97,7 @@ public class HomeFolderTool {
 		List<ChildAssociationRef> childAssocs = nodeService.getChildAssocsByPropertyValue(parent, QName.createQName(CCConstants.CCM_PROP_MAP_TYPE), mapType);
 		if(childAssocs == null || childAssocs.size() == 0){
 			String userDataFolderName = I18nServer.getTranslationDefaultResourcebundle(nameI18nKey);
-			Map<QName,Serializable> props = new HashMap<QName,Serializable>();
+			Map<QName,Serializable> props = new HashMap<>();
 			props.put(ContentModel.PROP_NAME,userDataFolderName);
 			MLText mlTitle = new MLText();
 			mlTitle.addValue(new Locale("de","DE"),I18nServer.getTranslationDefaultResourcebundle(nameI18nKey, "de_DE"));

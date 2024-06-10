@@ -28,6 +28,7 @@
 package org.edu_sharing.service.authentication.cas;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -37,7 +38,7 @@ import java.util.Set;
  */
 public class PGTStack {
 
-	private static HashMap<String, String> map = new HashMap<String, String>();
+	private static Map<String, String> map = new HashMap<>();
 
 	/**
 	 * 

@@ -56,7 +56,7 @@ public class RessourceInfoTool {
 	 */
 	public ArrayList<QTIInfo> isQti(Document doc, XPath xpath){
 		
-		ArrayList<QTIInfo> qtiInfos = new ArrayList<QTIInfo>();
+		ArrayList<QTIInfo> qtiInfos = new ArrayList<>();
 		try{
 			String ressourceTypeExp = "/manifest/resources/resource[@type]";
 			NodeList nodeList = (NodeList) xpath.evaluate(ressourceTypeExp, doc, XPathConstants.NODESET);

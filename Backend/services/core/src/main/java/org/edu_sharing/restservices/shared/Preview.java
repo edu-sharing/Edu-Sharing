@@ -5,8 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 ;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -34,7 +33,7 @@ public class Preview implements Serializable {
   public Preview(){
 	  
   }
-  public Preview(NodeService nodeService, String storeProtocol, String storeIdentifier, String nodeId, String version, String type, HashMap<String, Object> nodeProps) {
+  public Preview(NodeService nodeService, String storeProtocol, String storeIdentifier, String nodeId, String version, String type, Map<String, Object> nodeProps) {
     GetPreviewResult preview = nodeService.getPreview(storeProtocol, storeIdentifier, nodeId ,nodeProps, version);
     PreviewServlet.PreviewDetail detail = null;
     try {

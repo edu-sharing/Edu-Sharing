@@ -1,6 +1,5 @@
 package org.edu_sharing.service.mediacenter;
 
-import com.google.common.collect.Lists;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -21,14 +20,15 @@ import org.edu_sharing.alfresco.service.AuthorityService;
 import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
+import org.edu_sharing.repository.client.rpc.ACE;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.repository.server.importer.PersistentHandlerEdusharing;
 import org.edu_sharing.repository.server.importer.RecordHandlerInterfaceBase;
 import org.edu_sharing.repository.server.jobs.helper.NodeHelper;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
+import org.edu_sharing.service.permission.PermissionServiceFactory;
 import org.edu_sharing.service.search.SearchServiceElastic;
 import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.service.search.model.SearchToken;
@@ -62,6 +62,7 @@ public class MediacenterServiceImpl implements MediacenterService {
     SearchService searchService = serviceregistry.getSearchService();
     PermissionService permissionService = serviceregistry.getPermissionService();
     BehaviourFilter policyBehaviourFilter = (BehaviourFilter) applicationContext.getBean("policyBehaviourFilter");
+
     public MediacenterServiceImpl() {
 
     }
@@ -69,7 +70,7 @@ public class MediacenterServiceImpl implements MediacenterService {
     @NotNull
     public static String getAuthorityScope(String mediacenter) throws Exception {
         String authorityScope = MediacenterServiceFactory.getLocalService().getMediacenterProxyGroup(mediacenter);
-        if(authorityScope == null){
+        if (authorityScope == null) {
             throw new Exception("No mediacenter proxy group found.");
         }
         return authorityScope;
@@ -106,7 +107,7 @@ public class MediacenterServiceImpl implements MediacenterService {
 
 
                         counter++;
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         logger.error("error in record: " + ((record == null || record.size() < 1) ? null : record.get(0)), e);
                         throw e;
                     }
@@ -183,17 +184,17 @@ public class MediacenterServiceImpl implements MediacenterService {
          */
         NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(alfAuthorityName);
 
-        Map<QName, Serializable> groupExtProps = new HashMap<QName, Serializable>();
+        Map<QName, Serializable> groupExtProps = new HashMap<>();
         groupExtProps.put(QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE), AuthorityService.MEDIA_CENTER_GROUP_TYPE);
         nodeService.addAspect(authorityNodeRef, QName.createQName(CCConstants.CCM_ASPECT_GROUPEXTENSION), groupExtProps);
 
-        Map<QName, Serializable> groupAddressProps = new HashMap<QName, Serializable>();
+        Map<QName, Serializable> groupAddressProps = new HashMap<>();
         if (postalCode != null)
             groupAddressProps.put(QName.createQName(CCConstants.CCM_PROP_ADDRESS_POSTALCODE), postalCode);
         if (city != null) groupAddressProps.put(QName.createQName(CCConstants.CCM_PROP_ADDRESS_CITY), city);
         nodeService.addAspect(authorityNodeRef, QName.createQName(CCConstants.CCM_ASPECT_ADDRESS), groupAddressProps);
 
-        Map<QName, Serializable> groupMZProps = new HashMap<QName, Serializable>();
+        Map<QName, Serializable> groupMZProps = new HashMap<>();
         groupMZProps.put(QName.createQName(CCConstants.CCM_PROP_MEDIACENTER_ID), id);
         if (city != null) groupMZProps.put(QName.createQName(CCConstants.CCM_PROP_ADDRESS_CITY), city);
         nodeService.addAspect(authorityNodeRef, QName.createQName(CCConstants.CCM_ASPECT_MEDIACENTER), groupMZProps);
@@ -261,9 +262,9 @@ public class MediacenterServiceImpl implements MediacenterService {
 
 
                         counter++;
-                    }catch(DuplicateChildNodeNameException e){
-                        logger.error("error in record: " + ((record == null || record.size() < 1) ? null : record.get(0)) +" Folder already exists", e);
-                    }  catch (Exception e) {
+                    } catch (DuplicateChildNodeNameException e) {
+                        logger.error("error in record: " + ((record == null || record.size() < 1) ? null : record.get(0)) + " Folder already exists", e);
+                    } catch (Exception e) {
                         logger.error("error in record: " + ((record == null || record.size() < 1) ? null : record.get(0)), e);
                         throw e;
                     }
@@ -306,7 +307,7 @@ public class MediacenterServiceImpl implements MediacenterService {
                         if (rs == null || rs.length() < 1) {
                             logger.error("no mediacenters found");
                         } else {
-                            Map<String, List<String>> existingMZsAndSchools = new HashMap<String, List<String>>();
+                            Map<String, List<String>> existingMZsAndSchools = new HashMap<>();
                             for (NodeRef mzNodeRef : rs.getNodeRefs()) {
                                 String authorityName = (String) nodeService.getProperty(mzNodeRef, ContentModel.PROP_AUTHORITY_NAME);
                                 String mzId = authorityName.replace("GROUP_MEDIA_CENTER_", "");
@@ -331,7 +332,7 @@ public class MediacenterServiceImpl implements MediacenterService {
 
                                         List<String> schools = existingMZsAndSchools.get(mzId);
                                         if (schools == null) {
-                                            schools = new ArrayList<String>();
+                                            schools = new ArrayList<>();
                                         }
                                         if (!schools.contains(schoolId)) {
                                             schools.add(schoolId);
@@ -347,7 +348,7 @@ public class MediacenterServiceImpl implements MediacenterService {
                                 List<String> newSchools = newMZsAndSchools.get(mzAndSchools.getKey());
                                 if (newSchools == null) {
                                     logger.info("existing mz:" + mzAndSchools.getKey() + " has a null school list in new sheet");
-                                    newSchools = new ArrayList<String>();
+                                    newSchools = new ArrayList<>();
                                 }
 
                                 if (mzAndSchools.getValue() == null) {
@@ -422,11 +423,11 @@ public class MediacenterServiceImpl implements MediacenterService {
     }
 
     Map<String, List<String>> listToUniqueMap(List<List<String>> records) {
-        Map<String, List<String>> result = new HashMap<String, List<String>>();
+        Map<String, List<String>> result = new HashMap<>();
 
         for (List<String> record : records) {
             if (!result.containsKey(record.get(0))) {
-                List<String> list = new ArrayList<String>();
+                List<String> list = new ArrayList<>();
                 list.add(record.get(1));
                 result.put(record.get(0), list);
             } else {
@@ -520,10 +521,31 @@ public class MediacenterServiceImpl implements MediacenterService {
         return null;
     }
 
-    private String getMediacenterId(String authorityName) {
+    @Override
+    public List<String> getMediacenterAuthoritiesByNode(String nodeId) throws Exception {
+        List<String> allMediacenterIds = getAllMediacenterIds();
+
+        return Arrays.stream(PermissionServiceFactory.getLocalService().getPermissions(nodeId).getAces())
+                .map(ACE::getAuthority)
+                .filter(x -> x.startsWith(PermissionService.GROUP_PREFIX + AuthorityService.MEDIA_CENTER_PROXY_GROUP_TYPE))
+                .map(this::getMediacenterIdFromProxyGroup)
+                .filter(allMediacenterIds::contains)
+                .map(this::getMediacenterAuthority)
+                .filter(this::isActive)
+                .collect(Collectors.toList());
+    }
+
+    String getMediacenterId(String authorityName) {
         return authorityName.replace(PermissionService.GROUP_PREFIX + AuthorityService.MEDIA_CENTER_GROUP_TYPE + "_", "");
     }
 
+    public String getMediacenterIdFromProxyGroup(String authorityName) {
+        return authorityName.replace(PermissionService.GROUP_PREFIX + AuthorityService.MEDIA_CENTER_PROXY_GROUP_TYPE + "_", "");
+    }
+
+    public String getMediacenterAuthority(String mediacenterId) {
+        return PermissionService.GROUP_PREFIX + AuthorityService.MEDIA_CENTER_GROUP_TYPE + "_" + mediacenterId;
+    }
 
     public boolean isActive(String authorityName) {
         String proxyGroup = getMediacenterProxyGroup(authorityName);
@@ -566,8 +588,6 @@ public class MediacenterServiceImpl implements MediacenterService {
     }
 
 
-
-
     List<String> getAllMediacenterIds() {
         Set<String> allGroups = authorityService.getAllAuthoritiesInZone(org.alfresco.service.cmr.security.AuthorityService.ZONE_APP_DEFAULT, AuthorityType.GROUP);
 
@@ -587,14 +607,14 @@ public class MediacenterServiceImpl implements MediacenterService {
         boolean hasPermission = false;
         Set<AccessPermission> permissionsSet = permissionService.getAllSetPermissions(nodeRef);
 
-        for(AccessPermission ap : permissionsSet){
-            if(authority.equals(ap.getAuthority())
+        for (AccessPermission ap : permissionsSet) {
+            if (authority.equals(ap.getAuthority())
                     && permission.equals(ap.getPermission())
-                    && AccessStatus.ALLOWED.equals(ap.getAccessStatus())){
-                if(!ap.isInherited()) {
+                    && AccessStatus.ALLOWED.equals(ap.getAccessStatus())) {
+                if (!ap.isInherited()) {
                     hasPermission = true;
-                }else{
-                    logger.warn(nodeRef + " permission"+ ap.getPermission() + " is inherited");
+                } else {
+                    logger.warn(nodeRef + " permission" + ap.getPermission() + " is inherited");
                 }
             }
         }
@@ -621,14 +641,14 @@ public class MediacenterServiceImpl implements MediacenterService {
         logger.info("cache mediacenter nodes");
 
         String impFolderId = getPersistentHandlerEdusharing().getImportFolderId();
-        if(impFolderId == null){
+        if (impFolderId == null) {
             logger.error("no imported objects folder found");
             return;
         }
-        HashMap<String, NodeRef> importedNodes = new NodeHelper().getImportedNodes(impFolderId);
+        Map<String, NodeRef> importedNodes = new NodeHelper().getImportedNodes(impFolderId);
 
 
-        HashMap<String, List<String>> sodisMediacenterIdNodes = new HashMap<>();
+        Map<String, List<String>> sodisMediacenterIdNodes = new HashMap<>();
         for (String mediacenterId : allMediacenterIds) {
             logger.info("cache provider mediacenter nodes mediacenterId:" + mediacenterId + " already cached:" + sodisMediacenterIdNodes.size());
             List<String> nodes = MediacenterLicenseProviderFactory.getMediacenterLicenseProvider().getNodes(mediacenterId);
@@ -636,8 +656,8 @@ public class MediacenterServiceImpl implements MediacenterService {
         }
 
 
-        HashMap<String, List<NodeRef>> addToMediacenterList = new HashMap<>();
-        HashMap<String, List<NodeRef>> removeFromMediacenterList = new HashMap<>();
+        Map<String, List<NodeRef>> addToMediacenterList = new HashMap<>();
+        Map<String, List<NodeRef>> removeFromMediacenterList = new HashMap<>();
 
         for (String mediacenterId : allMediacenterIds) {
             logger.info("collect differences for " + mediacenterId);
@@ -664,7 +684,7 @@ public class MediacenterServiceImpl implements MediacenterService {
                 if (sodisLicensedNodes.contains(entry.getKey()) && (!hasConsumerPermission || !hasPublishPermission)) {
                     List<NodeRef> nodeRefs = addToMediacenterList.get(mediacenterName);
                     if (nodeRefs == null) {
-                        nodeRefs = new ArrayList<NodeRef>();
+                        nodeRefs = new ArrayList<>();
                         addToMediacenterList.put(mediacenterName, nodeRefs);
                     }
                     nodeRefs.add(entry.getValue());
@@ -672,7 +692,7 @@ public class MediacenterServiceImpl implements MediacenterService {
                         && (hasConsumerPermission || hasPublishPermission)) {
                     List<NodeRef> nodeRefs = removeFromMediacenterList.get(mediacenterName);
                     if (nodeRefs == null) {
-                        nodeRefs = new ArrayList<NodeRef>();
+                        nodeRefs = new ArrayList<>();
                         removeFromMediacenterList.put(mediacenterName, nodeRefs);
                     }
                     nodeRefs.add(entry.getValue());
@@ -708,12 +728,12 @@ public class MediacenterServiceImpl implements MediacenterService {
     }
 
     private PersistentHandlerEdusharing getPersistentHandlerEdusharing() {
-        if(persistentHandlerEdusharing != null) {
+        if (persistentHandlerEdusharing != null) {
             return persistentHandlerEdusharing;
         }
         persistentHandlerEdusharing = AuthenticationUtil.runAsSystem(() -> {
             try {
-                return new PersistentHandlerEdusharing(null,null,false);
+                return new PersistentHandlerEdusharing(null, null, false);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -728,14 +748,14 @@ public class MediacenterServiceImpl implements MediacenterService {
 
         for (String mediacenterId : allMediacenterIds) {
             String mediacenterProxyName = "GROUP_" + AuthorityService.MEDIA_CENTER_PROXY_GROUP_TYPE + "_" + mediacenterId;
-            String mediacenterGroupName  = "GROUP_" + AuthorityService.MEDIA_CENTER_GROUP_TYPE + "_" + mediacenterId;
+            String mediacenterGroupName = "GROUP_" + AuthorityService.MEDIA_CENTER_GROUP_TYPE + "_" + mediacenterId;
             String mediacenterAdminGroup = getMediacenterAdminGroup(mediacenterGroupName);
             List<String> nodesAdd = MediacenterLicenseProviderFactory.getMediacenterLicenseProvider().getNodes(mediacenterId, from, until);
             logger.info(mediacenterId + " found new nodes: " + nodesAdd.size() + " for period: " + from + " - " + until);
 
             for (String replicationsourceId : nodesAdd) {
-                NodeRef nodeRef  = getNodeRefByReplicationSourceId(replicationsourceId);
-                if(nodeRef == null){
+                NodeRef nodeRef = getNodeRefByReplicationSourceId(replicationsourceId);
+                if (nodeRef == null) {
                     logger.warn("no node found in repo for:" + replicationsourceId);
                     continue;
                 }
@@ -743,27 +763,27 @@ public class MediacenterServiceImpl implements MediacenterService {
                         CCConstants.PERMISSION_CC_PUBLISH);
                 boolean hasConsumerPermission = hasPermissionSet(nodeRef, mediacenterProxyName,
                         CCConstants.PERMISSION_CONSUMER);
-                boolean hasPublishPermissionAdmin = hasPermissionSet(nodeRef,mediacenterAdminGroup,
+                boolean hasPublishPermissionAdmin = hasPermissionSet(nodeRef, mediacenterAdminGroup,
                         CCConstants.PERMISSION_CC_PUBLISH);
-                boolean hasConsumerPermissionAdmin = hasPermissionSet(nodeRef,mediacenterAdminGroup,
+                boolean hasConsumerPermissionAdmin = hasPermissionSet(nodeRef, mediacenterAdminGroup,
                         CCConstants.PERMISSION_CONSUMER);
 
 
                 serviceregistry.getRetryingTransactionHelper().doInTransaction(() -> {
                     policyBehaviourFilter.disableBehaviour(nodeRef);
-                    if(!hasPublishPermission){
+                    if (!hasPublishPermission) {
                         logger.info(mediacenterProxyName + " add publish permission for " + nodeRef);
                         permissionService.setPermission(nodeRef, mediacenterProxyName, CCConstants.PERMISSION_CONSUMER, true);
                     }
-                    if(!hasConsumerPermission){
+                    if (!hasConsumerPermission) {
                         logger.info(mediacenterProxyName + " add consumer permission for " + nodeRef);
                         permissionService.setPermission(nodeRef, mediacenterProxyName, CCConstants.PERMISSION_CC_PUBLISH, true);
                     }
-                    if(!hasPublishPermissionAdmin){
+                    if (!hasPublishPermissionAdmin) {
                         logger.info(mediacenterAdminGroup + " add publish permission for " + nodeRef);
                         permissionService.setPermission(nodeRef, mediacenterAdminGroup, CCConstants.PERMISSION_CC_PUBLISH, true);
                     }
-                    if(!hasConsumerPermissionAdmin){
+                    if (!hasConsumerPermissionAdmin) {
                         logger.info(mediacenterAdminGroup + " add consumer permission for " + nodeRef);
                         permissionService.setPermission(nodeRef, mediacenterAdminGroup, CCConstants.PERMISSION_CONSUMER, true);
                     }
@@ -772,7 +792,7 @@ public class MediacenterServiceImpl implements MediacenterService {
                 });
 
 
-                fixMediacenterStatus(nodeRef,mediacenterGroupName,true);
+                fixMediacenterStatus(nodeRef, mediacenterGroupName, true);
             }
 
 
@@ -789,12 +809,12 @@ public class MediacenterServiceImpl implements MediacenterService {
                 boolean hasConsumerPermission = hasPermissionSet(nodeRef, mediacenterProxyName,
                         CCConstants.PERMISSION_CONSUMER);
 
-                boolean hasPublishPermissionAdmin = hasPermissionSet(nodeRef,mediacenterAdminGroup,
+                boolean hasPublishPermissionAdmin = hasPermissionSet(nodeRef, mediacenterAdminGroup,
                         CCConstants.PERMISSION_CC_PUBLISH);
-                boolean hasConsumerPermissionAdmin = hasPermissionSet(nodeRef,mediacenterAdminGroup,
+                boolean hasConsumerPermissionAdmin = hasPermissionSet(nodeRef, mediacenterAdminGroup,
                         CCConstants.PERMISSION_CONSUMER);
 
-                if(hasPublishPermission){
+                if (hasPublishPermission) {
                     serviceregistry.getRetryingTransactionHelper().doInTransaction(() -> {
                         policyBehaviourFilter.disableBehaviour(nodeRef);
                         logger.info(mediacenterProxyName + " remove publish permission for " + nodeRef);
@@ -803,7 +823,7 @@ public class MediacenterServiceImpl implements MediacenterService {
                         return null;
                     });
                 }
-                if(hasConsumerPermission){
+                if (hasConsumerPermission) {
                     serviceregistry.getRetryingTransactionHelper().doInTransaction(() -> {
                         policyBehaviourFilter.disableBehaviour(nodeRef);
                         logger.info(mediacenterProxyName + " remove consumer permission for " + nodeRef);
@@ -813,51 +833,51 @@ public class MediacenterServiceImpl implements MediacenterService {
                     });
                 }
 
-                if(!hasPublishPermissionAdmin){
+                if (!hasPublishPermissionAdmin) {
                     logger.info(mediacenterAdminGroup + " add publish permission for " + nodeRef);
                     permissionService.setPermission(nodeRef, mediacenterAdminGroup, CCConstants.PERMISSION_CC_PUBLISH, true);
                 }
-                if(!hasConsumerPermissionAdmin){
+                if (!hasConsumerPermissionAdmin) {
                     logger.info(mediacenterAdminGroup + " add consumer permission for " + nodeRef);
                     permissionService.setPermission(nodeRef, mediacenterAdminGroup, CCConstants.PERMISSION_CONSUMER, true);
                 }
 
-                fixMediacenterStatus(nodeRef,mediacenterGroupName,false);
+                fixMediacenterStatus(nodeRef, mediacenterGroupName, false);
             }
         }
     }
 
-    private void fixMediacenterStatus(NodeRef nodeRef, String mediacenterGroupName, Boolean activated){
+    private void fixMediacenterStatus(NodeRef nodeRef, String mediacenterGroupName, Boolean activated) {
 
         QName prop = QName.createQName(CCConstants.CCM_PROP_IO_MEDIACENTER);
-        List<String> mcStatusList = (List<String>)nodeService.getProperty(nodeRef, prop);
+        List<String> mcStatusList = (List<String>) nodeService.getProperty(nodeRef, prop);
 
         JSONObject jo = new JSONObject();
-        jo.put("name",mediacenterGroupName);
-        jo.put("activated",activated.toString());
+        jo.put("name", mediacenterGroupName);
+        jo.put("activated", activated.toString());
 
         ArrayList<String> mcStatusListNew = new ArrayList<>();
 
-        if(mcStatusList == null){
+        if (mcStatusList == null) {
             mcStatusListNew.add(jo.toJSONString());
-        }else if(mcStatusList.stream().anyMatch(o -> o.contains(mediacenterGroupName))){
+        } else if (mcStatusList.stream().anyMatch(o -> o.contains(mediacenterGroupName))) {
             mcStatusListNew.addAll(mcStatusList.stream().map(o -> {
                 try {
-                    return ((JSONObject)new JSONParser().parse(o)).get("name").equals(mediacenterGroupName) ? jo.toJSONString() : o;
+                    return ((JSONObject) new JSONParser().parse(o)).get("name").equals(mediacenterGroupName) ? jo.toJSONString() : o;
                 } catch (ParseException e) {
                     logger.error(e.getMessage());
                     return o;
                 }
             }).collect(Collectors.toList()));
-        }else{
+        } else {
             mcStatusListNew.addAll(mcStatusList);
             mcStatusListNew.add(jo.toJSONString());
         }
 
-            if(mcStatusList == null || (CollectionUtils.disjunction(mcStatusListNew, mcStatusList)).size() > 0){
+        if (mcStatusList == null || (CollectionUtils.disjunction(mcStatusListNew, mcStatusList)).size() > 0) {
             serviceregistry.getRetryingTransactionHelper().doInTransaction(() -> {
                 policyBehaviourFilter.disableBehaviour(nodeRef);
-                logger.info("updateing mediacenter status for " + nodeRef+" mediacenter:"+mediacenterGroupName+" activated:"+activated);
+                logger.info("updateing mediacenter status for " + nodeRef + " mediacenter:" + mediacenterGroupName + " activated:" + activated);
                 nodeService.setProperty(nodeRef, prop, mcStatusListNew);
                 policyBehaviourFilter.enableBehaviour(nodeRef);
                 return null;
@@ -867,33 +887,29 @@ public class MediacenterServiceImpl implements MediacenterService {
 
     }
 
-    private NodeRef getNodeRefByReplicationSourceId(String replicationSourceId){
-        NodeRef nodeRef = getPersistentHandlerEdusharing().getNodeIfExists(new HashMap<String, Object>() {
-            {
-                put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replicationSourceId);
-            }}
+    private NodeRef getNodeRefByReplicationSourceId(String replicationSourceId) {
+        NodeRef nodeRef = getPersistentHandlerEdusharing().getNodeIfExists(new HashMap<>() {
+                                                                               {
+                                                                                   put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replicationSourceId);
+                                                                               }
+                                                                           }
         );
 
-        if(nodeRef == null){
-            logger.info("creating dummy object for:"+replicationSourceId);
-            HashMap<String,Object> properties = new HashMap<>();
-            properties.put(CCConstants.CM_NAME,replicationSourceId);
+        if (nodeRef == null) {
+            logger.info("creating dummy object for:" + replicationSourceId);
+            Map<String, Object> properties = new HashMap<>();
+            properties.put(CCConstants.CM_NAME, replicationSourceId);
             properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCETIMESTAMP, "1900-01-01T00:00:00Z");
-            properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID,replicationSourceId);
-            properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE,MediacenterLicenseProviderFactory.getMediacenterLicenseProvider().getCatalogId());
-            properties.put(CCConstants.CCM_PROP_IO_TECHNICAL_STATE,"problem_notAvailable");
+            properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, replicationSourceId);
+            properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE, MediacenterLicenseProviderFactory.getMediacenterLicenseProvider().getCatalogId());
+            properties.put(CCConstants.CCM_PROP_IO_TECHNICAL_STATE, "problem_notAvailable");
             try {
-                String nodeId = getPersistentHandlerEdusharing().safe(new RecordHandlerInterfaceBase() {
-                    @Override
-                    public HashMap<String, Object> getProperties() {
-                        return properties;
-                    }
-                },null,MediacenterLicenseProviderFactory.getMediacenterLicenseProvider().getSet());
-                if(nodeId != null){
-                    nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,nodeId);
+                String nodeId = getPersistentHandlerEdusharing().safe((RecordHandlerInterfaceBase) () -> properties, null, MediacenterLicenseProviderFactory.getMediacenterLicenseProvider().getSet());
+                if (nodeId != null) {
+                    nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId);
                 }
             } catch (Throwable throwable) {
-                logger.error(throwable.getMessage(),throwable);
+                logger.error(throwable.getMessage(), throwable);
             }
         }
         return nodeRef;
@@ -901,30 +917,31 @@ public class MediacenterServiceImpl implements MediacenterService {
 
     @Override
     public void deleteMediacenter(String authorityName) {
-        if(authorityService.authorityExists(authorityName)){
+        if (authorityService.authorityExists(authorityName)) {
             NodeRef nodeRef = authorityService.getAuthorityNodeRef(authorityName);
-            if(!nodeService.hasAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_MEDIACENTER))){
+            if (!nodeService.hasAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_MEDIACENTER))) {
                 throw new RuntimeException(authorityName + " is no mediacenter.");
             }
             serviceregistry.getRetryingTransactionHelper().doInTransaction(() -> {
 
                 String authorityNameAdmin = getMediacenterAdminGroup(authorityName);
-                if(authorityNameAdmin != null) {
+                if (authorityNameAdmin != null) {
                     authorityService.deleteAuthority(authorityNameAdmin);
                 }
 
                 authorityService.deleteAuthority(authorityName);
 
                 String authorityNameProxy = getMediacenterProxyGroup(authorityName);
-                if(authorityNameProxy != null) {
+                if (authorityNameProxy != null) {
                     authorityService.deleteAuthority(authorityNameProxy);
                 }
                 return null;
             });
-        }else{
+        } else {
             throw new RuntimeException(authorityName + " does not exist.");
         }
     }
+
     @Override
     public List<org.edu_sharing.service.model.NodeRef> getAllLicensedNodes(String mediacenter, Map<String, String[]> criteria, SortDefinition sortDefinition) throws Throwable {
         List<org.edu_sharing.service.model.NodeRef> data = new ArrayList<>();
@@ -932,13 +949,15 @@ public class MediacenterServiceImpl implements MediacenterService {
         searchToken.setAuthorityScope(Collections.singletonList(getAuthorityScope(mediacenter)));
         searchToken.setFacets(new ArrayList<>());
         searchToken.setExcludes(Arrays.asList("preview", "collections", "children"));
-        if(sortDefinition != null) {
+        if (sortDefinition != null) {
             searchToken.setSortDefinition(sortDefinition);
         }
-        if(SearchServiceFactory.getLocalService() instanceof SearchServiceElastic) {
+        if (SearchServiceFactory.getLocalService() instanceof SearchServiceElastic) {
             return ((SearchServiceElastic) SearchServiceFactory.getLocalService()).searchAll(MetadataHelper.getLocalDefaultMetadataset(), "mediacenter_filter", criteria, searchToken);
         } else {
             throw new RuntimeException("getAllLicensedNodes requires Elasticsearch");
         }
     }
+
+
 }

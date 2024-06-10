@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.edu_sharing.repository.client.rpc.ACL;
 import org.edu_sharing.repository.client.rpc.EduGroup;
@@ -23,22 +24,22 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap getBaskets() throws Throwable {
+	public Map<String,Map<String,Object>> getBaskets() throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> search(String luceneString, String type) throws Exception {
+	public Map<String, Map<String, Object>> search(String luceneString, String type) throws Exception {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> search(String luceneString) throws Throwable {
+	public Map<String, Map<String, Object>> search(String luceneString) throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> search(String luceneString, ContextSearchMode mode)
+	public Map<String, Map<String, Object>> search(String luceneString, ContextSearchMode mode)
 			throws Throwable {
 		return null;
 	}
@@ -54,18 +55,18 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChildren(String parentID) throws Throwable {
+	public Map<String, Map<String, Object>> getChildren(String parentID) throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChildrenByAssociation(String nodeId, String association)
+	public Map<String, Map<String, Object>> getChildrenByAssociation(String nodeId, String association)
 			throws Exception {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChildrenByAssociation(String store, String nodeId,
+	public Map<String, Map<String, Object>> getChildrenByAssociation(String store, String nodeId,
 			String association) throws Exception {
 		return null;
 	}
@@ -100,12 +101,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap getGroupFolders() throws Throwable {
+	public Map<String, Map<String, Object>> getGroupFolders() throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap> getParents(String nodeID, boolean primary) throws Throwable {
+	public Map<String, Map<String, Object>> getParents(String nodeID, boolean primary) throws Throwable {
 		return null;
 	}
 
@@ -114,13 +115,13 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String nodeId, String authority, String[] permissions)
+	public Map<String, Boolean> hasAllPermissions(String nodeId, String authority, String[] permissions)
 			throws Exception {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String nodeId, String[] permissions) throws Exception {
+	public Map<String, Boolean> hasAllPermissions(String nodeId, String[] permissions) throws Exception {
 		return null;
 	}
 
@@ -130,12 +131,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public String dropToBasketRemoteNode(String basketId, HashMap<String, String> params) throws Exception {
+	public String dropToBasketRemoteNode(String basketId, Map<String, String> params) throws Exception {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap> getAssocNode(String nodeID, String association) throws Throwable {
+	public Map<String, Map<String, Object>> getAssocNode(String nodeID, String association) throws Throwable {
 		return null;
 	}
 
@@ -166,13 +167,13 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, String> checkAndCreateShadowUser(String username, String email, String repId)
+	public Map<String, String> checkAndCreateShadowUser(String username, String email, String repId)
 			throws Exception {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getVersionHistory(String nodeId) throws Throwable {
+	public Map<String, Map<String, Object>> getVersionHistory(String nodeId) throws Throwable {
 		return null;
 	}
 
@@ -210,18 +211,18 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChilden(String parentId, String type, HashMap props)
+	public Map<String, Map<String, Object>> getChilden(String parentId, String type, Map<String, Object> props)
 			throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Object> getChildRecursive(String parentId, String type, HashMap props) throws Throwable {
+	public Map<String, Object> getChildRecursive(String parentId, String type, Map<String, Object> props) throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChildrenRecursive(String parentId, String type)
+	public Map<String, Map<String, Object>> getChildrenRecursive(String parentId, String type)
 			throws Throwable {
 		return null;
 	}
@@ -266,7 +267,7 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public void executeAction(String nodeId, String actionName, String actionId, HashMap parameters, boolean async)
+	public void executeAction(String nodeId, String actionName, String actionId, Map<String, Object> parameters, boolean async)
 			throws Exception {	
 	}
 
@@ -313,7 +314,7 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChildren(String parentID, String[] permissionsOnChild)
+	public Map<String, Map<String, Object>> getChildren(String parentID, String[] permissionsOnChild)
 			throws Throwable {
 		return null;
 	}
@@ -343,12 +344,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties(String storeId, String storeProtocol, String nodeId) throws Throwable {
+	public Map<String, Object> getProperties(String storeId, String storeProtocol, String nodeId) throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
 			String[] permissions) {
 		return null;
 	}
@@ -360,12 +361,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 
 	@Override
 	public String createNode(String parentID, String nodeTypeString, String childAssociation,
-			HashMap<String, Object> _props) throws Exception {
+			Map<String, Object> _props) throws Exception {
 		return null;
 	}
 
 	@Override
-	public String createNode(String parentID, String nodeTypeString, HashMap<String, Object> _props) throws Exception {
+	public String createNode(String parentID, String nodeTypeString, Map<String, Object> _props) throws Exception {
 		return null;
 	}
 
@@ -374,7 +375,7 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public void updateNode(String nodeId, HashMap<String, Object> _props) throws Exception {
+	public void updateNode(String nodeId, Map<String, Object> _props) throws Exception {
 	}
 
 	@Override
@@ -387,12 +388,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties(String nodeId) throws Throwable {
+	public Map<String, Object> getProperties(String nodeId) throws Throwable {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Object> getChild(String parentId, String type, String property, String value)
+	public Map<String, Object> getChild(String parentId, String type, String property, String value)
 			throws Throwable {
 		return null;
 	}
@@ -416,12 +417,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getChildrenByType(String nodeId, String type) throws Exception {
+	public Map<String, Map<String, Object>> getChildrenByType(String nodeId, String type) throws Exception {
 		return null;
 	}
 
 	@Override
-	public HashMap<String, String> getUserInfo(String userName) throws Exception {
+	public Map<String, String> getUserInfo(String userName) throws Exception {
 		return null;
 	}
 
@@ -445,12 +446,12 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 	}
 
 	@Override
-	public MCBaseClient getInstance(HashMap<String, String> _authenticationInfo) {
+	public MCBaseClient getInstance(Map<String, String> _authenticationInfo) {
 		return null;
 	}
 
 	@Override
-	public MCBaseClient getInstance(String _repositoryFile, HashMap<String, String> _authenticationInfo) {
+	public MCBaseClient getInstance(String _repositoryFile, Map<String, String> _authenticationInfo) {
 		return null;
 	}
 	

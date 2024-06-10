@@ -1,35 +1,33 @@
 package org.edu_sharing.service.nodeservice;
 
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-
 import lombok.NonNull;
 import org.alfresco.service.cmr.repository.*;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.rpc.User;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
 import org.edu_sharing.service.permission.HandleMode;
 import org.edu_sharing.service.search.model.SortDefinition;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.*;
+
 public interface NodeService {
 
 	
-	public void updateNode(String nodeId, HashMap<String, String[]> props) throws Throwable;
+	public void updateNode(String nodeId, Map<String, String[]> props) throws Throwable;
 
 	public void createAssoc(String parentId,String childId,String assocName);
 
-	public String createNode(String parentId, String nodeType, HashMap<String, String[]> props)throws Throwable;
+	public String createNode(String parentId, String nodeType, Map<String, String[]> props)throws Throwable;
 	
-	public String createNode(String parentId, String nodeType, HashMap<String, String[]> props, String childAssociation) throws Throwable;
+	public String createNode(String parentId, String nodeType, Map<String, String[]> props, String childAssociation) throws Throwable;
 	
-	public String createNodeBasic(String parentID, String nodeTypeString, HashMap<String, ?> _props);
+	public String createNodeBasic(String parentID, String nodeTypeString, Map<String, ?> _props);
 
 	public String createNodeBasic(StoreRef store, String parentID, String nodeTypeString, String childAssociation,
-			HashMap<String, ?> _props);
+								  Map<String, ?> _props);
 
 	public String findNodeByName(String parentId, String name );
 
@@ -37,7 +35,7 @@ public interface NodeService {
 
 	public String getCompanyHome();
 
-	public HashMap<String, String[]> getNameProperty(String name);
+	public Map<String, String[]> getNameProperty(String name);
 
     List<NodeRef> getChildrenRecursive(StoreRef store, String nodeId, List<String> types,RecurseMode recurseMode);
 
@@ -78,19 +76,19 @@ public interface NodeService {
 	
 	public void removeNode(String nodeID, String fromID);
 
-	public HashMap<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable;
+	public Map<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable;
 
 	/**
 	 * this method is called when a local object has ccm:remoterepositry aspect, and all local properties will get
 	 * updated on the fly with the properties provided by this method
 	 */
-	public HashMap<String, Object> getPropertiesDynamic(String storeProtocol, String storeId, String nodeId) throws Throwable;
+	public Map<String, Object> getPropertiesDynamic(String storeProtocol, String storeId, String nodeId) throws Throwable;
 
 	/**
 	 * this method is called when a local object has ccm:remoterepositry aspect and the node should be stored localy
 	 * You can define which properties should be copied locally and which should be fetched dynamically by skipping them here
 	 */
-	public HashMap<String, Object> getPropertiesPersisting(String storeProtocol, String storeId, String nodeId) throws Throwable;
+	public Map<String, Object> getPropertiesPersisting(String storeProtocol, String storeId, String nodeId) throws Throwable;
 
 	public default boolean hasAspect(String storeProtocol, String storeId, String nodeId, String aspect){
 		return Arrays.asList(getAspects(storeProtocol,storeId,nodeId)).contains(aspect);
@@ -111,7 +109,7 @@ public interface NodeService {
 	
 	public void revertVersion(String nodeId, String verLbl) throws Exception;
 	
-	public HashMap<String, HashMap<String,Object>> getVersionHistory(String nodeId) throws Throwable;
+	public Map<String, Map<String, Object>> getVersionHistory(String nodeId) throws Throwable;
 
 	@NonNull
 	List<String> getVersionLabelsHistory(String nodeId);
@@ -136,7 +134,7 @@ public interface NodeService {
 
 	public void removeAspect(String nodeId, String aspect);
 
-    public void updateNodeNative(String nodeId, HashMap<String, ?> _props);
+    public void updateNodeNative(String nodeId, Map<String, ?> _props);
 
 	public void removeProperty(String storeProtocol, String storeId, String nodeId, String property);
 
@@ -159,10 +157,11 @@ public interface NodeService {
 	/**
 	 * Sets the properties for this node's template (inherit metadata to child nodes)
 	 * Should only be supported for folder types
+	 *
 	 * @param nodeId
-	 * @param stringHashMap
+	 * @param properties
 	 */
-	void setTemplateProperties(String nodeId, HashMap<String,String[]> stringHashMap) throws Throwable;
+	void setTemplateProperties(String nodeId, Map<String, String[]> properties) throws Throwable;
 
 	/**
 	 * Set if the inherition of properties is enabled for this folder
@@ -179,7 +178,7 @@ public interface NodeService {
 
 	void setProperty(String protocol, String storeId, String nodeId, String property, Serializable value, boolean skipDefinitionChecks);
 
-    GetPreviewResult getPreview(String storeProtocol, String storeIdentifier, String nodeId, HashMap<String, Object> nodeProps, String version);
+    GetPreviewResult getPreview(String storeProtocol, String storeIdentifier, String nodeId, Map<String, Object> nodeProps, String version);
 
     Collection<org.edu_sharing.service.model.NodeRef> getFrontpageNodes() throws Throwable;
 
@@ -193,6 +192,9 @@ public interface NodeService {
 	 */
 	String publishCopy(String nodeId, HandleMode handleMode) throws Throwable;
 
+	default void createHandle(NodeRef nodeRef, List<String> publishedCopies, HandleMode handleMode) throws Exception {
+		throw new NotImplementedException();
+	}
 	/**
 	 * Get all published copies of this node
 	 * @return

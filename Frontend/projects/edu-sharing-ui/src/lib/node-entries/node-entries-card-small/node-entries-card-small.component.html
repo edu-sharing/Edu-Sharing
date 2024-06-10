@@ -1,7 +1,14 @@
 <div
-  class="grid-card"
-  [class.grid-card-collection]="nodeHelper.isNodeCollection(node)"
-  [class.dynamic-single-click]="entriesService.singleClickHint === 'dynamic'"
+  [class]="
+    'grid-card' +
+    (nodeHelper.isNodeCollection(node)
+      ? ' grid-card-collection grid-card-collection-scope-' +
+        node.collection.scope +
+        ' grid-card-collection-type-' +
+        node.collection.type
+      : '') +
+    (entriesService.singleClickHint === 'dynamic' ? ' dynamic-single-click' : '')
+  "
   [style.background-color]="nodeHelper.isNodeCollection(node) ? node.collection.color : null"
   (contextmenu)="openContextmenu($event)"
   (keydown.ContextMenu)="openContextmenu($event)"
@@ -12,7 +19,7 @@
     (click)="
       entriesService.clickItem.emit({
         element: node,
-        source: ClickSource.Overlay
+        source: ClickSource.Overlay,
       })
     "
   >
@@ -46,7 +53,7 @@
     (click)="
       entriesService.clickItem.emit({
         element: node,
-        source: ClickSource.Preview
+        source: ClickSource.Preview,
       })
     "
   >
@@ -72,7 +79,7 @@
     (click)="
       entriesService.clickItem.emit({
         element: node,
-        source: ClickSource.Metadata
+        source: ClickSource.Metadata,
       })
     "
   >

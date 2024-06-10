@@ -123,7 +123,7 @@ public class ApplicationInfoList {
 		/**
 		 * @TODO refactor calls to this methode so that hashmap building is not needed
 		 */
-		HashMap<String, ApplicationInfo> result = new HashMap<>();
+		Map<String, ApplicationInfo> result = new HashMap<>();
 		appInfos.getKeys().forEach(appId -> result.put(appId,appInfos.get(appId)));
 		return Collections.synchronizedMap(result);
 	}
@@ -199,7 +199,7 @@ public class ApplicationInfoList {
 	 */
 	public static ArrayList<ApplicationInfo> getRepositoryInfosOrdered(){
 		//set home reporsitory as the first one
-		ArrayList<ApplicationInfo> appInfoList = new ArrayList<ApplicationInfo>();
+		ArrayList<ApplicationInfo> appInfoList = new ArrayList<>();
 		for(String key : ApplicationInfoList.getApplicationInfos().keySet()){
 			ApplicationInfo repInfo = ApplicationInfoList.getApplicationInfos().get(key);
 			appInfoList.add(repInfo);

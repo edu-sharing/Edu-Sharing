@@ -14,7 +14,7 @@ import {
     MatAutocompleteSelectedEvent,
     MatAutocompleteTrigger,
 } from '@angular/material/autocomplete';
-import { MatChip, MatChipInputEvent, MatChipOption, MatChipRow } from '@angular/material/chips';
+import { MatChipInputEvent, MatChipOption, MatChipRow } from '@angular/material/chips';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateService } from '@ngx-translate/core';
 import * as rxjs from 'rxjs';
@@ -34,19 +34,24 @@ import {
 import { Toast, ToastType } from '../../../../../services/toast';
 import { UIHelper } from '../../../../../core-ui-module/ui-helper';
 import { MdsWidget, MdsWidgetType, MdsWidgetValue } from '../../../types/types';
-import { MdsEditorInstanceService, SuggestionGroup } from '../../mds-editor-instance.service';
+import { MdsEditorInstanceService } from '../../mds-editor-instance.service';
 import { DisplayValue } from '../DisplayValues';
-import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
+import {
+    MdsEditorWidgetBase,
+    MdsEditorWidgetChipsSuggestionBase,
+    ValueType,
+} from '../mds-editor-widget-base';
 import { MdsEditorWidgetContainerComponent } from '../mds-editor-widget-container/mds-editor-widget-container.component';
-import { RangedValueSuggestionData, SuggestionStatus } from 'ngx-edu-sharing-graphql';
 import { Helper } from '../../../../../core-module/rest/helper';
+import { SuggestionResponseDto, SuggestionStatus } from 'ngx-edu-sharing-api';
+import { AuthorityNamePipe } from '../../../../../shared/pipes/authority-name.pipe';
 
 @Component({
     templateUrl: './mds-editor-widget-chips.component.html',
     styleUrls: ['./mds-editor-widget-chips.component.scss'],
 })
 export class MdsEditorWidgetChipsComponent
-    extends MdsEditorWidgetBase
+    extends MdsEditorWidgetChipsSuggestionBase
     implements OnInit, AfterViewInit
 {
     @ViewChild('input') input: ElementRef<HTMLInputElement>;
@@ -59,9 +64,6 @@ export class MdsEditorWidgetChipsComponent
     readonly valueType: ValueType = ValueType.MultiValue;
     readonly separatorKeysCodes: number[] = [ENTER, COMMA];
     inputControl = new UntypedFormControl();
-    chipsControl: UntypedFormControl;
-    // holds suggestions from users or automatic generated data
-    chipsSuggestions: SuggestionGroup[];
     autocompleteValues: Observable<DisplayValue[]>;
     shouldShowNoMatchingValuesNotice: Observable<boolean>;
     indeterminateValues$: BehaviorSubject<string[]>;
@@ -93,7 +95,7 @@ export class MdsEditorWidgetChipsComponent
             [
                 ...((await this.widget.getInitalValuesAsync()).jointValues ?? []),
                 ...((await this.widget.getInitalValuesAsync()).individualValues ?? []),
-            ].map((value) => this.toDisplayValues(value)),
+            ].map((value) => this.toDisplayValue(value)),
             this.getStandardValidators(),
         );
         this.widget
@@ -103,19 +105,10 @@ export class MdsEditorWidgetChipsComponent
                 this.chipsControl.setValue(await this.getInitialValues());
             });
 
-        this.chipsSuggestions =
-            this.widget
-                .getSuggestions()
-                ?.filter((s) => s.data.info.status === SuggestionStatus.Pending)
-                .map((s) => {
-                    s.displayValue = this.toDisplayValues(
-                        (s.data as RangedValueSuggestionData).value.value,
-                    );
-                    return s;
-                }) ?? [];
         this.indeterminateValues$ = new BehaviorSubject(
             (await this.widget.getInitalValuesAsync()).individualValues,
         );
+        super.initSuggestions();
         if (
             this.widget.definition.type === MdsWidgetType.MultiValueBadges ||
             this.widget.definition.type === MdsWidgetType.MultiValueSuggestBadges
@@ -161,9 +154,9 @@ export class MdsEditorWidgetChipsComponent
         this.indeterminateValues$.subscribe((indeterminateValues) =>
             this.widget.setIndeterminateValues(indeterminateValues),
         );
-        this.widget.addValue.subscribe((value: MdsWidgetValue) =>
-            this.add(this.toDisplayValues(value)),
-        );
+        this.widget.addValue.subscribe((value: MdsWidgetValue) => {
+            this.add(this.toDisplayValue(value));
+        });
         this.registerValueChanges(this.chipsControl);
     }
 
@@ -171,7 +164,7 @@ export class MdsEditorWidgetChipsComponent
         return [
             ...((await this.widget.getInitalValuesAsync()).jointValues ?? []),
             ...((await this.widget.getInitalValuesAsync()).individualValues ?? []),
-        ].map((value) => this.toDisplayValues(value));
+        ].map((value) => this.toDisplayValue(value));
     }
 
     ngAfterViewInit(): void {
@@ -201,7 +194,7 @@ export class MdsEditorWidgetChipsComponent
         }
         const value = (event.value || '').trim();
         if (value) {
-            this.add(this.toDisplayValues(value));
+            this.add(this.toDisplayValue(value));
         }
         this.inputControl.setValue(null);
     }
@@ -259,9 +252,6 @@ export class MdsEditorWidgetChipsComponent
         this.removeFromIndeterminateValues(toBeRemoved.key);
         this.inhibitAutocomplete();
     }
-    removeSuggestion(toBeRemoved: SuggestionGroup): void {
-        this.updateSuggestionState(toBeRemoved, SuggestionStatus.Declined);
-    }
 
     selected(event: MatAutocompleteSelectedEvent) {
         this.add(event.option.value);
@@ -271,15 +261,6 @@ export class MdsEditorWidgetChipsComponent
 
     focus() {
         this.input?.nativeElement?.focus();
-    }
-    addSuggestion(suggestion: SuggestionGroup) {
-        this.add(suggestion.displayValue);
-        this.updateSuggestionState(suggestion, SuggestionStatus.Accepted);
-    }
-    updateSuggestionState(suggestion: SuggestionGroup, status: SuggestionStatus) {
-        suggestion.status = status;
-        this.mdsEditorInstance.updateSuggestionState(suggestion);
-        this.chipsSuggestions.splice(this.chipsSuggestions.indexOf(suggestion), 1);
     }
     add(value: DisplayValue): void {
         if (this.widget.definition.type === MdsWidgetType.SingleValueSuggestBadges) {
@@ -304,14 +285,6 @@ export class MdsEditorWidgetChipsComponent
             return value.label + ` (${this.translate.instant('MDS.DELETE_KEY_NOTICE')})`;
         }
     }
-    getSuggestionTooltip(suggestion: SuggestionGroup): string | null {
-        return `${this.translate.instant('MDS.SUGGESTION_TOOLTIP', {
-            value: suggestion.displayValue.label,
-            // @TODO
-            creator: suggestion.suggestion.id,
-        })}`;
-    }
-
     /**
      * Prevent the auto-complete panel from quickly opening and closing.
      *
@@ -399,7 +372,7 @@ export class MdsEditorWidgetChipsComponent
         );
     }
 
-    private toDisplayValues(value: MdsWidgetValue | string): DisplayValue {
+    toDisplayValue(value: MdsWidgetValue | string): DisplayValue {
         if (typeof value === 'string') {
             const knownValue = this.widget.definition.values?.find((v) => v.id === value);
             if (!knownValue && this.widget.getInitialDisplayValues().value) {
@@ -433,7 +406,7 @@ export class MdsEditorWidgetChipsComponent
         return from(this.widget.getSuggestedValues(filterString)).pipe(
             map((suggestedValues) =>
                 suggestedValues
-                    .map((suggestedValue) => this.toDisplayValues(suggestedValue))
+                    .map((suggestedValue) => this.toDisplayValue(suggestedValue))
                     .filter((suggestedValue) =>
                         selectedValues.every(
                             (selectedValue) => suggestedValue.key !== selectedValue.key,
@@ -450,80 +423,9 @@ export class MdsEditorWidgetChipsComponent
             this.autocompleteIsInhibited.next(false);
         });
     }
-
-    getSuggestions() {
-        return this.chipsSuggestions?.filter(
-            (s) =>
-                !this.chipsControl.value.filter((s1: DisplayValue) => s1.key === s.displayValue.key)
-                    .length,
-        );
-    }
-    public static mapGraphqlSuggestionId(definition: MdsWidget) {
-        const id = MdsEditorWidgetBase.mapGraphqlId(definition)?.[0];
-        if (id) {
-            return [
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('value');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('info');
-                    a.push('status');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('version');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('info');
-                    a.push('editor');
-                    return a;
-                }),
-            ];
-        }
-        return [];
-    }
 }
 @Component({
     templateUrl: './mds-editor-widget-chips.component.html',
     styleUrls: ['./mds-editor-widget-chips.component.scss'],
 })
-export class MdsEditorWidgetChipsRangedValueComponent extends MdsEditorWidgetChipsComponent {
-    public static mapGraphqlId(definition: MdsWidget) {
-        // attach the "RangedValue" graphql Attributes
-        return MdsEditorWidgetBase.attachGraphqlSelection(definition, ['id', 'value']);
-    }
-    public static mapGraphqlSuggestionId(definition: MdsWidget) {
-        const id = MdsEditorWidgetBase.mapGraphqlId(definition)?.[0];
-        if (id) {
-            return [
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('value');
-                    a.push('id');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('value');
-                    a.push('value');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('info');
-                    a.push('status');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('version');
-                    return a;
-                }),
-                MdsEditorInstanceService.mapGraphqlField(id, (a) => {
-                    a.push('info');
-                    a.push('editor');
-                    return a;
-                }),
-            ];
-        }
-        return [];
-    }
-}
+export class MdsEditorWidgetChipsRangedValueComponent extends MdsEditorWidgetChipsComponent {}

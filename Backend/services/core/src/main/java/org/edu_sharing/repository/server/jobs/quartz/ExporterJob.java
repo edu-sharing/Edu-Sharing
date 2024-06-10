@@ -44,7 +44,7 @@ public class ExporterJob extends AbstractJob {
 			
 				ApplicationInfo appInfo = ApplicationInfoList.getHomeRepository();
 				
-				HashMap<String, String> authInfo = new AuthenticationToolAPI().createNewSession(appInfo.getUsername(), appInfo.getPassword());
+				Map<String, String> authInfo = new AuthenticationToolAPI().createNewSession(appInfo.getUsername(), appInfo.getPassword());
 				MCAlfrescoAPIClient apiClient = new MCAlfrescoAPIClient(authInfo);
 				String[] nodeIds = apiClient.searchNodeIds(luceneFilter);
 

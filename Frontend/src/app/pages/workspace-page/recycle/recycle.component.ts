@@ -125,13 +125,17 @@ export class RecycleMainComponent implements OnInit, AfterViewInit, OnDestroy {
             o.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         });
         this.searchField
-            .getCurrentInstance()
-            .onSearchTriggered()
+            .observeCurrentInstance()
             .pipe(takeUntil(this.destroyed))
-            .subscribe(({ searchString }) => {
-                this.searchQuery = searchString;
-                this.refresh();
-            });
+            .subscribe((instance) =>
+                instance
+                    .onSearchTriggered()
+                    .pipe(takeUntil(this.destroyed))
+                    .subscribe(({ searchString }) => {
+                        this.searchQuery = searchString;
+                        this.refresh();
+                    }),
+            );
     }
 
     ngAfterViewInit(): void {

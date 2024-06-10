@@ -2,7 +2,7 @@ import { trigger } from '@angular/animations';
 import { Component, HostListener, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { UserService } from 'ngx-edu-sharing-api';
+import { ConfigService, UserService } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     AppContainerService,
@@ -26,7 +26,7 @@ import {
 } from 'ngx-edu-sharing-ui';
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { delay, first, map, takeUntil } from 'rxjs/operators';
+import { delay, first, map, take, takeUntil } from 'rxjs/operators';
 import {
     ConfigurationService,
     Connector,
@@ -68,6 +68,8 @@ import { WorkspaceExplorerComponent } from './explorer/explorer.component';
 import { WorkspaceTreeComponent } from './tree/tree.component';
 import { canDragDrop, canDropOnNode } from './workspace-utils';
 import { WorkspaceService } from './workspace.service';
+import { ThemeService } from '../../services/theme.service';
+import { RecycleMainComponent } from './recycle/recycle.component';
 
 @Component({
     selector: 'es-workspace-page',
@@ -102,6 +104,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
     @ViewChild('explorer') explorer: WorkspaceExplorerComponent;
 
     @ViewChild(WorkspaceTreeComponent) treeComponent: WorkspaceTreeComponent;
+    @ViewChild(RecycleMainComponent) recycleMainComponent: RecycleMainComponent;
     @ViewChild('actionbar') actionbarRef: ActionbarComponent;
 
     cardHasOpenModals$: Observable<boolean>;
@@ -199,6 +202,8 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
         private toolService: RestToolService,
         private translate: TranslateService,
         private translations: TranslationsService,
+        private configService: ConfigService,
+        private themeService: ThemeService,
         private ui: UIService,
         private workspace: WorkspaceService,
     ) {
@@ -481,6 +486,13 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
         this.connector.scope = this.isSafe ? RestConstants.SAFE_SCOPE : null;
         this.isLoggedIn = true;
         this.globalProgress = false;
+
+        if (this.isSafe) {
+            const config = await this.configService.observeConfig().pipe(take(1)).toPromise();
+            if (config.themeColors?.colorSafe) {
+                this.themeService.applyFromConfigColors(config.themeColors.colorSafe);
+            }
+        }
     }
 
     private handleQueryParamsUpdate(params: Params) {
@@ -583,8 +595,8 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
         const id = this.currentFolder
             ? this.currentFolder.ref.id
             : this.searchQuery && this.searchQuery.node
-            ? this.searchQuery.node.ref.id
-            : null;
+              ? this.searchQuery.node.ref.id
+              : null;
         void this.routeTo(this.root, id, event.searchString);
         if (!event.cleared) {
             this.ui.hideKeyboardIfMobile();
@@ -667,15 +679,15 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
     }
 
     setSelection(nodes: Node[]) {
-        this.explorer.nodeEntries.getSelection().clear();
-        this.explorer.nodeEntries.getSelection().select(...nodes);
+        this.explorer?.nodeEntries.getSelection().clear();
+        this.explorer?.nodeEntries.getSelection().select(...nodes);
         this.setFixMobileNav();
     }
 
     private setFixMobileNav() {
         this.mainNavService
             .getMainNav()
-            .setFixMobileElements(this.explorer.nodeEntries.getSelection().selected?.length > 0);
+            .setFixMobileElements(this.explorer?.nodeEntries.getSelection().selected?.length > 0);
     }
 
     private closeMetadata() {

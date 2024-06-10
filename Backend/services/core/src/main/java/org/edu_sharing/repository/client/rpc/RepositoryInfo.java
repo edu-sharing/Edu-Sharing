@@ -29,6 +29,7 @@ package org.edu_sharing.repository.client.rpc;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author rudolph
@@ -38,7 +39,7 @@ public class RepositoryInfo implements Serializable {
 	/**
 	 * repositoryId, repository Properties
 	 */
-	HashMap<String, HashMap<String,String>> repInfoMap;
+	Map<String, Map<String,String>> repInfoMap;
 
 	/**
 	 * Help URLs
@@ -57,14 +58,14 @@ public class RepositoryInfo implements Serializable {
 	/**
 	 * @return the repInfoMap
 	 */
-	public HashMap<String, HashMap<String, String>> getRepInfoMap() {
+	public Map<String, Map<String, String>> getRepInfoMap() {
 		return repInfoMap;
 	}
 
 	/**
 	 * @param repInfoMap the repInfoMap to set
 	 */
-	public void setRepInfoMap(HashMap<String, HashMap<String, String>> repInfoMap) {
+	public void setRepInfoMap(Map<String, Map<String, String>> repInfoMap) {
 		this.repInfoMap = repInfoMap;
 	}
 

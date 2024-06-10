@@ -13,7 +13,7 @@ public class StatisticRequest {
 	
 	Filter filter;
 	
-	List<String> properties = new ArrayList<String>();
+	List<String> properties = new ArrayList<>();
 	
 	@Schema(required = true, description = "")
 	@JsonProperty("filter")

@@ -177,7 +177,7 @@ public class UpdaterService implements ApplicationContextAware, ApplicationListe
         currentlyRunningUpdates.add(x.getId());
         try {
             Protocol protocol = beanFactory.getBean(Protocol.class);
-            HashMap<String, Object> updateInfo = protocol.getSysUpdateEntry(x.getId());
+            Map<String, Object> updateInfo = protocol.getSysUpdateEntry(x.getId());
             if (updateInfo != null) {
                 log.info("Update" + x.getId() + " already done at " + updateInfo.get(CCConstants.CCM_PROP_SYSUPDATE_DATE));
                 return;

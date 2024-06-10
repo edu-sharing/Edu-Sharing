@@ -84,7 +84,7 @@ public class OAILOMExporterHSOER extends OAILOMExporter {
                         for(MetadataKey metadataKey : valuesAsMap.values()){
                             if(metadataKey.getKey().equals(university)){
 
-                                HashMap<String,String> map = new HashMap<>();
+                                Map<String,String> map = new HashMap<>();
                                 map.put(CCConstants.VCARD_ORG,metadataKey.getCaption());
                                 map.put(CCConstants.VCARD_URL,"https://"+university);
 

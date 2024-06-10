@@ -207,7 +207,7 @@ public class StatisticDao {
 			for (org.edu_sharing.service.statistic.StatisticEntry entry : statisticsBackend.getEntries()) {
 				StatisticEntry statEntry = new StatisticEntry();
 				statEntry.setProperty(entry.getProperty());
-				List<StatisticEntity> entities = new ArrayList<StatisticEntity>();
+				List<StatisticEntity> entities = new ArrayList<>();
 				for (Map.Entry<String, Integer> statEntity : entry.getStatistic().entrySet()) {
 					StatisticEntity entity = new StatisticEntity();
 					entity.setValue(statEntity.getKey());

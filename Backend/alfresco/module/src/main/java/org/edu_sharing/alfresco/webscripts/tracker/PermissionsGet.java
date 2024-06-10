@@ -70,7 +70,7 @@ public class PermissionsGet extends DeclarativeWebScript {
                     "Parameter 'aclIds' must hold from 1 or more IDs.");
         }
 
-        aclIds = new ArrayList<Long>(aclIdsJSON.length());
+        aclIds = new ArrayList<>(aclIdsJSON.length());
         for (int i = 0; i < aclIdsJSON.length(); i++)
         {
             aclIds.add(aclIdsJSON.getLong(i));
@@ -103,7 +103,7 @@ public class PermissionsGet extends DeclarativeWebScript {
         }
 
 
-        Map<String, Object> model = new HashMap<String, Object>(1, 1.0f);
+        Map<String, Object> model = new HashMap<>(1, 1.0f);
         model.put("accessControlLists", accessControlLists);
 
         if (logger.isDebugEnabled())

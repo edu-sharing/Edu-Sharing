@@ -128,7 +128,7 @@ public class RepairBrockhausRemoteIosJob extends AbstractJob{
 				SearchResultNodeRef results = searchServiceBrockhaus.search(null, MetadataSet.DEFAULT_CLIENT_QUERY, criteria, token);
 				String finalDescription = (String) description;
 				List<NodeRef> filtered = results.getData().stream().filter(r -> {
-					HashMap<String, Object> props = r.getProperties();
+					Map<String, Object> props = r.getProperties();
 					return
 							(
 									Objects.equals(props.get(CCConstants.LOM_PROP_GENERAL_TITLE), title) &&

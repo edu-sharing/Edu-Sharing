@@ -125,7 +125,7 @@ public class RecordHandlerKeywordsDNBMarc implements RecordHandlerInterface{
     }
 
     @Override
-    public HashMap<String, Object> getProperties() {
+    public Map<String, Object> getProperties() {
         return toSafeMap;
     }
 }

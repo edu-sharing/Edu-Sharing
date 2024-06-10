@@ -8,11 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -45,7 +41,7 @@ public class NodeServiceLAppsImpl extends NodeServiceAdapter{
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
+	public Map<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
 
 		String path = "getappbyid="+nodeId;
 
@@ -77,8 +73,8 @@ public class NodeServiceLAppsImpl extends NodeServiceAdapter{
 		return getPropertiesForNode(this.appId,map);
    }
 
-	public static HashMap<String,Object> getPropertiesForNode(String appId, NamedNodeMap map) {
-		HashMap<String,Object> properties=new HashMap<>();
+	public static Map<String,Object> getPropertiesForNode(String appId, NamedNodeMap map) {
+		Map<String,Object> properties=new HashMap<>();
 		properties.put(CCConstants.SYS_PROP_NODE_UID,map.getNamedItem("id").getNodeValue());
 		properties.put(CCConstants.LOM_PROP_GENERAL_TITLE,map.getNamedItem("title").getNodeValue());
 		

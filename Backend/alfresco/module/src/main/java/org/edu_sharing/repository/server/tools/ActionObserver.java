@@ -49,7 +49,7 @@ public class ActionObserver {
 	}
 
 	public Map<NodeRef, List<Action>> nodeActionsMap = Collections
-			.synchronizedMap(new HashMap<NodeRef, List<Action>>());
+			.synchronizedMap(new HashMap<>());
 
 	/**
 	 * calls removeInactiveActions
@@ -70,7 +70,7 @@ public class ActionObserver {
 		List<Action> actions = nodeActionsMap.get(nodeRef);
 		if (actions == null) {
 			synchronized (nodeActionsMap) {
-				actions = Collections.synchronizedList(new ArrayList<Action>());
+				actions = Collections.synchronizedList(new ArrayList<>());
 				nodeActionsMap.put(nodeRef, actions);
 			}
 		}
@@ -115,7 +115,7 @@ public class ActionObserver {
 		RunAsWork<Void> runAs = new RunAsWork<Void>() {
 			@Override
 			public Void doWork() throws Exception {
-				ArrayList<NodeRef> toRemove = new ArrayList<NodeRef>();
+				ArrayList<NodeRef> toRemove = new ArrayList<>();
 
 				synchronized (nodeActionsMap) {
 					for (Map.Entry<NodeRef, List<Action>> entry : nodeActionsMap.entrySet()) {
@@ -142,7 +142,7 @@ public class ActionObserver {
 						if (entry.getValue() != null && entry.getValue().size() > 0) {
 
 							List<Action> actions = entry.getValue();
-							List<Action> toRemoveActions = new ArrayList<Action>();
+							List<Action> toRemoveActions = new ArrayList<>();
 
 							for (Action action : actions) {
 								Date addDate = (Date) action.getParameterValue(ACTION_OBSERVER_ADD_DATE);

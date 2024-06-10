@@ -9,15 +9,18 @@ import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.*;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -69,6 +72,17 @@ public class ConfigurationPropertiesAnnotationProcessor implements BeanDefinitio
 
             rootBeanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             rootBeanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+            if(beanDefinition instanceof AnnotatedBeanDefinition){
+                AnnotatedBeanDefinition annotatedBeanDefinition = (AnnotatedBeanDefinition) beanDefinition;
+                String scope = annotatedBeanDefinition
+                        .getMetadata()
+                        .getAnnotations()
+                        .get(Scope.class)
+                        .getValue("scopeName", String.class)
+                        .orElse(BeanDefinition.SCOPE_SINGLETON);
+                rootBeanDefinition.setScope(scope);
+            }
+
             registry.registerBeanDefinition(beanDefinition.getBeanClassName(), rootBeanDefinition);
         }
     }

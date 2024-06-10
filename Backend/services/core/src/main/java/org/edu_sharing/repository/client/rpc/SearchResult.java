@@ -32,7 +32,7 @@ import org.edu_sharing.metadataset.v2.SearchCriterias;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SearchResult extends Result<HashMap<String, HashMap<String, Object>>>{
+public class SearchResult extends Result<Map<String, Map<String, Object>>>{
 	
 	Map<String,Map<String,Integer>> countedProps = null;
 	
@@ -42,15 +42,15 @@ public class SearchResult extends Result<HashMap<String, HashMap<String, Object>
 		
 	}
 	
-	public HashMap<String, HashMap<String, Object>> getData() {
+	public Map<String, Map<String, Object>> getData() {
 		return data;
 	}
-	public void setData(HashMap<String, HashMap<String, Object>> data) {
+	public void setData(Map<String, Map<String, Object>> data) {
 		this.data = data;
 	}
 	
 	/**
-	 * HashMap<property, HashMap<value, count>>
+	 * Map<property, Map<value, count>>
 	 * @return
 	 */
 	public Map<String, Map<String, Integer>> getCountedProps() {

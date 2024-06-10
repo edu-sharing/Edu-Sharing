@@ -72,16 +72,16 @@ public class NotificationServiceImpl implements NotificationService {
 			);
 		}
         try {
-            HashMap<String, Object> userProps = NodeServiceHelper.getProperties(AuthorityServiceFactory.getLocalService().getAuthorityNodeRef(AuthenticationUtil.getFullyAuthenticatedUser()));
+            Map<String, Object> userProps = NodeServiceHelper.getProperties(AuthorityServiceFactory.getLocalService().getAuthorityNodeRef(AuthenticationUtil.getFullyAuthenticatedUser()));
             MailTemplate.applyNodePropertiesToMap("user.", userProps, replace);
             SearchResult<EduGroup> orgList = SearchServiceFactory.getLocalService().getAllOrganizations(true);
             if(!orgList.getData().isEmpty()) {
-                HashMap<String, Object> orgProps = NodeServiceHelper.getProperties(AuthorityServiceFactory.getLocalService().getAuthorityNodeRef(orgList.getData().get(0).getGroupname()));
+                Map<String, Object> orgProps = NodeServiceHelper.getProperties(AuthorityServiceFactory.getLocalService().getAuthorityNodeRef(orgList.getData().get(0).getGroupname()));
                 MailTemplate.applyNodePropertiesToMap("user.organization.", orgProps, replace);
             }
             List<String> mzList = SearchServiceFactory.getLocalService().getAllMediacenters();
             if(!mzList.isEmpty()) {
-                HashMap<String, Object> mzProps = NodeServiceHelper.getProperties(AuthorityServiceFactory.getLocalService().getAuthorityNodeRef(mzList.get(0)));
+                Map<String, Object> mzProps = NodeServiceHelper.getProperties(AuthorityServiceFactory.getLocalService().getAuthorityNodeRef(mzList.get(0)));
                 MailTemplate.applyNodePropertiesToMap("user.mediacenter.", mzProps, replace);
             }
         } catch (Throwable ignored) {

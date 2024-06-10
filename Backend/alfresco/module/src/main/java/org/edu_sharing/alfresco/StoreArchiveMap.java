@@ -72,7 +72,7 @@ public class StoreArchiveMap extends org.alfresco.repo.node.StoreArchiveMap{
 		
 	    public StoreArchiveMap()
 	    {
-	    	storeArchiveMap = new HashMap<StoreRef, StoreRef>(0);
+	    	storeArchiveMap = new HashMap<>(0);
 	    	logger.info("archiving of Nodes is disabled by this class");
 	    }
 	    

@@ -182,7 +182,7 @@ public class Usage implements Serializable {
     
     
 	public Map<String,String> toMap(){
-		Map<String,String> result = new HashMap<String,String>();
+		Map<String,String> result = new HashMap<>();
 		result.put(CCConstants.CCM_PROP_USAGE_APPID, this.getLmsId());
 		result.put(CCConstants.CCM_PROP_USAGE_APPUSER, this.getAppUser());
 		result.put(CCConstants.CCM_PROP_USAGE_APPUSERMAIL, this.getAppUserMail());

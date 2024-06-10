@@ -27,12 +27,12 @@
  */
 package org.edu_sharing.repository.server;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
 public interface AuthenticationTool {
-	public HashMap<String, String> createNewSession(String userName, String password) throws Exception;
+	 Map<String, String> createNewSession(String userName, String password) throws Exception;
 
 	/**
 	 * username and ticket are stored in a ThreadLocal variable in Both implementations API and WS Client
@@ -43,9 +43,9 @@ public interface AuthenticationTool {
 	 * @return
 	 * @throws Exception
 	 */
-	public HashMap<String, String> getUserInfo(String userName, String ticket) throws Exception;
+	 Map<String, String> getUserInfo(String userName, String ticket) throws Exception;
 	
-	public void logout(String ticket);
+	 void logout(String ticket);
 
 	/**
 	 * 
@@ -59,7 +59,7 @@ public interface AuthenticationTool {
 	 * @param ticket
 	 * @param session
 	 */
-	public void storeAuthInfoInSession(String username, String ticket, String authType, HttpSession session);
+	 void storeAuthInfoInSession(String username, String ticket, String authType, HttpSession session);
 	
 	/**
 	 * returns validated AuthenticationInfo
@@ -67,26 +67,26 @@ public interface AuthenticationTool {
 	 * @param session
 	 * @return
 	 */
-	public HashMap<String,String> validateAuthentication(HttpSession session);
+	 Map<String,String> validateAuthentication(HttpSession session);
 	
 	/**
 	 * returns AuthenticationInfo without validation
 	 * @param session
 	 * @return
 	 */
-	public HashMap<String,String> getAuthentication(HttpSession session);
+	 Map<String,String> getAuthentication(HttpSession session);
 	
 	/**
 	 * 
 	 * @param session
 	 * @return
 	 */
-	public String getTicketFromSession(HttpSession session);
+	 String getTicketFromSession(HttpSession session);
 	
 	/**
 	 * 
 	 * @param ticket
 	 * @return
 	 */
-	public boolean validateTicket(String ticket);
+	 boolean validateTicket(String ticket);
 }

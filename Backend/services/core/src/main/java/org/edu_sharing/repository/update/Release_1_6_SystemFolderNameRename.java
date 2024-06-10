@@ -44,8 +44,8 @@ public class Release_1_6_SystemFolderNameRename {
             for (String user : users) {
                 log.info("processing user:" + user);
                 String homefolderId = mcAlfrescoBaseClient.getHomeFolderID(user);
-                HashMap<String, HashMap<String, Object>> children = mcAlfrescoBaseClient.getChildren(homefolderId);
-                for (Map.Entry<String, HashMap<String, Object>> entry : children.entrySet()) {
+                Map<String, Map<String, Object>> children = mcAlfrescoBaseClient.getChildren(homefolderId);
+                for (Map.Entry<String, Map<String, Object>> entry : children.entrySet()) {
                     String mapType = (String) entry.getValue().get(CCConstants.CCM_PROP_MAP_TYPE);
                     String folderId = (String) entry.getValue().get(CCConstants.SYS_PROP_NODE_UID);
                     if (mapType != null) {
@@ -68,7 +68,7 @@ public class Release_1_6_SystemFolderNameRename {
         }
     }
 
-    private void updateFolder(String folderId, HashMap suroundingNodes, String i8nKey, boolean test) throws Exception {
+    private void updateFolder(String folderId, Map<String, Map<String, Object>>  suroundingNodes, String i8nKey, boolean test) throws Exception {
 
         HashMap newProps = new HashMap();
 

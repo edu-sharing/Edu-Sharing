@@ -2,7 +2,7 @@ package org.edu_sharing.repository.client.tools;
 
 import java.util.*;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
 public class CCConstants {
 
@@ -947,6 +947,10 @@ public class CCConstants {
 	public final static String CCM_VALUE_TOOLPERMISSION_RATE_READ = "TOOLPERMISSION_RATE_READ";
 
 
+	public final static String CCM_VALUE_TOOLPERMISSION_SUGGESTION_WRITE = "TOOLPERMISSION_SUGGESTION_WRITE";
+	public final static String CCM_VALUE_TOOLPERMISSION_SUGGESTION_READ = "TOOLPERMISSION_SUGGESTION_READ";
+
+
 	public final static String CCM_VALUE_TOOLPERMISSION_MANAGE_RELATIONS = "TOOLPERMISSION_MANAGE_RELATIONS";
 
 	public final static String CCM_VALUE_TOOLPERMISSION_VIDEO_AUDIO_CUT = "TOOLPERMISSION_VIDEO_AUDIO_CUT";
@@ -1025,9 +1029,9 @@ public class CCConstants {
     public static final String TEMPLATE_NODE_NAME = ".METADATA_TEMPLATE";
 
 
-    private static HashMap<String,String> lifecycleContributerPropsMap = new HashMap<String,String>();
+    private static Map<String,String> lifecycleContributerPropsMap = new HashMap<>();
 
-	public static HashMap<String, String> getLifecycleContributerPropsMap() {
+	public static Map<String, String> getLifecycleContributerPropsMap() {
 		if(lifecycleContributerPropsMap.size() == 0){
 			lifecycleContributerPropsMap.put("publisher", CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_PUBLISHER);
 			lifecycleContributerPropsMap.put("unknown", CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_UNKNOWN);
@@ -1117,9 +1121,9 @@ public class CCConstants {
 		return  getLifecycleContributerPropsMap().get(role);
 	}
 
-	private static HashMap<String,String> metadataContributerPropsMap = new HashMap<String,String>();
+	private static Map<String,String> metadataContributerPropsMap = new HashMap<>();
 
-	public static HashMap<String, String> getMetadataContributerPropsMap() {
+	public static Map<String, String> getMetadataContributerPropsMap() {
 		if(metadataContributerPropsMap.size() == 0){
 			metadataContributerPropsMap.put("creator", CCM_PROP_IO_REPL_METADATACONTRIBUTER_CREATOR);
 			metadataContributerPropsMap.put("provider", CCM_PROP_IO_REPL_METADATACONTRIBUTER_PROVIDER);
@@ -1618,7 +1622,7 @@ public class CCConstants {
 
 	public static ArrayList<String> getDetailPropList(){
 		if(detailsProps == null){
-			detailsProps = new ArrayList<String>();
+			detailsProps = new ArrayList<>();
 			detailsProps.add(CM_PROP_C_TITLE);
 			detailsProps.add(CM_PROP_C_CREATOR);
 			detailsProps.add(CM_PROP_C_CREATED);
@@ -1932,7 +1936,7 @@ public class CCConstants {
 
 	public static Map<String,String> getLicenseMap(){
 		if(licenseMap == null) {
-			licenseMap = new HashMap<String,String>();
+			licenseMap = new HashMap<>();
 			licenseMap.put(CCConstants.COMMON_LICENSE_CC_BY_SA_LINK.split("\\$")[0],CCConstants.COMMON_LICENSE_CC_BY_SA);
 			licenseMap.put(CCConstants.COMMON_LICENSE_CC_BY_LINK.split("\\$")[0],CCConstants.COMMON_LICENSE_CC_BY);
 			licenseMap.put(CCConstants.COMMON_LICENSE_CC_BY_ND_LINK.split("\\$")[0],CCConstants.COMMON_LICENSE_CC_BY_ND);
@@ -1982,14 +1986,14 @@ public class CCConstants {
 		return permission;
 	}
 
-	private static ArrayList<String> usagePermissions = null;
+	private static HashSet<String> usagePermissions = null;
 	/**
 	 * Permissions allowed if the node was opened via usage (lms) or signature
 	 * @return
 	 */
-	public static synchronized List<String> getUsagePermissions(){
+	public static synchronized Set<String> getUsagePermissions(){
 		if(usagePermissions == null){
-				usagePermissions = new ArrayList<>();
+			usagePermissions = new HashSet<>();
 				usagePermissions.add(PERMISSION_READ);
 				usagePermissions.add(PERMISSION_READ_PREVIEW);
 				usagePermissions.add(PERMISSION_READ_ALL);
@@ -1998,7 +2002,7 @@ public class CCConstants {
 				usagePermissions.add(PERMISSION_RATE);
 				usagePermissions.add(PERMISSION_RATE_READ);
 		}
-		return unmodifiableList(usagePermissions);
+		return unmodifiableSet(usagePermissions);
 	}
 
 	//AuthorityTypeKey
@@ -2115,14 +2119,14 @@ public class CCConstants {
 
 	public static final String CC_CACHE_MILLISECONDS_KEY = "CC_CACHE_MILLISECONDS_KEY";
 
-	private static HashMap<String, String> nameSpaceMap = null;
+	private static Map<String, String> nameSpaceMap = null;
 
     /**
 	 * @return <namespace,localnamespace>
 	 */
-	public static HashMap<String, String> getNameSpaceMap() {
+	public static Map<String, String> getNameSpaceMap() {
 		if(nameSpaceMap == null){
-			nameSpaceMap = new HashMap<String, String>();
+			nameSpaceMap = new HashMap<>();
 			nameSpaceMap.put(NAMESPACE_CCM, NAMESPACE_SHORT_CCM);
 			nameSpaceMap.put(NAMESPACE_CM, NAMESPACE_SHORT_CM);
 			nameSpaceMap.put(NAMESPACE_LOM, NAMESPACE_SHORT_LOM);
@@ -2144,7 +2148,7 @@ public class CCConstants {
 
 		for(Map.Entry<String,String> entry: getNameSpaceMap().entrySet()){
 			if(value.contains(entry.getKey())){
-				String valMinusNamespace =  value.replaceAll("\\{"+entry.getKey()+"\\}","");
+				String valMinusNamespace =  value.replace("{"+entry.getKey()+"}","");
 				return entry.getValue()+":"+valMinusNamespace;
 			}
 		}
@@ -2157,11 +2161,9 @@ public class CCConstants {
 	 * @return
 	 */
 	public static String getValidGlobalName(String value){
-
 		for(Map.Entry<String,String> entry: getNameSpaceMap().entrySet()){
 			if(value.startsWith(entry.getValue())){
-				String valMinusNamespace =  value.replaceAll("^.+:", "");
-				return "{" + entry.getKey() + "}" + valMinusNamespace;
+				return "{" + entry.getKey() + "}" + value.substring(entry.getValue().length() + 1);
 			}
 		}
 		return null;

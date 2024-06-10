@@ -1,7 +1,6 @@
 package org.edu_sharing.service.license;
 
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.URLTool;
 
 public class LicenseService {
@@ -64,7 +63,7 @@ public class LicenseService {
 				result = result.replace("${version}", version);
 			}
 			
-			String country = (locale == null) ? "en" : locale.split("_")[0];
+			String country = (locale == null) ? "de" : locale.split("_")[0];
 			if(result.contains("${locale}")){
 				result = result.replace("${locale}", country);
 			}

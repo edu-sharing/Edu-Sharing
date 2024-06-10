@@ -475,7 +475,7 @@ public class WebDAVHelper
 
         // split the path
         StringTokenizer token = new StringTokenizer(path, PathSeperator);
-        List<String> results = new ArrayList<String>(10);
+        List<String> results = new ArrayList<>(10);
         while (token.hasMoreTokens())
         {
             results.add(token.nextToken());

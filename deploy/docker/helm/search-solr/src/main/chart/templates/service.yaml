@@ -60,11 +60,12 @@ spec:
 {{- end }}
 {{- if .Values.multistage.enabled }}
 {{- range .Values.multistage.stages }}
+{{ $stage := printf "%s-stage-%s" (include "edusharing_common_lib.names.name" $) .name }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "edusharing_common_lib.names.name" $ }}-headless-{{ .name }}
+  name: {{ $stage }}-headless
   labels: {{ include "edusharing_common_lib.labels.app" $ | nindent 4 }}
     app.kubernetes.io/stage: {{ .name }}
 spec:
@@ -81,7 +82,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "edusharing_common_lib.names.name" $ }}-metrics-{{ .name }}
+  name: {{ $stage }}-metrics
   labels: {{ include "edusharing_common_lib.labels.app" $ | nindent 4 }}
     app.kubernetes.io/component: "metrics"
     app.kubernetes.io/stage: {{ .name }}

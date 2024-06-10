@@ -22,5 +22,6 @@ import { WorkspacePageComponent } from './workspace-page.component';
         WorkspaceTreeComponent,
     ],
     imports: [SharedModule, WorkspacePageRoutingModule],
+    exports: [WorkspaceMetadataBlockComponent],
 })
 export class WorkspacePageModule {}

@@ -76,7 +76,7 @@ export class MdsEditorWidgetSearchSuggestionsComponent
                 // build up tree if not yet present
                 this.tree = Tree.generateTree(this.widget.definition.values);
             }
-            return this.tree.idToDisplayValue(suggestion.value).hint;
+            return this.tree.toDisplayValue(suggestion.value).hint;
         }
         return null;
     }

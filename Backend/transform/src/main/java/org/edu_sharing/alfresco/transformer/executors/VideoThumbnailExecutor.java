@@ -5,10 +5,9 @@ import org.alfresco.transform.base.executors.AbstractCommandExecutor;
 import org.alfresco.transform.base.executors.RuntimeExec;
 import org.alfresco.transform.base.util.CustomTransformerFileAdaptor;
 import org.alfresco.transform.common.RequestParamMap;
-import org.alfresco.transform.exceptions.TransformException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.edu_sharing.alfresco.transformer.extractors.VideoMetadataExtractor;
+import org.edu_sharing.alfresco.transformer.executors.tools.Commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -69,7 +68,7 @@ public class VideoThumbnailExecutor extends AbstractCommandExecutor implements C
     public void transform(String sourceMimetype, String targetMimetype, Map<String, String> transformOptions, File sourceFile, File targetFile, TransformManager transformManager) throws Exception {
         logger.info("sourceMimetype:"+sourceMimetype+" targetMimetype:"+targetMimetype+" sourceFile:"+sourceFile +" targetFile:"+targetFile);
         if(transformOptions != null)
-            transformOptions.entrySet().stream().forEach(e -> System.out.println("o:"+ e.getKey() + " "+e.getValue()));
+            transformOptions.forEach((key, value) -> System.out.println("o:" + key + " " + value));
 
         List<String> comandAndArgs = null;
         try {
@@ -89,7 +88,7 @@ public class VideoThumbnailExecutor extends AbstractCommandExecutor implements C
 
             Long timeout = stringToLong(transformOptions.get(RequestParamMap.TIMEOUT));
             //this.run(StringUtils.join(comandAndArgs," "),sourceFile,targetFile,timeout);
-            HashMap<String,String> options = new HashMap<>();
+            Map<String,String> options = new HashMap<>();
             options.put("options",StringUtils.join(comandAndArgs," "));
             this.run(options,targetFile,timeout);
         }catch (IOException e){
@@ -106,11 +105,7 @@ public class VideoThumbnailExecutor extends AbstractCommandExecutor implements C
 
     @Override
     protected RuntimeExec createCheckCommand() {
-        RuntimeExec runtimeExec = new RuntimeExec();
-        Map<String, String[]> commandsAndArguments = new HashMap<>();
-        commandsAndArguments.put(".*", new String[] { "ffmpeg", "-version" });
-        runtimeExec.setCommandsAndArguments(commandsAndArguments);
-        return runtimeExec;
+        return Commands.getFFMPegRuntimeExec();
     }
 
 }

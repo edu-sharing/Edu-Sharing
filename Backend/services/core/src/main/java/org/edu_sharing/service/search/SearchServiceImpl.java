@@ -161,7 +161,7 @@ public class SearchServiceImpl implements SearchService {
 					NodeServiceFactory.getNodeService(applicationId).getProperty(ref.getStoreRef().getProtocol(), ref.getStoreRef().getIdentifier(), ref.getId(), CCConstants.CM_PROP_AUTHORITY_AUTHORITYNAME)
 			).collect(Collectors.toList());
 		}else {
-			List<String> result = new ArrayList<String>();
+			List<String> result = new ArrayList<>();
 			for(String memberShip : memberships) {
 				NodeRef nodeRef = serviceRegistry.getAuthorityService().getAuthorityNodeRef(memberShip);
 				if(nodeRef != null && serviceRegistry.getNodeService().hasAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_MEDIACENTER))) {
@@ -199,7 +199,7 @@ public class SearchServiceImpl implements SearchService {
 				@Override
 				public SearchResult<EduGroup> doWork() throws Exception {
 					try {
-						List<EduGroup> result = new ArrayList<EduGroup>();
+						List<EduGroup> result = new ArrayList<>();
 						org.alfresco.service.cmr.search.SearchService searchService = serviceRegistry
 								.getSearchService();
 						SearchParameters parameters = new SearchParameters();
@@ -215,7 +215,7 @@ public class SearchServiceImpl implements SearchService {
 						//only search organisations the curren user is in,except: its adminuser and onlyMemberShips == true
 						StringBuilder additionalQuery=null;
 						if(onlyMemberShips) {
-							List<String> memberShibsOrg = new ArrayList<String>(); 
+							List<String> memberShibsOrg = new ArrayList<>();
 							if(memberships != null && memberships.size() > 0) {
 								for(String membershib : memberships) {
 									NodeRef authorityNodeRef = serviceRegistry.getAuthorityService().getAuthorityNodeRef(membershib);
@@ -261,12 +261,12 @@ public class SearchServiceImpl implements SearchService {
 						ResultSet edugroups = searchService.query(parameters);
 
 						for (ResultSetRow row : edugroups) {
-							HashMap<String, Object> entry = apiClient.getProperties(row.getNodeRef().getId());
+							Map<String, Object> entry = apiClient.getProperties(row.getNodeRef().getId());
 							String nodeRef = (String) entry.get(CCConstants.CCM_PROP_AUTHORITYCONTAINER_EDUHOMEDIR);
 							// when a group folder relation is removed the noderef can be null cause of async solr refresh
 							if (nodeRef != null) {
 								String nodeId = nodeRef.replace("workspace://SpacesStore/", "");
-								HashMap<String, Object> folderProps = apiClient.getProperties(nodeId);
+								Map<String, Object> folderProps = apiClient.getProperties(nodeId);
 								EduGroup eduGroup = new EduGroup();
 								eduGroup.setFolderId((String) folderProps.get(CCConstants.SYS_PROP_NODE_UID));
 								eduGroup.setFolderName((String) folderProps.get(CCConstants.CM_NAME));
@@ -355,7 +355,7 @@ public class SearchServiceImpl implements SearchService {
 				}, true);
 	}
 	private SearchResult<String> filterAndSortAuthorities(String[] data,String pattern,String authorityType,int skipCount, int maxValues,SortDefinition sort) throws Exception {
-		List<String> list2 = new ArrayList<String>();
+		List<String> list2 = new ArrayList<>();
 		if (authorityType != null && !authorityType.isEmpty()) {
 			for (String authority : data) {
 				if (authorityType.equals("GROUP")
@@ -456,11 +456,11 @@ public class SearchServiceImpl implements SearchService {
 							maxValues = 10;
 						}
 						
-						List<String> result = new ArrayList<String>();
+						List<String> result = new ArrayList<>();
 						if (globalSearch) {
 							checkGlobalSearchPermission();
 							PersonService personService = serviceRegistry.getPersonService();
-							List<QName> filters = new ArrayList<QName>();
+							List<QName> filters = new ArrayList<>();
 							filters.add(ContentModel.PROP_FIRSTNAME);
 							filters.add(ContentModel.PROP_LASTNAME);
 							filters.add(ContentModel.PROP_EMAIL);
@@ -622,7 +622,7 @@ public class SearchServiceImpl implements SearchService {
 		scParam.setMetadataSetQuery(query);
 		searchToken.setSearchCriterias(scParam);
 
-		HashMap<ContentType, SearchToken> lastTokens = getLastSearchTokens();
+		Map<ContentType, SearchToken> lastTokens = getLastSearchTokens();
 		lastTokens.put(searchToken.getContentType(),searchToken);
 		Context.getCurrentInstance().getRequest().getSession().setAttribute(CCConstants.SESSION_LAST_SEARCH_TOKENS,lastTokens);
 		List<String> facets = searchToken.getFacets();
@@ -630,9 +630,9 @@ public class SearchServiceImpl implements SearchService {
 		return search;
 	}
 	@Override
-	public HashMap<ContentType,SearchToken> getLastSearchTokens() throws Throwable {
+	public Map<ContentType,SearchToken> getLastSearchTokens() throws Throwable {
 		if(Context.getCurrentInstance().getRequest().getSession().getAttribute(CCConstants.SESSION_LAST_SEARCH_TOKENS)!=null) {
-			return (HashMap<ContentType, SearchToken>) Context.getCurrentInstance().getRequest().getSession().getAttribute(CCConstants.SESSION_LAST_SEARCH_TOKENS);
+			return (Map<ContentType, SearchToken>) Context.getCurrentInstance().getRequest().getSession().getAttribute(CCConstants.SESSION_LAST_SEARCH_TOKENS);
 		}
 		return new HashMap<>();
 
@@ -696,7 +696,7 @@ public class SearchServiceImpl implements SearchService {
 				}
 			}
 
-			List<FieldHighlightParameters> fieldHighlightParameters = new ArrayList<FieldHighlightParameters>();
+			List<FieldHighlightParameters> fieldHighlightParameters = new ArrayList<>();
 			fieldHighlightParameters.add( new FieldHighlightParameters("cm:name",255,100,false,"",""));
 			fieldHighlightParameters.add( new FieldHighlightParameters("cm:title",255,100,false,"",""));
 			fieldHighlightParameters.add( new FieldHighlightParameters("cm:description",255,100,false,"",""));
@@ -829,7 +829,7 @@ public class SearchServiceImpl implements SearchService {
 		
 
 		if(findUsersQuery == null && findGroupsQuery == null) {
-			return new SearchResult<String>(new ArrayList<String>(), 0, 0);
+			return new SearchResult<String>(new ArrayList<>(), 0, 0);
 		}
 		
 		/**
@@ -879,7 +879,7 @@ public class SearchServiceImpl implements SearchService {
 
 		logger.debug("finalQuery:" + finalQuery);
 
-		List<Authority> data = new ArrayList<Authority>();
+		List<Authority> data = new ArrayList<>();
 
 		SearchParameters searchParameters = new SearchParameters();
 		searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
@@ -898,7 +898,7 @@ public class SearchServiceImpl implements SearchService {
 		org.alfresco.service.cmr.search.SearchService searchService = serviceRegistry.getSearchService();
 		ResultSet resultSet = searchService.query(searchParameters);
 
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 			String authorityName = (String) serviceRegistry.getNodeService().getProperty(nodeRef,
 					ContentModel.PROP_AUTHORITY_NAME);

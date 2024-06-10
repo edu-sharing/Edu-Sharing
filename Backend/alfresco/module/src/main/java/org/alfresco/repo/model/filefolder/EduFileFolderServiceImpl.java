@@ -263,7 +263,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
      */
     private List<FileInfo> toFileInfo(List<NodeRef> nodeRefs) throws InvalidTypeException
     {
-        List<FileInfo> results = new ArrayList<FileInfo>(nodeRefs.size());
+        List<FileInfo> results = new ArrayList<>(nodeRefs.size());
         for (NodeRef nodeRef : nodeRefs)
         {
             try
@@ -395,7 +395,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
 				qnameSet.add(QName.createQName(CCConstants.CCM_TYPE_IO));
 				qnameSet.add(QName.createQName(CCConstants.CCM_TYPE_MAP));
 				List<ChildAssociationRef> childRefs = nodeService.getChildAssocs(contextNodeRef,qnameSet);
-				ArrayList<NodeRef> toTransform = new ArrayList<NodeRef>();
+				ArrayList<NodeRef> toTransform = new ArrayList<>();
 				for(ChildAssociationRef childRef:childRefs){
 					toTransform.add(childRef.getChildRef());
 				}
@@ -407,7 +407,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
                 // use the helper which is also used by the local node service and filter out special nodes which are also invisible in workspace
                 List<NodeRef> toTransform = childRefs.stream().
                         map((ChildAssociationRef::getChildRef)).
-                        filter((NodeRef ref)->!EduSharingNodeHelper.shouldFilter(ref,new ArrayList<String>(Arrays.asList(new String[] {"edugroup"})))).
+                        filter((NodeRef ref)->!EduSharingNodeHelper.shouldFilter(ref,new ArrayList<>(Arrays.asList(new String[] {"edugroup"})))).
                         collect(Collectors.toList());
                 results = toFileInfo(toTransform);
             }
@@ -453,7 +453,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
             totalCount = null;
         }
         
-        final List<FileInfo> nodeInfos = new ArrayList<FileInfo>(nodeRefs.size());
+        final List<FileInfo> nodeInfos = new ArrayList<>(nodeRefs.size());
         for (NodeRef nodeRef : nodeRefs)
         {
             nodeInfos.add(toFileInfo(nodeRef, true));
@@ -968,7 +968,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
         }
 
         // To hold the results.
-        List<NodeRef> result = new ArrayList<NodeRef>();
+        List<NodeRef> result = new ArrayList<>();
         
         // Build a list of folder types
         Set<QName> folderTypeQNames = buildFolderTypes();
@@ -1330,7 +1330,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
     private FileInfo createImpl(NodeRef parentNodeRef, String name, QName typeQName, QName assocQName) throws FileExistsException
     {
         // set up initial properties
-        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(11);
+        Map<QName, Serializable> properties = new HashMap<>(11);
         properties.put(ContentModel.PROP_NAME, (Serializable) name);
         
         // Check the type is valid for file/folder service
@@ -1454,7 +1454,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
         }
         try
         {
-            ArrayList<FileInfo> results = new ArrayList<FileInfo>(10);
+            ArrayList<FileInfo> results = new ArrayList<>(10);
             // get the primary path
             Path path = nodeService.getPath(nodeRef);
             // iterate and turn the results into file info objects
@@ -1542,7 +1542,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
         try
         {
             final NodeRef rNodeRef = rootNodeRef;
-            final ArrayList<String> results = new ArrayList<String>(10);
+            final ArrayList<String> results = new ArrayList<>(10);
             // Run as system as the user could not have access to all folders in the path, see ALF-13816
             AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>()
             {

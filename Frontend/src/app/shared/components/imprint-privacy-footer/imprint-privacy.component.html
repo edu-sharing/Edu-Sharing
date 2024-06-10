@@ -1,0 +1,21 @@
+<ng-container *ngIf="service.imprintUrl || service.privacyInformationUrl">
+  <a
+    cdkMonitorElementFocus
+    tabindex="0"
+    class="clickable"
+    *ngIf="service.imprintUrl"
+    (click)="service.openImprint()"
+    (keyup.enter)="service.openImprint()"
+    >{{ 'IMPRINT' | translate }}</a
+  >
+  {{ service.imprintUrl && service.privacyInformationUrl ? separator : '' }}
+  <a
+    cdkMonitorElementFocus
+    tabindex="0"
+    class="clickable"
+    *ngIf="service.privacyInformationUrl"
+    (click)="service.openPrivacy()"
+    (keyup.enter)="service.openPrivacy()"
+    >{{ 'PRIVACY_INFORMATION' | translate }}</a
+  >
+</ng-container>

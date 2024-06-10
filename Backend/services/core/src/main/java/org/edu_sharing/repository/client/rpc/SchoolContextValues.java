@@ -2,16 +2,17 @@ package org.edu_sharing.repository.client.rpc;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SchoolContextValues implements Serializable{
 
 	Boolean resultBasedOnCombination = false;
 	
-	HashMap<String,String> federalState = new HashMap<String,String>();
-	HashMap<String,String> typeOfSchool = new HashMap<String,String>();
-	HashMap<String,String> schoolSubject = new HashMap<String,String>();
-	HashMap<String,String> ageGroup = new HashMap<String,String>();
-	HashMap<String,String> topic = new HashMap<String,String>();
+	Map<String,String> federalState = new HashMap<>();
+	Map<String,String> typeOfSchool = new HashMap<>();
+	Map<String,String> schoolSubject = new HashMap<>();
+	Map<String,String> ageGroup = new HashMap<>();
+	Map<String,String> topic = new HashMap<>();
 	
 	public SchoolContextValues() {
 	}
@@ -20,7 +21,7 @@ public class SchoolContextValues implements Serializable{
 	 * <NodeRef,Caption>
 	 * @return
 	 */
-	public HashMap<String, String> getFederalState() {
+	public Map<String, String> getFederalState() {
 		return federalState;
 	}
 
@@ -28,7 +29,7 @@ public class SchoolContextValues implements Serializable{
 	 * <NodeRef,Caption>
 	 * @return
 	 */
-	public HashMap<String, String> getTypeOfSchool() {
+	public Map<String, String> getTypeOfSchool() {
 		return typeOfSchool;
 	}
 
@@ -36,7 +37,7 @@ public class SchoolContextValues implements Serializable{
 	 * <NodeRef,Caption>
 	 * @return
 	 */
-	public HashMap<String, String> getSchoolSubject() {
+	public Map<String, String> getSchoolSubject() {
 		return schoolSubject;
 	}
 
@@ -44,7 +45,7 @@ public class SchoolContextValues implements Serializable{
 	 * <NodeRef,Caption>
 	 * @return
 	 */
-	public HashMap<String, String> getAgeGroup() {
+	public Map<String, String> getAgeGroup() {
 		return ageGroup;
 	}
 
@@ -52,7 +53,7 @@ public class SchoolContextValues implements Serializable{
 	 * <NodeRef,Caption>
 	 * @return
 	 */
-	public HashMap<String, String> getTopic() {
+	public Map<String, String> getTopic() {
 		return topic;
 	}
 	

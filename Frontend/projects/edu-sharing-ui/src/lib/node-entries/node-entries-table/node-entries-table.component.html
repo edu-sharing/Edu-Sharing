@@ -41,7 +41,7 @@
       <mat-checkbox
         [checked]="entriesService.selection.isSelected(node)"
         (change)="entriesService.onCheckboxChanged(node, $event.checked)"
-        aria-label="{{ 'SELECT' | translate : { element: (node | nodeTitle) } }}"
+        aria-label="{{ 'SELECT' | translate: { element: (node | nodeTitle) } }}"
         color="primary"
       ></mat-checkbox>
     </mat-cell>
@@ -147,14 +147,14 @@
             event: $event,
             element: node,
             source: ClickSource.Metadata,
-            attribute: column
+            attribute: column,
           })
         "
         (dblclick)="
           entriesService.dblClickItem.emit({
             element: node,
             source: ClickSource.Metadata,
-            attribute: column
+            attribute: column,
           })
         "
         esCheckTextOverflow
@@ -168,7 +168,7 @@
             class="childobject-count"
             matTooltip="{{
               'CHILDOBJECT_COUNT'
-                | translate : { count: node.properties['virtual:childobjectcount'] * 1 + 1 }
+                | translate: { count: node.properties['virtual:childobjectcount'] * 1 + 1 }
             }}"
           >
             <span>{{ node.properties['virtual:childobjectcount'] * 1 + 1 }}</span
@@ -193,6 +193,7 @@
     (nodeDropped)="drop($event)"
     class="mat-row"
     [class.mat-row-selected]="entriesService.selection.isSelected(node)"
+    [class.mat-row-import-blocked]="isBlocked(node)"
     [class.selected-when-dragging]="isDragging && entriesService.selection.isSelected(node)"
     [class.mat-row-virtual]="node.virtual"
     [class.mat-row-virtual-first]="

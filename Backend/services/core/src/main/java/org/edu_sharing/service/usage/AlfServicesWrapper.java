@@ -34,10 +34,7 @@ import java.util.*;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
@@ -87,28 +84,28 @@ public class AlfServicesWrapper implements UsageDAO{
 		nodeService = serviceRegistry.getNodeService();
 	}
 
-	public AlfServicesWrapper(HashMap authInfo) {
+	public AlfServicesWrapper(Map<String,String> authInfo) {
 		this();
 		authenticationService.validate((String) authInfo.get(CCConstants.AUTH_TICKET));
 	}
 
-	public HashMap<String, String> authenticate(String username, String password) {
+	public Map<String, String> authenticate(String username, String password) {
 		authenticationService.authenticate(username, password.toCharArray());
 		String ticket = authenticationService.getCurrentTicket();
-		HashMap<String, String> authInfo = new HashMap<String, String>();
+		Map<String, String> authInfo = new HashMap<>();
 		authInfo.put(CCConstants.AUTH_USERNAME, username);
 		authInfo.put(CCConstants.AUTH_TICKET, ticket);
 		return authInfo;
 	}
 
-	public HashMap<String, HashMap<String, Object>> getUsages(String nodeId) {
-		HashMap<String, HashMap<String, Object>> result = getChildrenByType(nodeId, CCConstants.CCM_TYPE_USAGE);
+	public Map<String, Map<String, Object>> getUsages(String nodeId) {
+		Map<String, Map<String, Object>> result = getChildrenByType(nodeId, CCConstants.CCM_TYPE_USAGE);
 		return result;
 	}
 	
-	public HashMap<String,Object> getProperties(NodeRef nodeRef){
+	public Map<String,Object> getProperties(NodeRef nodeRef){
 		Map<QName, Serializable> childPropMap = nodeService.getProperties(nodeRef);
-		HashMap<String, Object> resultProps = new HashMap<String, Object>();
+		Map<String, Object> resultProps = new HashMap<>();
 		for (QName qname : childPropMap.keySet()) {
 
 			Serializable object = childPropMap.get(qname);
@@ -133,10 +130,10 @@ public class AlfServicesWrapper implements UsageDAO{
 	}
 
 	@Override
-	public HashMap<String, Object> getUsageOnNodeOrParents(String lmsId, String courseId, String objectNodeId, String resourceId) throws Exception {
+	public Map<String, Object> getUsageOnNodeOrParents(String lmsId, String courseId, String objectNodeId, String resourceId) throws Exception {
 		NodeRef nodeId=new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,objectNodeId);
 		while(nodeId!=null) {
-			HashMap<String, Object> usage = getUsage(lmsId, courseId, nodeId.getId(), resourceId);
+			Map<String, Object> usage = getUsage(lmsId, courseId, nodeId.getId(), resourceId);
 			if(usage!=null)
 				return usage;
 			nodeId=nodeService.getPrimaryParent(nodeId).getParentRef();
@@ -145,10 +142,10 @@ public class AlfServicesWrapper implements UsageDAO{
 	}
 
 	@Override
-	public HashMap<String, Object> getUsage(String lmsId, String courseId, String objectNodeId, String resourceId) throws Exception {
-		HashMap<String, HashMap<String, Object>> children = getChildrenByType(objectNodeId, CCConstants.CCM_TYPE_USAGE);
+	public Map<String, Object> getUsage(String lmsId, String courseId, String objectNodeId, String resourceId) throws Exception {
+		Map<String, Map<String, Object>> children = getChildrenByType(objectNodeId, CCConstants.CCM_TYPE_USAGE);
 		for (String key : children.keySet()) {
-			HashMap<String, Object> usageNode = children.get(key);
+			Map<String, Object> usageNode = children.get(key);
 			String tmpAppId = (String) usageNode.get(CCConstants.CCM_PROP_USAGE_APPID);
 			String tmpCourseId = (String) usageNode.get(CCConstants.CCM_PROP_USAGE_COURSEID);
 			// String tmpAppUser = (String)usageNode.get(CCConstants.CCM_PROP_USAGE_APPUSER);
@@ -170,13 +167,13 @@ public class AlfServicesWrapper implements UsageDAO{
 	}
 	
 	@Override
-	public HashMap<String, Object> getUsage(String usageId) throws Exception {
+	public Map<String, Object> getUsage(String usageId) throws Exception {
 		
 		return getProperties(new NodeRef(storeRef,usageId));
 	}
 
-	public HashMap<String, HashMap<String, Object>> getUsagesByCourse(String lmsId, String courseId) throws Exception {
-		HashMap<String, HashMap<String, Object>> result = new HashMap<String, HashMap<String, Object>>();
+	public Map<String, Map<String, Object>> getUsagesByCourse(String lmsId, String courseId) throws Exception {
+		Map<String, Map<String, Object>> result = new HashMap<>();
 
 		// prevent getting all usages by using * as courseId
 		if(courseId.contains("*")){
@@ -190,7 +187,7 @@ public class AlfServicesWrapper implements UsageDAO{
 			
 			try{
 				Map<QName, Serializable> tmpprops = nodeService.getProperties(nodeRef);
-				HashMap<String, Object> props = new HashMap<String, Object>();
+				Map<String, Object> props = new HashMap<>();
 				for (QName key : tmpprops.keySet()) {
 					String propName = key.toString();
 					Object propValue = tmpprops.get(key);
@@ -207,15 +204,15 @@ public class AlfServicesWrapper implements UsageDAO{
 	}
 	
 	@Override
-	public HashMap<String, HashMap<String, Object>> getUsagesByAppId(String appId) throws Exception {
-		HashMap<String, HashMap<String, Object>> result = new HashMap<String, HashMap<String, Object>>();
+	public Map<String, Map<String, Object>> getUsagesByAppId(String appId) throws Exception {
+		Map<String, Map<String, Object>> result = new HashMap<>();
 		String queryString = "TYPE:\"{http://www.campuscontent.de/model/1.0}usage\" AND @ccm\\:usageappid:" + appId;
 		ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, queryString);
 		for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 			
 			try{
 				Map<QName, Serializable> tmpprops = nodeService.getProperties(nodeRef);
-				HashMap<String, Object> props = new HashMap<String, Object>();
+				Map<String, Object> props = new HashMap<>();
 				for (QName key : tmpprops.keySet()) {
 					String propName = key.toString();
 					Object propValue = tmpprops.get(key);
@@ -233,7 +230,7 @@ public class AlfServicesWrapper implements UsageDAO{
 	}
 	
 	@Override
-	public HashMap<String, HashMap<String, Object>> getUsages(String repositoryId, String nodeId, Long from, Long to) throws Exception {
+	public Map<String, Map<String, Object>> getUsages(String repositoryId, String nodeId, Long from, Long to) throws Exception {
 		ApplicationInfo appInfo = ApplicationInfoList.getRepositoryInfoById(repositoryId);
 		if(appInfo == null) {
 			throw new Exception("unknown application " +repositoryId);
@@ -251,90 +248,87 @@ public class AlfServicesWrapper implements UsageDAO{
 		
 		
 		
-		RunAsWork<HashMap<String, HashMap<String, Object>>> runAs = new RunAsWork<HashMap<String,HashMap<String,Object>>>() {
-			@Override
-			public HashMap<String, HashMap<String, Object>> doWork() throws Exception {
-				
-				HashMap<String, HashMap<String, Object>> result = new HashMap<String, HashMap<String, Object>>();
-				
-				if(ApplicationInfoList.getHomeRepository().getAppId().equals(appInfo.getAppId())) {
-					String queryString = "TYPE:\"{http://www.campuscontent.de/model/1.0}usage\"";
-					if(nodeId != null && nodeId.trim().length() > 0) {
-						queryString += " AND @ccm\\:usageparentnodeid:" + nodeId;
-					}
-					if(from != null) {
-						
-						String fromFormated = ISO8601DateFormat.format(new Date(from));
-						
-						Long to2 = (to == null) ? new Date().getTime() : to;
-						String toFormated = ISO8601DateFormat.format(new Date(to2));
-						queryString += " AND @cm\\:created:[" + fromFormated + " TO " + toFormated + "]";
-					}
-					
-					ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, queryString);
-					for (NodeRef nodeRef : resultSet.getNodeRefs()) {
-						
-						try{
-							
-							HashMap<String, Object> props = getProperties(nodeRef);
-							ChildAssociationRef childssocRef = nodeService.getPrimaryParent(nodeRef);
-							props.put(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID, childssocRef.getParentRef().getId());
-							
-							result.put(nodeRef.getId(), props);
-						}catch(org.alfresco.service.cmr.repository.InvalidNodeRefException e){
-							logger.error("nodeRef: "+nodeRef+" does not exist. maybe an archived usage node:"+e.getMessage());
-						}
-					}
-				}else {
-					String queryString = "TYPE:\"{http://www.campuscontent.de/model/1.0}remoteobject\" AND @ccm\\:remoterepositoryid:" + repositoryIdF;
-					if(nodeId != null && nodeId.trim().length() > 0) {
-						queryString += " AND @ccm\\:remotenodeid:" + nodeId;
-					}
-					if(from != null) {
-						
-						String fromFormated = ISO8601DateFormat.format(new Date(from));
-						
-						Long to2 = (to == null) ? new Date().getTime() : to;
-						String toFormated = ISO8601DateFormat.format(new Date(to2));
-						queryString += " AND @cm\\:created:[" + fromFormated + " TO " + toFormated + "]";
-					}
-					
-					ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, queryString);
-					for (NodeRef nodeRef : resultSet.getNodeRefs()) {
-						
-						try{
-							
-							List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
-							for(ChildAssociationRef childRef : childAssocs) {
-								if(QName.createQName(CCConstants.CCM_TYPE_USAGE).equals(nodeService.getType(childRef.getChildRef()))){
-						
-									HashMap<String, Object> props = getProperties(childRef.getChildRef());
-									ChildAssociationRef childssocRef = nodeService.getPrimaryParent(childRef.getChildRef());
-									props.put(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID, childssocRef.getParentRef().getId());
-									
-									result.put(childRef.getChildRef().getId(), props);
-								}
-							}
-							
-						}catch(org.alfresco.service.cmr.repository.InvalidNodeRefException e){
-							logger.error("nodeRef: "+nodeRef+" does not exist. maybe an archived usage node:"+e.getMessage());
-						}
-					}
-				}
-				
-				return result;
-			}
-		};
+		RunAsWork<Map<String, Map<String, Object>>> runAs = () -> {
+
+            Map<String, Map<String, Object>> result = new HashMap<>();
+
+            if(ApplicationInfoList.getHomeRepository().getAppId().equals(appInfo.getAppId())) {
+                String queryString = "TYPE:\"{http://www.campuscontent.de/model/1.0}usage\"";
+                if(nodeId != null && nodeId.trim().length() > 0) {
+                    queryString += " AND @ccm\\:usageparentnodeid:" + nodeId;
+                }
+                if(from != null) {
+
+                    String fromFormated = ISO8601DateFormat.format(new Date(from));
+
+                    Long to2 = (to == null) ? new Date().getTime() : to;
+                    String toFormated = ISO8601DateFormat.format(new Date(to2));
+                    queryString += " AND @cm\\:created:[" + fromFormated + " TO " + toFormated + "]";
+                }
+
+                ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, queryString);
+                for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+
+                    try{
+
+                        Map<String, Object> props = getProperties(nodeRef);
+                        ChildAssociationRef childssocRef = nodeService.getPrimaryParent(nodeRef);
+                        props.put(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID, childssocRef.getParentRef().getId());
+
+                        result.put(nodeRef.getId(), props);
+                    }catch(InvalidNodeRefException e){
+                        logger.error("nodeRef: "+nodeRef+" does not exist. maybe an archived usage node:"+e.getMessage());
+                    }
+                }
+            }else {
+                String queryString = "TYPE:\"{http://www.campuscontent.de/model/1.0}remoteobject\" AND @ccm\\:remoterepositoryid:" + repositoryIdF;
+                if(nodeId != null && nodeId.trim().length() > 0) {
+                    queryString += " AND @ccm\\:remotenodeid:" + nodeId;
+                }
+                if(from != null) {
+
+                    String fromFormated = ISO8601DateFormat.format(new Date(from));
+
+                    Long to2 = (to == null) ? new Date().getTime() : to;
+                    String toFormated = ISO8601DateFormat.format(new Date(to2));
+                    queryString += " AND @cm\\:created:[" + fromFormated + " TO " + toFormated + "]";
+                }
+
+                ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, queryString);
+                for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+
+                    try{
+
+                        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
+                        for(ChildAssociationRef childRef : childAssocs) {
+                            if(QName.createQName(CCConstants.CCM_TYPE_USAGE).equals(nodeService.getType(childRef.getChildRef()))){
+
+                                Map<String, Object> props = getProperties(childRef.getChildRef());
+                                ChildAssociationRef childssocRef = nodeService.getPrimaryParent(childRef.getChildRef());
+                                props.put(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID, childssocRef.getParentRef().getId());
+
+                                result.put(childRef.getChildRef().getId(), props);
+                            }
+                        }
+
+                    }catch(InvalidNodeRefException e){
+                        logger.error("nodeRef: "+nodeRef+" does not exist. maybe an archived usage node:"+e.getMessage());
+                    }
+                }
+            }
+
+            return result;
+        };
 		
 		return AuthenticationUtil.runAsSystem(runAs);
 	}
 
-	public HashMap<String, HashMap<String, Object>> getChildrenByType(String nodeId, String type) {
+	public Map<String, Map<String, Object>> getChildrenByType(String nodeId, String type) {
 		return this.getChildrenByType(storeRef, nodeId, type);
 	}
 
-	public HashMap<String, HashMap<String, Object>> getChildrenByType(StoreRef store, String nodeId, String type) {
-		HashMap<String, HashMap<String, Object>> result = new HashMap<String, HashMap<String, Object>>();
+	public Map<String, Map<String, Object>> getChildrenByType(StoreRef store, String nodeId, String type) {
+		Map<String, Map<String, Object>> result = new HashMap<>();
 		List<ChildAssociationRef> childAssocList = nodeService.getChildAssocs(new NodeRef(store, nodeId),Collections.singleton(QName.createQName(type)));
 		for (ChildAssociationRef child : childAssocList) {
 			result.put(child.getChildRef().getId(), getProperties(child.getChildRef()));
@@ -376,7 +370,7 @@ public class AlfServicesWrapper implements UsageDAO{
 
 	public boolean hasPermissions(String nodeId, String authority, String[] permissions) throws Exception {
 
-		HashMap<String, Boolean> hasPResult = null;
+		Map<String, Boolean> hasPResult = null;
 		try {
 			
 			ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
@@ -409,11 +403,11 @@ public class AlfServicesWrapper implements UsageDAO{
 
 	}
 
-	public void updateNode(String nodeId, HashMap<String, Object> _props) {
+	public void updateNode(String nodeId, Map<String, Object> _props) {
 		this.updateNode(storeRef, nodeId, _props);
 	}
 
-	public void updateNode(StoreRef store, String nodeId, HashMap<String, Object> _props) {
+	public void updateNode(StoreRef store, String nodeId, Map<String, Object> _props) {
 
 		Map<QName, Serializable> props = transformPropMap(_props);
 		NodeRef nodeRef = new NodeRef(store, nodeId);
@@ -426,20 +420,20 @@ public class AlfServicesWrapper implements UsageDAO{
 
 	}
 
-	Map<QName, Serializable> transformPropMap(HashMap map) {
-		Map<QName, Serializable> result = new HashMap<QName, Serializable>();
-		for (Object key : map.keySet()) {
-			result.put(QName.createQName((String) key), (Serializable) map.get(key));
+	Map<QName, Serializable> transformPropMap(Map<String, ?> map) {
+		Map<QName, Serializable> result = new HashMap<>();
+		for (String key : map.keySet()) {
+			result.put(QName.createQName(key), (Serializable)map.get(key));
 		}
 		return result;
 	}
 
-	public String createNode(String parentID, String nodeTypeString, String childAssociation, HashMap<String, String> _props) {
+	public String createNode(String parentID, String nodeTypeString, String childAssociation, Map<String, String> _props) {
 		return this.createNode(storeRef, parentID, nodeTypeString, childAssociation, _props);
 	}
 
 	public String createNode(StoreRef store, String parentID, String nodeTypeString, String childAssociation,
-			HashMap<String, String> _props) {
+			Map<String, String> _props) {
 
 		Map<QName, Serializable> properties = transformPropMap(_props);
 
@@ -454,7 +448,7 @@ public class AlfServicesWrapper implements UsageDAO{
 			String accesskey){
 		logger.info("starting... personId:" + personId + " username:" + username + " applicationId:" + applicationId
 				+ " accessAllowed:" + accessAllowed + " accesskey:" + accesskey);
-		HashMap<String, String> persAccEleProps = new HashMap<String, String>();
+		Map<String, String> persAccEleProps = new HashMap<>();
 		if (accessAllowed == null) {
 			persAccEleProps.put(CCConstants.CM_PROP_PERSONACCESSELEMENT_CCACCESS, new Boolean(false).toString());
 		} else {
@@ -503,20 +497,20 @@ public class AlfServicesWrapper implements UsageDAO{
 	}
 	
 	@Override
-	public String createUsage(String parentId, HashMap<String, Object> properties) {
-		String usageId = this.createNode(parentId, CCConstants.CCM_TYPE_USAGE, CCConstants.CCM_ASSOC_USAGEASPECT_USAGES,(HashMap)properties);
+	public String createUsage(String parentId, Map<String, Object> properties) {
+		String usageId = this.createNode(parentId, CCConstants.CCM_TYPE_USAGE, CCConstants.CCM_ASSOC_USAGEASPECT_USAGES,(Map)properties);
 		return usageId;
 	}
 	
 	@Override
-	public void updateUsage(String usageNodeId, HashMap<String, Object> properties) {
+	public void updateUsage(String usageNodeId, Map<String, Object> properties) {
 		this.updateNode(usageNodeId, properties);		
 	}
 	
 	@Override
 	public void removeUsage(String appId, String courseId, String parentNodeId, String resourceId) throws Exception {
 		logger.info("appId:"+appId +" courseId:"+courseId+ " parentNodeId:"+parentNodeId+" resourceId:"+resourceId);
-		HashMap<String, Object> usage = this.getUsage(appId, courseId, parentNodeId, resourceId);
+		Map<String, Object> usage = this.getUsage(appId, courseId, parentNodeId, resourceId);
 		if(usage != null){
 			String parentId = (String)usage.get(CCConstants.CCM_PROP_USAGE_PARENTNODEID);
 			String usageId = (String)usage.get(CCConstants.SYS_PROP_NODE_UID);
@@ -529,12 +523,12 @@ public class AlfServicesWrapper implements UsageDAO{
 	
 	@Override
 	public boolean removeUsages(String appId, String courseId) throws Exception {
-		HashMap<String, HashMap<String, Object>> usages = this.getUsagesByCourse(appId, courseId);
+		Map<String, Map<String, Object>> usages = this.getUsagesByCourse(appId, courseId);
 		
 		boolean allDeleted = true;
 		
 		for(String key: usages.keySet()){
-			HashMap<String,Object> props = usages.get(key);
+			Map<String,Object> props = usages.get(key);
 			String tmpCourseId = (String)props.get(CCConstants.CCM_PROP_USAGE_COURSEID);
 			String tmpPrimaryParentId = (String)props.get(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID);
 			String tmpAppId =  (String)props.get(CCConstants.CCM_PROP_USAGE_APPID);

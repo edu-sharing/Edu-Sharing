@@ -1,4 +1,0 @@
-type Affiliation {
-    context: [String!]
-    scope: String
-}

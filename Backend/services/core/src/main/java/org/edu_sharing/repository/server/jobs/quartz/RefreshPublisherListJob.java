@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.server.jobs.quartz;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.edu_sharing.metadataset.v2.MetadataReader;
@@ -77,7 +78,7 @@ public class RefreshPublisherListJob extends AbstractJob {
 		ApplicationInfo homeRep  = ApplicationInfoList.getHomeRepository();
 		try{
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeRep.getAppId());
-			HashMap<String, String>  authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
+			Map<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
 			
 			AdminServiceFactory.getInstance().writePublisherToMDSXml(vcardProps, valuespaceProp, ignoreEntries, filePath, authInfo);
 

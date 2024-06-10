@@ -1,9 +1,0 @@
-#Defines value in a value space
-type RangedValue {
-
-    #The identifier of the source
-    id: String
-
-    #The specific Value
-    value: String!
-}

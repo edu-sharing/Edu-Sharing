@@ -1,7 +1,0 @@
-input FormatInput {
-    mimetype: String
-    type: String
-    subtype: [String!]
-    version: String
-    content: String
-}

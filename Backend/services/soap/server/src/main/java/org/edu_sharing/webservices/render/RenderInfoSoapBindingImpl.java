@@ -58,7 +58,7 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
             // now done when delegating to render @RenderProxy
             UsageDAO usageDao = new AlfServicesWrapper();
             if(lmsId!=null && courseId!=null) {
-                HashMap<String, Object> usageMap = usageDao.getUsageOnNodeOrParents(lmsId, courseId, nodeId, resourceId);
+                Map<String, Object> usageMap = usageDao.getUsageOnNodeOrParents(lmsId, courseId, nodeId, resourceId);
                 if (usageMap != null) {
                     result.setUsage(transform(new UsageService().getUsageResult(usageMap)));
                 }
@@ -137,7 +137,7 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
 
 		RenderInfoResult rir = new RenderInfoResult();
 
-		HashMap<String, String> userInfo = client.getUserInfo(userName);
+		Map<String, String> userInfo = client.getUserInfo(userName);
 		if(userInfo == null){
 			throw new RemoteException(EXCEPTION_USER_DOES_NOT_EXISTS);
 		}
@@ -158,15 +158,15 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
 
 		String finalUserName = userName;
 		LogTime.log("Fetching permissions for node "+nodeId,()-> {
-			HashMap<String, Boolean> perms = permissionService.hasAllPermissions(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId, finalUserName, new String[]{CCConstants.PERMISSION_READ,CCConstants.PERMISSION_CC_PUBLISH});
+			Map<String, Boolean> perms = permissionService.hasAllPermissions(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId, finalUserName, new String[]{CCConstants.PERMISSION_READ,CCConstants.PERMISSION_CC_PUBLISH});
 			rir.setPermissions(PermissionServiceHelper.getPermissionsAsString(perms).toArray(new String[0]));
 			rir.setPublishRight(new Boolean(perms.get(CCConstants.PERMISSION_CC_PUBLISH)));
 			rir.setUserReadAllowed(new Boolean(perms.get(PermissionService.READ)));
 		});
 
 		//this does not work anymore in alfresco-5.0.d:
-		//HashMap<String, Boolean> permsGuest = client.hasAllPermissions(nodeId, PermissionService.ALL_AUTHORITIES, new String[]{PermissionService.READ});
-		HashMap<String, Boolean> permsGuest = permissionService.hasAllPermissions(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId, PermissionService.GUEST_AUTHORITY, new String[]{PermissionService.READ});
+		//Map<String, Boolean> permsGuest = client.hasAllPermissions(nodeId, PermissionService.ALL_AUTHORITIES, new String[]{PermissionService.READ});
+		Map<String, Boolean> permsGuest = permissionService.hasAllPermissions(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId, PermissionService.GUEST_AUTHORITY, new String[]{PermissionService.READ});
 		rir.setGuestReadAllowed(new Boolean(permsGuest.get(PermissionService.READ)));
 
 		HashMap versionProps = null;
@@ -191,8 +191,8 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
 
 		} else if(version != null && !version.trim().equals("") && !version.trim().equals("-1")){
 
-			HashMap<String, HashMap<String,Object>> versionHIstory = client.getVersionHistory(nodeId);
-			for(Map.Entry<String, HashMap<String,Object>> entry : versionHIstory.entrySet()){
+			Map<String, Map<String,Object>> versionHIstory = client.getVersionHistory(nodeId);
+			for(Map.Entry<String, Map<String,Object>> entry : versionHIstory.entrySet()){
 
 				HashMap tmpVersionProps = entry.getValue();
 				String vlable = (String)tmpVersionProps.get(CCConstants.CM_PROP_VERSIONABLELABEL);
@@ -249,7 +249,7 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
 			// 4.0: Fetch actual metadata from the remote object
 			appInfo=ApplicationInfoList.getRepositoryInfoById((String) props.get(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORYID));
 			String remoteId=(String) props.get(CCConstants.CCM_PROP_REMOTEOBJECT_NODEID);
-			HashMap<String, Object> propsNew = NodeServiceFactory.getNodeService(appInfo.getAppId()).getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), remoteId);
+			Map<String, Object> propsNew = NodeServiceFactory.getNodeService(appInfo.getAppId()).getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), remoteId);
 			props.putAll(propsNew);
 		}
 		rir.setIconUrl(new MimeTypesV2(appInfo).getIcon(nodeType,props,Arrays.asList(aspects)));
@@ -345,11 +345,11 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
 			String toolInstanceNodeRef = client.getProperty(MCAlfrescoAPIClient.storeRef, nodeId, CCConstants.CCM_PROP_TOOL_OBJECT_TOOLINSTANCEREF);
 			String nodeIdToolInstance = new NodeRef(toolInstanceNodeRef).getId();
 
-			HashMap<String,Object> propsToolInstance = client.getProperties(MCAlfrescoAPIClient.storeRef.getProtocol(),
+			Map<String,Object> propsToolInstance = client.getProperties(MCAlfrescoAPIClient.storeRef.getProtocol(),
 					MCAlfrescoAPIClient.storeRef.getIdentifier(),
 					nodeIdToolInstance);
 
-			List<KeyValue> propsResultToolInstance = new ArrayList<KeyValue>();
+			List<KeyValue> propsResultToolInstance = new ArrayList<>();
 			for(Map.Entry<String, Object> entry : propsToolInstance.entrySet()) {
 				KeyValue kv = new KeyValue(entry.getKey(),(String)entry.getValue());
 				propsResultToolInstance.add(kv);
@@ -383,7 +383,7 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
      */
 
     private KeyValue[] convertProperties(Map<String,Object> propertiesIn) {
-        List<KeyValue> propsresult = new ArrayList<KeyValue>();
+        List<KeyValue> propsresult = new ArrayList<>();
 
         //MetadataSetV2 mds = MetadataReaderV2.getMetadataset(ApplicationInfoList.getRepositoryInfoById(appId),CCConstants.metadatasetdefault_id);
         for(Map.Entry<String,Object> entry : propertiesIn.entrySet()){
@@ -399,8 +399,8 @@ public class RenderInfoSoapBindingImpl implements org.edu_sharing.webservices.re
         return NodeServiceHelper.getSubobjects(NodeServiceFactory.getLocalService(),nodeId);
 
     }
-    private static HashMap<String, Object> removeUTF16Chars(Map<String, Object> props){
-        HashMap<String, Object> propsClean = new HashMap(props);
+    private static Map<String, Object> removeUTF16Chars(Map<String, Object> props){
+        Map<String, Object> propsClean = new HashMap(props);
         for(Map.Entry<String, Object> set : propsClean.entrySet()){
             if(set.getValue() instanceof String){
                 String s= (String) set.getValue();

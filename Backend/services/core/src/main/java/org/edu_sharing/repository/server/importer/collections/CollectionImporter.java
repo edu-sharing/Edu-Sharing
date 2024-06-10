@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -126,7 +127,7 @@ public class CollectionImporter {
 			
 			// set custom collection properties
 			if(collection.getProperty()!=null) {
-				HashMap<String,String[]> properties=new HashMap<>();
+				Map<String,String[]> properties=new HashMap<>();
 				for(Property property : collection.getProperty()) {
 					properties.put(property.getKey(),property.getValue().toArray(new String[0]));
 				}

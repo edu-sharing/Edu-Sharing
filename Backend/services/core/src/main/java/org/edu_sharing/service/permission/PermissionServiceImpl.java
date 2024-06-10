@@ -130,7 +130,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 		/**
 		 * remove the inherited from the old and new
 		 */
-		List<ACE> acesNew = new ArrayList<ACE>(aces);
+		List<ACE> acesNew = new ArrayList<>(aces);
 		acesNew=addCollectionCoordinatorPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,nodeId),acesNew);
 		Iterator<ACE> acesNewIter = acesNew.iterator();
 		while (acesNewIter.hasNext()) {
@@ -140,7 +140,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 			}
 		}
 
-		List<ACE> acesOld = new ArrayList<ACE>(Arrays.asList(currentACL.getAces()));
+		List<ACE> acesOld = new ArrayList<>(Arrays.asList(currentACL.getAces()));
 		Iterator<ACE> acesOldIter = acesOld.iterator();
 		while (acesOldIter.hasNext()) {
 			ACE ace = acesOldIter.next();
@@ -149,10 +149,10 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 			}
 		}
 
-		List<ACE> acesToAdd = new ArrayList<ACE>();
-		List<ACE> acesToUpdate = new ArrayList<ACE>();
-		List<ACE> acesToRemove = new ArrayList<ACE>();
-		List<ACE> acesNotChanged = new ArrayList<ACE>();
+		List<ACE> acesToAdd = new ArrayList<>();
+		List<ACE> acesToUpdate = new ArrayList<>();
+		List<ACE> acesToRemove = new ArrayList<>();
+		List<ACE> acesNotChanged = new ArrayList<>();
 
 		/**
 		 * remove the ones that are already set (didn't change)
@@ -166,7 +166,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 			}
 		}
 
-		List<String> aceOldAuthorityList = new ArrayList<String>();
+		List<String> aceOldAuthorityList = new ArrayList<>();
 		for (ACE aceOld : acesOld) {
 			aceOldAuthorityList.add(aceOld.getAuthority());
 		}
@@ -186,13 +186,13 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
 		boolean createNotify = false;
 		if (acesToAdd.size() > 0) {
-			HashMap<String, String[]> authPermissions = new HashMap<String, String[]>();
+			Map<String, String[]> authPermissions = new HashMap<>();
 			for (ACE toAdd : acesToAdd) {
 				String[] permissions = authPermissions.get(toAdd.getAuthority());
 				if (permissions == null) {
 					permissions = new String[] { toAdd.getPermission() };
 				} else {
-					ArrayList<String> plist = new ArrayList<String>(Arrays.asList(permissions));
+					ArrayList<String> plist = new ArrayList<>(Arrays.asList(permissions));
 					plist.add(toAdd.getPermission());
 					permissions = plist.toArray(new String[plist.size()]);
 				}
@@ -270,7 +270,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 	}
 
 	@Override
-	public void addPermissions(String _nodeId, HashMap<String, String[]> _authPerm, Boolean _inheritPermissions,
+	public void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions,
 							   String _mailText, Boolean _sendMail, Boolean _sendCopy) throws Throwable {
 
 		String user = new AuthenticationToolAPI().getCurrentUser();
@@ -291,7 +291,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
 			if (_sendMail) {
 				String nodeType = eduNodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
-				HashMap<String, Object> props = eduNodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
+				Map<String, Object> props = eduNodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
 				List<String> aspects = Arrays.asList(eduNodeService.getAspects(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId));
 				NotificationServiceFactoryUtility.getLocalService()
 						.notifyPermissionChanged(user, authority, _nodeId, nodeType, aspects, props, permissions, _mailText);
@@ -373,7 +373,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 		Gson gson = new Gson();
 		List<String> jsonHistory = (List<String>)nodeService.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,nodeId),QName.createQName(CCConstants.CCM_PROP_PH_HISTORY));
 
-		List<Notify> notifyList = new ArrayList<Notify>();
+		List<Notify> notifyList = new ArrayList<>();
 		if(jsonHistory != null) {
 			for(String json : jsonHistory) {
 				Notify notify = gson.fromJson(json, Notify.class);
@@ -450,7 +450,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 			}
 		}
 
-		ArrayList<AccessPermission> toRemove = new ArrayList<AccessPermission>();
+		ArrayList<AccessPermission> toRemove = new ArrayList<>();
 		Set<AccessPermission> allSetPerm = permissionsService.getAllSetPermissions(nodeRef);
 
 		for (AccessPermission accessPerm : allSetPerm) {
@@ -1031,18 +1031,16 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 			if (searchWord != null) {
 				searchWord = searchWord.replaceAll("[\\*\\?]", "");
 			}
-			
-			for (String token : StringTool.getPhrases(searchWord)) {
 
-				boolean isPhrase = token.startsWith("\"") && token.endsWith("\"");
+			String token = searchWord;
+			boolean isPhrase = token.startsWith("\"") && token.endsWith("\"");
 
-				if (isPhrase) {
-					token = (token.length() > 2) ? token.substring(1, token.length() - 1) : "";
-				}
+			if (isPhrase) {
+				token = (token.length() > 2) ? token.substring(1, token.length() - 1) : "";
+			}
 
-				if (token.length() > 0) {
-					subQuery.append("=@cm:authorityDisplayName:").append("\"").append(token).append("\"");
-				}
+			if (token.length() > 0) {
+				subQuery.append("=@cm:authorityDisplayName:").append("\"").append(token).append("\"");
 			}
 
 			// if not fuzzy and no value for email return empty result
@@ -1122,7 +1120,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 		searchParameters.addSort("@" + CCConstants.PROP_USER_EMAIL, true);
 		ResultSet resultSet = searchService.query(searchParameters);
 
-		List<User> data = new ArrayList<User>();
+		List<User> data = new ArrayList<>();
 		for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 			User user = new User();
 			user.setEmail((String) nodeService.getProperty(nodeRef, ContentModel.PROP_EMAIL));
@@ -1187,7 +1185,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
 		System.out.println("finalQuery:" + finalQuery);
 
-		List<Authority> data = new ArrayList<Authority>();
+		List<Authority> data = new ArrayList<>();
 
 		SearchParameters searchParameters = new SearchParameters();
 		searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
@@ -1266,7 +1264,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 			return new Result<List<Group>>();
 		}
 
-		List<Group> data = new ArrayList<Group>();
+		List<Group> data = new ArrayList<>();
 
 		SearchParameters searchParameters = new SearchParameters();
 		searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
@@ -1353,7 +1351,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
 					String jsonStringACL = gson.toJson(n);
 					List<String> history = (List<String>) nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_PH_HISTORY));
-					history = (history == null) ? new ArrayList<String>() : history;
+					history = (history == null) ? new ArrayList<>() : history;
 					while (history.size() > MAX_NOTIFY_HISTORY_LENGTH) {
 						history.remove(0);
 					}
@@ -1379,7 +1377,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
 	private void addUserToSharedList(String user, NodeRef nodeRef, Date created) {
 		ArrayList<String> phUsers = (ArrayList<String>) nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_PH_USERS));
-		if (phUsers == null) phUsers = new ArrayList<String>();
+		if (phUsers == null) phUsers = new ArrayList<>();
 		if (!phUsers.contains(user)) phUsers.add(user);
 		nodeService.setProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_PH_USERS), phUsers);
 		nodeService.setProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_PH_MODIFIED), created);
@@ -1492,16 +1490,16 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 		return hasAllPermissions(storeProtocol,storeId,nodeId,authority,new String[]{permission}).get(permission);
 	}
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String authority,
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String authority,
 													  String[] permissions) {
 		return AuthenticationUtil.runAs(()->hasAllPermissions(storeProtocol,storeId,nodeId,permissions),authority);
 	}
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
 			String[] permissions) {
 		boolean guest = GuestCagePolicy.getGuestUsers().contains(AuthenticationUtil.getFullyAuthenticatedUser());
 		PermissionService permissionService = serviceRegistry.getPermissionService();
-		HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+		Map<String, Boolean> result = new HashMap<>();
 		NodeRef nodeRef = new NodeRef(new StoreRef(storeProtocol, storeId), nodeId);
 		if (permissions != null && permissions.length > 0) {
 			for (String permission : permissions) {

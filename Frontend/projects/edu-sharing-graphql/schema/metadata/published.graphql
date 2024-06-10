@@ -1,5 +1,0 @@
-type Published {
-    date: Date
-    handleId: String
-    mode: String
-}

@@ -350,7 +350,13 @@ function filterMetadataSets(
             (mdsConfig.repository === HOME_REPOSITORY && repository.isHomeRepo),
     )?.mds;
     if (enabledMetadataSets) {
-        return metadataSets.filter((mds) => enabledMetadataSets.includes(mds.id));
+        const mds = metadataSets.filter((mds) => enabledMetadataSets.includes(mds.id));
+        if (mds.length === 0) {
+            console.warn(
+                `The filtered mds ${enabledMetadataSets} did not exists for the current app ${repository.id}. Check your Application XML config value "metadatasetsV2"`,
+            );
+        }
+        return mds;
     } else {
         return metadataSets;
     }

@@ -102,7 +102,7 @@ public class MetadataHelper {
 	 * attach any available translations/display names for keys of a given property set and attach them with the postfix DISPLAYNAME in this set
 	 * The current locale will be used
 	 */
-	public static void addVirtualDisplaynameProperties(MetadataSet mds, HashMap<String, Object> props) {
+	public static void addVirtualDisplaynameProperties(MetadataSet mds, Map<String, Object> props) {
 		for(MetadataWidget widget: mds.getWidgets()) {
 			Map<String, MetadataKey> values = widget.getValuesAsMap();
 			String id = CCConstants.getValidGlobalName(widget.getId());

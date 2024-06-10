@@ -1,9 +1,0 @@
-input TechnicalInput {
-    format: [FormatInput!]
-    size: String
-    location:[String!]
-    installationRemarks: [String!]
-    otherPlatformRequirements: [String!]
-    duration: Duration
-    dimension: DimensionInput
-}

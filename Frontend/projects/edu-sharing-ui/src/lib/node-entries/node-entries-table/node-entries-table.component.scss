@@ -82,6 +82,10 @@ mat-cell {
             background-color: rgb(var(--palette-primary-50));
         }
     }
+    &.mat-row-import-blocked {
+        opacity: 0.75;
+        text-decoration: line-through;
+    }
     &.mat-row-selected {
         background: var(--listItemSelectedBackgroundEffect);
         .mat-mdc-cell {

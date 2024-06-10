@@ -41,4 +41,8 @@ export type MdsEditorDialogData =
 
 export type MdsEditorDialogResultNodes = Node[] | null;
 export type MdsEditorDialogResultValues = Values | null;
-export type MdsEditorDialogResult = MdsEditorDialogResultNodes | MdsEditorDialogResultValues;
+export type MdsEditorDialogResult =
+    | MdsEditorDialogResultNodes
+    | MdsEditorDialogResultValues
+    | 'NO-CHANGES'
+    | 'CANCEL';

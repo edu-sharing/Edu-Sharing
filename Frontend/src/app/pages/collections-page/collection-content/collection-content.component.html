@@ -16,7 +16,7 @@
         [dragDrop]="{
           dragAllowed: isAllowedToEditCollection(),
           dropAllowed: canDropOnCollection,
-          dropped: dropOnCollection
+          dropped: dropOnCollection,
         }"
         [sort]="{
           active: sortCollections.active,
@@ -27,7 +27,7 @@
             !isMobile() &&
             dataSourceCollections.getData()?.length > 1 &&
             isUserAllowedToEdit(collection) &&
-            !sortReferences?.customSortingInProgress
+            !sortReferences?.customSortingInProgress,
         }"
         (sortChange)="setCollectionSort($event)"
       >
@@ -56,11 +56,20 @@
         </ng-template>
       </es-node-entries-wrapper>
       <div
-        *ngIf="!isRootLevel && dataSourceCollections.isEmpty() && !dataSourceCollections.isLoading"
-        class="section-headline collection-nocontent-container"
+        *ngIf="
+          !isRootLevel &&
+          dataSourceCollections.isEmpty() &&
+          !dataSourceCollections.isLoading &&
+          isUserAllowedToEdit(collection)
+        "
       >
-        <div class="collection-nocontent-small" *ngIf="isUserAllowedToEdit(collection)">
-          {{ 'COLLECTIONS.NO_SUBCOLLECTIONS_HINT' | translate }}
+        <div class="collection-nocontent-big">
+          {{ 'COLLECTIONS.NO_SUBCOLLECTIONS' | translate }}
+        </div>
+        <div class="section-headline collection-nocontent-container">
+          <div class="collection-nocontent-small">
+            {{ 'COLLECTIONS.NO_SUBCOLLECTIONS_HINT' | translate }}
+          </div>
         </div>
       </div>
     </div>
@@ -94,7 +103,7 @@
           [dragDrop]="{
             dragAllowed: isAllowedToEditCollection(),
             dropAllowed: canDropOnRef,
-            dropped: dropOnRef
+            dropped: dropOnRef,
           }"
           [sort]="{
             active: sortReferences.active,
@@ -105,7 +114,7 @@
               !isMobile() &&
               dataSourceReferences.getData()?.length > 1 &&
               isUserAllowedToEdit(collection) &&
-              !sortCollections?.customSortingInProgress
+              !sortCollections?.customSortingInProgress,
           }"
           (clickItem)="onContentClick($event)"
           (sortChange)="setReferenceSort($event)"

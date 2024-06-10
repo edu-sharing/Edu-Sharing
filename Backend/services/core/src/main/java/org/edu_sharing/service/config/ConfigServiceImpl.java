@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -12,8 +13,7 @@ import jakarta.xml.bind.Unmarshaller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
+import lombok.RequiredArgsConstructor;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -36,14 +36,17 @@ import org.edu_sharing.alfresco.service.config.model.Language;
 import org.edu_sharing.alfresco.service.config.model.Values;
 import org.edu_sharing.alfresco.service.config.model.Variables;
 import org.edu_sharing.service.nodeservice.NodeService;
-import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.permission.PermissionService;
-import org.edu_sharing.service.permission.PermissionServiceFactory;
+import org.edu_sharing.spring.scope.refresh.RefreshScopeRefreshedEvent;
 import org.json.JSONObject;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Service;
 
 
-public class ConfigServiceImpl implements ConfigService{
+@Service
+@RequiredArgsConstructor
+public class ConfigServiceImpl implements ConfigService, ApplicationListener<RefreshScopeRefreshedEvent> {
 	private static Logger logger=Logger.getLogger(ConfigServiceImpl.class);
 	private static String CACHE_KEY = "CLIENT_CONFIG";
 	// we use a non-serializable Config as value because this is a local cache and not distributed
@@ -76,16 +79,7 @@ public class ConfigServiceImpl implements ConfigService{
 	private DocumentBuilder builder;
 	private JSONObject json;
 	*/
-	
-	public ConfigServiceImpl(){
-		nodeService=NodeServiceFactory.getLocalService();
-		permissionService=PermissionServiceFactory.getLocalService();
-		/*
-		json = XML.toJSONObject(FileUtils.readFileToString(CONFIG_XML,"UTF-8"));
-		builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		doc = builder.parse(CONFIG_XML);
-		*/
-	}
+
 	/*
 	public JSONObject getAsJson(String contextId) throws Exception {
 		JSONObject copy = new JSONObject(json, JSONObject.getNames(json));
@@ -139,7 +133,9 @@ public class ConfigServiceImpl implements ConfigService{
 			throw new IOException(file + " missing");
 		return is;
 	}
-	private Context getContext(String domain) throws Exception {
+
+	@Override
+	public Context getContext(String domain) throws Exception {
 		Config config=getConfig();
 		if(config.contexts!=null && config.contexts.context!=null) {
 			for (Context context : config.contexts.context) {
@@ -155,30 +151,28 @@ public class ConfigServiceImpl implements ConfigService{
 		return null;
 	}
 	@Override
-	public String getContextId(String domain) throws Exception {
-		Context context = getContext(domain);
-		if(context!=null)
-			return context.id;
-		return null;
-	}
-	@Override
 	public Config getConfigByDomain(String domain) throws Exception {
 		Context context=getContext(domain);
 		if(context == null) {
-			throw new IllegalArgumentException("Context with domain "+domain+" does not exists");
+			throw new IllegalArgumentException("Context with domain "+ domain +" does not exists");
 		}
+		return getConfigByContext( context);
+
+	}
+
+	@Override
+	public Config getConfigByContext(Context context) throws Exception {
 		if(!"true".equalsIgnoreCase(ApplicationInfoList.getHomeRepository().getDevmode()) && configCache.getKeys().contains(CACHE_KEY + "_" + context)) {
 			return configCache.get(CACHE_KEY + "_" + context);
 		}
 		Config config=getConfig().deepCopy();
-		overrideValues(config.values,context.values);
+		overrideValues(config.values, context.values);
 		if(context.language!=null)
-			config.language = overrideLanguage(config.language,context.language);
+			config.language = overrideLanguage(config.language, context.language);
 		if(context.variables!=null)
-			config.variables = overrideVariables(config.variables,context.variables);
+			config.variables = overrideVariables(config.variables, context.variables);
 		configCache.put(CACHE_KEY + "_" + context, config);
 		return config;
-
 	}
 
 	@Override
@@ -193,12 +187,12 @@ public class ConfigServiceImpl implements ConfigService{
 			nodeId = child.getId();
 		}catch(Throwable t){
 			// does not exists -> we will create a new node
-			HashMap<String, String[]> props=new HashMap<>();
+			Map<String, String[]> props=new HashMap<>();
 			props.put(CCConstants.CM_NAME,new String[]{key});
 			nodeId=nodeService.createNode(folder,CCConstants.CCM_TYPE_CONFIGOBJECT,props);
 		}
 
-		HashMap<String, Object> props=new HashMap<>();
+		Map<String, Object> props=new HashMap<>();
 		props.put(CCConstants.CCM_PROP_CONFIGOBJECT_VALUE,object.toString());
 		nodeService.updateNodeNative(nodeId,props);
 		DynamicConfig result=new DynamicConfig();
@@ -275,14 +269,18 @@ public class ConfigServiceImpl implements ConfigService{
 		
 	}
 
-	@Override
-	public void refresh() {
+	private void refresh() {
 		configCache.remove(CACHE_KEY);
 		try {
 			getConfig();
 		} catch (Exception e) {
 			logger.error("error refreshing client config: "+e.getMessage(),e);
 		}
+	}
+
+	@Override
+	public void onApplicationEvent(RefreshScopeRefreshedEvent event) {
+		refresh();
 	}
 
 

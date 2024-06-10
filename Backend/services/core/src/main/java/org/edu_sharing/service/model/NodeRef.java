@@ -29,44 +29,44 @@ public interface NodeRef {
 		Boolean getIcon();
 	}
 
-	public String getRepositoryId();
+	 String getRepositoryId();
 
-	public void setRepositoryId(String repositoryId);
+	 void setRepositoryId(String repositoryId);
 
-	public String getStoreProtocol();
+	 String getStoreProtocol();
 
-	public void setStoreProtocol(String storeProtocol);
+	 void setStoreProtocol(String storeProtocol);
 
-	public String getStoreId();
+	 String getStoreId();
 
-	public void setStoreId(String storeId);
+	 void setStoreId(String storeId);
 
-	public String getNodeId();
+	 String getNodeId();
 
-	public void setNodeId(String nodeId);
+	 void setNodeId(String nodeId);
 
-	public HashMap<String,Object> getProperties();
+	 Map<String,Object> getProperties();
 
-	public void setProperties(HashMap<String,Object> properties);
+	 void setProperties(Map<String,Object> properties);
 
-	public void setPreview(Preview preview);
+	 void setPreview(Preview preview);
 
-	public Preview getPreview();
+	 Preview getPreview();
 
-	public Map<String,Boolean> getPermissions();
+	 Map<String,Boolean> getPermissions();
 
-	public void setPermissions(Map<String,Boolean> permissions);
+	 void setPermissions(Map<String,Boolean> permissions);
 
 	public Boolean getPublic();
 
-	public void setPublic(Boolean aPublic);
+	void setPublic(Boolean aPublic);
 
 	void setAspects(List<String> aspects);
 
-	public List<String> getAspects();
+	 List<String> getAspects();
 
-	public void setUsedInCollections(List<CollectionRef> usedInCollections);
+	 void setUsedInCollections(List<CollectionRef> usedInCollections);
 
-	public List<CollectionRef> getUsedInCollections();
+	 List<CollectionRef> getUsedInCollections();
 
 }

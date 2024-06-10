@@ -1,4 +1,0 @@
-type Editorial {
-    state: RangedValue
-    checklist: [RangedValue!]
-}

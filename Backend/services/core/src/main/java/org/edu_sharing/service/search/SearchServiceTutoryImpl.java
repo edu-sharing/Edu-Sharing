@@ -79,8 +79,8 @@ public class SearchServiceTutoryImpl extends SearchServiceAdapter{
 		return searchResultNodeRef;
 	}
 	
-	public static HashMap<String,Object> getProperties(JSONObject worksheet) throws JSONException{
-		HashMap<String,Object> properties=new HashMap<>();
+	public static Map<String,Object> getProperties(JSONObject worksheet) throws JSONException{
+		Map<String,Object> properties=new HashMap<>();
 		String id = worksheet.getString("id");
 		properties.put(CCConstants.SYS_PROP_NODE_UID,id);
 		properties.put(CCConstants.LOM_PROP_GENERAL_TITLE,worksheet.getString("name"));

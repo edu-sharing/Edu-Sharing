@@ -1,5 +1,7 @@
 // Reexport API models that are exposed by wrappers.
 
+import { SearchV1Service } from './api/services/search-v-1.service';
+
 export {
     About,
     Connector,
@@ -31,6 +33,8 @@ export {
     NodeVersionRefEntries,
     NodeRef,
     NodeStats,
+    Config,
+    ConfigThemeColor,
     Organization,
     Group,
     Pagination,
@@ -38,11 +42,14 @@ export {
     RelationData,
     ReferenceEntries,
     SearchResultNode as SearchResults,
+    SearchParameters,
     Repo as Repository,
     Statistics,
     StatisticsGroup,
     StreamEntry,
     Tool,
+    NodeSuggestionResponseDto,
+    SuggestionResponseDto,
     Tools,
     User,
     UserProfile,
@@ -52,9 +59,10 @@ export {
     RegisterInformation,
 } from './api/models';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Group, MdsView, Organization, Person, User } from './api/models';
-import { Acl } from './api/models';
+import { Acl, Group, MdsView, Organization, Person, User } from './api/models';
+import { SuggestionsV1Service } from './api/services/suggestions-v-1.service';
 
+export type SuggestionStatus = Parameters<SuggestionsV1Service['updateStatus']>[0]['status'];
 export type MdsViewRelation = MdsView['rel'];
 export type GenericAuthority = Organization | Group | User;
 export type ApiErrorResponse = HttpErrorResponse & {

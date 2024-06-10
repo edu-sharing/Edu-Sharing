@@ -283,8 +283,17 @@
             <ref bean="permissionService" />
         </property>
   	</bean>
- 
-   	     
+
+    <!-- edu-sharing user cache -->
+    <bean id="userCache" class="org.edu_sharing.repository.server.tools.cache.UserCache">
+        <property name="personService">
+            <ref bean="personService"/>
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+    </bean>
+
     <!-- edu-sharing default folders -->
     <bean id="onUpdatePersonPropertiesPolicy" class="org.edu_sharing.alfresco.policy.OnUpdatePersonPropertiesPolicy" init-method="init">
    	 	<property name="policyComponent">

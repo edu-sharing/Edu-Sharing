@@ -51,6 +51,7 @@ import { MainMenuEntriesService } from '../main-menu-entries.service';
 import { MainNavConfig, MainNavService } from '../main-nav.service';
 import { SearchFieldService } from '../search-field/search-field.service';
 import { TopBarComponent } from '../top-bar/top-bar.component';
+import { ImprintPrivacyService } from '../../../shared/components/imprint-privacy-footer/imprint-privacy-service';
 
 /**
  * The main nav (top bar + menus)
@@ -135,6 +136,7 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
         private dialogs: DialogsService,
         private licenseAgreement: LicenseAgreementService,
         private searchField: SearchFieldService,
+        private imprintPrivacy: ImprintPrivacyService,
     ) {}
 
     ngOnInit(): void {
@@ -391,18 +393,6 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     }
 
-    openImprint() {
-        UIHelper.openUrl(this.config.imprintUrl, this.bridge, OPEN_URL_MODE.BlankSystemBrowser);
-    }
-
-    openPrivacy() {
-        UIHelper.openUrl(
-            this.config.privacyInformationUrl,
-            this.bridge,
-            OPEN_URL_MODE.BlankSystemBrowser,
-        );
-    }
-
     private checkConfig() {
         this.configService.getAll().subscribe((data: any) => {
             this.config = data;
@@ -515,7 +505,9 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         const infoGroup = new OptionGroup('info', 20);
         if (this.config.imprintUrl) {
-            const option = new OptionItem('IMPRINT', 'info_outline', () => this.openImprint());
+            const option = new OptionItem('IMPRINT', 'info_outline', () =>
+                this.imprintPrivacy.openImprint(),
+            );
             option.group = infoGroup;
             option.mediaQueryType = UIConstants.MEDIA_QUERY_MAX_WIDTH;
             option.mediaQueryValue = UIConstants.MOBILE_TAB_SWITCH_WIDTH;
@@ -523,7 +515,7 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         if (this.config.privacyInformationUrl) {
             const option = new OptionItem('PRIVACY_INFORMATION', 'verified_user', () =>
-                this.openPrivacy(),
+                this.imprintPrivacy.openPrivacy(),
             );
             option.group = infoGroup;
             option.mediaQueryType = UIConstants.MEDIA_QUERY_MAX_WIDTH;
@@ -702,7 +694,7 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
                 .observeAutoLogout()
                 .pipe(takeUntil(this.destroyed$))
                 .subscribe(async () => {
-                    this.topBar?.mainMenuSidebar?.close();
+                    this.topBar?.mainMenuSidebar?.hide();
                     const dialogRef = await this.dialogs.openGenericDialog({
                         title: 'WORKSPACE.AUTOLOGOUT',
                         message: 'WORKSPACE.AUTOLOGOUT_INFO',

@@ -62,7 +62,7 @@ public class SearchServiceWSImpl extends SearchServiceAdapter {
 	@Override
 	public SearchResultNodeRef search(SearchToken _searchToken) {
 		org.edu_sharing.repository.client.rpc.SearchToken searchToken = new org.edu_sharing.repository.client.rpc.SearchToken();
-		searchToken.setCountProps(new ArrayList<String>(_searchToken.getFacets()));
+		searchToken.setCountProps(new ArrayList<>(_searchToken.getFacets()));
 		searchToken.setCountPropsMinCount(_searchToken.getFacetsMinCount());
 		searchToken.setNrOfResults(_searchToken.getMaxResult());
 		searchToken.setRepositoryId(appId);
@@ -96,7 +96,7 @@ public class SearchServiceWSImpl extends SearchServiceAdapter {
 	}
 
 	@Override
-	public HashMap<ContentType,SearchToken> getLastSearchTokens() throws Throwable {
+	public Map<ContentType,SearchToken> getLastSearchTokens() throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -13,7 +13,7 @@ public class AlfrescoDaoHelper {
 	}
 	
 	public static List<NodeRef> marshall(List<org.edu_sharing.service.model.NodeRef> list){
-		List<NodeRef> nodeRefs = new ArrayList<NodeRef>();
+		List<NodeRef> nodeRefs = new ArrayList<>();
 		for(org.edu_sharing.service.model.NodeRef nr :  list){
 			nodeRefs.add(marshall(nr));
 		}

@@ -129,8 +129,8 @@ public class ZipContentIndexer extends ActionExecuterAbstractBase {
 		
 		String contentToIdx = "";
 		
-		ArrayList<InputStream> theInputStreams = new ArrayList<InputStream>();
-		ArrayList<String> fileNamesToIndex = new ArrayList<String>();
+		ArrayList<InputStream> theInputStreams = new ArrayList<>();
+		ArrayList<String> fileNamesToIndex = new ArrayList<>();
 		
 		try {
 

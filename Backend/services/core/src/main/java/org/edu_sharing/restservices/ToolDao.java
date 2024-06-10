@@ -45,7 +45,7 @@ public class ToolDao {
 					try {
 						NodeService nodeService = NodeServiceFactory.getNodeService(repoDao.getApplicationInfo().getAppId());
 						String nodeId = nodeService.createNode(companyHomeId, CCConstants.CCM_TYPE_MAP, nodeService.getNameProperty( CCConstants.TOOL_HOMEFOLDER));
-						PermissionServiceFactory.getPermissionService(null).setPermissions(nodeId, new ArrayList<ACE>(), false, null,null, false);
+						PermissionServiceFactory.getPermissionService(null).setPermissions(nodeId, new ArrayList<>(), false, null,null, false);
 						return nodeId;
 		}catch(Throwable e) {
 			throw new Exception(e);
@@ -88,7 +88,7 @@ public class ToolDao {
 			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
 			new NodeApi().resolveURLTitle(properties);
 
-			List<String> aspects = new ArrayList<String>();
+			List<String> aspects = new ArrayList<>();
 			if (aspect != null && !aspect.trim().equals("")) {
 				aspects.add(aspect);
 			}
@@ -118,7 +118,7 @@ public class ToolDao {
 		}
 
 		List<NodeRef> childRefs = nodeDao.getChildren();
-		List<Node> result = new ArrayList<Node>();
+		List<Node> result = new ArrayList<>();
 		for (NodeRef nodeRef : childRefs) {
 			Node node = NodeDao.getNode(repoDao, nodeRef.getId()).asNode();
 			if (node.getType().equals(NameSpaceTool.transformToShortQName(CCConstants.CCM_TYPE_TOOL_INSTANCE))) {
@@ -138,7 +138,7 @@ public class ToolDao {
 		String toolFolderId = getToolFolder(repositoryId);
 		List<ChildAssociationRef> children = nodeService.getChildrenChildAssociationRef(toolFolderId);
 		
-		List<Node> result = new ArrayList<Node>();
+		List<Node> result = new ArrayList<>();
 		
 		for(ChildAssociationRef child : children) {
 			String[] aspects = nodeService.getAspects(child.getChildRef().getStoreRef().getProtocol(), child.getChildRef().getStoreRef().getIdentifier(), child.getChildRef().getId());

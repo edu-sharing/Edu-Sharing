@@ -35,6 +35,11 @@ type LoginAction =
           accessToken: string;
       }
     | {
+          // Logs the user in with the provided credentials.
+          kind: 'loginEduTicket';
+          ticket: string;
+      }
+    | {
           // Logs the user out.
           kind: 'logout';
       }
@@ -148,6 +153,14 @@ export class AuthenticationService {
         this.loginActionTrigger.next({
             kind: 'loginToken',
             accessToken,
+        });
+        return this.loginInfo$.pipe(first());
+    }
+
+    loginEduTicket(ticket: string): Observable<LoginInfo> {
+        this.loginActionTrigger.next({
+            kind: 'loginEduTicket',
+            ticket,
         });
         return this.loginInfo$.pipe(first());
     }
@@ -371,6 +384,8 @@ export class AuthenticationService {
                 }
             case 'loginToken':
                 return this.loginWithToken(action.accessToken);
+            case 'loginEduTicket':
+                return this.loginWithEduTicket(action.ticket);
             case 'logout':
                 return this.authentication.logout().pipe(switchMap(() => this.fetchLoginInfo()));
             case 'initial':
@@ -385,6 +400,9 @@ export class AuthenticationService {
         });
     }
 
+    /**
+     * request authentication by providing an username and password
+     */
     private loginWithBasicAuth(username: string, password: string): Observable<LoginInfo> {
         return rxjs.of(void 0).pipe(
             // Make `setBasicAuthForNextRequest` part of the observable, so it is guaranteed to
@@ -395,11 +413,26 @@ export class AuthenticationService {
             switchMap(() => this.authentication.login()),
         );
     }
+    /**
+     * request authentication by providing an oauth token
+     */
     private loginWithToken(accessToken: string): Observable<LoginInfo> {
         return rxjs.of(void 0).pipe(
             // Make `setBasicAuthForNextRequest` part of the observable, so it is guaranteed to
             // be run together with the login request.
             tap(() => this.apiRequestConfiguration.setBearerAuthForNextRequest(accessToken)),
+            switchMap(() => this.authentication.login()),
+        );
+    }
+
+    /**
+     * request authentication by providing an edu-sharing ticket (usually gathered via authByApp)
+     */
+    private loginWithEduTicket(ticket: string): Observable<LoginInfo> {
+        return rxjs.of(void 0).pipe(
+            // Make `setBasicAuthForNextRequest` part of the observable, so it is guaranteed to
+            // be run together with the login request.
+            tap(() => this.apiRequestConfiguration.setEduTicketAuthForNextRequest(ticket)),
             switchMap(() => this.authentication.login()),
         );
     }
@@ -425,28 +458,31 @@ export class AuthenticationService {
     private createUserChanges(): Observable<void> {
         return this.loginActionResponseSubject.pipe(
             filter((response): response is LoginActionResponse => response !== null),
-            scan((acc, response) => {
-                if (acc === null && response.loginAction.kind === 'initial') {
-                    // We had no information about the logged-in user so far and just refreshed the
-                    // login information. We learned about the logged-in user, but they really were
-                    // already logged-in before.
-                    return {
-                        changed: false,
-                        authorityName: response.loginInfo.authorityName,
-                    };
-                } else if (acc?.authorityName !== response.loginInfo.authorityName) {
-                    // The logged-in user changed.
-                    return {
-                        changed: true,
-                        authorityName: response.loginInfo.authorityName,
-                    };
-                } else {
-                    return {
-                        changed: false,
-                        authorityName: response.loginInfo.authorityName,
-                    };
-                }
-            }, null as { changed: boolean; authorityName?: string } | null),
+            scan(
+                (acc, response) => {
+                    if (acc === null && response.loginAction.kind === 'initial') {
+                        // We had no information about the logged-in user so far and just refreshed the
+                        // login information. We learned about the logged-in user, but they really were
+                        // already logged-in before.
+                        return {
+                            changed: false,
+                            authorityName: response.loginInfo.authorityName,
+                        };
+                    } else if (acc?.authorityName !== response.loginInfo.authorityName) {
+                        // The logged-in user changed.
+                        return {
+                            changed: true,
+                            authorityName: response.loginInfo.authorityName,
+                        };
+                    } else {
+                        return {
+                            changed: false,
+                            authorityName: response.loginInfo.authorityName,
+                        };
+                    }
+                },
+                null as { changed: boolean; authorityName?: string } | null,
+            ),
             filter((acc) => acc?.changed ?? false),
             mapTo(void 0),
             share(),

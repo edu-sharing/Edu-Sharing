@@ -2,11 +2,13 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_FORM_FIELD } from '@angular/material/form-field';
 import { TranslateService } from '@ngx-translate/core';
-import { DateHelper } from 'ngx-edu-sharing-ui';
+import { SuggestionResponseDto, SuggestionStatus } from 'ngx-edu-sharing-api';
+import { DateHelper, UIAnimation } from 'ngx-edu-sharing-ui';
 import { filter } from 'rxjs/operators';
 import { Toast } from '../../../../../services/toast';
 import { MdsEditorInstanceService, Widget } from '../../mds-editor-instance.service';
 import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
+import { trigger } from '@angular/animations';
 
 @Component({
     selector: 'es-mds-editor-widget-text',
@@ -16,6 +18,7 @@ import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
         // Tell the input that it is inside a form field so it will apply relevant classes.
         { provide: MAT_FORM_FIELD, useValue: true },
     ],
+    animations: [],
 })
 export class MdsEditorWidgetTextComponent extends MdsEditorWidgetBase implements OnInit {
     @ViewChild('inputElement') inputElement: ElementRef;
@@ -23,6 +26,7 @@ export class MdsEditorWidgetTextComponent extends MdsEditorWidgetBase implements
     readonly valueType: ValueType = ValueType.String;
     formControl: UntypedFormControl;
     fileNameChecker: FileNameChecker;
+    suggestions: SuggestionResponseDto[];
 
     constructor(
         mdsEditorInstance: MdsEditorInstanceService,
@@ -55,6 +59,10 @@ export class MdsEditorWidgetTextComponent extends MdsEditorWidgetBase implements
             );
         }
         this.registerValueChanges(this.formControl);
+    }
+
+    getSuggestions() {
+        return this.widget.getSuggestions()?.filter((s) => s.status === 'PENDING') ?? [];
     }
 
     focus(): void {
@@ -99,6 +107,18 @@ export class MdsEditorWidgetTextComponent extends MdsEditorWidgetBase implements
         if (this.mdsEditorInstance.editorMode === 'search') {
             this.setValue([this.formControl.value]);
         }
+    }
+
+    setSuggestionState(suggestion: SuggestionResponseDto, status: SuggestionStatus) {
+        suggestion.status = status;
+        this.mdsEditorInstance.updateSuggestionState(this.widget.definition.id, suggestion);
+        this.widget.markSuggestionChanged();
+    }
+
+    applySuggestion(suggestion: SuggestionResponseDto) {
+        this.formControl.setValue(suggestion.value as string);
+        this.setValue([suggestion.value as string]);
+        this.setSuggestionState(suggestion, 'ACCEPTED');
     }
 }
 

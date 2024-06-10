@@ -332,7 +332,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             parent: await this.getParent(),
             chooseParent: this.showPicker,
         });
-        if (nodes) {
+        if (nodes && Array.isArray(nodes)) {
             this.onCreate.emit(nodes);
         }
     }
@@ -439,7 +439,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
 
     private openCamera() {
         this.bridge.getCordova().getPhotoFromCamera(
-            (data: any) => {
+            async (data: string) => {
                 const name =
                     this.translate.instant('SHARE_APP.IMAGE') +
                     ' ' +
@@ -450,12 +450,9 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                     '.jpg';
                 const blob: any = Helper.base64toBlob(data, 'image/jpeg');
                 blob.name = name;
-                const list: any = {};
-                list.item = (i: number) => {
-                    return blob;
-                };
-                list.length = 1;
-                this.openUpload(list);
+                const fakeFileList = [blob] as unknown as FileList;
+                fakeFileList.item = (index: number) => blob;
+                await this.openUpload(fakeFileList);
             },
             (error: any) => {
                 console.warn(error);

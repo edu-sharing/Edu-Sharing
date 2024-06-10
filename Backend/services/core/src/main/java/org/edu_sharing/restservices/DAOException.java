@@ -28,7 +28,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collections;
 import java.util.Map;
 
-public class DAOException extends Exception {
+public class DAOException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	private String nodeId;

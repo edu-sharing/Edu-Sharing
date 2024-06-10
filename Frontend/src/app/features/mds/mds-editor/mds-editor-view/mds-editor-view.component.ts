@@ -422,7 +422,7 @@ export class MdsEditorViewComponent implements OnInit, AfterViewInit, OnChanges,
         if (constraints.requiresNode === true) {
             if (
                 !this.mdsEditorInstance.nodes$.value &&
-                !this.mdsEditorInstance.graphqlMetadata$.value
+                !this.mdsEditorInstance.suggestionMetadata$.value
             ) {
                 return 'Only supported if a node object is available';
             }

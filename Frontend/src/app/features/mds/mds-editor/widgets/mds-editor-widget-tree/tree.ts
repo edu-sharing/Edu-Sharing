@@ -115,7 +115,7 @@ export class Tree {
         return ancestors;
     }
 
-    idToDisplayValue(id: string): DisplayValue {
+    toDisplayValue(id: string): DisplayValue {
         const node = this.nodesMap[id] || this.nodesMapAlternativeIds[id];
         if (node == null) {
             return {

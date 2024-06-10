@@ -367,10 +367,7 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 	private String authByAppUsernameMappingDirectoryUsername = null;
 	
 	private String authByAppUsernameMappingRepositoryUsername = null;
-	
-	//an "," separated String with authentication Types that need to be explicit activated. i.e. valid value is "shibboleth"
-	private String allowedAuthenticationTypes = null;
-	
+
 	//for lms or other connected systems: if they call the gwt app with the css_appid param then the custom css file is included in the html
 	private String customCss = null;
 	
@@ -541,8 +538,6 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 
 		authByAppUserWhitelist = properties.getProperty(AUTHBYAPP_USER_WHITELIST);
 
-		allowedAuthenticationTypes = properties.getProperty("allowed_authentication_types");
-		
 		customCss = properties.getProperty("custom_css");
 		
 		String tmpTrackingBufferSize = properties.getProperty("trackingBufferSize");
@@ -930,13 +925,6 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 		return authByAppUsernameMappingRepositoryUsername;
 	}
 
-	public String getAllowedAuthenticationTypes() {
-		
-		return allowedAuthenticationTypes;
-		
-		
-	}
-
 	public String getCustomCss() {
 		return customCss;
 	}
@@ -951,7 +939,7 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 	 * @return
 	 */
 	public boolean isTrustedHost(String hostName){
-		List<String> hostList = new ArrayList<String>();
+		List<String> hostList = new ArrayList<>();
 		hostList.add(host);
 		if(this.getDomain() != null && !this.getDomain().equals("")){
 			hostList.add(this.getDomain());

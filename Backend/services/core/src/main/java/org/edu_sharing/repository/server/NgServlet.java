@@ -30,6 +30,7 @@ import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Map;
 
 public class NgServlet extends HttpServlet {
 	public static final String COMPONENTS_RENDER = "components/render";
@@ -84,7 +85,7 @@ public class NgServlet extends HttpServlet {
 	private static String addSEO(String html, URL url) {
 		try {
 			NodeRefVersion node = getNodeFromURL(url);
-			HashMap<String, Object> props = NodeServiceHelper.getPropertiesVersion(node.getNodeRef(), node.getVersion());
+			Map<String, Object> props = NodeServiceHelper.getPropertiesVersion(node.getNodeRef(), node.getVersion());
 
 			Document doc = Jsoup.parse(html);
 			String title = (String) (props.get(CCConstants.LOM_PROP_GENERAL_TITLE));

@@ -26,6 +26,7 @@ import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.spring.ApplicationContextFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Provider {
     protected final String appId;
@@ -64,7 +65,7 @@ public abstract class Provider {
     /**
      * @Deprecated
      */
-    public MCBaseClient getApiClient(HashMap<String, String> auth){
+    public MCBaseClient getApiClient(Map<String, String> auth){
         return new MCAlfrescoAPIClient(appId, auth);
     }
     public abstract SearchService getSearchService();

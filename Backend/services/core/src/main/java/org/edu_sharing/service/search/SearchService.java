@@ -10,7 +10,6 @@ import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.search.model.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,7 +85,7 @@ public interface SearchService {
 	SearchResult<String> searchPersonGroups(String authorityName, String pattern, int skipCount, int maxValues,
 			SortDefinition sort);
 
-	HashMap<ContentType,SearchToken> getLastSearchTokens() throws Throwable;
+	Map<ContentType,SearchToken> getLastSearchTokens() throws Throwable;
 	
 	public default List<? extends  Suggestion> getSuggestions(MetadataSet mds, String queryId, String parameterId, String value, List<MdsQueryCriteria> criterias) {
 		return null;	

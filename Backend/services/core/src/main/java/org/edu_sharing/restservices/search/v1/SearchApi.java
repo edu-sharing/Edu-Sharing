@@ -9,6 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
@@ -29,13 +33,10 @@ import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SearchVCard;
 import org.edu_sharing.service.search.model.SortDefinition;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 @Path("/search/v1")
 @Tag(name= "SEARCH v1" )
@@ -73,8 +74,8 @@ public class SearchApi {
 			@Context HttpServletRequest req) {
 
 		try {
-			
-			
+
+
 			if(RepoProxyFactory.getRepoProxy().myTurn(repository)) {
 				return RepoProxyFactory.getRepoProxy().searchV2(repository, mdsId, query, contentType, maxItems, skipCount, sortProperties, sortAscending, parameters, propertyFilter, req);
 			}
@@ -99,38 +100,45 @@ public class SearchApi {
 			token.setResolveCollections(parameters.isResolveCollections());
 			token.setReturnSuggestion(parameters.isReturnSuggestions());
 			token.setExcludes(parameters.getExcludes());
-			NodeSearch search = NodeDao.search(repoDao, mdsDao, query, parameters.getCriteria(), token, filter);
+			NodeSearch search = NodeDao.search(repoDao, mdsDao, query, parameters.getCriteria(), token, filter, parametersToDaoTransformer(parameters));
 
-		    	List<Node> data = null;//new ArrayList<Node>();
-		    	if(search.getNodes().size() == 0){
-		    		//searched repo deliveres only nodeRefs by query time
-					data = NodeDao.convertToRest(repoDao, search.getResult(), filter, null);
-		    	}else{
-		    		//searched repo delivered properties by query time
-		    		data = search.getNodes();
-		    		// @TODO: we may need to still call convertToRest to make sure we've latest data from remote repos
-		    	}
+			List<Node> data = null;//new ArrayList<>();
+			if(search.getNodes().isEmpty()){
+				//searched repo deliveres only nodeRefs by query time
+				data = NodeDao.convertToRest(repoDao, search.getResult(), filter, parametersToDaoTransformer(parameters));
+			}else{
+				//searched repo delivered properties by query time
+				data = search.getNodes();
+				// @TODO: we may need to still call convertToRest to make sure we've latest data from remote repos
+			}
 
-		    	
-		    	Pagination pagination = new Pagination();
-		    	pagination.setFrom(search.getSkip());
-		    	pagination.setCount(data.size());
-		    	pagination.setTotal(search.getCount());
-		    	
-		    	
-		    	SearchResultNode response = new SearchResultNode();
-		    	response.setNodes(data);
-		    	response.setIgnored(search.getIgnored());
-		    	response.setPagination(pagination);	    	
-		    	response.setFacets(search.getFacets());
-				response.setSuggests(search.getSuggests());
 
-		    	return Response.status(Response.Status.OK).entity(response).build();
+			Pagination pagination = new Pagination();
+			pagination.setFrom(search.getSkip());
+			pagination.setCount(data.size());
+			pagination.setTotal(search.getCount());
 
-	    	}  catch (Throwable t) {
-	    		return ErrorResponse.createResponse(t);
-	    	}
 
+			SearchResultNode response = new SearchResultNode();
+			response.setNodes(data);
+			response.setIgnored(search.getIgnored());
+			response.setPagination(pagination);
+			response.setFacets(search.getFacets());
+			response.setSuggests(search.getSuggests());
+
+			return Response.status(Response.Status.OK).entity(response).build();
+
+		}  catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+
+	}
+
+	public static Function<NodeDao, NodeDao> parametersToDaoTransformer(SearchParameters parameters) {
+		return (dao) -> {
+			dao.resolveUsernames = parameters.isResolveUsernames();
+			return dao;
+		};
 	}
 
 	@POST
@@ -185,9 +193,9 @@ public class SearchApi {
 			token.setResolveCollections(parameters.isResolveCollections());
 			token.setReturnSuggestion(parameters.isReturnSuggestions());
 			token.setExcludes(parameters.getExcludes());
-			NodeSearch search = NodeDao.search(repoDao, mdsDao, query, parameters.getCriteria(), token, filter);
+			NodeSearch search = NodeDao.search(repoDao, mdsDao, query, parameters.getCriteria(), token, filter, parametersToDaoTransformer(parameters));
 
-			List<Node> nodes = null;//new ArrayList<Node>();
+			List<Node> nodes = null;//new ArrayList<>();
 			if(search.getNodes().size() == 0){
 				//searched repo deliveres only nodeRefs by query time
 				nodes = NodeDao.convertToRest(repoDao, search.getResult(), filter, null);
@@ -239,10 +247,10 @@ public class SearchApi {
 	@Operation(summary = "Search in facets.", description = "Perform queries based on metadata sets.")
 
 	@ApiResponses(value = { @ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = SearchResultNode.class))),
-		@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-		@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-		@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-		@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
 
 	public Response searchFacets(
@@ -355,11 +363,11 @@ public class SearchApi {
 							contentType,
 							new SortDefinition(sortProperties,sortAscending),
 							facets
-							);
+					);
 			return Response.status(Response.Status.OK).entity(result).build();
-	    	}  catch (Throwable t) {
-	    		return ErrorResponse.createResponse(t);
-	    	}
+		}  catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
 
 	}
 
@@ -385,35 +393,35 @@ public class SearchApi {
 			@Parameter(description = RestConstants.MESSAGE_SORT_ASCENDING) @QueryParam("sortAscending") List<Boolean> sortAscending,
 			@Parameter(description = "property filter for result nodes (or \"-all-\" for all properties)", array = @ArraySchema(schema = @Schema(defaultValue="-all-"))) @QueryParam("propertyFilter") List<String> propertyFilter,
 			@Context HttpServletRequest req) {
-			
-			try {
-				RepositoryDao repoDao = RepositoryDao.getRepository(repository);
-				
-				Filter filter = new Filter(propertyFilter);
-				NodeSearch nodeSearch = NodeDao.searchFingerprint(repoDao, nodeId, filter);
-				SearchResultNode response = new SearchResultNode();
-				
-				List<Node> data = new ArrayList<Node>();
-				for (org.edu_sharing.restservices.shared.NodeRef ref : nodeSearch.getResult()) {
-					data.add(NodeDao.getNode(repoDao, ref.getId(), filter).asNode());
-				}
-				response.setNodes(data);
-				
-				
-				Pagination pagination = new Pagination();
-		    	pagination.setFrom(nodeSearch.getSkip());
-		    	pagination.setCount(data.size());
-		    	pagination.setTotal(nodeSearch.getCount());
-		    	
-		    	response.setPagination(pagination);
 
-				return Response.status(Response.Status.OK).entity(response).build();
-			} catch (Throwable t) {
-				return ErrorResponse.createResponse(t);
+		try {
+			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
+
+			Filter filter = new Filter(propertyFilter);
+			NodeSearch nodeSearch = NodeDao.searchFingerprint(repoDao, nodeId, filter);
+			SearchResultNode response = new SearchResultNode();
+
+			List<Node> data = new ArrayList<>();
+			for (org.edu_sharing.restservices.shared.NodeRef ref : nodeSearch.getResult()) {
+				data.add(NodeDao.getNode(repoDao, ref.getId(), filter).asNode());
 			}
-			
+			response.setNodes(data);
+
+
+			Pagination pagination = new Pagination();
+			pagination.setFrom(nodeSearch.getSkip());
+			pagination.setCount(data.size());
+			pagination.setTotal(nodeSearch.getCount());
+
+			response.setPagination(pagination);
+
+			return Response.status(Response.Status.OK).entity(response).build();
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+
 	}
-	
+
 
 	@GET
 	@Path("/custom/{repository}")
@@ -491,26 +499,26 @@ public class SearchApi {
 			token.setLuceneString(query);
 			NodeSearch search = NodeDao.search(repoDao, token);
 
-	    	List<Node> data = new ArrayList<Node>();
-	    	for (NodeRef ref : search.getResult()) {
-	    		data.add(NodeDao.getNode(repoDao, ref.getId(),filter).asNode());
-	    	}
-	    	
-	    	Pagination pagination = new Pagination();
-	    	pagination.setFrom(search.getSkip());
-	    	pagination.setCount(data.size());
-	    	pagination.setTotal(search.getCount());
+			List<Node> data = new ArrayList<>();
+			for (NodeRef ref : search.getResult()) {
+				data.add(NodeDao.getNode(repoDao, ref.getId(),filter).asNode());
+			}
+
+			Pagination pagination = new Pagination();
+			pagination.setFrom(search.getSkip());
+			pagination.setCount(data.size());
+			pagination.setTotal(search.getCount());
 
 
 			SearchResultNode response = new SearchResultNode();
-	    	response.setNodes(data);
-	    	response.setPagination(pagination);	    	
-	    	response.setFacets(search.getFacets());
-	    	return Response.status(Response.Status.OK).entity(response).build();
-	
-    	}  catch (Throwable t) {
-    		return ErrorResponse.createResponse(t);
-    	}
+			response.setNodes(data);
+			response.setPagination(pagination);
+			response.setFacets(search.getFacets());
+			return Response.status(Response.Status.OK).entity(response).build();
+
+		}  catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
 
 	}
 
@@ -618,7 +626,7 @@ public class SearchApi {
 			Filter filter = new Filter(propertyFilter);
 			NodeSearch search = NodeDao.getMetadata(repoDao, nodeIds, filter);
 
-			List<Node> data = null;//new ArrayList<Node>();
+			List<Node> data = null;//new ArrayList<>();
 			if(search.getNodes().size() < search.getResult().size()){
 				//searched repo deliveres only nodeRefs by query time
 				data = NodeDao.convertToRest(repoDao, search.getResult(), null, null);

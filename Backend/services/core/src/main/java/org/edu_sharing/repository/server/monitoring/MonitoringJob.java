@@ -46,7 +46,7 @@ public class MonitoringJob extends AbstractJob{
 				
 				logger.info("MBEAN:" + mbean);
 				
-				HashMap<String, String> attributes = dao.getMBeanAttributes(mbean, MonitoringDao.mbeanAttributes);
+				Map<String,String> attributes = dao.getMBeanAttributes(mbean, MonitoringDao.mbeanAttributes);
 				for(Map.Entry<String,String> entry : attributes.entrySet()){
 					logger.info(entry.getKey() + ":"  + entry.getValue());
 				}
@@ -54,7 +54,7 @@ public class MonitoringJob extends AbstractJob{
 			
 			
 			logger.info("**********SessionCount****************");
-			HashMap<Application, Integer> map = dao.getSessionCount("localhost");
+			Map<Application, Integer> map = dao.getSessionCount("localhost");
 			for(Map.Entry<Application, Integer> entry : map.entrySet()){
 				logger.info(entry.getKey().getName() + " " + entry.getValue());
 			}
@@ -66,8 +66,8 @@ public class MonitoringJob extends AbstractJob{
 	}
 	
 	@Override
-	public Class[] getJobClasses() {
-		Class[] result = Arrays.copyOf(allJobs, allJobs.length + 1);
+	public Class<?>[] getJobClasses() {
+		Class<?>[] result = Arrays.copyOf(allJobs, allJobs.length + 1);
 	    result[result.length - 1] = MonitoringJob.class;
 		return result;
 	}

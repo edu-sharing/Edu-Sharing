@@ -3,13 +3,14 @@ package org.edu_sharing.service.authentication.sso.config;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MappingRoot {
 
-	HashMap<String,String> personMapping;
+	Map<String,String> personMapping;
 	Condition personMappingCondition;
 	
-	List<MappingGroup> groupMappings = new ArrayList<MappingGroup>();
+	List<MappingGroup> groupMappings = new ArrayList<>();
 	
 	public MappingRoot() {
 	}
@@ -18,7 +19,7 @@ public class MappingRoot {
 		this.groupMappings = groupMapping;
 	}
 	
-	public void setPersonMapping(HashMap<String, String> personMapping) {
+	public void setPersonMapping(Map<String, String> personMapping) {
 		this.personMapping = personMapping;
 	}
 	
@@ -26,12 +27,12 @@ public class MappingRoot {
 		return groupMappings;
 	}
 	
-	public HashMap<String, String> getPersonMapping() {
+	public Map<String, String> getPersonMapping() {
 		return personMapping;
 	}
 	
 	public List<String> getSSOGroupAttributes(){
-		List<String> ssoGroupAttributes = new ArrayList<String>();
+		List<String> ssoGroupAttributes = new ArrayList<>();
 		for(MappingGroup groupMapping : groupMappings){
 			getSSOGroupAttributes(ssoGroupAttributes,groupMapping.getCondition());
 		}
@@ -39,11 +40,11 @@ public class MappingRoot {
 	}
 	
 	public List<String> getSSOPersonAttributes(){
-		return new ArrayList<String>(personMapping.keySet());
+		return new ArrayList<>(personMapping.keySet());
 	}
 	
 	public List<String> getAllSSOAttributes(){
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		result.addAll(getSSOPersonAttributes());
 		result.addAll(getSSOGroupAttributes());
 		return result;

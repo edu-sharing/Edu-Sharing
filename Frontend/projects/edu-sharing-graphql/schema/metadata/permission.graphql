@@ -1,7 +1,0 @@
-type Permission {
-    action: String!
-    history: [String!]
-    invited: [String!]
-    modified: Date!
-    users: [String!]
-}

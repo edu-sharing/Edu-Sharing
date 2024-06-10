@@ -21,7 +21,7 @@ public class SystemStatistic {
 	
 	public static List<CacheCluster> getAllRepoStates(){
 		
-		List<CacheCluster> cacheCluster = new ArrayList<CacheCluster>();
+		List<CacheCluster> cacheCluster = new ArrayList<>();
 		
 		Iterator iter = bufferRepoState.iterator();
 		while(iter.hasNext()) {
@@ -33,7 +33,7 @@ public class SystemStatistic {
 	
 	public static List<CacheCluster> getRepoStates(Date since){
 		
-		List<CacheCluster> cacheCluster = new ArrayList<CacheCluster>();
+		List<CacheCluster> cacheCluster = new ArrayList<>();
 		
 		Iterator iter = bufferRepoState.iterator();
 		while(iter.hasNext()) {

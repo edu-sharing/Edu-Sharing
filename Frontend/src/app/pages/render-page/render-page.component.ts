@@ -66,10 +66,11 @@ import { CardService } from '../../services/card.service';
 import { NodeHelperService } from '../../services/node-helper.service';
 import { OptionsHelperService } from '../../services/options-helper.service';
 import { Toast } from '../../services/toast';
+import * as jQuery from 'jquery';
 import { BreadcrumbsService } from '../../shared/components/breadcrumbs/breadcrumbs.service';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { RenderHelperService } from './render-helper.service';
-
+import { CardDialogService } from '../../features/dialogs/card-dialog/card-dialog.service';
 @Component({
     selector: 'es-render-page',
     templateUrl: 'render-page.component.html',
@@ -102,6 +103,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy {
         private toolService: RestToolService,
         private cardServcie: CardService,
         viewContainerRef: ViewContainerRef,
+        private cardDialogService: CardDialogService,
         private frame: FrameEventsService,
         private toast: Toast,
         private configLegacy: ConfigurationService,
@@ -246,7 +248,10 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy {
 
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
-        if (CardComponent.getNumberOfOpenCards() > 0) {
+        if (
+            CardComponent.getNumberOfOpenCards() > 0 ||
+            this.cardDialogService.openDialogs.length > 0
+        ) {
             return;
         }
         if (event.code == 'ArrowLeft' && this.canSwitchBack()) {
@@ -279,7 +284,18 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy {
                     // use a timeout to let the browser try to go back in history first
                     setTimeout(() => {
                         if (!this.isDestroyed) {
-                            this.mainNavService.getMainNav().topBar?.toggleMenuSidebar();
+                            this.mainNavService.patchMainNavConfig({ showNavigation: true });
+                            setTimeout(() => {
+                                this.mainNavService.getMainNav().topBar?.toggleMenuSidebar();
+                                this.mainNavService
+                                    .getMainNav()
+                                    .topBar.onCloseScopeSelector.pipe(takeUntil(this.destroyed$))
+                                    .subscribe(() => {
+                                        this.mainNavService.patchMainNavConfig({
+                                            showNavigation: false,
+                                        });
+                                    });
+                            });
                         }
                     }, 250);
                 }

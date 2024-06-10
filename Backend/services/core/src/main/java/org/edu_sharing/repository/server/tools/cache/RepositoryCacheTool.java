@@ -48,7 +48,7 @@ public class RepositoryCacheTool {
 	 * @param rootfolderId
 	 * @throws Throwable
 	 */
-	public void buildNewCache(HashMap authenticationInfo, String rootfolderId) throws Throwable {
+	public void buildNewCache(Map<String, String> authenticationInfo, String rootfolderId) throws Throwable {
 		Map<String, Map<String, Object>> newCache = new ConcurrentHashMap<String, Map<String, Object>>();
 
 		MCBaseClient mcBaseClient = RepoFactory.getInstance(ApplicationInfoList.getHomeRepository().getAppId(),
@@ -57,9 +57,9 @@ public class RepositoryCacheTool {
 			MCAlfrescoAPIClient apiClient = (MCAlfrescoAPIClient) mcBaseClient;
 			long startMillies = System.currentTimeMillis();
 			logger.info("starting getChildrenRecursive");
-			Map<NodeRef, HashMap<String, Object>> childRecursive = buildCache(rootfolderId, CCConstants.CCM_TYPE_IO);
+			Map<NodeRef, Map<String, Object>> childRecursive = buildCache(rootfolderId, CCConstants.CCM_TYPE_IO);
 			logger.info("getChildrenRecursive returned.starting to copy to cachemap. size:" + childRecursive.size());
-			for (Map.Entry<NodeRef, HashMap<String, Object>> entry : childRecursive.entrySet()) {
+			for (Map.Entry<NodeRef, Map<String, Object>> entry : childRecursive.entrySet()) {
 				newCache.put(entry.getKey().getId(), entry.getValue());
 			}
 
@@ -95,7 +95,7 @@ public class RepositoryCacheTool {
 	 * @param authenticationInfo
 	 * @param rootfolderId
 	 */
-	public void buildStickyCache(HashMap authenticationInfo, String rootfolderId) throws Throwable {
+	public void buildStickyCache(Map<String, String> authenticationInfo, String rootfolderId) throws Throwable {
 
 		
 		logger.info("preparing first level subfolders for folder: " + nodeService.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,rootfolderId),ContentModel.PROP_NAME ));
@@ -106,12 +106,12 @@ public class RepositoryCacheTool {
 
 		List<Callable<Void>> threads = new ArrayList<>();
 
-		List<ChildAssociationRef> childRefsThread = new ArrayList<ChildAssociationRef>();
+		List<ChildAssociationRef> childRefsThread = new ArrayList<>();
 
 		long time = System.currentTimeMillis();
 
 		logger.info("THREAD_COUNT:" + THREAD_COUNT);
-		int modulo = (childAssocRefs.size() > THREAD_COUNT) ? (int) (childAssocRefs.size() / THREAD_COUNT) : 1;
+		int modulo = (childAssocRefs.size() > THREAD_COUNT) ? (childAssocRefs.size() / THREAD_COUNT) : 1;
 
 		List<List<String>> threadNodes = new ArrayList<>();
 
@@ -138,39 +138,35 @@ public class RepositoryCacheTool {
 			int nr = j;
 			threads.add(() -> {
 
-				RunAsWork<Void> runAs = new RunAsWork<Void>() {
-					@Override
-					public Void doWork() throws Exception {
+				RunAsWork<Void> runAs = () -> {
+                    ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
 
-						ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
+                    ServiceRegistry sr = (ServiceRegistry) applicationContext
+                            .getBean(ServiceRegistry.SERVICE_REGISTRY);
+                    NodeService nodeService = sr.getNodeService();
 
-						ServiceRegistry sr = (ServiceRegistry) applicationContext
-								.getBean(ServiceRegistry.SERVICE_REGISTRY);
-						NodeService nodeService = sr.getNodeService();
+                    List<String> childRefPage = new ArrayList<>(threadData);
+                    logger.info("thread nr:" + nr + " got's " + childRefPage.size());
+                    for (String cr : childRefPage) {
+                        long startMillies = System.currentTimeMillis();
 
-						List<String> childRefPage = new ArrayList<>(threadData);
-						logger.info("thread nr:" + nr + " got's " + childRefPage.size());
-						for (String cr : childRefPage) {
-							long startMillies = System.currentTimeMillis();
+                        logger.info("thread nr:" + nr + "	starting getChildrenRecursive for folder:" + nodeService
+                                .getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, cr), ContentModel.PROP_NAME));
 
-							logger.info("thread nr:" + nr + "	starting getChildrenRecursive for folder:" + nodeService
-									.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, cr), ContentModel.PROP_NAME));
+                        try {
+                            buildCache(cr, CCConstants.CCM_TYPE_IO);
 
-							try {
-								buildCache(cr, CCConstants.CCM_TYPE_IO);
+                        } catch (Throwable e) {
+                            logger.error("thread nr:" + nr + e.getMessage(), e);
+                        }
+                        long endMillies = System.currentTimeMillis();
+                        long diff = (endMillies - startMillies) / 1000;
+                        long diffMinutes = diff / 60;
+                    }
 
-							} catch (Throwable e) {
-								logger.error("thread nr:" + nr + e.getMessage(), e);
-							}
-							long endMillies = System.currentTimeMillis();
-							long diff = (endMillies - startMillies) / 1000;
-							long diffMinutes = diff / 60;
-						}
+                    return null;
 
-						return null;
-
-					}
-				};
+                };
 
 				AuthenticationUtil.runAsSystem(runAs);
 
@@ -208,7 +204,7 @@ public class RepositoryCacheTool {
 
 	}
 
-	private Map<NodeRef, HashMap<String, Object>> buildCache(String parent, String type) {
+	private Map<NodeRef, Map<String, Object>> buildCache(String parent, String type) {
 		List<NodeRef> refs = NodeServiceFactory.getLocalService().getChildrenRecursive(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parent, Collections.singletonList(type), RecurseMode.Folders);
 		return refs.stream().collect(Collectors.toMap(ref -> ref,
 				ref -> {

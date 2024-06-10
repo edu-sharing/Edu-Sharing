@@ -21,8 +21,8 @@ public class MimeTypesV2 {
 	}
 	public static final String MIME_DIRECTORY="application/x-directory";
 
-	private static HashMap<String, String> extensionMimeMap;
-	private static HashMap<String, String> lrtMimeMap;
+	private static Map<String, String> extensionMimeMap;
+	private static Map<String, String> lrtMimeMap;
 	private final ApplicationInfo appInfo;
 	private String theme;
 	private final PathType pathType;
@@ -318,7 +318,7 @@ private static boolean isLtiObject(List<String> aspects) {
 		return false;
 	return aspects.contains(CCConstants.CCM_ASPECT_TOOL_OBJECT);
 }
-	public static HashMap<String, String> getLrtMimeMap() {
+	public static Map<String, String> getLrtMimeMap() {
 
 		if (lrtMimeMap == null) {
 			lrtMimeMap = new HashMap<>();
@@ -336,10 +336,10 @@ private static boolean isLtiObject(List<String> aspects) {
 		}
 		return lrtMimeMap;
 	}
-public static HashMap<String, String> getExtensionMimeMap() {
+public static Map<String, String> getExtensionMimeMap() {
 		
 		if(extensionMimeMap == null){
-			extensionMimeMap = new HashMap<String,String>();
+			extensionMimeMap = new HashMap<>();
 			extensionMimeMap.put("jpg", "image/jpeg");
 			extensionMimeMap.put("jpeg", "image/jpeg");
 			extensionMimeMap.put("png", "image/png");

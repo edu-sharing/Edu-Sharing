@@ -48,7 +48,7 @@ public class PersistentHandlerDB implements PersistentHandlerInterface{
 	
 	public String safe(RecordHandlerInterfaceBase recordHandler, String cursor, String set) throws Throwable{
 		
-		HashMap<String,String> tableStruct = this.getTableStructure(null, recordHandler.getProperties(), null);
+		Map<String,String> tableStruct = this.getTableStructure(null, recordHandler.getProperties(), null);
 			
 		String checkTableExistsSql = "show tables";
 		
@@ -148,13 +148,13 @@ public class PersistentHandlerDB implements PersistentHandlerInterface{
 		}
 	}
 	
-	HashMap<String,String>  getTableStructure(HashMap<String,String> tablestructure, Map props, String colNamePrefix){
+	Map<String,String>  getTableStructure(Map<String,String> tablestructure, Map<String, Object> props, String colNamePrefix){
 		if(tablestructure == null){
-			tablestructure  = new HashMap<String,String>();
+			tablestructure  = new HashMap<>();
 		}
 		
-		HashMap<String,Object> simpleProps = new HashMap<String,Object>();
-		HashMap<String,Object> nodeProps = new HashMap<String,Object>();
+		Map<String,Object> simpleProps = new HashMap<>();
+		Map<String,Object> nodeProps = new HashMap<>();
 		for(Object key:props.keySet()){
 			String propKey = (String)key;
 			if(propKey.startsWith("TYPE#")){

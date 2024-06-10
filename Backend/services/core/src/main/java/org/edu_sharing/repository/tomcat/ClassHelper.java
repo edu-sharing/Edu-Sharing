@@ -39,7 +39,7 @@ public class ClassHelper {
 
     public static List<Field> getStaticFields(Class clazz){
         Field[] declaredFields = clazz.getDeclaredFields();
-        List<Field> staticFields = new ArrayList<Field>();
+        List<Field> staticFields = new ArrayList<>();
         for (Field field : declaredFields) {
             if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                 staticFields.add(field);

@@ -6,16 +6,15 @@ import org.edu_sharing.restservices.DAOException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface BulkService {
 
     NodeRef getPrimaryFolder();
 
-    void refresh();
+    NodeRef sync(String group, List<String> match, List<String> groupBy, String type, List<String> aspects, Map<String, String[]> properties, boolean forceUpdate) throws Throwable;
 
-    NodeRef sync(String group, List<String> match, List<String> groupBy, String type, List<String> aspects, HashMap<String, String[]> properties, boolean forceUpdate) throws Throwable;
-
-    NodeRef find(HashMap<String, String[]> properties) throws Exception;
+    NodeRef find(Map<String, String[]> properties) throws Exception;
 
     List<BulkRun> runs(String replicationsource, BulkRun.RunState filterByState) throws DAOException;
 }

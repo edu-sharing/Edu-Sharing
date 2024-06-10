@@ -79,7 +79,7 @@ public class AuthMethodCAS implements AuthMethodInterface {
 		this.serviceRegistry = (ServiceRegistry) applicationContext.getBean("ServiceRegistry");
 	}
 	
-	public String authenticate(HashMap<String,String> params) throws AuthenticationException{
+	public String authenticate(Map<String, String> params) throws AuthenticationException{
 		String result = null;
 		String proxyValidate = null;
 		String proxyservice = null;
@@ -155,7 +155,7 @@ public class AuthMethodCAS implements AuthMethodInterface {
 					authenticationService.authenticate(homeRepository.getUsername(), homeRepository.getPassword().toCharArray());
 
 					authenticationDao.createUser(userName, "liferay".toCharArray());
-					Map<QName, Serializable> persProps = new HashMap<QName, Serializable>();
+					Map<QName, Serializable> persProps = new HashMap<>();
 					persProps.put(QName.createQName(CCConstants.PROP_USERNAME), userName);
 					persProps.put(QName.createQName(CCConstants.PROP_USER_EMAIL), userName);
 					personService.setPersonProperties(userName, persProps);

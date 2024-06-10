@@ -61,7 +61,7 @@ public class RedirectServlet extends HttpServlet {
 			}
 			throw new ServletException("Repository "+appId+" does not support rendering and didn't provide a "+CCConstants.LOM_PROP_TECHNICAL_LOCATION+" property! Please make sure that a property is provided");
 		}
-		String url=URLTool.getNgRenderNodeUrl(nodeId,req.getParameter("version"));
+		String url=URLTool.getNgRenderNodeUrl(nodeId,req.getParameter("version"), false, appId);
 		String params = req.getParameter("params");
 		if (params != null && !params.trim().equals("")) {
 			url=UrlTool.setParamEncode(url,"params",params);
@@ -176,7 +176,7 @@ public class RedirectServlet extends HttpServlet {
 			// contenturl
 			if ((renderServiceUrl == null || renderServiceUrl.trim().equals(""))) {
 				
-				HashMap<String, String> authInfo = new HashMap<String, String>();
+				Map<String, String> authInfo = new HashMap<>();
 				authInfo.put(CCConstants.AUTH_USERNAME, username);
 				authInfo.put(CCConstants.AUTH_TICKET, ticket);
 				try {
@@ -187,9 +187,9 @@ public class RedirectServlet extends HttpServlet {
 							renderServiceUrl = mcAlfrescoBaseClient.getAlfrescoContentUrl(renderUrlNodeId);
 
 							if(version != null && !version.trim().equals("")){
-								HashMap<String,HashMap<String,Object>> versHist = mcAlfrescoBaseClient.getVersionHistory(renderUrlNodeId);
+								Map<String,Map<String,Object>> versHist = mcAlfrescoBaseClient.getVersionHistory(renderUrlNodeId);
 								
-								for(Map.Entry<String,HashMap<String,Object>> entry : versHist.entrySet()){
+								for(Map.Entry<String,Map<String,Object>> entry : versHist.entrySet()){
 									
 									
 									String currentVers = (String)entry.getValue().get(CCConstants.CM_PROP_VERSIONABLELABEL);
@@ -232,7 +232,7 @@ public class RedirectServlet extends HttpServlet {
 						
 					}else{
 						
-						HashMap<String, Object> props = NodeServiceFactory.getNodeService(appId).getProperties(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId);
+						Map<String, Object> props = NodeServiceFactory.getNodeService(appId).getProperties(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId);
 
 						 if(props != null){
 							 String technicalLocation = (String)props.get(CCConstants.LOM_PROP_TECHNICAL_LOCATION);
@@ -290,7 +290,7 @@ public class RedirectServlet extends HttpServlet {
 	private String setUrlParameters(String appId, String nodeId, ApplicationInfo repInfo, String redirectUrl)
 			throws Throwable {
 		NodeService nodeService = NodeServiceFactory.getNodeService(appId);
-		HashMap<String, Object> props = nodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId);
+		Map<String, Object> props = nodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId);
 		
 		if (props != null) {
 			String title = (String) props.get(CCConstants.LOM_PROP_GENERAL_TITLE);

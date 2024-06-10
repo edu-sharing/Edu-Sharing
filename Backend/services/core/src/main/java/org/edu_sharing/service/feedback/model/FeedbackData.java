@@ -31,7 +31,7 @@ public class FeedbackData implements Serializable {
         return data;
     }
 
-    public void setData(HashMap<String, List<String>> data) {
+    public void setData(Map<String, List<String>> data) {
         this.data = data;
     }
 

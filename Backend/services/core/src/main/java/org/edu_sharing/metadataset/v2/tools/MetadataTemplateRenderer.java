@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.policy.GuestCagePolicy;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.metadataset.v2.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.I18nAngular;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
  */
 public class MetadataTemplateRenderer {
 
-	private final HashMap<String, String[]> propertiesNative;
+	private final Map<String, String[]> propertiesNative;
 
 	public enum RenderingMode{
 		HTML,
@@ -80,8 +81,8 @@ public class MetadataTemplateRenderer {
 	public Map<String, String[]> getProcessedProperties(){
 		return this.properties;
 	}
-	public static HashMap<String, String[]> convertProps(Map<String, Object> props) {
-		HashMap<String, String[]> propsConverted = new HashMap<>();
+	public static Map<String, String[]> convertProps(Map<String, Object> props) {
+		Map<String, String[]> propsConverted = new HashMap<>();
 		for(String key : props.keySet()){
 			String keyLocal= CCConstants.getValidLocalName(key);
 
@@ -211,9 +212,9 @@ public class MetadataTemplateRenderer {
 					int i = 0;
 					for (String value : values) {
 						String rawValue = value;
-						HashMap<String, Object> vcardData = null;
+						Map<String, Object> vcardData = null;
 						if ("vcard".equals(widget.getType())) {
-							ArrayList<HashMap<String, Object>> map = VCardConverter.vcardToHashMap(
+							ArrayList<Map<String, Object>> map = VCardConverter.vcardToMap(
 									// html in vcards gets escaped beforehand for security reason, unescape special chars to not break the format
 									org.apache.commons.lang.StringEscapeUtils.unescapeHtml(value)
 							);
@@ -228,9 +229,8 @@ public class MetadataTemplateRenderer {
 							String licenseVersion = properties.containsKey(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_COMMONLICENSE_CC_VERSION)) ?
 									properties.get(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_COMMONLICENSE_CC_VERSION))[0] : null;
 
-
 							LicenseService license = new LicenseService();
-							String link = license.getLicenseUrl(licenseName, mds.getI18n(), licenseVersion);
+							String link = license.getLicenseUrl(licenseName, Context.getCurrentInstance().getLocale(), licenseVersion);
 							value = "";
 							if (renderingMode.equals(RenderingMode.HTML)) {
 								if (link != null)
@@ -598,15 +598,31 @@ public class MetadataTemplateRenderer {
 			}
 		}
 		Map<String, MetadataKey> valuesMap = widget.getValuesAsMap();
-		if(valuesMap.containsKey(value))
-			value=valuesMap.get(value).getCaption();
+		MetadataKey entry = null;
+		if(valuesMap.containsKey(value)) {
+			entry = valuesMap.get(value);
+			value = valuesMap.get(value).getCaption();
+		}
 
 		if(widget.getFormat()!=null && !widget.getFormat().isEmpty()){
 			if(widget.getFormat().contains("${value}")) {
 				value = widget.getFormat().replace("${value}", value);
 			}
 		}
-		return value;
+		if(entry != null) {
+			value = "<span class=\"value-caption\">" + value + "</span>";
+			if(entry.getDescription() != null) {
+				value += " <span class=\"value-description\">" + entry.getDescription() + "</span>";
+			}
+			if(entry.getIcon() != null) {
+				value = "<img src=\"" + (entry.getIcon().startsWith("http://") || entry.getIcon().startsWith("https://") ? entry.getIcon() : "assets/images/" + entry.getIcon()) + "\" alt=\"\"><div class=\"value-group\">" + value + "</div>";
+			}
+			if(entry.getUrl() != null) {
+				value = "<a href=\"" + entry.getUrl() + "\" target=\"_BLANK\">" + value + "</a>";
+			}
+		}
+
+			return value;
 	}
 
 	/*
@@ -621,8 +637,8 @@ public class MetadataTemplateRenderer {
 		return cleaned;
 	}
 	*/
-	public HashMap<String, String[]> cleanupTextMultivalueProperties(Map<String, String[]> properties, boolean htmlMode) {
-		HashMap<String,String[]> cleaned=new HashMap<>();
+	public Map<String, String[]> cleanupTextMultivalueProperties(Map<String, String[]> properties, boolean htmlMode) {
+		Map<String,String[]> cleaned=new HashMap<>();
 		for(Map.Entry<String,String[]> entry : properties.entrySet()){
 			if(entry.getValue()==null) {
 				cleaned.put(entry.getKey(), null);

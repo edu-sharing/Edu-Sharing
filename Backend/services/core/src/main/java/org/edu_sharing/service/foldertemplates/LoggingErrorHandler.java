@@ -10,7 +10,7 @@ public class LoggingErrorHandler implements ErrorHandler {
 
     private boolean isValid = true;
     
-    List<String> message = new ArrayList<String>(); 
+    List<String> message = new ArrayList<>(); 
 
     public boolean isValid() {
         return this.isValid;

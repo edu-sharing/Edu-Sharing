@@ -6,6 +6,8 @@ services:
     environment:
       CACHE_HOST: ""
       CACHE_PORT: ""
+    extra_hosts:
+      - "repository.127.0.0.1.nip.io:host-gateway"
     volumes:
       - "${GIT_ROOT}/repository/Backend/alfresco/module/target/edu_sharing-community-repository-backend-alfresco-module-${org.edu_sharing:edu_sharing-community-repository-backend-alfresco-module:amp.version}.amp:/opt/alfresco/amps/alfresco/1/edu_sharing-community-repository-backend-alfresco-module-${org.edu_sharing:edu_sharing-community-repository-backend-alfresco-module:amp.version}.amp"
       - "${GIT_ROOT}/repository/Backend/services/common/target/edu_sharing-community-repository-backend-services-common-${org.edu_sharing:edu_sharing-community-repository-backend-services-common:jar.version}.jar:/opt/alfresco/tomcat/webapps/edu-sharing/WEB-INF/lib/edu_sharing-community-repository-backend-services-common-${org.edu_sharing:edu_sharing-community-repository-backend-services-common:jar.version}.jar"

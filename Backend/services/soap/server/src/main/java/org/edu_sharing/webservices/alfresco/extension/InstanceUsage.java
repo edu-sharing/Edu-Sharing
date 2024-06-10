@@ -53,9 +53,9 @@ public class InstanceUsage {
 	
 	private void count(String parentId) throws RemoteException {
 		System.out.println("Instance:" + naw.getProperties(parentId).get(CCConstants.CM_NAME));
-		HashMap<String,Object> nodes = naw.getChildren(parentId, null);
+		Map<String,Object> nodes = naw.getChildren(parentId, null);
 		for(Map.Entry<String, Object> entry : nodes.entrySet()) {
-			HashMap<String, Object> nodeProps = (HashMap<String, Object>)entry.getValue();
+			Map<String, Object> nodeProps = (HashMap<>)entry.getValue();
 			
 			String type = (String)nodeProps.get(CCConstants.NODETYPE);
 			System.out.println("nodeType:" + type + " " + nodeProps.get(CCConstants.CM_NAME) + " size:"+size + " MB:" + ((size /1000)/1000) +" Date:" + new Date());

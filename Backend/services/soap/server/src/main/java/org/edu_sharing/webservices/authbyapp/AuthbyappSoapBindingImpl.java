@@ -52,7 +52,7 @@ public class AuthbyappSoapBindingImpl implements org.edu_sharing.webservices.aut
 		log.info("Client ipAddress:"+ipAddress);
 		log.info("AuthClass:"+eduAuthenticationService.getClass().getName());
 		
-		HashMap<String,String> ssoDataMap = new HashMap<String,String>();
+		Map<String,String> ssoDataMap = new HashMap<>();
 		try{
 			
 			
@@ -79,7 +79,7 @@ public class AuthbyappSoapBindingImpl implements org.edu_sharing.webservices.aut
 		 * Attention if you put an username that does not exist, alfresco creates a ne person object without an user object in user store
 		 * watch out for Alfresco class PersonServiceImpl
 		 */
-		HashMap<String,String> userProps = eduAuthenticationService.getPersonProperties(eduAuthenticationService.getCurrentUserName());
+		Map<String,String> userProps = eduAuthenticationService.getPersonProperties(eduAuthenticationService.getCurrentUserName());
 		String localemail = userProps.get(CCConstants.CM_PROP_PERSON_EMAIL);
 		String localFirstname = userProps.get(CCConstants.CM_PROP_PERSON_FIRSTNAME);
 		String localLastname = userProps.get(CCConstants.CM_PROP_PERSON_LASTNAME);

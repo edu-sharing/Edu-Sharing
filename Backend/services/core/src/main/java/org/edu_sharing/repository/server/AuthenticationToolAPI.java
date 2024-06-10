@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.server;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -77,10 +78,10 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 	public AuthenticationToolAPI(String appId) {
 	}
 	
-	public java.util.HashMap<String,String> createNewSession(String userName, String password) throws Exception {
+	public Map<String,String> createNewSession(String userName, String password) throws Exception {
 		authenticationService.authenticate(userName, password.toCharArray());
 		
-		HashMap<String,String> returnval = new HashMap<String,String>();
+		Map<String,String> returnval = new HashMap<>();
 		returnval.put(CCConstants.AUTH_USERNAME, authenticationService.getCurrentUserName());
 		returnval.put(CCConstants.AUTH_TICKET, authenticationService.getCurrentTicket());
 		
@@ -95,9 +96,9 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 	};
 	
 	@Override
-	public HashMap<String, String> getUserInfo(String userName, String ticket) throws Exception {
+	public Map<String, String> getUserInfo(String userName, String ticket) throws Exception {
 		serviceRegistry.getAuthenticationService().validate(ticket);
-		HashMap<String,String> returnval = new HashMap<String,String>();
+		Map<String,String> returnval = new HashMap<>();
 		returnval.put(CCConstants.AUTH_USERNAME, authenticationService.getCurrentUserName());
 		returnval.put(CCConstants.AUTH_TICKET, authenticationService.getCurrentTicket());
 		
@@ -118,10 +119,10 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 		return (String)session.getAttribute(CCConstants.AUTH_SCOPE);
 	}
 	
-	private void addClientUserInfo(HashMap<String,String> authInfo) throws Exception{
+	private void addClientUserInfo(Map<String,String> authInfo) throws Exception{
 		
 		MCAlfrescoAPIClient mcAlfrescoAPIClient = new MCAlfrescoAPIClient(authInfo);
-		HashMap<String, String> repositoryUseInfo = mcAlfrescoAPIClient.getUserInfo(authenticationService.getCurrentUserName());
+		Map<String, String> repositoryUseInfo = mcAlfrescoAPIClient.getUserInfo(authenticationService.getCurrentUserName());
 		String userNameCaption = repositoryUseInfo.get(CCConstants.CM_PROP_PERSON_EMAIL);
 		
 		if(userNameCaption == null || userNameCaption.trim().equals("")) userNameCaption = authInfo.get(CCConstants.AUTH_USERNAME);
@@ -181,10 +182,10 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 	 * - ticket and user name will be returned
 	 * 
 	 * @param session
-	 * @return null when no valid ticket was found else user name / ticket as HashMap<String,String>
+	 * @return null when no valid ticket was found else user name / ticket as Map<String,String>
 	 */
-	public HashMap<String,String> validateAuthentication(HttpSession session){
-		HashMap<String,String> result = null;
+	public Map<String,String> validateAuthentication(HttpSession session){
+		Map<String,String> result = null;
 		String currentTicket = (String)session.getAttribute(CCConstants.AUTH_TICKET);
 		if(currentTicket != null){
 			try{
@@ -234,7 +235,7 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 		//ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions();
 
 		try {
-			HashMap<String, String> userInfo = getUserInfo(authenticationService.getCurrentUserName(), ticket);
+			Map<String, String> userInfo = getUserInfo(authenticationService.getCurrentUserName(), ticket);
 			session.setAttribute(CCConstants.AUTH_USERNAME_CAPTION, userInfo.get(CCConstants.AUTH_USERNAME_CAPTION));
 		}catch(Exception e) {
 			

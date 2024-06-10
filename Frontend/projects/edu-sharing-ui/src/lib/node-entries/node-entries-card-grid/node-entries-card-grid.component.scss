@@ -15,6 +15,10 @@ $horizontalScrollPadding: 1.5em;
     }
 }
 
+:host {
+    --scroll-gradient-color: white;
+}
+
 .order-panel {
     margin-left: auto;
 }
@@ -49,8 +53,8 @@ $horizontalScrollPadding: 1.5em;
         justify-content: flex-start;
         background: linear-gradient(
             to left,
-            rgba(255, 255, 255, 0.000001) 0,
-            rgb(255, 255, 255) calc(100% - $horizontalScrollPadding)
+            transparent 0,
+            var(--scroll-gradient-color) calc(100% - $horizontalScrollPadding)
         );
         > button {
             margin-left: calc($horizontalScrollPadding - 8px);
@@ -61,8 +65,8 @@ $horizontalScrollPadding: 1.5em;
         justify-content: flex-end;
         background: linear-gradient(
             to right,
-            rgba(255, 255, 255, 0.000001) 0,
-            rgb(255, 255, 255) calc(100% - $horizontalScrollPadding)
+            transparent 0,
+            var(--scroll-gradient-color) calc(100% - $horizontalScrollPadding)
         );
         > button {
             margin-right: calc($horizontalScrollPadding - 8px);
@@ -96,6 +100,13 @@ $horizontalScrollPadding: 1.5em;
         > .card-grid-drag-wrapper {
             scroll-snap-align: center;
             scroll-snap-stop: always;
+        }
+    }
+
+    .card-import-blocked {
+        ::ng-deep .card-meta {
+            opacity: 0.75;
+            text-decoration: line-through;
         }
     }
     > .card-grid-drag-wrapper {

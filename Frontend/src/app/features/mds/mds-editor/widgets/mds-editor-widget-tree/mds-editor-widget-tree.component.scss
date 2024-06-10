@@ -27,3 +27,31 @@ mat-form-field {
     // Use the button color which respects disabled state.
     color: unset;
 }
+.mat-chip-suggestions {
+    padding-left: 8px;
+    .mat-chip-suggestion {
+        ::ng-deep .mat-mdc-chip-action {
+            @include clickable();
+        }
+
+        mat-icon {
+            line-height: normal;
+        }
+
+        color: $textLight;
+        background: repeating-linear-gradient(-45deg, #f2f2f2, #f2f2f2 5px, #fff 5px, #fff 10px);
+
+        .accept {
+            @include clickable();
+            width: 25px;
+
+            mat-icon {
+                color: $colorStatusPositive;
+            }
+        }
+
+        .decline {
+            color: $colorStatusNegative !important;
+        }
+    }
+}

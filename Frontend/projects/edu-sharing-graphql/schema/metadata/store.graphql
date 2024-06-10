@@ -1,5 +1,0 @@
-type Store {
-    dbId: Int!
-    id: String!
-    protocol: String
-}

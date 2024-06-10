@@ -1,4 +1,0 @@
-type IntRange {
-    from: Int
-    to: Int
-}

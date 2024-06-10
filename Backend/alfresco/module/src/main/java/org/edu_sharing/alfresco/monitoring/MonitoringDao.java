@@ -1,9 +1,6 @@
 package org.edu_sharing.alfresco.monitoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -34,8 +31,8 @@ public class MonitoringDao {
 	
 	
 	
-	public HashMap<String,String> getDataBasePoolInfo(){
-		 HashMap<String,String> map = new HashMap<String,String>();
+	public Map<String,String> getDataBasePoolInfo(){
+		 Map<String,String> map = new HashMap<>();
 		 map.put(MAX_TOTAL, "" + dataSource.getMaxTotal());
 		 map.put(MAX_IDLE, "" + dataSource.getMaxIdle());
 		 map.put(NUM_ACTIVE, "" + dataSource.getNumActive());
@@ -55,7 +52,7 @@ public class MonitoringDao {
 		Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
 		Iterator<ObjectInstance> iterator = set.iterator();
 
-		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<>();
 		while (iterator.hasNext()) {
 			ObjectInstance oi = iterator.next();
 			ObjectName objName = oi.getObjectName();
@@ -74,7 +71,7 @@ public class MonitoringDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public HashMap<String, String> getMBeanAttributes(String mbeanName, String[] attributes) throws Exception {
+	public Map<String, String> getMBeanAttributes(String mbeanName, String[] attributes) throws Exception {
 
 		MBeanServer mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
 		String onStr = "*:type=ThreadPool,*";
@@ -82,7 +79,7 @@ public class MonitoringDao {
 		Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
 		Iterator<ObjectInstance> iterator = set.iterator();
 
-		HashMap<String, String> result = new HashMap<String, String>();
+		Map<String,String> result = new HashMap<>();
 		while (iterator.hasNext()) {
 			ObjectInstance oi = iterator.next();
 
@@ -118,7 +115,7 @@ public class MonitoringDao {
 	}
 	
 	
-	 public HashMap<Application,Integer> getSessionCount(String host) throws Exception{
+	 public Map<Application,Integer> getSessionCount(String host) throws Exception{
 		 return new TomcatUtil().getSessionCount(host);
 	 }
 	

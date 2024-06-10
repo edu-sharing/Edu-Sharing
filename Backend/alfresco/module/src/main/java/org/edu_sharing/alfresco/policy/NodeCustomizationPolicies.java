@@ -365,8 +365,8 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
 		}
 	}
 
-	private static HashMap<String, List<String>> getMimetypeAllowList() {
-		HashMap<String, List<String>> allowList = LightbendConfigLoader.get().
+	private static Map<String, List<String>> getMimetypeAllowList() {
+		Map<String, List<String>> allowList = LightbendConfigLoader.get().
 				getConfig("security.fileManagement.mimetypeVerification.list").entrySet().stream().collect(
 						Collectors.toMap(e -> StringUtils.strip(e.getKey(), "\""), e -> (List<String>) e.getValue().unwrapped(),
 								(a, b) -> b, HashMap::new)
@@ -479,7 +479,7 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
 				 * only do this with local created objects. contributer info is delivered by importer
 				 */
 				if(replicationSourceId == null || replicationSourceId.trim().equals("")){
-					HashMap<String,String> vcardMap = new HashMap<String,String>();
+					Map<String, String> vcardMap = new HashMap<>();
 					if(personRef!=null) {
 						vcardMap.put(CCConstants.VCARD_URN_UID, uid);
 						vcardMap.put(CCConstants.VCARD_GIVENNAME, givenName);
@@ -843,7 +843,7 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
 	 * @return
 	 */
 	Map<String,Serializable> transformQNameKeyToString(Map<QName, Serializable> props){
-		Map<String,Serializable> result = new HashMap<String,Serializable>();
+		Map<String,Serializable> result = new HashMap<>();
 		for(Map.Entry<QName,Serializable> entry : props.entrySet()){
 			result.put(entry.getKey().toString(), entry.getValue());
 		}

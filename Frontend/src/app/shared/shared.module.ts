@@ -73,6 +73,7 @@ import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { SplitNewLinesPipe } from './pipes/split-new-lines.pipe';
 import { VersionLabelPipe } from './pipes/version-label.pipe';
 import { SmallCollectionComponent } from './components/small-collection/small-collection.component';
+import { ImprintPrivacyComponent } from './components/imprint-privacy-footer/imprint-privacy.component';
 
 @NgModule({
     declarations: [
@@ -112,6 +113,7 @@ import { SmallCollectionComponent } from './components/small-collection/small-co
         ToolpermissionCheckDirective,
         TutorialComponent,
         UserAvatarComponent,
+        ImprintPrivacyComponent,
         UserQuotaComponent,
         VersionLabelPipe,
     ],
@@ -163,6 +165,7 @@ import { SmallCollectionComponent } from './components/small-collection/small-co
         FormsModule,
         GlobalProgressComponent,
         ImageConfigDirective,
+        ImprintPrivacyComponent,
         InfoMessageComponent,
         InputPasswordComponent,
         LicenseSourceComponent,

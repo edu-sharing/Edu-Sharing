@@ -7,7 +7,7 @@
   <es-info-message mode="info" *ngIf="!editSupported">
     {{
       'ADMIN.GLOBAL_CONFIG.EDIT_DISABLED'
-        | translate : { key: 'security.configuration.inlineEditing' }
+        | translate: { key: 'security.configuration.inlineEditing' }
     }}
   </es-info-message>
   <!--<div class="size-chooser">
@@ -24,11 +24,10 @@
     'ADMIN.GLOBAL_CONFIG.VOLATILE_WARNING' | translate
   }}</es-info-message>
   <div class="monaco-editor">
-    <ngx-monaco-editor
+    <es-code-editor
       [options]="clientCodeOptions"
       [(ngModel)]="configs.clientConfig"
-      [ngModelOptions]="{ standalone: true }"
-    ></ngx-monaco-editor>
+    ></es-code-editor>
     <mat-hint
       ><div>{{ 'ADMIN.GLOBAL_CONFIG.CLIENT_CONFIG_HINT' | translate }}</div></mat-hint
     >
@@ -41,12 +40,11 @@
       {{ 'ADMIN.GLOBAL_CONFIG.BASE_CONFIG_TITLE' | translate }}
     </h3>
     <div class="monaco-editor">
-      <ngx-monaco-editor
+      <es-code-editor
         class="roConfig"
         [options]="codeOptionsHocoonRO"
         [(ngModel)]="configs.reference"
-        [ngModelOptions]="{ standalone: true }"
-      ></ngx-monaco-editor>
+      ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.BASE_CONFIG_HINT' | translate }}</div></mat-hint
       >
@@ -60,11 +58,11 @@
       'ADMIN.GLOBAL_CONFIG.VOLATILE_WARNING' | translate
     }}</es-info-message>
     <div class="monaco-editor">
-      <ngx-monaco-editor
+      <es-code-editor
         [options]="codeOptionsHocoonRW"
         [(ngModel)]="configs.extension"
         [ngModelOptions]="{ standalone: true }"
-      ></ngx-monaco-editor>
+      ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.EXTENSION_CONFIG_HINT' | translate }}</div></mat-hint
       >
@@ -76,12 +74,11 @@
         {{ 'ADMIN.GLOBAL_CONFIG.CLUSTER_DEPLOYMENT_CONFIG_TITLE' | translate }}
       </h3>
       <div class="monaco-editor">
-        <ngx-monaco-editor
+        <es-code-editor
           class="roConfig"
           [options]="codeOptionsHocoonRO"
           [(ngModel)]="configs.clusterDeployment"
-          [ngModelOptions]="{ standalone: true }"
-        ></ngx-monaco-editor>
+        ></es-code-editor>
         <mat-hint
           ><div>
             {{ 'ADMIN.GLOBAL_CONFIG.CLUSTER_DEPLOYMENT_CONFIG_HINT' | translate }}
@@ -95,11 +92,10 @@
       {{ 'ADMIN.GLOBAL_CONFIG.CLUSTER_OVERRIDE_CONFIG_TITLE' | translate }}
     </h3>
     <div class="monaco-editor">
-      <ngx-monaco-editor
+      <es-code-editor
         [options]="codeOptionsHocoonRW"
         [(ngModel)]="configs.clusterOverride"
-        [ngModelOptions]="{ standalone: true }"
-      ></ngx-monaco-editor>
+      ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.CLUSTER_OVERRIDE_CONFIG_HINT' | translate }}</div></mat-hint
       >
@@ -110,12 +106,11 @@
       {{ 'ADMIN.GLOBAL_CONFIG.NODE_DEPLOYMENT_CONFIG_TITLE' | translate }}
     </h3>
     <div class="monaco-editor">
-      <ngx-monaco-editor
+      <es-code-editor
         class="roConfig"
         [options]="codeOptionsHocoonRO"
         [(ngModel)]="configs.nodeDeployment"
-        [ngModelOptions]="{ standalone: true }"
-      ></ngx-monaco-editor>
+      ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.NODE_DEPLOYMENT_CONFIG_HINT' | translate }}</div></mat-hint
       >
@@ -125,11 +120,10 @@
   <ng-container *ngIf="editSupported || configs.nodeOverride">
     <h3 class="mat-heading-3 mat-heading-underline">{{ 'ADMIN.GLOBAL_CONFIG.NODE_OVERRIDE_CONFIG_TITLE' | translate}}</h3>
     <div class="monaco-editor">
-      <ngx-monaco-editor
+      <es-code-editor
         [options]="codeOptionsHocoonRW"
         [(ngModel)]="configs.nodeOverride"
-        [ngModelOptions]="{ standalone: true }"
-      ></ngx-monaco-editor>
+      ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.NODE_OVERRIDE_CONFIG_HINT' | translate }}</div></mat-hint
       >
@@ -141,12 +135,11 @@
       {{ 'ADMIN.GLOBAL_CONFIG.PARSED_TITLE' | translate }}
     </h3>
     <div class="monaco-editor">
-      <ngx-monaco-editor
+      <es-code-editor
         class="roConfig"
         [options]="codeOptionsHocoonRO"
         [(ngModel)]="configs.parsed"
-        [ngModelOptions]="{ standalone: true }"
-      ></ngx-monaco-editor>
+      ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.PARSED_HINT' | translate }}</div></mat-hint
       >

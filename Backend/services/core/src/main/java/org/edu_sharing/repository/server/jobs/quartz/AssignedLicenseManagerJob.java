@@ -114,7 +114,7 @@ public class AssignedLicenseManagerJob  extends AbstractJob {
 					}
 				}
 				List<String> mediaCentres = (List<String>)nodeService.getProperty(parentAssocRef.getParentRef(),QName.createQName(CCConstants.CCM_PROP_IO_MEDIACENTER));
-				ArrayList<String> newMediacentres = new ArrayList<String>();
+				ArrayList<String> newMediacentres = new ArrayList<>();
 				if(mediaCentres != null){
 					for(String mediaCentre : mediaCentres){
 						if(!authority.replace(AuthorityType.GROUP.getPrefixString(), "").equals(mediaCentre)){
@@ -153,7 +153,7 @@ public class AssignedLicenseManagerJob  extends AbstractJob {
 	@Override
 	public Class[] getJobClasses() {
 		// TODO Auto-generated method stub
-		List<Class> allJobs = new ArrayList<Class>(Arrays.asList(super.allJobs));
+		List<Class> allJobs = new ArrayList<>(Arrays.asList(super.allJobs));
 		allJobs.add(AssignedLicenseManagerJob.class);
 		return allJobs.toArray(new Class[0]);
 	}

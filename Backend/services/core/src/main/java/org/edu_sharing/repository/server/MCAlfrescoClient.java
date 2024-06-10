@@ -29,13 +29,12 @@ package org.edu_sharing.repository.server;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
 import org.edu_sharing.repository.client.rpc.Group;
-import org.edu_sharing.repository.client.rpc.Notify;
 import org.edu_sharing.repository.client.rpc.SearchResult;
 import org.edu_sharing.repository.client.rpc.Share;
 import org.edu_sharing.repository.client.rpc.User;
@@ -56,29 +55,29 @@ public interface MCAlfrescoClient {
 	/**
 	 * get all favorite folders for the current user
 	 * 
-	 * @return nested HashMap withe the nodeIds of the favorite folders and the corresponding propetries (as HashMap<String,Object>)
+	 * @return nested Map withe the nodeIds of the favorite folders and the corresponding propetries (as Map<String,Object>)
 	 * @throws Throwable
 	 */
-	public HashMap getBaskets() throws Throwable;
+	public Map<String, Map<String, Object>> getBaskets() throws Throwable;
 	
 	/**
 	 * search for nodes with a lucene string, filtered by type 
 	 * 
 	 * @param luceneString a lucene String
 	 * @param type the given type
-	 * @return nested HashMap with nodeId's and nodes
+	 * @return nested Map with nodeId's and nodes
 	 * @throws Exception
 	 */
-	public HashMap<String,HashMap<String,Object>> search(String luceneString, String type) throws Exception;
+	public Map<String,Map<String,Object>> search(String luceneString, String type) throws Exception;
 	
 	/**
 	 * search for nodes with a lucene string
 	 * 
 	 * @param luceneString a lucene String
-	 * @return nested HashMap with nodeId's and propeties
+	 * @return nested Map with nodeId's and propeties
 	 * @throws Throwable
 	 */
-	public HashMap<String, HashMap<String, Object>> search(String luceneString) throws Throwable;
+	public Map<String, Map<String, Object>> search(String luceneString) throws Throwable;
 	
 	/**
 	 * 
@@ -89,7 +88,7 @@ public interface MCAlfrescoClient {
 	 * @return
 	 * @throws Throwable
 	 */
-	public HashMap<String, HashMap<String, Object>> search(String luceneString, ContextSearchMode mode) throws Throwable;
+	public Map<String, Map<String, Object>> search(String luceneString, ContextSearchMode mode) throws Throwable;
 	
 	/**
 	 * search for nodeId's with a lucene string
@@ -106,20 +105,20 @@ public interface MCAlfrescoClient {
 	 * get all children of a given parentId
 	 * 
 	 * @param parentID
-	 * @return nested HashMap with nodeIds and the corresponding properties HashMap<String,HashMap<String,Object>>
+	 * @return nested Map with nodeIds and the corresponding properties Map<String,Map<String,Object>>
 	 * @throws Throwable
 	 */
-	public HashMap<String, HashMap<String, Object>> getChildren(String parentID) throws Throwable;
+	public Map<String, Map<String, Object>> getChildren(String parentID) throws Throwable;
 	
 	/**
 	 * get all children with a given association
 	 * 
 	 * @param nodeId node Id of the parent object
 	 * @param association the matching association
-	 * @return nested HashMap with nodeIds and the corresponding properties
+	 * @return nested Map with nodeIds and the corresponding properties
 	 * @throws Exception
 	 */
-	public HashMap<String, HashMap<String, Object>> getChildrenByAssociation(String nodeId, String association) throws Exception;
+	public Map<String, Map<String, Object>> getChildrenByAssociation(String nodeId, String association) throws Exception;
 	
 	/**
 	 * get all children with a given association in a given alfresco store
@@ -127,10 +126,10 @@ public interface MCAlfrescoClient {
 	 * @param store the store 
 	 * @param nodeId node Id of the parent object
 	 * @param association the matching association
-	 * @return nested HashMap with nodeIds and the corresponding properties
+	 * @return nested Map with nodeIds and the corresponding properties
 	 * @throws Exception
 	 */
-	public HashMap<String, HashMap<String, Object>> getChildrenByAssociation(String store, String nodeId, String association)  throws Exception;
+	public Map<String, Map<String, Object>> getChildrenByAssociation(String store, String nodeId, String association)  throws Exception;
 	
 	
 	/**
@@ -186,7 +185,7 @@ public interface MCAlfrescoClient {
 	 * @return
 	 * @throws Throwable
 	 */
-	public HashMap getGroupFolders() throws Throwable;
+	public Map<String, Map<String, Object>> getGroupFolders() throws Throwable;
 
 	/**
 	 * get all parents of a given nodeId
@@ -196,7 +195,7 @@ public interface MCAlfrescoClient {
 	 * @return
 	 * @throws Throwable
 	 */
-	public HashMap<String, HashMap> getParents(String nodeID, boolean primary) throws Throwable;
+	public Map<String, Map<String,Object>> getParents(String nodeID, boolean primary) throws Throwable;
 	
 	
 	
@@ -233,7 +232,7 @@ public interface MCAlfrescoClient {
 	 *  
 	 * @throws Exception
 	 */
-	public HashMap<String, Boolean> hasAllPermissions(String nodeId, String authority, String[] permissions) throws Exception;
+	public Map<String, Boolean> hasAllPermissions(String nodeId, String authority, String[] permissions) throws Exception;
 	
 	/**
 	 * 
@@ -244,7 +243,7 @@ public interface MCAlfrescoClient {
 	 * @return  Map with the permissions and the value true/false weather the permission is set or not
 	 * @throws Exception
 	 */
-	public HashMap<String, Boolean> hasAllPermissions(String nodeId, String[] permissions) throws Exception;
+	public Map<String, Boolean> hasAllPermissions(String nodeId, String[] permissions) throws Exception;
 	
 	
 	/**
@@ -272,17 +271,17 @@ public interface MCAlfrescoClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String dropToBasketRemoteNode(String basketId, HashMap<String, String> params) throws Exception;
+	public String dropToBasketRemoteNode(String basketId, Map<String, String> params) throws Exception;
 	
 	/**
 	 * get all associated nodes
 	 * 
 	 * @param nodeID the nodeId of the source node
 	 * @param association the association type
-	 * @return nested HashMap with nodeIds and properties
+	 * @return nested Map with nodeIds and properties
 	 * @throws Throwable
 	 */
-	public HashMap<String, HashMap> getAssocNode(String nodeID, String association) throws Throwable;
+	public Map<String, Map<String, Object>> getAssocNode(String nodeID, String association) throws Throwable;
 	
 	/**
 	 * remove relations for the current folder
@@ -339,18 +338,18 @@ public interface MCAlfrescoClient {
 	 * @return the person properties
 	 * @throws Exception
 	 */
-	public HashMap<String, String> checkAndCreateShadowUser(String username, String email, String repId) throws Exception;
+	public Map<String, String> checkAndCreateShadowUser(String username, String email, String repId) throws Exception;
 	
 	
 	/**
 	 * get the versionhistory of a node
 	 * 
 	 * @param nodeId
-	 * @return HashMap with id and properties. the id is the nodeId of the frozen state in the VersionStore
+	 * @return Map with id and properties. the id is the nodeId of the frozen state in the VersionStore
 	 * 
 	 * @throws Throwable
 	 */
-	public HashMap<String, HashMap<String,Object>> getVersionHistory(String nodeId) throws Throwable;
+	public Map<String, Map<String,Object>> getVersionHistory(String nodeId) throws Throwable;
 	
 	/**
 	 * revert a node to its state of a specified version
@@ -419,7 +418,7 @@ public interface MCAlfrescoClient {
 	 * @return 
 	 * @throws Throwable
 	 */
-	public abstract HashMap<String,HashMap<String,Object>> getChilden(String parentId, String type, HashMap props) throws Throwable;
+	public abstract Map<String,Map<String,Object>> getChilden(String parentId, String type, Map<String, Object> props) throws Throwable;
 	
 	/**
 	 * find a node that matches the given properties while navigatigating through all the children of the node with parentId
@@ -430,7 +429,7 @@ public interface MCAlfrescoClient {
 	 * @return the child prop if found else null
 	 * @throws Throwable
 	 */
-	public HashMap<String,Object> getChildRecursive(String parentId, String type, HashMap props)throws Throwable;
+	public Map<String,Object> getChildRecursive(String parentId, String type, Map<String, Object>  props)throws Throwable;
 	
 	/**
 	 * fina all chidren taht match the given type and return i t in a flat Map structure
@@ -439,7 +438,7 @@ public interface MCAlfrescoClient {
 	 * @return
 	 * @throws Throwable
 	 */
-	public HashMap<String,HashMap<String,Object>> getChildrenRecursive(String parentId, String type)throws Throwable;
+	public Map<String,Map<String,Object>> getChildrenRecursive(String parentId, String type)throws Throwable;
 	
 	/**
 	 * find out if the given type is subtype of parentType
@@ -457,7 +456,7 @@ public interface MCAlfrescoClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public HashMap<String, String> getUserInfo(String userName) throws Exception;
+	public Map<String, String> getUserInfo(String userName) throws Exception;
 	
 	
 
@@ -496,7 +495,7 @@ public interface MCAlfrescoClient {
 	 * @param async
 	 * @throws Exception
 	 */
-	public abstract void executeAction(String nodeId, String actionName, String actionId, HashMap parameters, boolean async) throws Exception;
+	public abstract void executeAction(String nodeId, String actionName, String actionId, Map<String, Object>  parameters, boolean async) throws Exception;
 
 	public String copyNode(String nodeId, String toNodeId, boolean copyChildren) throws Exception;
 
@@ -516,7 +515,7 @@ public interface MCAlfrescoClient {
 
 	public String guessMimetype(String filename);
 	
-	public HashMap<String, HashMap<String, Object>> getChildren(String parentID, String[] permissionsOnChild) throws Throwable;
+	public Map<String, Map<String, Object>> getChildren(String parentID, String[] permissionsOnChild) throws Throwable;
 
 	public void removeGlobalAspectFromGroup(String groupNodeId) throws Exception;
 	
@@ -527,12 +526,12 @@ public interface MCAlfrescoClient {
 	
 	public void removeNode(String storeProtocol, String storeId, String nodeId);
 	
-	public HashMap<String, Object> getProperties(String storeId, String storeProtocol, String nodeId) throws Throwable;
+	public Map<String, Object> getProperties(String storeId, String storeProtocol, String nodeId) throws Throwable;
 	
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String[] permissions);
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String[] permissions);
 	
 	public String[] getAspects(String storeProtocol, String storeId, String nodeId);
 	
-	public void addAspect(String nodeId, String aspect);
+	public void addAspect(String nodeId, String aspect) throws Exception;
 	
 } 

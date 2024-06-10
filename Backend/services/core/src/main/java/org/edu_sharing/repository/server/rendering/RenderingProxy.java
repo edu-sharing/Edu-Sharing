@@ -253,7 +253,7 @@ public class RenderingProxy extends HttpServlet {
 			AuthenticationUtil.RunAsWork<String> runAs = () -> {
 				String localUsername = new String(usernameDecrypted2).trim();
 				MCAlfrescoAPIClient apiClient = new MCAlfrescoAPIClient();
-				HashMap<String, String> personData = apiClient.getUserInfo(localUsername);
+				Map<String, String> personData = apiClient.getUserInfo(localUsername);
 
 				/**
 				 * make sure that the remote user exists

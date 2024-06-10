@@ -13,6 +13,7 @@ import { LuceneTemplateMemoryComponent } from './lucene-template-memory/lucene-t
 import { AdminMediacenterComponent } from './mediacenter/mediacenter.component';
 import { AdminPluginsComponent } from './plugins/plugins.component';
 import { AdminStatisticsComponent } from './statistics/statistics.component';
+import { CodeEditorComponent } from './code-editor/code-editor';
 
 @NgModule({
     declarations: [
@@ -23,6 +24,7 @@ import { AdminStatisticsComponent } from './statistics/statistics.component';
         AdminPluginsComponent,
         AdminStatisticsComponent,
         AutocompleteComponent,
+        CodeEditorComponent,
         LtiAdminComponent,
         LtitoolAdminComponent,
         LuceneTemplateMemoryComponent,

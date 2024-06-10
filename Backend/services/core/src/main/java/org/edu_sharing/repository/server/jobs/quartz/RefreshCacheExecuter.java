@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.server.jobs.quartz;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +46,7 @@ public class RefreshCacheExecuter {
 
 	protected Log logger = LogFactory.getLog(RefreshCacheExecuter.class);
 	
-	public void excecute(String rootFolderId, boolean sticky, HashMap authInfo) throws Throwable {
+	public void excecute(String rootFolderId, boolean sticky, Map<String, String> authInfo) throws Throwable {
 		if (authInfo == null) {
 			String userName = ApplicationInfoList.getHomeRepository().getUsername();
 			String password = ApplicationInfoList.getHomeRepository().getPassword();
@@ -61,7 +62,7 @@ public class RefreshCacheExecuter {
 			MCAlfrescoBaseClient mcAlfrescoBaseClient = (MCAlfrescoBaseClient) mcBaseClient;
 			String repositoryRoot = mcAlfrescoBaseClient.getRepositoryRoot();
 			String companyHomeId = mcAlfrescoBaseClient.getCompanyHomeNodeId();
-			HashMap<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
+			Map<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
 					OAIPMHLOMImporter.FOLDER_NAME_IMPORTED_OBJECTS);
 			if (importFolderProps != null) {
 				rootFolderId = (String) importFolderProps.get(CCConstants.SYS_PROP_NODE_UID);

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Scope("prototype")
@@ -45,13 +46,13 @@ public class Protocol {
 		this.userEnvironmentToolFactory = userEnvironmentToolFactory;
 	}
 	
-	public HashMap<String,Object> getSysUpdateEntry(String updaterId) throws Throwable{
+	public Map<String,Object> getSysUpdateEntry(String updaterId) throws Throwable{
 		
-		HashMap<String,String> authInfo = new HashMap<>();
+		Map<String,String> authInfo = new HashMap<>();
 		authInfo.put(CCConstants.AUTH_USERNAME, authenticationService.getCurrentUserName());
 		authInfo.put(CCConstants.AUTH_TICKET, authenticationService.getCurrentTicket());
 		String eduSystemFolderUpdate;
-		HashMap<String,Object> updateInfo;
+		Map<String,Object> updateInfo;
 		eduSystemFolderUpdate = userEnvironmentToolFactory.createEnvironmentTool(ApplicationInfoList.getHomeRepository().getAppId(), authInfo)
 				.getEdu_SharingSystemFolderUpdate();
 
@@ -62,13 +63,13 @@ public class Protocol {
 	}
 	
 	public void writeSysUpdateEntry(String updaterId) throws Throwable{
-		HashMap<QName,Serializable> updateInfoProps = new HashMap<>();
+		Map<QName, Serializable> updateInfoProps = new HashMap<>();
 		
 		updateInfoProps.put(ContentModel.PROP_NAME, updaterId);
 		updateInfoProps.put(QName.createQName(CCConstants.CCM_PROP_SYSUPDATE_ID),updaterId);
 		updateInfoProps.put(QName.createQName(CCConstants.CCM_PROP_SYSUPDATE_DATE),new Date());
 		
-		HashMap<String,String> authInfo = new HashMap<>();
+		Map<String,String> authInfo = new HashMap<>();
 		authInfo.put(CCConstants.AUTH_USERNAME, authenticationService.getCurrentUserName());
 		authInfo.put(CCConstants.AUTH_TICKET, authenticationService.getCurrentTicket());
 		

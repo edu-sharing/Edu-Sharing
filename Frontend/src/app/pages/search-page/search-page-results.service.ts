@@ -210,6 +210,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                         criteria: this._getSearchCriteria(params),
                         facetLimit: 5,
                         facetMinCount: 1,
+                        resolveCollections: false,
+                        resolveUsernames: false,
                         permissions: this._searchPage.reUrl.value
                             ? [RestConstants.ACCESS_CC_PUBLISH]
                             : [],

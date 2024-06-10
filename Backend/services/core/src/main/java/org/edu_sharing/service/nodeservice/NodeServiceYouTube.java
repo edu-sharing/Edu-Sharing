@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.http.HttpRequest;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.forms.VCardTool;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
@@ -36,18 +36,12 @@ public class NodeServiceYouTube extends NodeServiceAdapter{
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
+	public Map<String, Object> getProperties(String storeProtocol, String storeId, String nodeId) throws Throwable {
 		return getProperties(nodeId);
 	}
-	private HashMap<String, Object> getProperties(String nodeId) throws Throwable {
-		YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
-			public void initialize(HttpRequest request) throws IOException {
-			}
-
-			@Override
-			public void initialize(com.google.api.client.http.HttpRequest arg0) throws IOException {
-			}
-		}).setApplicationName("youtube-cmdline-search-sample").build();
+	private Map<String, Object> getProperties(String nodeId) throws Throwable {
+		YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), arg -> {
+        }).setApplicationName("youtube-cmdline-search-sample").build();
 		Videos.List list = youtube.videos().list("id,snippet");
 		list.setId(nodeId);
 		list.setKey(googleAPIKey);
@@ -64,8 +58,8 @@ public class NodeServiceYouTube extends NodeServiceAdapter{
 		return null;
 	}
 
-	public static HashMap<String, Object> getPropsByVideoEntry(String repositoryId,GenericJson searchResult) {
-		HashMap<String, Object> properties = new HashMap<String, Object>();
+	public static Map<String, Object> getPropsByVideoEntry(String repositoryId,GenericJson searchResult) {
+		Map<String, Object> properties = new HashMap<>();
 		
 		String esrId = null;
 		String esrTitle = null;

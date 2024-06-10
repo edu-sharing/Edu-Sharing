@@ -62,6 +62,7 @@ export class RenderHelperService {
 
     injectModuleInCollections(node: Node) {
         let domCollections: Element;
+        let parentInner: Element;
         let parent: Element;
         try {
             domCollections = document.evaluate(
@@ -71,6 +72,7 @@ export class RenderHelperService {
                 XPathResult.FIRST_ORDERED_NODE_TYPE,
                 null,
             ).singleNodeValue as Element;
+            parentInner = domCollections.parentElement;
             parent = domCollections.parentElement.parentElement;
         } catch (e) {
             return;
@@ -83,12 +85,29 @@ export class RenderHelperService {
             SpinnerComponent,
             domCollections,
         );
+
+        function removeCollectionsContainer() {
+            // if its the only widget inside the group
+            if (parentInner.children.length <= 2) {
+                parent.remove();
+                return;
+            } else {
+                const children = [...parentInner.children];
+                let index = children.findIndex((child) => child === domCollections);
+                if (index > 0) {
+                    // remove caption
+                    children[index - 1].remove();
+                    children[index].remove();
+                }
+                return;
+            }
+        }
+
         this.getCollectionsContainingNode(node).subscribe(
             (collections) => {
                 // @TODO: This does currently ignore the "hideIfEmpty" flag of the mds template
                 if (collections.length === 0) {
-                    parent.remove();
-                    return;
+                    removeCollectionsContainer();
                 }
                 const data = {
                     dataSource: new NodeDataSource(collections),
@@ -106,7 +125,7 @@ export class RenderHelperService {
                 entriesComponentRef.instance.ngOnChanges();
             },
             (error) => {
-                parent.remove();
+                removeCollectionsContainer();
             },
         );
     }

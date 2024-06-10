@@ -28,6 +28,7 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
     @Input() currentScope: string;
 
     @Output() showLicenses = new EventEmitter<void>();
+    @Output() onClose = new EventEmitter<void>();
 
     // Internal state
     show = false;
@@ -35,7 +36,10 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
     loginInfo: LoginInfo;
     currentUser: User;
 
-    constructor(public iam: RestIamService, private user: UserService) {
+    constructor(
+        public iam: RestIamService,
+        private user: UserService,
+    ) {
         this.user
             .observeCurrentUser()
             .pipe(takeUntil(this.destroyed$))
@@ -51,10 +55,6 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
      */
     toggle() {
         this.show = !this.show;
-    }
-
-    close() {
-        this.show = false;
     }
 
     // Internal methods, should only be called by this component.
@@ -86,6 +86,7 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
 
     hide() {
         this.show = false;
+        this.onClose.emit();
     }
 
     onShowLicenses() {

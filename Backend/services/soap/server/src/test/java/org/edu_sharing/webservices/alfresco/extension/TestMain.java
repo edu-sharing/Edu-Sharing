@@ -61,11 +61,11 @@ public static void main(String[] args){
 		
 		int counterDatabase = 0;
 		int counterSolr = 0;
-		HashMap<String,Object> nrFolders = naw.getChildren("8fbbf231-8bfe-4495-b374-6fe5463a1171", CCConstants.CCM_TYPE_MAP);
+		Map< naw.getChildren("8fbbf231-8bfe-4495-b374-6fe5463a1171", CCConstants.CCM_TYPE_MAP);
 		for(Map.Entry<String,Object> entry : nrFolders.entrySet()) {
 			Map<String,Object> nrFolder = (Map<String,Object>)entry.getValue();
 			System.out.println("nrfolder:" + nrFolder.get(CCConstants.CM_NAME));
-			HashMap<String,Object> ios = naw.getChildren(entry.getKey(), CCConstants.CCM_TYPE_IO);
+			Map< naw.getChildren(entry.getKey(), CCConstants.CCM_TYPE_IO);
 			for(Map.Entry<String, Object> ioEntry : ios.entrySet()) {
 				counterDatabase++;
 				Map<String,Object> ioProps = (Map<String,Object>)ioEntry.getValue();
@@ -102,20 +102,20 @@ public static void main(String[] args){
 		if(true) return;
 		
 		String root = naw.getRepositoryRoot();
-		HashMap<String,HashMap<String,Object>> children = (HashMap<String,HashMap<String,Object>>) naw.getChildren(root,null);
-		for(Map.Entry<String, HashMap<String, Object>>  entry : children.entrySet()) {
+		Map<String,Map<String,Object>> children = (Map<String,Map<String,Object>>) naw.getChildren(root,null);
+		for(Map.Entry<String, Map<String, Object>>  entry : children.entrySet()) {
 			
 			String name = (String)entry.getValue().get(CCConstants.CM_NAME);
 			if(name.equals("Company Home")) {
-				HashMap<String,HashMap<String,Object>> chchildren = (HashMap<String,HashMap<String,Object>>) naw.getChildren(entry.getKey(),null);
-				for(Map.Entry<String, HashMap<String, Object>>  chentry : chchildren.entrySet()) {
+				Map<String,Map<String,Object>> chchildren = (Map<String,Map<String,Object>>) naw.getChildren(entry.getKey(),null);
+				for(Map.Entry<String, Map<String, Object>>  chentry : chchildren.entrySet()) {
 					String chName = (String)chentry.getValue().get(CCConstants.CM_NAME);
 					if(chName.equals("User Homes")) {
-						HashMap<String,HashMap<String,Object>> uhchildren = (HashMap<String,HashMap<String,Object>>) naw.getChildren(chentry.getKey(),null);
+						Map<String,Map<String,Object>> uhchildren = (Map<String,Map<String,Object>>) naw.getChildren(chentry.getKey(),null);
 						System.out.println(uhchildren.size());
 						
 						int i = 0;
-						for(Map.Entry<String, HashMap<String, Object>>  uhentry : uhchildren.entrySet()) {
+						for(Map.Entry<String, Map<String, Object>>  uhentry : uhchildren.entrySet()) {
 							String uhName = (String)uhentry.getValue().get(CCConstants.CM_NAME);
 							System.out.println(uhName);
 							if(InetAddressValidator.getInstance().isValid(uhName)){
@@ -142,14 +142,14 @@ public static void main(String[] args){
 		if(true) return;
 				
 		
-		HashMap<String,Object> test = naw.getProperties("defedcc4-fcf6-4182-b575-f137739c22aa");
+		Map<String,Object> test = naw.getProperties("defedcc4-fcf6-4182-b575-f137739c22aa");
 		
 		for(Map.Entry<String,Object> entry : test.entrySet()){
 			System.out.println("prop:"+entry.getKey()+" value:"+entry.getValue()); 
 		}
 		
 		
-		HashMap<String,Boolean> hasPermissionsResult = naw.hasPermissions("admin", new String[]{"Read"}, "ef84a120-2e3f-4dcb-9b43-67f7505bc576");
+		Map<String,Boolean> hasPermissionsResult = naw.hasPermissions("admin", new String[]{"Read"}, "ef84a120-2e3f-4dcb-9b43-67f7505bc576");
 		
 		System.out.println("HAS PERMISSIONSRESULT");
 		
@@ -206,7 +206,7 @@ public static void main(String[] args){
 	public static void testThread(){
 		int maxThreads = 5;
 		
-		List<Runnable> list = new ArrayList<Runnable>();
+		List<Runnable> list = new ArrayList<>();
 		for(int i = 0; i < maxThreads; i++) {
 			
 			final int fi = i;
@@ -222,7 +222,7 @@ public static void main(String[] args){
 						
 						final NativeAlfrescoWrapper  naw = new NativeAlfrescoWrapperServiceLocator(AuthenticationUtils.getEngineConfiguration()).getNativeAlfrescoWrapper(new URL("http://localhost:8080/edu-sharing/services/NativeAlfrescoWrapper?wsdl"));
 					
-						ArrayList<UserDetails> l = new ArrayList<UserDetails>();
+						ArrayList<UserDetails> l = new ArrayList<>();
 						
 						for(int i = 0; i < 10; i++) {
 							UserDetails ud = new UserDetails();

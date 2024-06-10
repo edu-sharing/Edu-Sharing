@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.client.tools.forms;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.edu_sharing.repository.client.tools.CCConstants;
 
@@ -212,7 +213,7 @@ public class CCForms {
 	
 	public static HashMap getClasses(){
 		if(classes == null){
-			classes = new HashMap();
+			classes = new HashMap<>();
 			classes.put(CCConstants.CCM_TYPE_IO, io);
 			classes.put(CCConstants.CCM_TYPE_MAP, map);
 			//classes.put(CCConstants.CCM_TYPE_MAPLINK, maplink);
@@ -250,11 +251,11 @@ public class CCForms {
 		return null;
 	}
 	
-	private static HashMap<String,String> propFormMapper = null;
+	private static Map<String,String> propFormMapper = null;
 	
 	private static void initFormMapper(){
 		if(propFormMapper == null){
-			propFormMapper = new HashMap<String,String>();
+			propFormMapper = new HashMap<>();
 			propFormMapper.put(CCConstants.CCM_TYPE_IO+"#"+CCConstants.CM_PROP_CONTENT, CCConstants.CCM_TYPE_IO+"#"+CCConstants.CM_PROP_CONTENT);
 			propFormMapper.put(CCConstants.CM_TYPE_THUMBNAIL+"#"+CCConstants.CM_PROP_CONTENT, CCConstants.CM_TYPE_THUMBNAIL+"#"+CCConstants.CM_PROP_CONTENT);
 			propFormMapper.put(CCConstants.CCM_TYPE_MAP+"#"+CCConstants.CCM_PROP_MAP_ICON, CCConstants.CCM_TYPE_MAP+"#"+CCConstants.CCM_PROP_MAP_ICON);	
@@ -316,11 +317,11 @@ public class CCForms {
 	/**
 	 * Child Assocition the ParentNode gots to it's childs
 	 */
-	private static HashMap<String,String> childAssocs = null;
+	private static Map<String,String> childAssocs = null;
 	
 	public static String getChildAssoc(String type){
 		if(childAssocs == null){
-			childAssocs = new HashMap<String,String>();
+			childAssocs = new HashMap<>();
 			childAssocs.put(CCConstants.LOM_TYPE_CONTRIBUTE, CCConstants.LOM_ASSOC_LIFECYCLE_CONTRIBUTE);
 			childAssocs.put(CCConstants.LOM_TYPE_RELATION, CCConstants.LOM_ASSOC_SCHEMA_RELATION);
 		}
@@ -331,11 +332,11 @@ public class CCForms {
 	/**
 	 * is multivalue
 	 */
-	private static HashMap<String,Boolean> isMultiValue = null;
+	private static Map<String,Boolean> isMultiValue = null;
 	
 	public static Boolean isMultiValue(String property){
 		if(isMultiValue == null){
-			isMultiValue = new HashMap<String,Boolean>();
+			isMultiValue = new HashMap<>();
 			isMultiValue.put(CCConstants.LOM_PROP_GENERAL_LANGUAGE, new Boolean(true));
 			isMultiValue.put(CCConstants.LOM_PROP_EDUCATIONAL_LEARNINGRESOURCETYPE, new Boolean(true));
 		}

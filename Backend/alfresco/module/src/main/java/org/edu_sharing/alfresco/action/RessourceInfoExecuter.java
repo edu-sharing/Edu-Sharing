@@ -1,12 +1,5 @@
 package org.edu_sharing.alfresco.action;
 
-import java.io.*;
-import java.util.*;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.alfresco.model.ContentModel;
@@ -29,10 +22,17 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tika.Tika;
-import org.apache.tika.mime.MimeType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 
@@ -106,6 +106,7 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 				ArchiveInputStream zip = getZipInputStream(contentreader);
 				ArchiveEntry current = null;
 				if(zip!=null) {
+					boolean genericHtmlFallback = false;
 					while ((current = zip.getNextEntry()) != null) {
 						if (current.getName().equals("imsmanifest.xml")) {
 
@@ -115,9 +116,7 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 
 						}
 						if (current.getName().equalsIgnoreCase("index.html") || current.getName().equalsIgnoreCase("index.htm")) {
-							zip.close();
-							proccessGenericHTML(actionedUponNodeRef);
-							return;
+							genericHtmlFallback = true;
 						}
 
 						if (current.getName().equals("moodle.xml")) {
@@ -145,6 +144,9 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 					}
 
 					zip.close();
+                    if(genericHtmlFallback){
+                        proccessGenericHTML(actionedUponNodeRef);
+                    }
 				} else {
 					if(Arrays.asList("application/json", "text/plain", "application/octet-stream").contains(contentreader.getMimetype()) &&
 							contentreader.getSize() < MAX_JSON_PARSE_SIZE) {
@@ -287,7 +289,7 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 					nodeService.setProperty(actionedUponNodeRef, QName.createQName(CCM_PROP_IO_RESSOURCEVERSION),
 							ressourceVersion);
 					if (isQtiList.size() > 0) {
-						ArrayList<String> qtiInfoSubtypeList = new ArrayList<String>();
+						ArrayList<String> qtiInfoSubtypeList = new ArrayList<>();
 						for (RessourceInfoTool.QTIInfo qtiInfo : isQtiList) {
 							String subtype = qtiInfo.getSubtype();
 							if (subtype != null && !subtype.trim().equals("")

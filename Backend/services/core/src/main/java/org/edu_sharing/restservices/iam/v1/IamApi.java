@@ -92,7 +92,7 @@ public class IamApi  {
 	    					filter
 	    			);
 
-	    	List<UserSimple> result = new ArrayList<UserSimple>();
+	    	List<UserSimple> result = new ArrayList<>();
 	    	for (String user: search.getData()) {
 	    		result.add(new PersonDao(repoDao,user).asPersonSimple(true));
 	    	}	
@@ -760,7 +760,7 @@ public class IamApi  {
         		@Context HttpServletRequest req) {
 
         	try {
-        		HashMap<String, String> props = new HashMap<String,String>();
+        		Map<String, String> props = new HashMap<>();
         		if(groupType!=null && !groupType.isEmpty()){
         			props.put(CCConstants.getValidLocalName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE), groupType);
         		}
@@ -778,7 +778,7 @@ public class IamApi  {
     	    					props
     	    			);
 
-    	    	List<Group> result = new ArrayList<Group>();
+    	    	List<Group> result = new ArrayList<>();
     	    	for (String group: search.getData()) {
 					try {
 						result.add(new GroupDao(repoDao, group).asGroup());
@@ -1246,7 +1246,7 @@ public class IamApi  {
 	    					new SortDefinition(sortProperties,sortAscending)
 	    			);
 	    	AuthorityEntries response = new AuthorityEntries();
-    		List<Authority> result = new ArrayList<Authority>();
+    		List<Authority> result = new ArrayList<>();
 	    	for (String member: search.getData()) {
 	    		result.add(
 	    				member.startsWith(PermissionService.GROUP_PREFIX) ?
@@ -1409,7 +1409,7 @@ public class IamApi  {
     		@Context HttpServletRequest req) {
 
     	try {
-			HashMap<String, String> props = new HashMap<>();
+			Map<String, String> props = new HashMap<>();
 			if(groupType!=null && !groupType.isEmpty()){
 				props.put(CCConstants.getValidLocalName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE), groupType);
 			}
@@ -1428,7 +1428,7 @@ public class IamApi  {
 	    					
 	    			);
 
-	    	List<Authority> result = new ArrayList<Authority>();
+	    	List<Authority> result = new ArrayList<>();
 	    	for (String user: search.getData()) {
 	    		result.add(getUserOrGroup(repoDao, user));
 	    	}	
@@ -1467,7 +1467,7 @@ public class IamApi  {
 		try {
 			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
 			List<String> recent = PermissionServiceFactory.getPermissionService(repoDao.getId()).getRecentlyInvited();
-			List<Authority> result = new ArrayList<Authority>();
+			List<Authority> result = new ArrayList<>();
 			for (String user: recent) {
 				result.add(getUserOrGroup(repoDao, user));
 			}

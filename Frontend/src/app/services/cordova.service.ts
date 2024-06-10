@@ -933,7 +933,7 @@ export class CordovaService extends AppServiceAbstract {
      */
 
     getPhotoFromCamera(
-        successCallback: Function,
+        successCallback: (data: string) => void,
         errorCallback: Function,
         options: any = null,
     ): void {
@@ -952,7 +952,7 @@ export class CordovaService extends AppServiceAbstract {
             // https://github.com/apache/cordova-plugin-camera
             const runPlugIn: Function = () => {
                 (navigator as any).camera.getPicture(
-                    (result: any) => {
+                    (result: string) => {
                         successCallback(result);
                     },
                     (error: any) => {

@@ -39,7 +39,7 @@ public class FolderTemplateServlet extends HttpServlet {
 			String homeAppId = ApplicationInfoList.getHomeRepository().getAppId();
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeAppId);
 			
-			// HashMap<String,String> authInfo = authTool.createNewSession(userName, password);
+			// Map<String,String> authInfo = authTool.createNewSession(userName, password);
 
 			MCAlfrescoBaseClient baseclient = (MCAlfrescoBaseClient)RepoFactory.getInstance(homeAppId, req.getSession());
 			

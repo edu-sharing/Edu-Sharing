@@ -3,6 +3,7 @@ package org.edu_sharing.repository.server;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -38,7 +39,7 @@ public class ExcelImportServlet extends HttpServlet{
 		JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
 		
 		
-		HashMap<String, String> authInfo = new AuthenticationToolAPI().validateAuthentication(request.getSession());
+		Map<String, String> authInfo = new AuthenticationToolAPI().validateAuthentication(request.getSession());
 		
 		if(authInfo == null){
 			logger.error("not authenticated");

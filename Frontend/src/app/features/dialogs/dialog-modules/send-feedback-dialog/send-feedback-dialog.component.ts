@@ -58,14 +58,17 @@ export class SendFeedbackDialogComponent implements OnInit {
     private async addFeedback() {
         const values = (await this.mdsEditorInstance.save()) as Values;
         this.dialogRef.patchState({ isLoading: true });
-        await this.feedbackService
-            .addFeedback({
-                repository: RestConstants.HOME_REPOSITORY,
-                node: this.data.node.ref.id,
-                body: values,
-            })
-            .toPromise();
-        this.toast.toast('FEEDBACK.TOAST');
+        try {
+            await this.feedbackService
+                .addFeedback({
+                    repository: RestConstants.HOME_REPOSITORY,
+                    node: this.data.node.ref.id,
+                    body: values,
+                })
+                .toPromise();
+        } catch (e) {
+            this.toast.error(e);
+        }
         this.dialogRef.close();
         const queryParams = await this.route.queryParams.toPromise();
         if (queryParams.feedbackClose) {

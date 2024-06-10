@@ -3,7 +3,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { TranslateService } from '@ngx-translate/core';
-import { MdsWidget } from 'ngx-edu-sharing-api';
+import { MdsWidget, SuggestionResponseDto } from 'ngx-edu-sharing-api';
 import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import { CordovaService } from '../../../services/cordova.service';
 import { Toast } from '../../../services/toast';
@@ -74,7 +74,22 @@ export class WidgetDummy {
 
     setValue() {}
 
-    getSuggestedValues(): Promise<MdsWidgetValue[]> {
-        return Promise.resolve(this.definition.values);
+    getSuggestions(): SuggestionResponseDto[] {
+        return [
+            {
+                value: 'hello world',
+                createdBy: {
+                    authorityName: 'Superschlauer Duper KI',
+                },
+                status: 'PENDING',
+            },
+            {
+                value: 'AB\nDEF',
+                createdBy: {
+                    authorityName: 'Noch schlauerer Redakteur',
+                },
+                status: 'PENDING',
+            },
+        ];
     }
 }

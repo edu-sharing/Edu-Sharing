@@ -1,6 +1,0 @@
-type Workflow {
-    instructions: String
-    protocol: [String!]
-    receiver: [String!]
-    status: String
-}

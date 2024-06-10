@@ -4,14 +4,13 @@ import org.edu_sharing.service.tracking.TrackingService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class NodeData {
     private String timestamp;
-    HashMap<TrackingService.EventType, Integer> counts = new HashMap<>();
+    Map<TrackingService.EventType, Integer> counts = new HashMap<>();
 
     public String getTimestamp() {
         return timestamp;

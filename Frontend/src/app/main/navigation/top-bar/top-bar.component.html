@@ -16,6 +16,7 @@
       <es-main-menu-sidebar
         #mainMenuSidebar
         [currentScope]="currentScope"
+        (onClose)="onCloseScopeSelector.emit()"
         (showLicenses)="showLicenses.emit()"
       ></es-main-menu-sidebar>
       <ng-container
@@ -24,7 +25,7 @@
           context: {
             currentScope: this.currentScope,
             canOpen: this.canOpen,
-            onClick: toggleSidebar
+            onClick: toggleSidebar,
           }
         "
       ></ng-container>
@@ -34,6 +35,7 @@
         <es-main-menu-dropdown
           #mainMenuDropdown
           [currentScope]="currentScope"
+          (onClose)="onCloseScopeSelector.emit()"
         ></es-main-menu-dropdown>
         <button
           *ngIf="showScope"
@@ -55,6 +57,7 @@
           #mainMenuSidebar
           [currentScope]="currentScope"
           (showLicenses)="showLicenses.emit()"
+          (onClose)="onCloseScopeSelector.emit()"
         ></es-main-menu-sidebar>
         <button
           *ngIf="showScope"
@@ -128,31 +131,12 @@
         *ngTemplateOutlet="
           mainNavService.getCustomTemplateSlot(TemplateSlot.BeforeUserMenu);
           context: {
-            currentScope: this.currentScope
+            currentScope: this.currentScope,
           }
         "
       ></ng-container>
     </ng-container>
-    <div class="imprint" *ngIf="config.imprintUrl || config.privacyInformationUrl">
-      <a
-        cdkMonitorElementFocus
-        tabindex="0"
-        class="clickable"
-        *ngIf="config.imprintUrl"
-        (click)="openImprint.emit()"
-        (keyup.enter)="openImprint.emit()"
-        >{{ 'IMPRINT' | translate }}</a
-      >
-      <a
-        cdkMonitorElementFocus
-        tabindex="0"
-        class="clickable"
-        *ngIf="config.privacyInformationUrl"
-        (click)="openPrivacy.emit()"
-        (keyup.enter)="openPrivacy.emit()"
-        >{{ 'PRIVACY_INFORMATION' | translate }}</a
-      >
-    </div>
+    <es-imprint-privacy></es-imprint-privacy>
     <button
       mat-icon-button
       *ngIf="currentUser && showChat"
@@ -189,7 +173,7 @@
     *ngTemplateOutlet="
       mainNavService.getCustomTemplateSlot(TemplateSlot.BelowTopBar);
       context: {
-        currentScope: this.currentScope
+        currentScope: this.currentScope,
       }
     "
   ></ng-container>

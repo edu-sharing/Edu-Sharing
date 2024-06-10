@@ -175,7 +175,7 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
         return this.value.map((v) => {
             if (this.widget.definition.format) {
                 try {
-                    return new DatePipe(null).transform(v, this.widget.definition.format);
+                    return new DatePipe('en').transform(v, this.widget.definition.format);
                 } catch (e) {
                     console.warn('Could not format date', e, this.widget.definition);
                     return DateHelper.formatDate(this.translate, v, {

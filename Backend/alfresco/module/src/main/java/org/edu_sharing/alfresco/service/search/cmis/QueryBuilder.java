@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class QueryBuilder {
     private final DictionaryService dictionaryService;
 
-    private static final Map<String, String> cmisAlfMapping = new HashMap<String, String>(){{
+    private static final Map<String, String> cmisAlfMapping = new HashMap<>(){{
         put(CCConstants.SYS_PROP_NODE_UID, "objectId");
         put(CCConstants.CM_NAME, "name");
         put(CCConstants.CM_PROP_VERSIONABLELABEL, "versionLabel");

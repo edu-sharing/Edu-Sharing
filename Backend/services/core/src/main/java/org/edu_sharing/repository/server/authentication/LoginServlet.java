@@ -2,6 +2,7 @@ package org.edu_sharing.repository.server.authentication;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -41,7 +42,7 @@ public class LoginServlet extends HttpServlet {
 				redirectSuccessUrl = appInfo.getClientBaseUrl();
 			}
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(ApplicationInfoList.getHomeRepository().getAppId());
-			HashMap<String,String> authInfo = authTool.createNewSession(userName, password);
+			Map<String,String> authInfo = authTool.createNewSession(userName, password);
 			authTool.storeAuthInfoInSession(userName, authInfo.get(CCConstants.AUTH_TICKET), CCConstants.AUTH_TYPE_DEFAULT, req.getSession());
 			if (redirectSuccessUrl.length()<=1) {
 				try {Thread.sleep(1000);} catch(Exception ex) {}

@@ -1,4 +1,0 @@
-input RangedValueInput {
-    id: String
-    value: String!
-}

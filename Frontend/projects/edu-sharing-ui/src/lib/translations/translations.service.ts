@@ -3,12 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of as observableOf } from 'rxjs';
 import { first, map, switchMap, tap } from 'rxjs/operators';
-import { LANGUAGES } from './languages';
-import { ConfigService, SessionStorageService } from 'ngx-edu-sharing-api';
+import { ConfigService, LANGUAGES, SessionStorageService } from 'ngx-edu-sharing-api';
 import { AppService } from '../services/abstract/app.service';
 
 // 'none' means that only labels should be shown (for dev)
-const DEFAULT_SUPPORTED_LANGUAGES = ['de', 'de-informal', 'en', 'none'];
+const DEFAULT_SUPPORTED_LANGUAGES = ['de', 'de-informal', 'en', 'fr', 'it', 'none'];
 
 @Injectable({ providedIn: 'root' })
 export class TranslationsService {

@@ -19,7 +19,7 @@ public class Node implements Serializable {
 	private NodeLTIDeepLink nodeLTIDeepLink = null;
 	private Remote remote = null;
 	private String type = null;
-	private List<String> aspects = new ArrayList<String>();
+	private List<String> aspects = new ArrayList<>();
 	private String name = null;
 	private String title = null;
 	private String metadataset = null;
@@ -30,7 +30,7 @@ public class Node implements Serializable {
 	private Person modifiedBy = null;
 	private List<String> access = null;
 	private String downloadUrl = null;
-	private HashMap<String,String[]> properties = null;
+	private Map<String,String[]> properties = null;
 	private String mimetype = null;
 	private String mediatype = null;
 	private String size = null;
@@ -243,11 +243,11 @@ public class Node implements Serializable {
    **/
 	@Schema(description = "")
 	@JsonProperty("properties")
-	public HashMap<String, String[]> getProperties() {
+	public Map<String, String[]> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(HashMap<String, String[]> properties) {
+	public void setProperties(Map<String, String[]> properties) {
 		this.properties = properties;
 	}
 

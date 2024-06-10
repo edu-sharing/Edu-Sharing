@@ -93,7 +93,7 @@ public class MdsDao {
     }
 
     private List<MdsWidget> getWidgets() {
-        List<MdsWidget> result = new ArrayList<MdsWidget>();
+        List<MdsWidget> result = new ArrayList<>();
         for (MetadataWidget type : this.mds.getWidgets()) {
             result.add(new MdsWidget(type));
         }
@@ -101,7 +101,7 @@ public class MdsDao {
     }
 
     private List<MdsView> getViews() {
-        List<MdsView> result = new ArrayList<MdsView>();
+        List<MdsView> result = new ArrayList<>();
         for (MetadataTemplate type : this.mds.getTemplates()) {
             result.add(new MdsView(type));
         }
@@ -109,7 +109,7 @@ public class MdsDao {
     }
 
     private List<MdsGroup> getGroups() {
-        List<MdsGroup> result = new ArrayList<MdsGroup>();
+        List<MdsGroup> result = new ArrayList<>();
         for (MetadataGroup type : this.mds.getGroups()) {
             result.add(new MdsGroup(type));
         }

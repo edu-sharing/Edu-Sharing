@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Statistics {
 	
-	List<StatisticEntry> entries = new ArrayList<StatisticEntry>();
+	List<StatisticEntry> entries = new ArrayList<>();
 	
 	public void setEntries(List<StatisticEntry> entries) {
 		this.entries = entries;

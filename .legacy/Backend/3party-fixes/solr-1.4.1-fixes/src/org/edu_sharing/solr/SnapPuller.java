@@ -372,7 +372,7 @@ public class SnapPuller {
    */
   private void logReplicationTimeAndConfFiles(Collection<Map<String, Object>> modifiedConfFiles, boolean successfulInstall) {
     FileOutputStream outFile = null;
-    List<String> confFiles = new ArrayList<String>();
+    List<String> confFiles = new ArrayList<>();
     if (modifiedConfFiles != null && !modifiedConfFiles.isEmpty())
       for (Map<String, Object> map1 : modifiedConfFiles)
         confFiles.add((String) map1.get(NAME));
@@ -446,7 +446,7 @@ public class SnapPuller {
 
   private StringBuffer readToStringBuffer(long replicationTime, String str) {
     StringBuffer sb = new StringBuffer();
-    List<String> l = new ArrayList<String>();
+    List<String> l = new ArrayList<>();
     if (str != null && str.length() != 0) {
       String[] ss = str.split(",");
       for (int i = 0; i < ss.length; i++) {
@@ -523,7 +523,7 @@ public class SnapPuller {
         fileFetcher = new FileFetcher(tmpconfDir, file, saveAs, true, latestVersion);
         currentFile = file;
         fileFetcher.fetchFile();
-        confFilesDownloaded.add(new HashMap<String, Object>(file));
+        confFilesDownloaded.add(new HashMap<>(file));
       }
       // this is called before copying the files to the original conf dir
       // so that if there is an exception avoid corrupting the original files.
@@ -548,7 +548,7 @@ public class SnapPuller {
         fileFetcher = new FileFetcher(tmpIdxDir, file, (String) file.get(NAME), false, latestVersion);
         currentFile = file;
         fileFetcher.fetchFile();
-        filesDownloaded.add(new HashMap<String, Object>(file));
+        filesDownloaded.add(new HashMap<>(file));
       } else {
         LOG.info("Skipping download for " + localIndexFile);
       }
@@ -603,7 +603,7 @@ public class SnapPuller {
    */
   private boolean copyIndexFiles(File tmpIdxDir, File indexDir) throws IOException {
     String segmentsFile = null;
-    List<String> copiedfiles = new ArrayList<String>();
+    List<String> copiedfiles = new ArrayList<>();
     for (Map<String, Object> f : filesDownloaded) {
       String fname = (String) f.get(NAME);
       // the segments file must be copied last
@@ -685,7 +685,7 @@ public class SnapPuller {
       return true;
   }
 
-  private final Map<String, FileInfo> confFileInfoCache = new HashMap<String, FileInfo>();
+  private final Map<String, FileInfo> confFileInfoCache = new HashMap<>();
 
   /**
    * The local conf files are compared with the conf files in the master. If they are same (by checksum) do not copy.
@@ -698,7 +698,7 @@ public class SnapPuller {
     if (confFilesToDownload == null || confFilesToDownload.isEmpty())
       return Collections.EMPTY_LIST;
     //build a map with alias/name as the key
-    Map<String, Map<String, Object>> nameVsFile = new HashMap<String, Map<String, Object>>();
+    Map<String, Map<String, Object>> nameVsFile = new HashMap<>();
     NamedList names = new NamedList();
     for (Map<String, Object> map : confFilesToDownload) {
       //if alias is present that is the name the file may have in the slave
@@ -806,7 +806,7 @@ public class SnapPuller {
     FileFetcher tmpFileFetcher = fileFetcher;
     if (tmp == null)
       return null;
-    tmp = new HashMap<String, Object>(tmp);
+    tmp = new HashMap<>(tmp);
     if (tmpFileFetcher != null)
       tmp.put("bytesDownloaded", tmpFileFetcher.bytesDownloaded);
     return tmp;

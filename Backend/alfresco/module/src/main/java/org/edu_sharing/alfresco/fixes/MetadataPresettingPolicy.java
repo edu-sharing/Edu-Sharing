@@ -46,7 +46,7 @@ public class MetadataPresettingPolicy implements
 	private static final QName ASPECT_ASSOC = QName
 			.createQName(CCConstants.CCM_ASSOC_METADATA_PRESETTING_TEMPLATE);
 
-	private final List<QName> defaultQNames = new ArrayList<QName>();
+	private final List<QName> defaultQNames = new ArrayList<>();
 
 	/**
 	 * The common node service

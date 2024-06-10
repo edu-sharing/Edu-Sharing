@@ -65,7 +65,7 @@ public class NodeRefImpl implements NodeRef {
 	String nodeId;
 
 	Preview preview;
-	HashMap<String, Object> properties;
+	Map<String, Object> properties;
 	Map<String, Boolean> permissions;
 
 	/**
@@ -90,7 +90,7 @@ public class NodeRefImpl implements NodeRef {
 		this.storeProtocol = storeProtocol;
 		this.nodeId = nodeId;
 	}
-	public NodeRefImpl(String repositoryId, String storeProtocol, String storeId, HashMap<String, Object> properties ){
+	public NodeRefImpl(String repositoryId, String storeProtocol, String storeId, Map<String, Object> properties ){
 		this.repositoryId = repositoryId;
 		this.storeId = storeId;
 		this.storeProtocol = storeProtocol;
@@ -126,11 +126,11 @@ public class NodeRefImpl implements NodeRef {
 	}
 
 	@Override
-	public HashMap<String, Object> getProperties() {
+	public Map<String, Object> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(HashMap<String, Object> properties) {
+	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 	}
 	

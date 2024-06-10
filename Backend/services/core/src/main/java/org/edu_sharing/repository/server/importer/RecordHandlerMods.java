@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,7 +42,7 @@ public class RecordHandlerMods implements RecordHandlerInterface {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	
 	String metadataSetId = null;
-	HashMap<String, Object> toSafeMap = new HashMap<String, Object>();
+	Map<String, Object> toSafeMap = new HashMap<>();
 	
 	public RecordHandlerMods(String metadataSetId) {
 		if(metadataSetId == null || metadataSetId.trim().equals("")){
@@ -75,7 +76,7 @@ public class RecordHandlerMods implements RecordHandlerInterface {
 		String keywords = (String) xpath.evaluate("subject/topic", nodeMods, XPathConstants.STRING);
 		if(keywords != null) {
 			String[] splitted = keywords.split(",");
-			List<String> kws = new ArrayList<String>();
+			List<String> kws = new ArrayList<>();
 			for(String kw : splitted) {
 				kws.add(kw);
 			}
@@ -104,7 +105,7 @@ public class RecordHandlerMods implements RecordHandlerInterface {
 			String role = (String) xpath.evaluate("role/roleTerm[@type='text']", contributer.item(i), XPathConstants.STRING);
 			String firstName = (String) xpath.evaluate("namePart[@type='given']", contributer.item(i), XPathConstants.STRING);
 			String lastName = (String) xpath.evaluate("namePart[@type='family']", contributer.item(i), XPathConstants.STRING);
-			HashMap<String,String> properties = new HashMap<String,String>();
+			Map<String,String> properties = new HashMap<>();
 			properties.put(CCConstants.VCARD_SURNAME, lastName );
 			properties.put(CCConstants.VCARD_GIVENNAME, firstName );
 			if(role.equals("Author")) {
@@ -171,13 +172,13 @@ public class RecordHandlerMods implements RecordHandlerInterface {
 		con.setReadTimeout(5000);
 
 		con.connect();
-		String result = IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8.name());
+		String result = IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
 		con.disconnect();
 		return result;
 	}
 	
 	@Override
-	public HashMap<String, Object> getProperties() {
+	public Map<String, Object> getProperties() {
 		// TODO Auto-generated method stub
 		return toSafeMap;
 	}

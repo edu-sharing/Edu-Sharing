@@ -19,17 +19,17 @@ public class AssignedLicenseDAOSubTypeImpl implements AssignedLicenseDAO {
 	public List<AssignedLicense> getAssignedLicenses(String repositoryId, String nodeId) throws Throwable {
 
 		//remote repositories need a valid homeAuth to make the AuthByApp
-		HashMap homeAuthInfo = null;
+		Map<String, String> homeAuthInfo = null;
 		if(!ApplicationInfoList.getRepositoryInfoById(repositoryId).ishomeNode()){
 			homeAuthInfo = new AuthenticationToolAPI().getAuthentication(Context.getCurrentInstance().getRequest().getSession());
 		}
 		
 		MCAlfrescoBaseClient mcAlfrescoBaseClient = (MCAlfrescoBaseClient) RepoFactory.getInstance(repositoryId, homeAuthInfo);
-		HashMap<String, HashMap<String, Object>> assignedLicenses = mcAlfrescoBaseClient.getChildrenByType(nodeId,
+		Map<String, Map<String, Object>> assignedLicenses = mcAlfrescoBaseClient.getChildrenByType(nodeId,
 				CCConstants.CCM_TYPE_ASSIGNED_LICENSE);
 
-		List<AssignedLicense> licenses = new ArrayList<AssignedLicense>();
-		for (Map.Entry<String, HashMap<String, Object>> entryLicense : assignedLicenses.entrySet()) {
+		List<AssignedLicense> licenses = new ArrayList<>();
+		for (Map.Entry<String, Map<String, Object>> entryLicense : assignedLicenses.entrySet()) {
 			String assignedLicenseNodeId = entryLicense.getKey();
 			String[] assignedLicenseLicense = new String[] { (String) entryLicense.getValue().get(
 					CCConstants.CCM_PROP_ASSIGNED_LICENSE_ASSIGNEDLICENSE) };
@@ -44,22 +44,22 @@ public class AssignedLicenseDAOSubTypeImpl implements AssignedLicenseDAO {
 	public void setAssignedLicenses(String repositoryId, String nodeId, List<AssignedLicense> assignedLicenses) throws Throwable {
 
 		//remote repositories need a valid homeAuth to make the AuthByApp
-		HashMap homeAuthInfo = null;
+		Map<String, String> homeAuthInfo = null;
 		if(repositoryId != null && !ApplicationInfoList.getRepositoryInfoById(repositoryId).ishomeNode()){
 			homeAuthInfo = new AuthenticationToolAPI().getAuthentication(Context.getCurrentInstance().getRequest().getSession());
 		}
 		
 		MCAlfrescoBaseClient mcAlfrescoBaseClient = (MCAlfrescoBaseClient) RepoFactory.getInstance(repositoryId,homeAuthInfo);
 
-		ArrayList<String> newAuthorities = new ArrayList<String>();
+		ArrayList<String> newAuthorities = new ArrayList<>();
 		for (AssignedLicense assignedLicense : assignedLicenses) {
 			newAuthorities.add(assignedLicense.getAuthority());
 		}
 		// remove old licenses for authorities that are in
 		// newAuthorities List
-		HashMap<String, HashMap<String, Object>> assignedLicensesHashMap = mcAlfrescoBaseClient.getChildrenByType(nodeId,
+		Map<String, Map<String, Object>> assignedLicensesHashMap = mcAlfrescoBaseClient.getChildrenByType(nodeId,
 				CCConstants.CCM_TYPE_ASSIGNED_LICENSE);
-		for (Map.Entry<String, HashMap<String, Object>> assignedLicenseEntry : assignedLicensesHashMap.entrySet()) {
+		for (Map.Entry<String, Map<String, Object>> assignedLicenseEntry : assignedLicensesHashMap.entrySet()) {
 			String oldAuthority = (String) assignedLicenseEntry.getValue().get(CCConstants.CCM_PROP_ASSIGNED_LICENSE_AUTHORITY);
 			if (newAuthorities.contains(oldAuthority)) {
 				mcAlfrescoBaseClient.removeChild(nodeId, assignedLicenseEntry.getKey(), CCConstants.CCM_ASSOC_ASSIGNEDLICENSES);
@@ -71,7 +71,7 @@ public class AssignedLicenseDAOSubTypeImpl implements AssignedLicenseDAO {
 		// set new licenses
 		for (AssignedLicense assignedLicense : assignedLicenses) {
 			if (assignedLicense.getLicenses() != null) {
-				HashMap<String, Object> properties = new HashMap<String, Object>();
+				Map<String, Object> properties = new HashMap<>();
 				properties.put(CCConstants.CCM_PROP_ASSIGNED_LICENSE_AUTHORITY, assignedLicense.getAuthority());
 				properties.put(CCConstants.CCM_PROP_ASSIGNED_LICENSE_ASSIGNEDLICENSE, assignedLicense.getLicenses()[0]);
 

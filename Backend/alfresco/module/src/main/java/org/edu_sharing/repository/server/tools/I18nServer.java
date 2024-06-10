@@ -29,6 +29,7 @@ package org.edu_sharing.repository.server.tools;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.commons.logging.Log;
@@ -107,10 +108,10 @@ public class I18nServer {
 		return getTranslation(key,language,country,defaultResourceBundle);
 	}
 	
-	public static HashMap<String,String> permViewMapper = null;
+	public static Map<String,String> permViewMapper = null;
 	public final static String getPermissionCaption(String permKey){
 		if(permViewMapper == null){
-			permViewMapper = new HashMap<String,String>();
+			permViewMapper = new HashMap<>();
 			permViewMapper.put(CCConstants.PERMISSION_READ, "dialog_inviteusers_perm_read");
 			permViewMapper.put(CCConstants.PERMISSION_READ_PREVIEW, "dialog_inviteusers_perm_readpreview");
 			permViewMapper.put(CCConstants.PERMISSION_READ_ALL, "dialog_inviteusers_perm_readall");

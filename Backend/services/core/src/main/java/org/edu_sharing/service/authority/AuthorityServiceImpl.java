@@ -1,11 +1,6 @@
 package org.edu_sharing.service.authority;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-
 import jakarta.transaction.UserTransaction;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -22,24 +17,26 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfresco.policy.GuestCagePolicy;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.rpc.User;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.PropertyRequiredException;
-import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-
 import org.edu_sharing.repository.server.tools.KeyTool;
 import org.edu_sharing.repository.server.tools.cache.UserCache;
 import org.edu_sharing.service.NotAnAdminException;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class AuthorityServiceImpl implements AuthorityService {
@@ -48,6 +45,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 
 	ApplicationContext alfApplicationContext = AlfAppContextGate.getApplicationContext();
 	ServiceRegistry serviceRegistry = (ServiceRegistry) alfApplicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
+	UserCache userCache = alfApplicationContext.getBean(UserCache.class);
 	org.alfresco.service.cmr.security.AuthorityService authorityService = serviceRegistry.getAuthorityService();
 	NodeService nodeService = serviceRegistry.getNodeService();
 	OwnableService ownableService = serviceRegistry.getOwnableService();
@@ -246,7 +244,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 
 		
 		
-		ArrayList<EduGroup> result = new ArrayList<EduGroup>();
+		ArrayList<EduGroup> result = new ArrayList<>();
 
 		for (String a : authoritiesForUser) {
 			EduGroup eg = getEduGroup(a);
@@ -300,7 +298,7 @@ public EduGroup getEduGroup(String authority){
 
 	@Override
 	public ArrayList<EduGroup> getEduGroups(String authority,String scope) {
-		ArrayList<EduGroup> result = new ArrayList<EduGroup>();
+		ArrayList<EduGroup> result = new ArrayList<>();
 
 		for (EduGroup eduGroup : getAllEduGroups(authority)) {
 			if ((eduGroup.getScope() == null && scope == null)
@@ -371,7 +369,7 @@ public EduGroup getEduGroup(String authority){
 								eduGroup.getGroupDisplayName());
 
 						// scope
-						Map<QName, Serializable> propsAspectEduScope = new HashMap<QName, Serializable>();
+						Map<QName, Serializable> propsAspectEduScope = new HashMap<>();
 						propsAspectEduScope.put(QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME),
 								eduGroup.getScope());
 						nodeService.addAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_EDUSCOPE),
@@ -387,7 +385,7 @@ public EduGroup getEduGroup(String authority){
 								}
 							}
 							folderName = NodeServiceHelper.cleanupCmName(folderName);
-							Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
+							Map<QName, Serializable> folderProps = new HashMap<>();
 							folderProps.put(ContentModel.PROP_NAME, folderName);
 
 							String assocName = "{" + CCConstants.NAMESPACE_CCM + "}" + folderName;
@@ -404,7 +402,7 @@ public EduGroup getEduGroup(String authority){
 						}
 
 						// edugroup aspect
-						Map<QName, Serializable> propsAspectEduGroup = new HashMap<QName, Serializable>();
+						Map<QName, Serializable> propsAspectEduGroup = new HashMap<>();
 						propsAspectEduGroup.put(QName.createQName(CCConstants.CCM_PROP_EDUGROUP_EDU_HOMEDIR),
 								new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, eduGroupHomeFolderId));
 						nodeService.addAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP),
@@ -472,7 +470,7 @@ public EduGroup getEduGroup(String authority){
 
 	@Override
 	public User getUser(String userName) {
-		return new MCAlfrescoAPIClient().getUser(userName);
+		return userCache.getUser(userName);
 	}
 
 	@Override
@@ -578,7 +576,7 @@ public EduGroup getEduGroup(String authority){
 					nodeService.addAspect(personService.getPerson(userName),QName.createQName(CCConstants.CCM_ASPECT_USER_EXTENSION),null);
 		}
 		private Map<QName, Serializable> transformQName(Map<String, Serializable> data) {
-			Map<QName, Serializable> transformed = new HashMap<QName, Serializable>();
+			Map<QName, Serializable> transformed = new HashMap<>();
 			for(String key : data.keySet()) {
 				transformed.put(QName.createQName(key), data.get(key));
 			}
@@ -663,10 +661,10 @@ public EduGroup getEduGroup(String authority){
 				profileSettings.put(property, serviceRegistry.getNodeService().getProperty(personRef, QName.createQName(property)));
 			}
 			userObj.setProfileSettings(profileSettings);
-			UserCache.put(user,userObj);
+			userCache.put(user,userObj);
 		}
 
-		Map<String, Serializable> result = new HashMap<String, Serializable>();
+		Map<String, Serializable> result = new HashMap<>();
 
 		List<String> properties = new ArrayList<>();// ProfileSettings property to return
 		// If profileSettingsProperty==null than  Get all Properties for ProfileSettings
@@ -702,7 +700,7 @@ public EduGroup getEduGroup(String authority){
 			return;
 		}
 
-		HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+		Map<QName, Serializable> properties = new HashMap<>();
 		properties.put(ContentModel.PROP_USERNAME, CCConstants.PROXY_USER);
 		personService.createPerson(properties);
 		serviceRegistry.getAuthenticationService()

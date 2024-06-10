@@ -1,6 +1,0 @@
-type SavedSearch {
-    mds: String
-    parameters: [String!]
-    query: String
-    repository: String
-}

@@ -124,7 +124,7 @@ public class EduVersion2ServiceImpl extends org.alfresco.repo.version.Version2Se
                 if (needToRestoreDiscussion)
                 {
                     Map<QName, Serializable> currentVersionProp = this.nodeService.getProperties(nodeRef);
-                    forumProps = new HashMap<QName, Serializable>();
+                    forumProps = new HashMap<>();
                     for (QName key : currentVersionProp.keySet())
                     {
                         if (key.getNamespaceURI().equals(NamespaceService.FORUMS_MODEL_1_0_URI))
@@ -144,8 +144,8 @@ public class EduVersion2ServiceImpl extends org.alfresco.repo.version.Version2Se
             revertDetails.setNodeType(oldNodeTypeQName);
             
             //  Do we want to maintain any existing property values?
-            Collection<QName> propsToLeaveAlone = new ArrayList<QName>();
-            Collection<QName> assocsToLeaveAlone = new ArrayList<QName>();
+            Collection<QName> propsToLeaveAlone = new ArrayList<>();
+            Collection<QName> assocsToLeaveAlone = new ArrayList<>();
             
             TypeDefinition typeDef = dictionaryService.getType(oldNodeTypeQName);
             if(typeDef != null)
@@ -276,7 +276,7 @@ public class EduVersion2ServiceImpl extends org.alfresco.repo.version.Version2Se
             this.nodeService.setProperty(nodeRef, ContentModel.PROP_VERSION_LABEL, currentVersionLabel);
 
             // Add/remove the child nodes
-            List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(nodeRef));
+            List<ChildAssociationRef> children = new ArrayList<>(this.nodeService.getChildAssocs(nodeRef));
             List<ChildAssociationRef> versionedChildren = this.nodeService.getChildAssocs(versionNodeRef);
             for (ChildAssociationRef versionedChild : versionedChildren)
             {
@@ -354,7 +354,7 @@ public class EduVersion2ServiceImpl extends org.alfresco.repo.version.Version2Se
                 // Don't remove forum children
                 if (needToRestoreDiscussion)
                 {
-                    List<ChildAssociationRef> ignoredChildren = new ArrayList<ChildAssociationRef>();
+                    List<ChildAssociationRef> ignoredChildren = new ArrayList<>();
                     for (ChildAssociationRef childForCheck : children)
                     {
                         if (childForCheck.getTypeQName().getNamespaceURI().equals(NamespaceService.FORUMS_MODEL_1_0_URI))

@@ -1,6 +1,0 @@
-type Version {
-    version: String
-    comment: String
-    type: String
-    autoCreateVersion: Boolean
-}

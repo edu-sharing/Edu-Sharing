@@ -111,11 +111,11 @@ public class SearchServiceOCartImpl extends SearchServiceAdapter{
 		SearchResultNodeRef searchResultNodeRef = new SearchResultNodeRef();
 		List<NodeRef> data=new ArrayList<>();
 		
-		HashMap<String,HashMap<String,Object>> result = new HashMap<String, HashMap<String,Object>>();
+		Map<String,Map<String,Object>> result = new HashMap<>();
 		for(int i = 0; i < docs.length(); i++){
 			JSONObject doc = (JSONObject)docs.get(i);
 			
-			HashMap<String,Object> props =  this.getProperties(doc);
+			Map<String,Object> props =  this.getProperties(doc);
 			result.put((String)props.get(CCConstants.SYS_PROP_NODE_UID), props);
 
 			org.edu_sharing.service.model.NodeRef ref = new org.edu_sharing.service.model.NodeRefImpl(repositoryId, 
@@ -129,7 +129,7 @@ public class SearchServiceOCartImpl extends SearchServiceAdapter{
 		/*
 
 		
-			HashMap<String,Object> properties=new HashMap<>();
+			Map<String,Object> properties=new HashMap<>();
 			properties.put(CCConstants.SYS_PROP_NODE_UID,map.getNamedItem("id").getNodeValue());
 			properties.put(CCConstants.LOM_PROP_GENERAL_TITLE,map.getNamedItem("title").getNodeValue());
 			
@@ -160,9 +160,9 @@ public class SearchServiceOCartImpl extends SearchServiceAdapter{
 
 	}
 	
-	public static String httpGet(String urlStr, HashMap<String, String> properties) throws IOException {
+	public static String httpGet(String urlStr, Map<String, String> properties) throws IOException {
         if (properties == null) {
-            properties = new HashMap<String, String>();
+            properties = new HashMap<>();
         }
         // open HTTP connection with URL
         URL url = new URL(urlStr);
@@ -189,18 +189,18 @@ public class SearchServiceOCartImpl extends SearchServiceAdapter{
         return sb.toString();
     }	
 
-	private HashMap<String,Object> getProperties(JSONObject doc){
-		HashMap<String,Object> properties = new  HashMap<String,Object>();
+	private Map<String,Object> getProperties(JSONObject doc){
+		Map<String,Object> properties = new HashMap<>();
 		String id = null;
 		try {
-			id = (String)doc.getString("id");
+			id = doc.getString("id");
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		String title = null;
 		try {
-			title = (String)doc.getString("title");
+			title = doc.getString("title");
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -262,9 +262,9 @@ public class SearchServiceOCartImpl extends SearchServiceAdapter{
 	}
 	
 	
-	public HashMap<String, Object> getProperties(String nodeId) throws Throwable {
+	public Map<String, Object> getProperties(String nodeId) throws Throwable {
 		
-		HashMap<String,Object> properties = new  HashMap<String,Object>();
+		Map<String,Object> properties = new HashMap<>();
 		try{
 			String result = httpGet(OCA_API   +"/search/json/?byids="+nodeId, null);
 			if(result != null && result.trim().length() > 0){
@@ -320,7 +320,7 @@ public class SearchServiceOCartImpl extends SearchServiceAdapter{
 
 		String[] searchWordCriteria=criterias.get("ngsearchword");
 
-		List<String> extSearch = new ArrayList<String>();
+		List<String> extSearch = new ArrayList<>();
 		
  		String searchWord = searchWordCriteria[0];
 		if (searchWord.equals("*") ){

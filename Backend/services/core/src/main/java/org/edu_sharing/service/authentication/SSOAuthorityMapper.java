@@ -119,7 +119,7 @@ public class SSOAuthorityMapper {
 
 	CustomGroupMapping customGroupMapping;
 
-	List<String> additionalAttributes = new ArrayList<String>();
+	List<String> additionalAttributes = new ArrayList<>();
 
 	public void init(){
 		ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
@@ -169,7 +169,7 @@ public class SSOAuthorityMapper {
 	 * @return username: means the user exists(before or was created) null when
 	 *         user does not exist and can not be created
 	 */
-	public String mapAuthority(final HashMap<String, String> ssoAttributes) {
+	public String mapAuthority(final Map<String, String> ssoAttributes) {
 		RunAsWork<String> runAs = new RunAsWork<String>() {
 			@Override
 			public String doWork() throws Exception {
@@ -185,7 +185,7 @@ public class SSOAuthorityMapper {
 	}
 	
 	
-	private String mapAuthorityInternal(final HashMap<String, String> ssoAttributes) {
+	private String mapAuthorityInternal(final Map<String, String> ssoAttributes) {
 		
 		if(isDebug()){
 			for(Map.Entry<String,String> ssoAttribute : ssoAttributes.entrySet()){
@@ -292,8 +292,8 @@ public class SSOAuthorityMapper {
 			}
 
 			// person
-			HashMap<String, String> personMapping = mappingConfig.getPersonMapping();
-			HashMap<QName, Serializable> personProperties = new HashMap<QName, Serializable>();
+			Map<String, String> personMapping = mappingConfig.getPersonMapping();
+			Map<QName, Serializable> personProperties = new HashMap<>();
 
 			for (Map.Entry<String, String> ssoAttribute : ssoAttributes.entrySet()) {
 
@@ -385,7 +385,7 @@ public class SSOAuthorityMapper {
 				authenticationService.createAuthentication(existentUserName, new KeyTool().getRandomPassword().toCharArray());
 			}
 			// group memberships
-			List<MappingGroup> mappingGroups = new ArrayList<MappingGroup>(mappingConfig.getGroupMapping());
+			List<MappingGroup> mappingGroups = new ArrayList<>(mappingConfig.getGroupMapping());
 			
 			/**
 			 * add moodle global groups
@@ -462,9 +462,9 @@ public class SSOAuthorityMapper {
 			if(lmsGlobalGroups != null && !organisationName.trim().equals("")){
 				JSONArray globalGroupsJA = new JSONArray(lmsGlobalGroups);
 				
-				HashMap<String,String> alfrescoNameLmsIdMap = new HashMap<String,String>();
+				Map<String,String> alfrescoNameLmsIdMap = new HashMap<>();
 				
-				List<MappingGroup> lmsGlobalGroupsList = new ArrayList<MappingGroup>();
+				List<MappingGroup> lmsGlobalGroupsList = new ArrayList<>();
 				
 				for(int i = 0; i < globalGroupsJA.length(); i++){
 					JSONObject globalGroupJO = (JSONObject)globalGroupsJA.get(i);
@@ -498,7 +498,7 @@ public class SSOAuthorityMapper {
 			
 			if (mappingGroups != null) {
 
-				List<String> currentGroupsForUser = new ArrayList<String>();
+				List<String> currentGroupsForUser = new ArrayList<>();
 				for (MappingGroup mappingGroup : mappingGroups) {
 					
 					String groupName = mappingGroup.getMapTo();
@@ -520,7 +520,7 @@ public class SSOAuthorityMapper {
 							String newGroupName = authorityService.createAuthority(AuthorityType.GROUP, mappingGroup.getMapTo(), mappingGroup.getMapToDisplayName(), authorityService.getDefaultZones());
 							NodeRef nodeRef = authorityService.getAuthorityNodeRef(newGroupName);
 							
-							Map<QName,Serializable> aspectProperties = new HashMap<QName,Serializable>();
+							Map<QName,Serializable> aspectProperties = new HashMap<>();
 							aspectProperties.put(QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPSOURCE), appId);
 							nodeService.addAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_GROUPEXTENSION), aspectProperties);
 						}
@@ -610,7 +610,7 @@ public class SSOAuthorityMapper {
 			
 				//edu-sharing federated global groups
 				String gg = ssoAttributes.get(CCConstants.EDU_SHARING_GLOBAL_GROUPS);
-				List<String> globalGroupsMembership = (gg != null && !gg.trim().equals("")) ? Arrays.asList(gg.split(";")) : new ArrayList<String>();
+				List<String> globalGroupsMembership = (gg != null && !gg.trim().equals("")) ? Arrays.asList(gg.split(";")) : new ArrayList<>();
 				
 				//remove user from global group
 				Set<String> authoritiesForUser = authorityService.getAuthoritiesForUser(userName);
@@ -691,7 +691,7 @@ public class SSOAuthorityMapper {
 		return result;
 	}
 
-	private void logErrorParams(String missing, HashMap<String, String> ssoAttributes) {
+	private void logErrorParams(String missing, Map<String, String> ssoAttributes) {
 		String logString = "";
 		for (Map.Entry<String, String> entry : ssoAttributes.entrySet()) {
 			logString += entry.getKey() + ": " + entry.getValue() + "; ";

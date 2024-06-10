@@ -47,7 +47,7 @@ public class ConnectorDAO {
 					fileTypes = new ConnectorFileType[]{cftResult};
 					resultConnector.setFiletypes(fileTypes);
 				}else{
-					ArrayList<ConnectorFileType> list = new ArrayList<ConnectorFileType>(Arrays.asList(fileTypes));
+					ArrayList<ConnectorFileType> list = new ArrayList<>(Arrays.asList(fileTypes));
 					list.add(cftResult);
 					resultConnector.setFiletypes(list.toArray(new ConnectorFileType[list.size()]));
 				}
@@ -66,7 +66,7 @@ public class ConnectorDAO {
 			if(connectors == null || connectors.length == 0){
 				result.setConnectors(new Connector[]{resultConnector});
 			}else{
-				ArrayList<Connector> resultConnectorList  = new ArrayList<Connector>(Arrays.asList(connectors));
+				ArrayList<Connector> resultConnectorList  = new ArrayList<>(Arrays.asList(connectors));
 				resultConnectorList.add(resultConnector);
 				result.setConnectors(resultConnectorList.toArray(new Connector[0]));
 			}

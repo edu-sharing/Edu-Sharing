@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;;
 
 public class Statistics {
 	
-	List<StatisticEntry> entries = new ArrayList<StatisticEntry>();
+	List<StatisticEntry> entries = new ArrayList<>();
 	
 	public void setEntries(List<StatisticEntry> entries) {
 		this.entries = entries;

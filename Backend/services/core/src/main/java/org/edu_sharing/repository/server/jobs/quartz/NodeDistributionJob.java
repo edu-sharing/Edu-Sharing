@@ -48,7 +48,7 @@ public class NodeDistributionJob extends AbstractJob {
 			
 			ApplicationInfo homeRep = ApplicationInfoList.getHomeRepository();
 			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(homeRep.getAppId());
-			HashMap<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
+			Map<String, String> authInfo = authTool.createNewSession(homeRep.getUsername(), homeRep.getPassword());
 			MCAlfrescoBaseClient client = (MCAlfrescoBaseClient) RepoFactory.getInstance(homeRep.getAppId(), authInfo);
 
 			JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
@@ -63,7 +63,7 @@ public class NodeDistributionJob extends AbstractJob {
 			
 			// request node
 				
-			HashMap<String, HashMap<String, Object>> search = 
+			Map<String, Map<String, Object>> search =
 					client.search(
 							"PATH:\"" + jobDataMap.getString(JOB_PATH) + "\"", 
 							CCConstants.CM_TYPE_FOLDER);
@@ -76,16 +76,16 @@ public class NodeDistributionJob extends AbstractJob {
 			
 			// request io's
 			
-			HashMap<String, HashMap<String, Object>> children = 
+			Map<String, Map<String, Object>> children =
 					client.getChildrenByType(rootId, CCConstants.CCM_TYPE_IO);
 			
 			Calendar calendar = Calendar.getInstance();
-			Map<String, String> cache = new HashMap<String, String>();
+			Map<String, String> cache = new HashMap<>();
 			
-			for (Entry<String, HashMap<String, Object>> child : children.entrySet()) {
+			for (Entry<String, Map<String, Object>> child : children.entrySet()) {
 
 				String childId = child.getKey();
-				HashMap<String, Object> childProps = child.getValue();
+				Map<String, Object> childProps = child.getValue();
 				
 				Date created = new Date(Long.parseLong((String) childProps.get(CCConstants.CM_PROP_C_CREATED)));
 			
@@ -107,7 +107,7 @@ public class NodeDistributionJob extends AbstractJob {
 				
 				if (nodeId == null) {
 					
-					cache.put(key, nodeId = new NodeTool().createOrGetNodeByName(client, rootId, items));
+					cache.put(key, nodeId = NodeTool.createOrGetNodeByName(rootId, items));
 				}
 				
 				String childName = childProps.get(CCConstants.CM_NAME).toString();

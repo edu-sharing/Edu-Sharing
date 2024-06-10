@@ -95,7 +95,7 @@ public class SearchServiceMemuchoImpl extends SearchServiceAdapter{
 		searchResultNodeRef.setNodeCount(searchResultNodeRef.getNodeCount() + array.length());
 		for (int i = 0; i < array.length(); i++) {
 			JSONObject json = array.getJSONObject(i);
-				HashMap<String, Object> properties = new HashMap<>();
+				Map<String, Object> properties = new HashMap<>();
 			properties.put(CCConstants.SYS_PROP_NODE_UID, json.getString("TopicId"));
 			properties.put(CCConstants.LOM_PROP_GENERAL_TITLE, json.getString("Name"));
 			properties.put(CCConstants.CM_NAME, json.getString("Name"));

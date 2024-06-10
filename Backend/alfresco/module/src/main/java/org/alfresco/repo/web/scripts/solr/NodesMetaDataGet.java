@@ -104,7 +104,7 @@ public class NodesMetaDataGet extends DeclarativeWebScript
             if(o.has("nodeIds"))
             {
                 JSONArray jsonNodeIds =  o.getJSONArray("nodeIds");
-                nodeIds = new ArrayList<Long>(jsonNodeIds.length());
+                nodeIds = new ArrayList<>(jsonNodeIds.length());
                 for(int i = 0; i < jsonNodeIds.length(); i++)
                 {
                     Long nodeId = jsonNodeIds.getLong(i);
@@ -187,7 +187,7 @@ public class NodesMetaDataGet extends DeclarativeWebScript
             }
 
             final ArrayList<FreemarkerNodeMetaData> nodesMetaData =
-                    new ArrayList<FreemarkerNodeMetaData>(size > 0 ? size : INITIAL_DEFAULT_SIZE);
+                    new ArrayList<>(size > 0 ? size : INITIAL_DEFAULT_SIZE);
             NodeMetaDataParameters params = new NodeMetaDataParameters();
             params.setNodeIds(nodeIds);
             params.setFromNodeId(fromNodeId);
@@ -224,7 +224,7 @@ public class NodesMetaDataGet extends DeclarativeWebScript
                 }
             });
 
-            Map<String, Object> model = new HashMap<String, Object>(1, 1.0f);
+            Map<String, Object> model = new HashMap<>(1, 1.0f);
             model.put("nodes", nodesMetaData);
             model.put("filter", filter);
 
@@ -282,8 +282,8 @@ public class NodesMetaDataGet extends DeclarativeWebScript
             this.childAssocs = new ArrayList<>();
 
             // convert Paths to Strings
-            List<String> paths = new ArrayList<String>();
-            List<String> ancestorPaths = new ArrayList<String>();
+            List<String> paths = new ArrayList<>();
+            List<String> ancestorPaths = new ArrayList<>();
             HashSet<String> ancestors = new HashSet<String>();
             if(nodeMetaData.getPaths() != null)
             {
@@ -310,7 +310,7 @@ public class NodesMetaDataGet extends DeclarativeWebScript
 
 
             // convert name Paths to Strings
-            List<String> namePaths = new ArrayList<String>();
+            List<String> namePaths = new ArrayList<>();
             if(nodeMetaData.getNamePaths() != null)
             {
                 for(Collection<String> namePath : nodeMetaData.getNamePaths())
@@ -352,7 +352,7 @@ public class NodesMetaDataGet extends DeclarativeWebScript
             final Map<QName, Serializable> props = nodeMetaData.getProperties();
             if (props != null)
             {
-                final Map<String, PropertyValue> properties = new HashMap<String, PropertyValue>(props.size());
+                final Map<String, PropertyValue> properties = new HashMap<>(props.size());
                 for (final QName propName : props.keySet())
                 {
                     // need to run this in tenant context because types may be in a tenant-specific
@@ -443,7 +443,7 @@ public class NodesMetaDataGet extends DeclarativeWebScript
         }
         private ArrayList<NodeRef> getAncestors(Path path)
         {
-            ArrayList<NodeRef> ancestors = new ArrayList<NodeRef>(8);
+            ArrayList<NodeRef> ancestors = new ArrayList<>(8);
             for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
             {
                 Path.Element element = elit.next();

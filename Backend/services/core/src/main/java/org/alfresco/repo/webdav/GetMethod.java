@@ -457,7 +457,7 @@ public class GetMethod extends WebDAVMethod
      */
     private ArrayList<String> parseETags(String strETagHeader)
     {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
 
         StringTokenizer tokenizer = new StringTokenizer(strETagHeader, WebDAV.HEADER_VALUE_SEPARATOR);
         while (tokenizer.hasMoreTokens())

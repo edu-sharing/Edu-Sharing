@@ -13,6 +13,7 @@ public abstract class AbstractInterruptableJob extends AbstractJobMapAnnotationP
     public final void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         thread = new Thread(() -> {
             try {
+                updateJobInfo(jobExecutionContext);
                 executeInterruptable(jobExecutionContext);
             } catch (JobExecutionException e) {
                 logger.error(e);

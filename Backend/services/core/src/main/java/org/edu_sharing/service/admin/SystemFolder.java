@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SystemFolder {
 
@@ -36,7 +37,7 @@ public class SystemFolder {
         NodeService nodeService = NodeServiceFactory.getLocalService();
         String node = nodeService.findNodeByName(folder, name);
         if (node == null) {
-            HashMap<String, Object> props = new HashMap<>();
+            Map<String, Object> props = new HashMap<>();
             props.put(CCConstants.CM_NAME, name);
             node = nodeService.createNodeBasic(folder, CCConstants.CCM_TYPE_IO, props);
         }

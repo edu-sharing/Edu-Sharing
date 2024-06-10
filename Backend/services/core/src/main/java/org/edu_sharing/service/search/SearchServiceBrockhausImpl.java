@@ -55,7 +55,7 @@ public class SearchServiceBrockhausImpl extends SearchServiceAdapter{
 		for(int i=0;i<documents.length();i++){
 			JSONObject document=documents.getJSONObject(i);
 
-			HashMap<String,Object> properties=new HashMap<>();
+			Map<String,Object> properties=new HashMap<>();
 			// swagger doesn't like / as %2F encoded, so we try to prevent issues by mapping the data
 			properties.put(CCConstants.SYS_PROP_NODE_UID,document.getString("url").replace("/","%2f"));
 			properties.put(CCConstants.CM_PROP_C_MODIFIED,System.currentTimeMillis());

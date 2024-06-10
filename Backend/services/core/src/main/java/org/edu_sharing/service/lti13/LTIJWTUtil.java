@@ -6,9 +6,8 @@ import com.nimbusds.jose.jwk.AsymmetricJWK;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpSession;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.apache.catalina.session.StandardSession;
-import org.apache.catalina.session.StandardSessionFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
@@ -30,9 +29,7 @@ import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -40,7 +37,6 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.text.ParseException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LTIJWTUtil {
 
@@ -136,7 +132,7 @@ public class LTIJWTUtil {
                     return null;
                 }
                 // If the platform has a JWK Set endpoint... we try that.
-                if (StringUtils.isNoneEmpty(platform.getPublicKey())) {
+                if (StringUtils.isNoneEmpty(platform.getLtiKeysetUrl())) {
                     try {
                         JWKSet publicKeys = JWKSet.load(new URL(platform.getLtiKeysetUrl()));
                         JWK jwk = publicKeys.getKeyByKeyId(header.getKeyId());
@@ -149,7 +145,7 @@ public class LTIJWTUtil {
                         return null;
                     }
                 } else { // If not, we get the key stored in our configuration
-                    logger.error("The platform configuration must contain a valid Public Key");
+                    logger.error("The platform configuration must contain a keyset url");
                     return null;
                 }
 
@@ -164,6 +160,26 @@ public class LTIJWTUtil {
         return getDeepLinkingResponseJwt(ltiSessionObject,new Node[]{n});
     }
 
+    /**
+     * generates an jwt signed by homeApp with a claim nodeId that expires after "expireInSeconds"
+     * @param nodeId
+     * @return
+     * @throws GeneralSecurityException
+     */
+    public static String getShortAccessJwt(String nodeId, int expireInSeconds) throws GeneralSecurityException{
+        ApplicationInfo homeApp = ApplicationInfoList.getHomeRepository();
+        Key toolPrivateKey = new Signing().getPemPrivateKey(homeApp.getPrivateKey(), CCConstants.SECURITY_KEY_ALGORITHM);
+        Date date = new Date();
+        String jwt = Jwts.builder()
+                .setHeaderParam(LTIConstants.TYP, LTIConstants.JWT)
+                .setHeaderParam(LTIConstants.KID, homeApp.getLtiKid())
+                .setHeaderParam(LTIConstants.ALG, LTIConstants.RS256)
+                .setExpiration(DateUtils.addSeconds(date, expireInSeconds))
+                .setIssuedAt(date)
+                .claim(CCConstants.NODEID, nodeId).signWith(SignatureAlgorithm.RS256, toolPrivateKey)  //We sign it
+                .compact();
+        return jwt;
+    }
 
 
     public String getDeepLinkingResponseJwt(LTISessionObject ltiSessionObject, Node[] nodes) throws GeneralSecurityException{
@@ -260,13 +276,13 @@ public class LTIJWTUtil {
             deepLink.put(LTIConstants.DEEP_LINK_URL, ApplicationInfoList.getHomeRepository().getClientBaseUrl() + "/rest/lti/v13/"+LTIConstants.LTI_TOOL_REDIRECTURL_PATH+"/"+node.getRef().getId());
 
             //@TODO must custom part always be send? is only need when platform is also a tool that has customcontent option
-            HashMap<String,String> custom = new HashMap<>();
+            Map<String,String> custom = new HashMap<>();
             custom.put("nodeId",node.getRef().getId());
             custom.put("repositoryId",node.getRef().getRepo());
             deepLink.put("custom",custom);
 
             try {
-                HashMap<String,String> thumbnail = new HashMap<>();
+                Map<String,String> thumbnail = new HashMap<>();
                 //thumbnail.put("url",node.getPreview().getUrl());
                 thumbnail.put("url",new MimeTypesV2().getIcon(node.getType(),NodeServiceFactory.getLocalService().getProperties(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier() ,node.getRef().getId()) ,node.getAspects()));
                 thumbnail.put("width",""+node.getPreview().getWidth());
@@ -385,7 +401,7 @@ public class LTIJWTUtil {
             throw new ValidationException("wrong nodeId");
         }
 
-        HashMap<String,String> tokenData = new Gson().fromJson(ApiTool.decrpt(token), HashMap.class);
+        Map<String,String> tokenData = new Gson().fromJson(ApiTool.decrpt(token), HashMap.class);
         if(!appId.equals(tokenData.get(LTIPlatformConstants.CUSTOM_CLAIM_APP_ID))){
             throw new ValidationException("mismatch appId");
         }
@@ -482,7 +498,7 @@ public class LTIJWTUtil {
          *
          */
         //validate that token appId (tool) is the same as the session appId (tool)
-        HashMap<String,String> tokenData = new Gson().fromJson(ApiTool.decrpt(token), HashMap.class);
+        Map<String,String> tokenData = new Gson().fromJson(ApiTool.decrpt(token), HashMap.class);
         if(!sessionObject.getAppId().equals(tokenData.get(LTIPlatformConstants.CUSTOM_CLAIM_APP_ID))){
             throw new ValidationException("mismatch appId");
         }

@@ -35,8 +35,8 @@ public class FixNotifyDefaultScope extends AbstractJob {
 	BehaviourFilter policyBehaviourFilter = (BehaviourFilter)applicationContext.getBean("policyBehaviourFilter");
 	
 	PrintWriter out;
-	ArrayList<NodeRef> processedEduGroups = new ArrayList<NodeRef>();
-	ArrayList<NodeRef> eduGroupFolderNodeIds = new ArrayList<NodeRef>();
+	ArrayList<NodeRef> processedEduGroups = new ArrayList<>();
+	ArrayList<NodeRef> eduGroupFolderNodeIds = new ArrayList<>();
 	
 	int processedNodeCounter = 0;
 	
@@ -96,7 +96,7 @@ public class FixNotifyDefaultScope extends AbstractJob {
 				
 				if(!test){
 					
-					Map<QName,Serializable> aspectProps = new HashMap<QName,Serializable>();
+					Map<QName,Serializable> aspectProps = new HashMap<>();
 					aspectProps.put(QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME), null);
 					
 					
@@ -115,7 +115,7 @@ public class FixNotifyDefaultScope extends AbstractJob {
 				logger.info("updateing Map:"+ noderef +" in "+ nodeService.getPath(child.getChildRef()));
 				
 				if(!test){
-					Map<QName,Serializable> aspectProps = new HashMap<QName,Serializable>();
+					Map<QName,Serializable> aspectProps = new HashMap<>();
 					aspectProps.put(QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME), null);
 					serviceRegistry.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>() {
 						@Override

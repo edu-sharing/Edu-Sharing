@@ -28,7 +28,7 @@ import org.springframework.context.ApplicationContext;
 public class StatisticServiceImpl implements StatisticService {
 
 	ApplicationInfo appInfo;
-	HashMap<String, String> authInfo;
+	Map<String, String> authInfo;
 	MCAlfrescoBaseClient client;
 	AuthenticationTool authTool;
 

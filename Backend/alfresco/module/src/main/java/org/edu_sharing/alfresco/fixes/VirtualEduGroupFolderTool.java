@@ -45,7 +45,7 @@ public class VirtualEduGroupFolderTool {
 
 				Collection<NodeRef> eduGroupNodeRefs = getEduGroupNodeRefs();
 
-				List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>();
+				List<ChildAssociationRef> children = new ArrayList<>();
 				for (NodeRef eduGroupNodeRef : eduGroupNodeRefs) {
 
 					try {
@@ -80,7 +80,7 @@ public class VirtualEduGroupFolderTool {
 				NodeService nodeService = serviceRegistry.getNodeService();
 				Set<String> authorities = authorityService.getContainingAuthorities(AuthorityType.GROUP, user, true);
 
-				List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>();
+				List<ChildAssociationRef> children = new ArrayList<>();
 				for (String authority : authorities) {
 
 					NodeRef nodeRefAuthority = authorityService.getAuthorityNodeRef(authority);

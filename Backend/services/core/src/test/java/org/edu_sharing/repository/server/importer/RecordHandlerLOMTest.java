@@ -29,6 +29,7 @@ package org.edu_sharing.repository.server.importer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.xpath.XPath;
@@ -48,15 +49,15 @@ public class RecordHandlerLOMTest implements RecordHandlerInterface {
 
 	private PersistentHandlerInterface persistentHandler = new PersistentHandlerDB();
 	
-	ArrayList<String> keys = new ArrayList<String>();
+	List<String> keys = new ArrayList<>();
 	
-	ArrayList<HashMap<String,String>> allDS = new ArrayList<HashMap<String,String>>();
+	List<Map<String,String>> allDS =new ArrayList<>();
 
 	@Override
 	public void handleRecord(Node nodeRecord, String cursor, String set) throws Throwable {
 		// TODO Auto-generated method stub
 
-		HashMap<String, String> toSafe = new HashMap<String, String>();
+		Map<String, String> toSafe = new HashMap<>();
 		
 		Node node = (Node) xpath.evaluate("metadata/lom", nodeRecord, XPathConstants.NODE);
 		this.handleNode(node, "", toSafe);
@@ -78,7 +79,7 @@ public class RecordHandlerLOMTest implements RecordHandlerInterface {
 
 	}
 
-	private void handleNode(Node nodeRecord, String path, HashMap<String, String> toSafe) throws Exception {
+	private void handleNode(Node nodeRecord, String path, Map<String, String> toSafe) throws Exception {
 		NodeList metadataNodeList = (NodeList) xpath.evaluate("*", nodeRecord, XPathConstants.NODESET);
 		for (int i = 0; i < metadataNodeList.getLength(); i++) {
 			Node child = metadataNodeList.item(i);
@@ -102,7 +103,7 @@ public class RecordHandlerLOMTest implements RecordHandlerInterface {
 	}
 	
 	@Override
-	public HashMap<String, Object> getProperties() {
+	public Map<String, Object> getProperties() {
 		// TODO Auto-generated method stub
 		return null;
 	}

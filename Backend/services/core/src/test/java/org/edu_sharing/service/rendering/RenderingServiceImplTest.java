@@ -64,7 +64,7 @@ class RenderingServiceImplTest {
         List<Connector> connectors = new ArrayList<>();
         Connector connector = new Connector();
         connector.setId("test_not_editable");
-        connector.setFiletypes(Arrays.asList(
+        connector.setFiletypes(List.of(
                 fileTypeNotEditable
         ));
         connector.setHasViewMode(true);
@@ -72,7 +72,7 @@ class RenderingServiceImplTest {
 
         connector = new Connector();
         connector.setId("test_mime_basic_view");
-        connector.setFiletypes(Arrays.asList(
+        connector.setFiletypes(List.of(
                 fileTypeBasic
         ));
         connector.setHasViewMode(true);
@@ -110,7 +110,7 @@ class RenderingServiceImplTest {
     @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
     void getAvailableEditorsWithVersion() {
         List<RenderingServiceData.Editor> editors = underTest.getAvailableEditors(UUID.randomUUID().toString(),
-                String.valueOf(new Integer((int) (Math.random() * 10000))),
+                String.valueOf(Integer.valueOf((int) (Math.random() * 10000))),
                 UUID.randomUUID().toString()
         );
         assertEquals(0, editors.size());

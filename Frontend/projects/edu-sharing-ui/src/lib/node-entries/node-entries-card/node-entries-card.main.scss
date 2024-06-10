@@ -162,11 +162,12 @@ $cardLineHeight: 1.4;
                 }
             }
             &:first-child {
+                font-size: 120%;
                 > es-list-base,
                 > es-node-url {
                     width: 100%;
-                    color: var(--textMain);
                     font-size: 120%;
+                    color: var(--textMain);
                     height: $cardLineHeight * 2em;
                     text-align: left;
                     word-break: break-word;

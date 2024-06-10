@@ -1,4 +1,0 @@
-type EditorialSuggestion {
-    state: RangedValueSuggestionData
-    checklist: [RangedValueSuggestionData]
-}

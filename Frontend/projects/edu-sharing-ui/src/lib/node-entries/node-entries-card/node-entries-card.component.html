@@ -1,7 +1,16 @@
 <div
-  class="grid-card"
-  [class.grid-card-collection]="isCollection"
-  [class.grid-card-virtual]="$any(node).virtual"
+  [class]="
+    'grid-card' +
+    (isCollection
+      ? ' grid-card-collection grid-card-collection-scope-' +
+        node.collection.scope +
+        ' grid-card-collection-type-' +
+        node.collection.type
+      : '') +
+    ($any(node).virtual ? ' grid-card-virtual' : '') +
+    ' ' +
+    nodeEntriesGlobalService.getCustomCssClass(node)
+  "
   [style.background-color]="isCollection ? node.collection.color : null"
   [class.dynamic-single-click]="entriesService.singleClickHint === 'dynamic'"
   [class.selected]="entriesService.selection.isSelected(node)"
@@ -14,7 +23,7 @@
     (click)="
       entriesService.clickItem.emit({
         element: node,
-        source: ClickSource.Overlay
+        source: ClickSource.Overlay,
       })
     "
   >
@@ -46,7 +55,7 @@
         [checked]="entriesService.selection.isSelected(node)"
         (change)="entriesService.onCheckboxChanged(node, $event.checked)"
         color="primary"
-        aria-label="{{ 'SELECT' | translate : { element: (node | nodeTitle) } }}"
+        aria-label="{{ 'SELECT' | translate: { element: (node | nodeTitle) } }}"
       ></mat-checkbox>
     </div>
   </div>
@@ -72,13 +81,13 @@
       entriesService.onClicked({
         event: $event,
         element: node,
-        source: ClickSource.Metadata
+        source: ClickSource.Metadata,
       })
     "
     (dblclick)="
       entriesService.dblClickItem.emit({
         element: node,
-        source: ClickSource.Metadata
+        source: ClickSource.Metadata,
       })
     "
     esFocusState
@@ -110,7 +119,7 @@
         color="primary"
         (click)="openMenu(node)"
         [matMenuTriggerFor]="dropdown.menu"
-        [attr.aria-label]="'OPTIONS_FOR' | translate : { element: (node | nodeTitle) }"
+        [attr.aria-label]="'OPTIONS_FOR' | translate: { element: (node | nodeTitle) }"
         data-test="card-options-button"
       >
         <i esIcon="more_vert"></i>
@@ -141,7 +150,7 @@
     <div class="card-meta">
       <div
         *ngFor="let displayPart of getVisibleColumns(); let first = first"
-        class="card-meta-row card-meta-row-{{ displayPart.name | lowercase }}"
+        class="card-meta-row card-meta-row-{{ displayPart.name | lowercase | propertySlug }}"
         [class.card-meta-row-primary]="first"
       >
         <ng-container *ngIf="first">

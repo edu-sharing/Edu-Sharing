@@ -179,7 +179,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     private void authenticate(RegisterInformation info) throws Exception {
         AuthenticationTool authTool=new AuthenticationToolAPI();
-        HashMap<String, String> validatedAuth = authTool.createNewSession(info.getAuthorityName(), info.getPassword());
+        Map<String, String> validatedAuth = authTool.createNewSession(info.getAuthorityName(), info.getPassword());
         authTool.storeAuthInfoInSession(info.getAuthorityName(), validatedAuth.get(CCConstants.AUTH_TICKET),CCConstants.AUTH_TYPE_DEFAULT, Context.getCurrentInstance().getRequest().getSession(true));
         authService.authenticate(info.getAuthorityName(),info.getPassword().toCharArray());
     }

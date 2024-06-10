@@ -110,7 +110,7 @@ public class PersonDao {
 
 			} catch (NoSuchPersonException e) {
 
-				HashMap<String, Serializable> userInfo = profileToMap(profile);
+				Map<String, Serializable> userInfo = profileToMap(profile);
 				userInfo.put(CCConstants.PROP_USERNAME, userName);
 
 				AuthorityServiceFactory.getAuthorityService(repoDao.getId()).createOrUpdateUser(userInfo);
@@ -132,7 +132,7 @@ public class PersonDao {
 
 	private final Map<String, Serializable> userInfo;
 	private String homeFolderId;
-	private final List<String> sharedFolderIds = new ArrayList<String>();
+	private List<String> sharedFolderIds = null;
 
 	private NodeService nodeService;
 	private SearchService searchService;
@@ -162,45 +162,46 @@ public class PersonDao {
 					authorityService.getEduGroups(userName, NodeServiceInterceptor.getEduSharingScope())
 			);*/
 
-
-			try{
-
-				boolean getGroupFolder = true;
-				//don't run into access denied wrapped by Transaction commit failed
-				if(!AuthenticationUtil.isRunAsUserTheSystemUser()
-						&& !AuthenticationUtil.getRunAsUser().equals(ApplicationInfoList.getHomeRepository().getUsername())
-						&& !AuthenticationUtil.getRunAsUser().equals(userName)) {
-					getGroupFolder = false;
-				}
-				if(getGroupFolder && userName!=null) {
-					String groupFolderId = ((MCAlfrescoAPIClient)baseClient).getGroupFolderId(userName);
-					if (groupFolderId != null) {
-
-						HashMap<String, HashMap<String, Object>> children = baseClient.getChildren(groupFolderId);
-
-						for (Object key : children.keySet()) {
-
-							sharedFolderIds.add(key.toString());
-						}
-					}
-				}
-			}catch(InvalidNodeRefException e){
-
-			}
-			catch(AccessDeniedException e){
-
-			}
-
 		} catch (Throwable t) {
 			throw DAOException.mapping(t);
 		}
 	}
 
+	private void initGroupFolders() {
+		if(sharedFolderIds != null) {
+			return;
+		}
+		try{
+			sharedFolderIds = new ArrayList<>();
+			boolean getGroupFolder = true;
+			//don't run into access denied wrapped by Transaction commit failed
+			if(!AuthenticationUtil.isRunAsUserTheSystemUser()
+					&& !AuthenticationUtil.getRunAsUser().equals(ApplicationInfoList.getHomeRepository().getUsername())
+					&& !AuthenticationUtil.getRunAsUser().equals(getUserName())) {
+				getGroupFolder = false;
+			}
+			if(getGroupFolder && getUserName() !=null) {
+				String groupFolderId = ((MCAlfrescoAPIClient)baseClient).getGroupFolderId(getUserName());
+				if (groupFolderId != null) {
+
+					Map<String, Map<String, Object>> children = baseClient.getChildren(groupFolderId);
+
+					for (Object key : children.keySet()) {
+
+						sharedFolderIds.add(key.toString());
+					}
+				}
+			}
+		}catch(Throwable e) {
+
+        }
+    }
+
 	public void changeProfile(UserProfileEdit profile) throws DAOException {
 
 		try {
 
-			HashMap<String, Serializable> newUserInfo = profileToMap(profile);
+			Map<String, Serializable> newUserInfo = profileToMap(profile);
 			newUserInfo.put(CCConstants.PROP_USERNAME, getUserName());
 			authorityService.createOrUpdateUser(newUserInfo);
 		} catch (Throwable t) {
@@ -210,8 +211,8 @@ public class PersonDao {
 
 	}
 
-	private static HashMap<String, Serializable> profileToMap(UserProfileEdit profile) {
-		HashMap<String, Serializable> newUserInfo = new HashMap<>();
+	private static Map<String, Serializable> profileToMap(UserProfileEdit profile) {
+		Map<String, Serializable> newUserInfo = new HashMap<>();
 		newUserInfo.put(CCConstants.PROP_USER_FIRSTNAME, profile.getFirstName());
 		newUserInfo.put(CCConstants.PROP_USER_LASTNAME, profile.getLastName());
 		newUserInfo.put(CCConstants.PROP_USER_EMAIL, profile.getEmail());
@@ -317,7 +318,9 @@ public class PersonDao {
 	    	data.setHomeFolder(homeDir);
             data.setQuota(getQuota());
 
-	    	List<NodeRef> sharedFolderRefs = new ArrayList<NodeRef>();
+			initGroupFolders();
+
+			List<NodeRef> sharedFolderRefs = new ArrayList<>();
 	    	for (String sharedFolderId : sharedFolderIds) {
 
 	        	NodeRef sharedFolderRef = new NodeRef();
@@ -461,7 +464,7 @@ public class PersonDao {
 	public void changeAvatar(InputStream is) throws DAOException {
 		try {
 		org.alfresco.service.cmr.repository.NodeRef currentAvatar = getAvatarNode();
-		is=ImageTool.autoRotateImage(is,ImageTool.MAX_THUMB_SIZE);
+		ImageTool.VerifyResult result = ImageTool.verifyAndPreprocessImage(is, ImageTool.MAX_THUMB_SIZE);
 		String nodeId=null;
 		if(currentAvatar==null) {
 			nodeId = this.nodeService.createNode(getNodeId(), CCConstants.CCM_TYPE_IO, new HashMap<>(), CCConstants.ASSOC_USER_PREFERENCEIMAGE);
@@ -471,7 +474,7 @@ public class PersonDao {
 			nodeId=currentAvatar.getId();
 		}
 		NodeServiceHelper.setCreateVersion(nodeId,false);
-		nodeService.writeContent(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId, is, "image", null, CCConstants.CM_PROP_CONTENT);
+		nodeService.writeContent(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId, result.getInputStream(), result.getMediaType().toString(), null, CCConstants.CM_PROP_CONTENT);
 		this.nodeService.setPermissions(nodeId, CCConstants.AUTHORITY_GROUP_EVERYONE,new String[]{CCConstants.PERMISSION_CONSUMER},true);
 		}catch(Throwable t) {
 			throw DAOException.mapping(t);
@@ -589,7 +592,7 @@ public class PersonDao {
 	public void setPreferences(String preferences) throws Exception{
 		// validate json
 		new JSONObject(preferences);
-		HashMap<String, String> newUserInfo = new HashMap<String, String>();
+		Map<String, Object> newUserInfo = new HashMap<>();
 		newUserInfo.put(CCConstants.PROP_USERNAME, getUserName());
 		newUserInfo.put(CCConstants.CCM_PROP_PERSON_PREFERENCES, preferences);
 		((MCAlfrescoAPIClient)this.baseClient).updateUser(newUserInfo);
@@ -614,7 +617,7 @@ public class PersonDao {
 	 * @param  profileSettings (Object)
 	 */
 	public void setProfileSettings(ProfileSettings profileSettings) throws Exception{
-		HashMap<String, Serializable> newUserInfo = new HashMap<>();
+		Map<String, Object> newUserInfo = new HashMap<>();
 		newUserInfo.put(CCConstants.PROP_USERNAME, getUserName());
 		newUserInfo.put(CCConstants.CCM_PROP_PERSON_SHOW_EMAIL, profileSettings.getShowEmail());
 		((MCAlfrescoAPIClient)this.baseClient).updateUser(newUserInfo);

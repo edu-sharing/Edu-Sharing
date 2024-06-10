@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
 import org.edu_sharing.metadataset.v2.MetadataSet;
@@ -20,6 +24,7 @@ import org.edu_sharing.restservices.mediacenter.v1.model.McOrgConnectResult;
 import org.edu_sharing.restservices.mediacenter.v1.model.MediacentersImportResult;
 import org.edu_sharing.restservices.mediacenter.v1.model.OrganisationsImportResult;
 import org.edu_sharing.restservices.node.v1.model.SearchResult;
+import org.edu_sharing.restservices.search.v1.SearchApi;
 import org.edu_sharing.restservices.search.v1.model.SearchParameters;
 import org.edu_sharing.restservices.shared.*;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
@@ -34,10 +39,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.*;
@@ -232,7 +233,7 @@ public class MediacenterApi {
 			MdsDao mdsDao = MdsDao.getMds(repoDao, MdsDao.DEFAULT);
 
 			searchToken.setFacets(new ArrayList<>());
-			NodeSearch search = NodeDao.search(repoDao,mdsDao,"mediacenter_filter", parameters.getCriteria() ,searchToken,Filter.createShowAllFilter());
+			NodeSearch search = NodeDao.search(repoDao,mdsDao,"mediacenter_filter", parameters.getCriteria() ,searchToken,Filter.createShowAllFilter(), SearchApi.parametersToDaoTransformer(parameters));
 
 			List<Node> data = null;
 			if(search.getNodes().size() < search.getResult().size()){

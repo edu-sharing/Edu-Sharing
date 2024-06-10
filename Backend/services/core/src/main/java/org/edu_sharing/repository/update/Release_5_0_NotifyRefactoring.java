@@ -140,7 +140,7 @@ public class Release_5_0_NotifyRefactoring {
 				log.warn("getPermissions() failed: "+e.getMessage());
 				throw new RuntimeException(e);
 			}
-			List<ACE> directlySetAces = new ArrayList<ACE>();
+			List<ACE> directlySetAces = new ArrayList<>();
 			for (ACE ace : acl.getAces()) {
 				if (!ace.isInherited()) {
 					directlySetAces.add(ace);

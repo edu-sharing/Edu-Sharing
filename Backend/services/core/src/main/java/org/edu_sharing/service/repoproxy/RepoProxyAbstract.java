@@ -11,6 +11,7 @@ import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class RepoProxyAbstract implements RepoProxy {
 
@@ -62,7 +63,7 @@ public abstract class RepoProxyAbstract implements RepoProxy {
 	}
 	
 	@Override
-	public HashMap<String, String> remoteAuth(ApplicationInfo repoInfo, String username, boolean validate) throws Throwable {
+	public Map<String, String> remoteAuth(ApplicationInfo repoInfo, String username, boolean validate) throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}

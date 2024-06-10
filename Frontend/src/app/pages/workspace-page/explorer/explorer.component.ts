@@ -15,8 +15,7 @@ import {
     NodeList,
     RestConnectorService,
     RestConstants,
-    RestNodeService,
-    RestSearchService,
+    SearchRequestCriteria,
     SessionStorageService,
     UIService,
 } from '../../../core-module/core.module';
@@ -52,6 +51,14 @@ import {
     takeUntil,
     tap,
 } from 'rxjs/operators';
+import {
+    DEFAULT,
+    HOME_REPOSITORY,
+    NodeService,
+    PROPERTY_FILTER_ALL,
+    SearchResults,
+    SearchService,
+} from 'ngx-edu-sharing-api';
 
 @Component({
     selector: 'es-workspace-explorer',
@@ -176,7 +183,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
 
     public searchQuery$ = new BehaviorSubject<string>(null);
     node$ = new BehaviorSubject<Node>(null);
-    load$ = new ReplaySubject<{ nodes: Observable<NodeList>; reset: boolean }>();
+    load$ = new ReplaySubject<{ nodes: Observable<NodeList | SearchResults>; reset: boolean }>();
     private lastRequestSearch: boolean;
 
     _root: NodeRoot;
@@ -242,61 +249,51 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
         this.dataSource.isLoading = true;
         // ignore virtual (new) added/uploaded elements
         const offset = event.offset || this.getRealNodeCount();
-        const request: any = {
-            offset,
-            propertyFilter: [
-                RestConstants.ALL,
-                /*RestConstants.CM_MODIFIED_DATE,
-              RestConstants.CM_CREATOR,
-              RestConstants.CM_PROP_C_CREATED,
-              RestConstants.CCM_PROP_LICENSE,
-              RestConstants.LOM_PROP_LIFECYCLE_VERSION,
-              RestConstants.CCM_PROP_WF_STATUS,
-              RestConstants.CCM_PROP_CCRESSOURCETYPE,
-              RestConstants.CCM_PROP_CCRESSOURCESUBTYPE,
-              RestConstants.CCM_PROP_CCRESSOURCEVERSION,
-              RestConstants.CCM_PROP_WIDTH,
-              RestConstants.CCM_PROP_HEIGHT,
-              RestConstants.VIRTUAL_PROP_USAGECOUNT,*/
-            ],
-            sortBy: [this.sort.active],
-            sortAscending: this.sort.direction === 'asc',
-            count: event?.amount,
-        };
         if (this.searchQuery$.value) {
             const query = this.searchQuery$.value;
             this.lastRequestSearch = true;
             /*this.search.searchByProperties([RestConstants.NODE_ID,RestConstants.CM_PROP_TITLE,RestConstants.CM_NAME,RestConstants.LOM_PROP_DESCRIPTION,RestConstants.LOM_PROP_GENERAL_KEYWORD],
               [query,query,query,query,query],[],RestConstants.COMBINE_MODE_OR,RestConstants.CONTENT_TYPE_FILES_AND_FOLDERS, request).subscribe((data : NodeList) => this.addNodes(data,true));*/
-            const criterias: any = [];
-            criterias.push({ property: RestConstants.PRIMARY_SEARCH_CRITERIA, values: [query] });
+            const criteria: SearchRequestCriteria[] = [];
+            criteria.push({ property: RestConstants.PRIMARY_SEARCH_CRITERIA, values: [query] });
             if (this.node$.value) {
-                criterias.push({
+                criteria.push({
                     property: 'parent',
                     values: [this.node$.value ? this.node$.value.ref.id : ''],
                 });
             }
             this.load$.next({
                 reset: event?.reset,
-                nodes: this.search.search(
-                    criterias,
-                    [],
-                    request,
-                    this.connector.getCurrentLogin() && this.connector.getCurrentLogin().isAdmin
+                nodes: this.search.search({
+                    query: 'workspace',
+                    repository: HOME_REPOSITORY,
+                    metadataset: DEFAULT,
+                    contentType: (this.connector.getCurrentLogin() &&
+                    this.connector.getCurrentLogin().isAdmin
                         ? RestConstants.CONTENT_TYPE_ALL
-                        : RestConstants.CONTENT_TYPE_FILES_AND_FOLDERS,
-                    RestConstants.HOME_REPOSITORY,
-                    RestConstants.DEFAULT,
-                    [],
-                    'workspace',
-                ),
+                        : RestConstants.CONTENT_TYPE_FILES_AND_FOLDERS) as any,
+                    body: {
+                        criteria,
+                        resolveCollections: false,
+                        resolveUsernames: true,
+                    },
+                    skipCount: offset,
+                    propertyFilter: [PROPERTY_FILTER_ALL],
+                    sortProperties: [this.sort.active],
+                    sortAscending: [this.sort.direction === 'asc'],
+                    maxItems: event?.amount || RestConnectorService.DEFAULT_NUMBER_PER_REQUEST,
+                }),
             });
             // this.nodeApi.searchNodes(query,[],request).subscribe((data : NodeList) => this.addNodes(data,true));
         } else {
             this.lastRequestSearch = false;
             this.load$.next({
                 reset: event?.reset,
-                nodes: this.nodeApi.getChildren(this.node$.value.ref.id, [], request),
+                nodes: this.nodeApi.getChildren(this.node$.value.ref.id, {
+                    skipCount: offset,
+                    maxItems: event?.amount || RestConnectorService.DEFAULT_NUMBER_PER_REQUEST,
+                    propertyFilter: [PROPERTY_FILTER_ALL],
+                }),
             });
         }
     }
@@ -336,10 +333,10 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
         private storage: SessionStorageService,
         private temporaryStorage: TemporaryStorageService,
         private config: ConfigurationService,
-        private search: RestSearchService,
+        private search: SearchService,
         private toast: Toast,
         public ui: UIService,
-        private nodeApi: RestNodeService,
+        private nodeApi: NodeService,
         private localEvents: LocalEventsService,
     ) {
         // super(temporaryStorage,['_node','_nodes','sortBy','sortAscending','columns','totalCount','hasMoreToLoad']);

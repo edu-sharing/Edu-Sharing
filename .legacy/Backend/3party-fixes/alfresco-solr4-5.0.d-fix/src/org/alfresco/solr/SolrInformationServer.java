@@ -960,7 +960,7 @@ public class SolrInformationServer implements InformationServer
 
     private List<SolrIndexSearcher> getRegisteredSearchers()
     {
-        List<SolrIndexSearcher> searchers = new ArrayList<SolrIndexSearcher>();
+        List<SolrIndexSearcher> searchers = new ArrayList<>();
         for (Entry<String, SolrInfoMBean> entry : core.getInfoRegistry().entrySet())
         {
             if (entry.getValue() != null)

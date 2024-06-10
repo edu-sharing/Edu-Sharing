@@ -78,7 +78,7 @@ public class Release_3_2_DefaultScope {
                 log.info("updateing node:" + noderef + " in " + nodeService.getPath(child.getChildRef()) + " processedNodeCounter:" + processedNodeCounter);
                 if (!test) {
 
-                    Map<QName, Serializable> aspectProps = new HashMap<QName, Serializable>();
+                    Map<QName, Serializable> aspectProps = new HashMap<>();
                     aspectProps.put(QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME), null);
 
 

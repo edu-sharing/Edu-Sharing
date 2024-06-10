@@ -66,7 +66,7 @@ public class UsageSoapBindingImpl implements org.edu_sharing.webservices.usage.U
 			org.edu_sharing.service.usage.UsageService usageService = new org.edu_sharing.service.usage.UsageService(getRequestIp(), null,
 					repositoryTicket);
 			ArrayList<org.edu_sharing.service.usage.Usage> serviceResults = usageService.getUsageByParentNodeId(parentNodeId);
-			ArrayList<UsageResult> result = new ArrayList<UsageResult>();
+			ArrayList<UsageResult> result = new ArrayList<>();
 
 			for (org.edu_sharing.service.usage.Usage serviceResult : serviceResults) {
 				result.add(transform(serviceResult));

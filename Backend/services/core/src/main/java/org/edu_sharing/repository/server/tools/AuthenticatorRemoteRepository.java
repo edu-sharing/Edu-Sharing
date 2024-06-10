@@ -83,7 +83,7 @@ public class AuthenticatorRemoteRepository {
 	 */
 	public AuthenticatorRemoteAppResult getAuthInfoForApp(String username, ApplicationInfo remoteAppInfo) throws Throwable{
 
-		HashMap<String, String> resultAuthInfo = new HashMap<String, String>();
+		Map<String,String> resultAuthInfo = new HashMap<>();
 		MCAlfrescoBaseClient mcAlfrescoBaseClient = new MCAlfrescoAPIClient();
 
 		AuthenticationToken authToken = null;
@@ -121,7 +121,7 @@ public class AuthenticatorRemoteRepository {
 		logger.info("startSession remoteApplicationId:"+appId +" localAppId:"+localAppId);
 
 
-		HashMap<String,String> personMapping = new HashMap<>(ssoAuthorityMapper.getMappingConfig().getPersonMapping());
+		Map<String,String> personMapping = new HashMap<>(ssoAuthorityMapper.getMappingConfig().getPersonMapping());
 		String remoteUserid = ApplicationInfoList.getRepositoryInfoById(appId).getString(ApplicationInfo.REMOTE_USERID, null);
 		if(remoteUserid!=null && !remoteUserid.isEmpty()){
 			logger.info("remote_userid configured "+remoteUserid+", will change auth");

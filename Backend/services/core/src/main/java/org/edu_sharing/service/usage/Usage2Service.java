@@ -1,6 +1,5 @@
 package org.edu_sharing.service.usage;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import info.bliki.html.wikipedia.ThTag;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -16,7 +14,6 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.MLText;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO8601DateFormat;
@@ -57,7 +54,7 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 
 		AuthenticationUtil.RunAsWork<Usage> runAs = () -> {
 			Usage result = null;
-			HashMap<String, Object> usage = null;
+			Map<String, Object> usage = null;
 			try{
 				usage = usageDao.getUsage(lmsId, courseId, parentNodeId, resourceId);
 				if (usage != null) {
@@ -84,10 +81,10 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 		AuthenticationUtil.RunAsWork<List<Usage>> runAs = new AuthenticationUtil.RunAsWork<List<Usage>>(){
 			@Override
 			public List<Usage> doWork() throws Exception {
-				List<Usage> result = new ArrayList<Usage>();
+				List<Usage> result = new ArrayList<>();
 				try{
-					HashMap<String,HashMap<String,Object>> usages =  usageDao.getUsagesByCourse(appId, courseId);
-					for(Map.Entry<String, HashMap<String,Object>> entry : usages.entrySet()){
+					Map<String,Map<String,Object>> usages =  usageDao.getUsagesByCourse(appId, courseId);
+					for(Map.Entry<String, Map<String,Object>> entry : usages.entrySet()){
 						result.add(getUsageResult(entry.getValue()));
 					}
 				}catch(Exception e){
@@ -105,12 +102,12 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 	
 	public List<Usage> getUsages(String appId)throws UsageException{
 		
-		List<Usage> result = new ArrayList<Usage>();
+		List<Usage> result = new ArrayList<>();
 
 		try{
 			AuthenticationUtil.runAsSystem(()->{
-				HashMap<String,HashMap<String,Object>> usages =  usageDao.getUsagesByAppId(appId);
-				for(Map.Entry<String, HashMap<String,Object>> entry : usages.entrySet()){
+				Map<String,Map<String,Object>> usages =  usageDao.getUsagesByAppId(appId);
+				for(Map.Entry<String, Map<String,Object>> entry : usages.entrySet()){
 					result.add(getUsageResult(entry.getValue()));
 				}
 				return null;
@@ -127,9 +124,9 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 			String nodeId,
 			Long from,
 			Long to) throws Exception {
-		 List<Usage> result = new ArrayList<Usage>();
+		 List<Usage> result = new ArrayList<>();
 		 
-		 for(Map.Entry<String, HashMap<String, Object>> entry : usageDao.getUsages(repositoryId, nodeId, from, to).entrySet()) {
+		 for(Map.Entry<String, Map<String, Object>> entry : usageDao.getUsages(repositoryId, nodeId, from, to).entrySet()) {
 			 result.add(getUsageResult(entry.getValue()));
 		 }
 		 
@@ -150,7 +147,7 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 				try{
 					logger.info("before alfServicesWrapper.hasPermissions");
 
-					HashMap<String, Object> usage = usageDao.getUsage(lmsId, courseId, parentNodeId, resourceId);
+					Map<String, Object> usage = usageDao.getUsage(lmsId, courseId, parentNodeId, resourceId);
 
 					//only check publish permission for new content so that an teacher who modifies the course/wysiwyg can safe changes of permission
 					if(usage == null){
@@ -160,7 +157,7 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 							usageNodeId=NodeServiceHelper.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,usageNodeId),CCConstants.CCM_PROP_IO_ORIGINAL);
 						}
 						boolean hasPublishPerm = ((MCAlfrescoClient)RepoFactory.getInstance(ApplicationInfoList.getHomeRepository().getAppId(),
-								(HashMap)null)).hasPermissions(usageNodeId, user, new String[]{CCConstants.PERMISSION_CC_PUBLISH});
+								(Map<String, String>)null)).hasPermissions(usageNodeId, user, new String[]{CCConstants.PERMISSION_CC_PUBLISH});
 
 						if(!hasPublishPerm){
 							logger.info("User "+user+" has no publish permission on " + usageNodeId);
@@ -189,8 +186,8 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 	 * used by collections
 	 */
 	public Usage setUsageInternal(String repoId, String user, String lmsId, String courseId, String parentNodeId, String userMail, Calendar fromUsed, Calendar toUsed, int distinctPersons, String version, String resourceId, String xmlParams) throws Exception{
-		HashMap<String, Object> properties = new HashMap<>();
-		HashMap<String, Object> usage = usageDao.getUsage(lmsId, courseId, parentNodeId, resourceId);
+		Map<String, Object> properties = new HashMap<>();
+		Map<String, Object> usage = usageDao.getUsage(lmsId, courseId, parentNodeId, resourceId);
 		String guid = null;
 		NodeRef personRef = serviceRegistry.getPersonService().getPerson(user);
 		if(personRef != null){
@@ -279,14 +276,14 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 				StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),
 				parentNodeId,
 				PermissionService.READ)){
-			return new ArrayList<Usage>();
+			return new ArrayList<>();
 		}
 
 		try{
 			return AuthenticationUtil.runAsSystem(()->{
-				HashMap<String, HashMap<String, Object>> usages = usageDao.getUsages(parentNodeId);
+				Map<String, Map<String, Object>> usages = usageDao.getUsages(parentNodeId);
 				logger.info("usages.keySet().size():"+usages.keySet().size());
-				ArrayList<Usage> result = new ArrayList<Usage>();
+				ArrayList<Usage> result = new ArrayList<>();
 				for (String key : usages.keySet()) {
 					result.add(getUsageResult(usages.get(key)));
 				}
@@ -307,7 +304,7 @@ Logger logger = Logger.getLogger(Usage2Service.class);
 	private void addUsagesFromReferenceObjects(String parentNodeId, ArrayList<Usage> result) {
 		List<org.edu_sharing.service.model.NodeRef> nodes = CollectionServiceFactory.getLocalService().getReferenceObjects(parentNodeId);
 		for(org.edu_sharing.service.model.NodeRef node : nodes){
-			HashMap<String, HashMap<String, Object>> usages = usageDao.getUsages(node.getNodeId());
+			Map<String, Map<String, Object>> usages = usageDao.getUsages(node.getNodeId());
 			for (String key : usages.keySet()) {
 				Usage usage = getUsageResult(usages.get(key));
 				usage.setType(Usage.Type.INDIRECT);
@@ -339,7 +336,7 @@ Logger logger = Logger.getLogger(Usage2Service.class);
     }
 	
 	
-	public Usage getUsageResult(HashMap<String, Object> usage) {
+	public Usage getUsageResult(Map<String, Object> usage) {
 		logger.info("starting");
 		Usage usageResult = new Usage();
 		usageResult.setAppUser((String) usage.get(CCConstants.CCM_PROP_USAGE_APPUSER));

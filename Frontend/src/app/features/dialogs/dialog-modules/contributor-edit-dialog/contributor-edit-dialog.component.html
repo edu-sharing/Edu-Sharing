@@ -74,7 +74,7 @@
         <i esIcon="keyboard_arrow_right" *ngIf="!showPersistentIds"></i>
       </button>
       <div *ngIf="showPersistentIds" [@overlay]="more" class="persistent-id">
-        <div class="table">
+        <div class="table orcid">
           <mat-form-field floatLabel="always">
             <mat-label>{{ 'VCARD.X-ORCID' | translate }}</mat-label>
             <input
@@ -88,7 +88,7 @@
             <mat-hint innerHTML="{{ 'VCARD_HINT.X-ORCID' | translate }}"></mat-hint>
           </mat-form-field>
         </div>
-        <div class="table">
+        <div class="table gnduri">
           <mat-form-field floatLabel="always">
             <mat-label>{{ 'VCARD.X-GND-URI' | translate }}</mat-label>
             <input
@@ -140,7 +140,7 @@
         <i esIcon="keyboard_arrow_right" *ngIf="!showPersistentIds"></i>
       </button>
       <div *ngIf="showPersistentIds" [@overlay]="more" class="persistent-id">
-        <div class="table">
+        <div class="table ror">
           <mat-form-field floatLabel="always">
             <mat-label>{{ 'VCARD.X-ROR' | translate }}</mat-label>
             <input
@@ -154,7 +154,7 @@
             <mat-hint innerHTML="{{ 'VCARD_HINT.X-ROR' | translate }}"></mat-hint>
           </mat-form-field>
         </div>
-        <div class="table">
+        <div class="table wikidata">
           <mat-form-field floatLabel="always">
             <mat-label>{{ 'VCARD.X-Wikidata' | translate }}</mat-label>
             <input
@@ -186,10 +186,18 @@
     <div>
       <mat-form-field>
         <mat-label>{{ 'WORKSPACE.CONTRIBUTOR.SCOPE' | translate }}</mat-label>
-        <mat-select id="scope" [(ngModel)]="role" (ngModelChange)="updateSubtitle()">
-          <mat-option *ngFor="let role of roles" value="{{ role }}">{{
-            'WORKSPACE.CONTRIBUTOR.TYPE.' + role.toUpperCase() | translate
-          }}</mat-option>
+        <mat-select
+          id="scope"
+          [(ngModel)]="role"
+          (ngModelChange)="updateSubtitle()"
+          panelClass="contributor-role-select"
+        >
+          <mat-option
+            *ngFor="let role of roles"
+            value="{{ role }}"
+            ngClass="mat-option-role-{{ role }}"
+            >{{ 'WORKSPACE.CONTRIBUTOR.TYPE.' + role.toUpperCase() | translate }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
     </div>

@@ -130,7 +130,7 @@ public class SerloImporter implements Importer{
 	    	
 			for(int i = 0; i < ja.size(); i++){
 				
-				HashMap<String,Object> eduProps = new HashMap<String,Object>();
+				Map<String,Object> eduProps = new HashMap<>();
 				JSONObject jo = (JSONObject)ja.get(i);
 				
 			
@@ -160,7 +160,7 @@ public class SerloImporter implements Importer{
 				eduProps.put(CCConstants.CM_NAME, name);
 				eduProps.put(CCConstants.LOM_PROP_GENERAL_DESCRIPTION, (String) jo.get("description"));
 				
-				List<String> generalKeywords = new ArrayList<String>();
+				List<String> generalKeywords = new ArrayList<>();
 				if(jo.get("keywords") instanceof JSONObject){
 					JSONObject kw = (JSONObject)jo.get("keywords");
 					for(Object valueKW: kw.values()){
@@ -272,7 +272,7 @@ public class SerloImporter implements Importer{
 				
 				eduProps.put(CCConstants.CCM_PROP_IO_COMMONLICENSE_KEY, CCConstants.COMMON_LICENSE_CC_BY_SA);
 				
-				HashMap<String,String> serloContributer = new HashMap<String,String>();
+				Map<String,String> serloContributer = new HashMap<>();
 				serloContributer.put(CCConstants.VCARD_SURNAME, "serlo");
 				serloContributer.put(CCConstants.VCARD_ORG, "serlo");
 				serloContributer.put(CCConstants.VCARD_EMAIL, "info-de@serlo.org");

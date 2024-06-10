@@ -66,7 +66,38 @@
     <ng-container *ngTemplateOutlet="error"></ng-container>
   </mat-error>
 </mat-form-field>
-
+<div class="suggestions" *ngIf="getSuggestions()?.length">
+  <h5 class="mat-heading-5">{{ 'MDS.SUGGESTIONS.LIST_TITLE' | translate }}</h5>
+  <div class="suggestion" *ngFor="let suggestion of getSuggestions()">
+    <div class="info">
+      <es-user-avatar [user]="suggestion.createdBy" size="xxsmall"></es-user-avatar>
+      {{ suggestion.createdBy | authorityName }}
+      <i [esIcon]="suggestion.type === 'AI' ? 'settings' : 'person'"></i>
+    </div>
+    <div class="content-wrapper">
+      <div class="content">{{ suggestion.value }}</div>
+      <div class="actions">
+        <button
+          mat-icon-button
+          color="primary"
+          class="apply"
+          (click)="applySuggestion(suggestion)"
+          matTooltip="{{ 'MDS.SUGGESTIONS.APPLY' | translate }}"
+        >
+          <i esIcon="check"></i>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="setSuggestionState(suggestion, 'DECLINED')"
+          matTooltip="{{ 'MDS.SUGGESTIONS.DECLINE' | translate }}"
+        >
+          <i esIcon="close"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <ng-template #error>
   <ng-container *ngIf="widget.definition.isRequired === 'mandatory'">
     {{ 'MDS.REQUIRED_MESSAGE' | translate }}

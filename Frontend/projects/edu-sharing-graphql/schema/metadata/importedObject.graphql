@@ -1,5 +1,0 @@
-type ImportedObject {
-    nodeId: String
-    appId: String
-    appName: String
-}

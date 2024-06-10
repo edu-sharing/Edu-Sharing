@@ -2,6 +2,7 @@ package org.edu_sharing.repository.update;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.time.DateUtils;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
@@ -113,8 +114,9 @@ public class KeyGenerator {
 		certGenerator.setIssuerDN(issuer);
 		certGenerator.setSubjectDN(subject);
 		certGenerator.setPublicKey(publicKey);
-		certGenerator.setNotBefore(new Date(System.currentTimeMillis()));
-		certGenerator.setNotAfter(new Date(System.currentTimeMillis() + 10 * 365 * 24 * 60 * 60 * 1000)); // Valid for 10 year
+		long now = System.currentTimeMillis();
+		certGenerator.setNotBefore(new Date(now));
+		certGenerator.setNotAfter(DateUtils.addYears(new Date(now),10)); // Valid for 10 year
 		certGenerator.setSignatureAlgorithm("SHA256WithRSAEncryption");
 
 		return certGenerator.generate(privateKey, "BC");

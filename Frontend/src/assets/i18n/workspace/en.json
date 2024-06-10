@@ -287,6 +287,14 @@
         "IMPORT_BLOCKED": "Changed status of import-blocking"
       }
     },
+    "LTI_V13_PLATFORM": {
+      "NODE": {
+        "CREATE": {
+          "TITLE": "Create new file",
+          "NAME": "Tool: {{ltitool}}"
+        }
+      }
+    },
     "EDITOR": {
       "TITLE": "General informationen",
       "DESCRIPTION": "Description",

@@ -27,36 +27,22 @@
  */
 package org.edu_sharing.service.authentication;
 
-import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.xml.rpc.ServiceException;
 
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.RegexQNamePattern;
-import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.mail2.core.EmailException;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.KeyTool;
 import org.edu_sharing.service.usage.AlfServicesWrapper;
 import org.springframework.context.ApplicationContext;
 
@@ -117,7 +103,7 @@ public class AuthMethodTrustedRepository implements AuthMethodInterface {
 
 	}
 
-	public String authenticate(HashMap<String, String> params) throws AuthenticationException {
+	public String authenticate(Map<String, String> params) throws AuthenticationException {
 		throw new RuntimeException("old soap method should not be used");
 	}
 

@@ -54,11 +54,14 @@ import org.edu_sharing.service.authentication.EduAuthentication;
 import org.edu_sharing.service.authentication.SSOAuthorityMapper;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
+import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 
 public class ShibbolethServlet extends HttpServlet {
 
@@ -109,7 +112,7 @@ public class ShibbolethServlet extends HttpServlet {
 		}
 
 		AuthenticationToolAPI authTool = new AuthenticationToolAPI();
-		HashMap<String,String> validAuthInfo = authTool.validateAuthentication(req.getSession());
+		Map<String,String> validAuthInfo = authTool.validateAuthentication(req.getSession());
 
 		redirectUrl = (String)req.getSession().getAttribute(NgServlet.PREVIOUS_ANGULAR_URL);
 		// prefer the login url since it will intercept the regular angular url
@@ -147,7 +150,7 @@ public class ShibbolethServlet extends HttpServlet {
 				req.setCharacterEncoding("UTF-8");
 			}
 
-			HashMap<String,String> ssoMap = new HashMap<String,String>();
+			Map<String,String> ssoMap = new HashMap<>();
 			for(String ssoKey : ssoMapper.getMappingConfig().getAllSSOAttributes()){
 				ssoMap.put(ssoKey, getShibValue(ssoKey,req));
 			}
@@ -299,6 +302,14 @@ public class ShibbolethServlet extends HttpServlet {
 						return ((ArrayList<String>)att).stream().collect(Collectors.joining(";"));
 					}
 					return (att != null) ? att.toString() : null;
+				}
+				if(authentication instanceof Saml2Authentication){
+					Saml2AuthenticatedPrincipal samlAuthentication = (Saml2AuthenticatedPrincipal) authentication.getPrincipal();
+					if(samlAuthentication.getAttribute(attName) != null) {
+						return samlAuthentication.getAttribute(attName).stream().findFirst().map(Object::toString).orElse(null);
+					}else{
+						logger.info("att:" +attName +" is null");
+					}
 				}
 			}
 

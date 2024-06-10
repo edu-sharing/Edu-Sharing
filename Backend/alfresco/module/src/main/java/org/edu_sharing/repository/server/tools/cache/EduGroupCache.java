@@ -1,27 +1,19 @@
 package org.edu_sharing.repository.server.tools.cache;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 
@@ -91,7 +83,7 @@ public class EduGroupCache {
 	}
 	
 	public static String[] getNames(){
-		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<>();
 		for(NodeRef nodeRef : cache.getKeys()){
 			names.add((String)cache.get(nodeRef).get(ContentModel.PROP_AUTHORITY_NAME));
 		}
@@ -107,9 +99,10 @@ public class EduGroupCache {
 		synchronized(EduGroupCache.cache){
 			logger.info("size before refresh:"+EduGroupCache.cache.getKeys().size());
 			clear();
+			NodeService nodeServiceAlfresco = (NodeService) AlfAppContextGate.getApplicationContext().getBean("alfrescoDefaultDbNodeService");
 			serviceRegistry.getRetryingTransactionHelper().doInTransaction(() -> {
 				for (NodeRef eduGroupNodeRef : getEduGroupNodeRefs()) {
-					Map<QName, Serializable> properties = serviceRegistry.getNodeService().getProperties(eduGroupNodeRef);
+					Map<QName, Serializable> properties = nodeServiceAlfresco.getProperties(eduGroupNodeRef);
 					EduGroupCache.put(eduGroupNodeRef, properties);
 				}
 				return null;
@@ -140,12 +133,12 @@ public class EduGroupCache {
 	private static List<NodeRef> getEduGroupNodeRefs(){
 		logger.info("starting");
 		AuthorityService authorityService =serviceRegistry.getAuthorityService();
-		NodeService nodeService = serviceRegistry.getNodeService();
-		List<NodeRef> result = new ArrayList<NodeRef>();
+		NodeService nodeServiceAlfresco = (NodeService) AlfAppContextGate.getApplicationContext().getBean("alfrescoDefaultDbNodeService");
+		List<NodeRef> result = new ArrayList<>();
 		Set<String> allGroups = authorityService.getAllAuthoritiesInZone(AuthorityService.ZONE_APP_DEFAULT, AuthorityType.GROUP);
 		for(String authority : allGroups) {
 			NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(authority);
-			if(nodeService.hasAspect(authorityNodeRef, QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP))) {
+			if(nodeServiceAlfresco.hasAspect(authorityNodeRef, QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP))) {
 				result.add(authorityNodeRef);
 			}
 		}

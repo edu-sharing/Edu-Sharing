@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class About  {
   
   private ServiceVersion version = null;
-  private List<AboutService> services = new ArrayList<AboutService>();
+  private List<AboutService> services = new ArrayList<>();
   private List<PluginInfo> plugins = new ArrayList<>();
   private String themesUrl;
   private long lastCacheUpdate;

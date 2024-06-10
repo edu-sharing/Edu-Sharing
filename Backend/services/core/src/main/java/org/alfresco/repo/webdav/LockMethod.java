@@ -527,7 +527,7 @@ public class LockMethod extends WebDAVMethod
     /**
      * Generates a list of namespace declarations for the response
      */
-    protected String generateNamespaceDeclarations(HashMap<String,String> nameSpaces)
+    protected String generateNamespaceDeclarations(Map<String,String> nameSpaces)
     {
         StringBuilder ns = new StringBuilder();
 

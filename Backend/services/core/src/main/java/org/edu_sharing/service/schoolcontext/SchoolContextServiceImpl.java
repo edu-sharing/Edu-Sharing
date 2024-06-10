@@ -48,7 +48,7 @@ public class SchoolContextServiceImpl implements SchoolContextService {
 			MCAlfrescoBaseClient mcAlfrescoBaseClient = repoClient;
 			
 			SearchToken st = new SearchToken();
-			ArrayList<String> facettes = new ArrayList<String>();
+			ArrayList<String> facettes = new ArrayList<>();
 			facettes.add(SchoolContext.PROP_REF_AGEGROUP);
 			facettes.add(SchoolContext.PROP_REF_DISCIPLINE);
 			facettes.add(SchoolContext.PROP_REF_FEDERALSTATE);
@@ -130,11 +130,11 @@ public class SchoolContextServiceImpl implements SchoolContextService {
 	}
 	
 	
-	private void fillSchoolContextValues(String type, HashMap<String, String> targetMap, MCAlfrescoBaseClient mcAlfrescoBaseClient) throws Throwable{
+	private void fillSchoolContextValues(String type, Map<String, String> targetMap, MCAlfrescoBaseClient mcAlfrescoBaseClient) throws Throwable{
 		
 		String query = "TYPE:\""+type+"\"";
 		
-		ArrayList<String> facette = new ArrayList<String>();
+		ArrayList<String> facette = new ArrayList<>();
 		facette.add(CCConstants.SYS_PROP_NODE_UID);
 		
 		SearchResult srAG = mcAlfrescoBaseClient.searchSolr(query, 0, 0, facette, 1, 500000);

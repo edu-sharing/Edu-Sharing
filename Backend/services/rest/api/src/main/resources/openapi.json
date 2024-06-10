@@ -134,6 +134,13 @@
       },
       "Admin": {
         "properties": {
+          "editorType": {
+            "enum": [
+              "Textarea",
+              "Monaco"
+            ],
+            "type": "string"
+          },
           "statistics": {
             "$ref": "#/components/schemas/Statistics"
           }
@@ -622,6 +629,12 @@
             },
             "type": "array"
           },
+          "accessEffective": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "accessOriginal": {
             "items": {
               "type": "string"
@@ -860,6 +873,9 @@
       },
       "Config": {
         "properties": {
+          "contextId": {
+            "type": "string"
+          },
           "current": {
             "$ref": "#/components/schemas/Values"
           },
@@ -940,6 +956,12 @@
       "ConfigThemeColors": {
         "properties": {
           "color": {
+            "items": {
+              "$ref": "#/components/schemas/ConfigThemeColor"
+            },
+            "type": "array"
+          },
+          "colorSafe": {
             "items": {
               "$ref": "#/components/schemas/ConfigThemeColor"
             },
@@ -1214,6 +1236,24 @@
         "properties": {
           "onlyMetadata": {
             "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "CreateSuggestionRequestDTO": {
+        "properties": {
+          "confidence": {
+            "format": "double",
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "propertyId": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
           }
         },
         "type": "object"
@@ -2022,6 +2062,10 @@
             ],
             "type": "string"
           },
+          "threadId": {
+            "format": "int64",
+            "type": "integer"
+          },
           "worstLevel": {
             "$ref": "#/components/schemas/Level"
           }
@@ -2696,6 +2740,10 @@
           },
           "configuration": {
             "type": "string"
+          },
+          "countDefaultvalueAsFilter": {
+            "description": "When true, a set defaultvalue will still trigger the search to show an active filter. When false (default), the defaultvalue will be shown as if no filter is active",
+            "type": "boolean"
           },
           "defaultMax": {
             "format": "int32",
@@ -3578,6 +3626,23 @@
             "additionalProperties": {
               "format": "int32",
               "type": "integer"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "NodeSuggestionResponseDTO": {
+        "properties": {
+          "nodeId": {
+            "type": "string"
+          },
+          "suggestions": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/SuggestionResponseDTO"
+              },
+              "type": "array"
             },
             "type": "object"
           }
@@ -4670,6 +4735,12 @@
       },
       "Rendering": {
         "properties": {
+          "gdpr": {
+            "items": {
+              "$ref": "#/components/schemas/RenderingGdpr"
+            },
+            "type": "array"
+          },
           "prerender": {
             "type": "boolean"
           },
@@ -4699,6 +4770,20 @@
           "mimeType",
           "node"
         ],
+        "type": "object"
+      },
+      "RenderingGdpr": {
+        "properties": {
+          "matcher": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "privacyInformationUrl": {
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "Repo": {
@@ -4848,6 +4933,9 @@
             "type": "array"
           },
           "resolveCollections": {
+            "type": "boolean"
+          },
+          "resolveUsernames": {
             "type": "boolean"
           },
           "returnSuggestions": {
@@ -5616,6 +5704,62 @@
           },
           "valueParameters": {
             "$ref": "#/components/schemas/ValueParameters"
+          }
+        },
+        "type": "object"
+      },
+      "SuggestionResponseDTO": {
+        "properties": {
+          "confidence": {
+            "format": "double",
+            "type": "number"
+          },
+          "created": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserSimple"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "modified": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "modifiedBy": {
+            "$ref": "#/components/schemas/UserSimple"
+          },
+          "nodeId": {
+            "type": "string"
+          },
+          "propertyId": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACCEPTED",
+              "PENDING",
+              "DECLINED"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "AI",
+              "USER_PROPOSAL"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "version": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -21425,6 +21569,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "jwt for checking access in lms context",
+            "in": "query",
+            "name": "jwt",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -34652,6 +34804,270 @@
         "summary": "update status for a stream object and authority",
         "tags": [
           "STREAM v1"
+        ]
+      }
+    },
+    "/suggestions/v1/{repository}/{node}": {
+      "delete": {
+        "operationId": "deleteSuggestions",
+        "parameters": [
+          {
+            "description": "ID of repository (or \"-home-\" for home repository)",
+            "in": "path",
+            "name": "repository",
+            "required": true,
+            "schema": {
+              "default": "-home-",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of node",
+            "in": "path",
+            "name": "node",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "delete only specified versions. If not set, it deletes all versions",
+            "in": "query",
+            "name": "version",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete all suggestions of a given node."
+          }
+        },
+        "summary": "Delete suggestions",
+        "tags": [
+          "SUGGESTIONS v1"
+        ]
+      },
+      "get": {
+        "operationId": "getSuggestionsByNodeId",
+        "parameters": [
+          {
+            "description": "ID of repository (or \"-home-\" for home repository)",
+            "in": "path",
+            "name": "repository",
+            "required": true,
+            "schema": {
+              "default": "-home-",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of node",
+            "in": "path",
+            "name": "node",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter option",
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "items": {
+                "enum": [
+                  "ACCEPTED",
+                  "PENDING",
+                  "DECLINED"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeSuggestionResponseDTO"
+                }
+              }
+            },
+            "description": "get all suggestions notifications"
+          }
+        },
+        "summary": "Retrieve stored suggestion for the given nodeId",
+        "tags": [
+          "SUGGESTIONS v1"
+        ]
+      },
+      "patch": {
+        "operationId": "updateStatus",
+        "parameters": [
+          {
+            "description": "ID of repository (or \"-home-\" for home repository)",
+            "in": "path",
+            "name": "repository",
+            "required": true,
+            "schema": {
+              "default": "-home-",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of node",
+            "in": "path",
+            "name": "node",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "ACCEPTED",
+                "PENDING",
+                "DECLINED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SuggestionResponseDTO"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Updates the status of all suggestions by the given suggestion ids"
+          }
+        },
+        "summary": "Update suggestion status",
+        "tags": [
+          "SUGGESTIONS v1"
+        ]
+      },
+      "post": {
+        "operationId": "createSuggestions",
+        "parameters": [
+          {
+            "description": "ID of repository (or \"-home-\" for home repository)",
+            "in": "path",
+            "name": "repository",
+            "required": true,
+            "schema": {
+              "default": "-home-",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of node",
+            "in": "path",
+            "name": "node",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Type of the suggestion",
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "AI",
+                "USER_PROPOSAL"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version of the suggestion",
+            "in": "query",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/CreateSuggestionRequestDTO"
+                },
+                "type": "array"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SuggestionResponseDTO"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Store suggestions for the given node."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Duplicate Entity/Node conflict (Node with same name exists)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occured."
+          }
+        },
+        "summary": "Create suggestions",
+        "tags": [
+          "SUGGESTIONS v1"
         ]
       }
     },

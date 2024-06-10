@@ -421,7 +421,7 @@ public class MigrationJob extends AbstractJob {
 
 
         if(nodeEntries == null) {
-            nodeEntries = new ArrayList<String>();
+            nodeEntries = new ArrayList<>();
         }
 
         nodeEntries.add(authority.getId());

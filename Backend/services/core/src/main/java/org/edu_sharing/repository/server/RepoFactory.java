@@ -27,10 +27,7 @@
  */
 package org.edu_sharing.repository.server;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -45,20 +42,15 @@ import org.edu_sharing.metadataset.v2.MetadataSetInfo;
 import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.jobs.quartz.JobHandler;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.AuthenticatorRemoteAppResult;
 import org.edu_sharing.repository.server.tools.AuthenticatorRemoteRepository;
 import org.edu_sharing.repository.server.tools.PropertiesHelper;
-import org.edu_sharing.service.bulk.BulkServiceFactory;
-import org.edu_sharing.service.bulk.BulkServiceInterceptorInterface;
-import org.edu_sharing.service.config.ConfigServiceFactory;
-import org.edu_sharing.service.feedback.FeedbackServiceFactory;
-import org.edu_sharing.service.feedback.FeedbackServiceImpl;
 import org.edu_sharing.service.nodeservice.PropertiesInterceptorFactory;
 import org.edu_sharing.service.provider.ProviderHelper;
-import org.edu_sharing.service.version.VersionService;
+import org.edu_sharing.spring.ApplicationContextFactory;
+import org.edu_sharing.spring.scope.refresh.ContextRefresher;
 
 public class RepoFactory {
 
@@ -69,9 +61,9 @@ public class RepoFactory {
 	 * time then use direct contructor calls with getInstance of the
 	 * MCBaseClient subclass
 	 */
-	static HashMap<String, MCBaseClient> appClassCache = new HashMap<String, MCBaseClient>();
+	static Map<String, MCBaseClient> appClassCache = new HashMap<>();
 	
-	static HashMap<String,AuthenticationTool> appAuthToolCache = new HashMap<String,AuthenticationTool>();
+	static Map<String,AuthenticationTool> appAuthToolCache = new HashMap<>();
 
 	private static Log logger = LogFactory.getLog(RepoFactory.class);
 
@@ -100,7 +92,7 @@ public class RepoFactory {
 		AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(repositoryId);
 		
 		//for remote repositories: the authinfo is created by this method if its missing
-		HashMap<String,String> authInfo = authTool.validateAuthentication(session);
+		Map<String,String> authInfo = authTool.validateAuthentication(session);
 		
 		ApplicationInfo repInfo = ApplicationInfoList.getRepositoryInfoById(repositoryId);
 		if(authInfo != null){
@@ -124,7 +116,7 @@ public class RepoFactory {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static MCBaseClient getInstance(String repositoryId, HashMap homeRepAuthInfo) throws Throwable {
+	public static MCBaseClient getInstance(String repositoryId, Map<String, String> homeRepAuthInfo) throws Throwable {
 
 		logger.debug("repositoryId:" + repositoryId);
 		ApplicationInfo repInfo = null;
@@ -133,7 +125,7 @@ public class RepoFactory {
 		} else {
 			repInfo = ApplicationInfoList.getRepositoryInfoById(repositoryId);
 		}
-		HashMap remoteAuthInfo = null;
+		Map<String, String> remoteAuthInfo = null;
 
 		// authenticate when it's an remote Repository and an
 		// AuthenticationWebservice is configured
@@ -160,7 +152,7 @@ public class RepoFactory {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static MCBaseClient getInstanceForRepo(ApplicationInfo repInfo, HashMap authInfo) throws Throwable {
+	public static MCBaseClient getInstanceForRepo(ApplicationInfo repInfo, Map<String,String> authInfo) throws Throwable {
 
 		
 		String repositoryId = repInfo.getAppId();
@@ -236,20 +228,8 @@ public class RepoFactory {
 
 	public static void refresh() {
 		lastRefreshed = System.currentTimeMillis();
-		ApplicationInfoList.refresh();
-		LightbendConfigHelper.refresh();
 		appClassCache.clear();
-		BulkServiceFactory.getInstance().refresh();
-		MetadataReader.refresh();
-		FeedbackServiceFactory.getLocalService().refresh();
-		ConfigServiceFactory.refresh();
-		VersionService.invalidateCache();
-		try {
-			JobHandler.getInstance().refresh(false);
-		} catch (Exception ignored) {}
 		eduSharingProps = null;
-		PropertiesInterceptorFactory.refresh();
-		ProviderHelper.clearCache();
 	}
 
 	public static List<MetadataSetInfo> getMetadataSetsForRepository(String repositoryId) throws Exception {
@@ -257,7 +237,7 @@ public class RepoFactory {
 			repositoryId = ApplicationInfoList.getHomeRepository().getAppId();
 		}
 		ApplicationInfo appInfo = ApplicationInfoList.getRepositoryInfoById(repositoryId);
-		ArrayList<MetadataSetInfo> sets = new ArrayList<MetadataSetInfo>();
+		ArrayList<MetadataSetInfo> sets = new ArrayList<>();
 		for(String id : appInfo.getMetadatsets()){
 			MetadataSetInfo info=new MetadataSetInfo();
 			MetadataSet mds = MetadataHelper.getMetadataset(appInfo, id);

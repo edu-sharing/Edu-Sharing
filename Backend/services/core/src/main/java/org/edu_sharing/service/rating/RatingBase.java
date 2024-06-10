@@ -4,18 +4,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RatingBase implements Serializable {
 
     private RatingData overall;
-    private HashMap<String, RatingData> affiliation;
+    private Map<String, RatingData> affiliation;
 
 
-    public void setAffiliation(HashMap<String, RatingData> affiliation) {
+    public void setAffiliation(Map<String, RatingData> affiliation) {
         this.affiliation = affiliation;
     }
 
-    public HashMap<String, RatingData> getAffiliation() {
+    public Map<String, RatingData> getAffiliation() {
         return affiliation;
     }
 

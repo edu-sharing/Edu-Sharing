@@ -1,8 +1,0 @@
-type Reference {
-    title: String
-    description: String
-    version: String
-    videoVtt: String
-    proposalStatus: String
-    collection: Metadata
-}

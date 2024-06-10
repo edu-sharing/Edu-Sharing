@@ -80,7 +80,7 @@ public class SameSiteCookieFilter implements jakarta.servlet.Filter {
         	boolean forcedByConfig = false;
         	//default handling
         	if(cookieAttributes == null) {
-        		cookieAttributes = "SameSite=None";
+        		cookieAttributes = "SameSite=None; HttpOnly";
         	}//plain tomcat JSESSIONID
         	else if(cookieAttributes.trim().equals("")) {
         		logger.debug("default JSESSIONID. No cookie attribute set.");
@@ -91,20 +91,20 @@ public class SameSiteCookieFilter implements jakarta.servlet.Filter {
         	}
             if(cookiesAfterCreateSession != null && !response.isCommitted()) {
                 // search if a cookie JSESSIONID Secure exists
-            	final String fCookieAttributes = cookieAttributes;
-            	
+
             	//dont send on when Secure is off
             	if(!forcedByConfig) {
             		Optional<String> cookieJSessionId = cookiesAfterCreateSession.stream()
                             .filter(cookie -> cookie.startsWith("JSESSIONID") && !cookie.contains("Secure"))
 							.findAny();
             		if(cookieJSessionId.isPresent()) {
-            			logger.debug("no Secure Attribut found. will not set SameSite cookie");
-            			return;
+            			logger.debug("no Secure Attribute found. will not set SameSite cookie, only HttpOnly");
+						cookieAttributes = "HttpOnly";
             		}
             	}
-            	
-                Optional<String> cookieJSessionId = cookiesAfterCreateSession.stream()
+				final String fCookieAttributes = cookieAttributes;
+
+				Optional<String> cookieJSessionId = cookiesAfterCreateSession.stream()
                                                         .filter(cookie -> cookie.startsWith("JSESSIONID") && !cookie.contains(fCookieAttributes))
                 										.findAny();
                 if(cookieJSessionId.isPresent()) {

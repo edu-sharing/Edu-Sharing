@@ -39,7 +39,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.StringTool;
-import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -49,16 +48,16 @@ import java.util.stream.Collectors;
 public class VCardConverter {
 
 	static Logger logger = Logger.getLogger(VCardConverter.class);
-	public static ArrayList<HashMap<String,Object>> vcardToHashMap(String propPrefix, String vcardString){
+	public static ArrayList<Map<String,Object>> vcardToMap(String propPrefix, String vcardString){
 
-		ArrayList<HashMap<String,Object>> result = new ArrayList<>();
+		ArrayList<Map<String,Object>> result = new ArrayList<>();
 		try {
 			VCardEngine engine = new VCardEngine();
 			// unfortunately, the multi vcard string method is only private, so we need to make it accessible
 			Method method = engine.getClass().getDeclaredMethod("parseManyInOneVCard", String.class);
 			method.setAccessible(true);
 			for(VCard vcard : (List<VCard>)method.invoke(engine,vcardString)) {
-				HashMap<String,Object> vcardMap = new HashMap<>();
+				Map<String,Object> vcardMap = new HashMap<>();
 				String fn=vcard.getFN()==null ? null : vcard.getFN().getFormattedName();
 				String familyName=vcard.getN()==null ? null : vcard.getN().getFamilyName();
 				String givenName=vcard.getN()==null ? null : vcard.getN().getGivenName();
@@ -128,7 +127,7 @@ public class VCardConverter {
 		return result;
 	}
 
-	public static String getNameForVCard(String prefix,HashMap<String,Object> data){
+	public static String getNameForVCard(String prefix,Map<String,Object> data){
 		if(isPersonVCard(prefix,data)){
 			String name="";
 			if(data.containsKey(prefix+CCConstants.VCARD_TITLE))
@@ -146,7 +145,7 @@ public class VCardConverter {
 	}
 
 	public static String getNameForVCardString(String vcardString) {
-		ArrayList<HashMap<String, Object>> vcard = VCardConverter.vcardToHashMap(null, vcardString);
+		ArrayList<Map<String, Object>> vcard = VCardConverter.vcardToMap(null, vcardString);
 		if (vcard.size() == 0)
 			return null;
 		return StringUtils.join(vcard.stream().map(v ->
@@ -195,15 +194,15 @@ public class VCardConverter {
 			}
 		}
 	}
-	public static ArrayList<HashMap<String,Object>> vcardToHashMap(String vcardString){
-		return vcardToHashMap("", vcardString);
+	public static ArrayList<Map<String,Object>> vcardToMap(String vcardString){
+		return vcardToMap("", vcardString);
 	}
 
 	static ArrayList<String> vcardProps = null;
 
 	static public boolean isVCardProp(String property) {
 		if(vcardProps == null){
-			vcardProps = new ArrayList<String>();
+			vcardProps = new ArrayList<>();
 			vcardProps.add(CCConstants.LOM_PROP_CONTRIBUTE_ENTITY);
 			vcardProps.add(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR);
 			vcardProps.add(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_PUBLISHER);
@@ -241,13 +240,13 @@ public class VCardConverter {
 	 * @param value
 	 * @return
 	 */
-	public static HashMap<String, Object> getVCardHashMap(String type, String property, String value) {
+	public static Map<String, Object> getVCardMap(String type, String property, String value) {
 
 		if(value == null) {
-			return new HashMap<String, Object>();
+			return new HashMap<>();
 		}
 
-		HashMap<String, Object> result = null;
+		Map<String, Object> result =  null;
 
 		// VCard
 		if (isVCardProp(property)) {
@@ -255,14 +254,14 @@ public class VCardConverter {
 			//split for multivalue vcards:
 			String[] splitted = value.split(StringTool.escape(CCConstants.MULTIVALUE_SEPARATOR));
 			for(String split:splitted){
-				ArrayList<HashMap<String, Object>> vcards = vcardToHashMap(property, split);
+				ArrayList<Map<String,Object>> vcards = vcardToMap(property, split);
 				if (vcards != null) {
 					if(vcards.size()==0)
-						return new HashMap<String,Object>();
+						return new HashMap<>();
 					if(result == null){
 						result = vcards.get(0);
 					}else{
-						HashMap<String, Object> tmpVCardMap = vcards.get(0);
+						Map<String,Object> tmpVCardMap = vcards.get(0);
 						for(Map.Entry<String,Object> vcardEntry : tmpVCardMap.entrySet()){
 							//check if vcardprop already has a value in result
 							String vcardValInResult = (String)result.get(vcardEntry.getKey());
@@ -288,18 +287,18 @@ public class VCardConverter {
 	 * @return
 	 */
 	public static Map<String, Object> addVCardProperties(String nodeType, Map<String, Object> props) {
-		HashMap<String, Object> propsNew = new HashMap<String, Object>();
+		Map<String,Object> propsNew = new HashMap<>();
 		propsNew.putAll(props);
 		for(Map.Entry<String, Object> entry : props.entrySet()){
 			if(entry == null || entry.getKey() == null || entry.getValue() == null) continue;
-			HashMap<String, Object> vcard = getVCardHashMap(nodeType, entry.getKey(), entry.getValue().toString());
+			Map<String,Object> vcard = getVCardMap(nodeType, entry.getKey(), entry.getValue().toString());
 			if(vcard!=null)
 				propsNew.putAll(vcard);
 		}
 		return propsNew;
 	}
 
-	public static boolean isPersonVCard(String prefix, HashMap<String, Object> data) {
+	public static boolean isPersonVCard(String prefix, Map<String, Object> data) {
 		return data.get(prefix+CCConstants.VCARD_GIVENNAME)!=null && !data.get(prefix+CCConstants.VCARD_GIVENNAME).toString().isEmpty() ||
 				data.containsKey(prefix+CCConstants.VCARD_SURNAME) && !data.get(prefix+CCConstants.VCARD_SURNAME).toString().isEmpty();
 	}

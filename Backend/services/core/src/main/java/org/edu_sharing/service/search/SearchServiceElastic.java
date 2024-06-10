@@ -15,6 +15,7 @@ import co.elastic.clients.json.JsonpUtils;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.TransportOptions;
+import co.elastic.clients.transport.rest_client.RestClientOptions;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -63,7 +64,9 @@ import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SearchVCard;
 import org.edu_sharing.service.search.model.SharedToMeType;
 import org.edu_sharing.service.search.model.SortDefinition;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -94,6 +97,8 @@ public class SearchServiceElastic extends SearchServiceImpl {
     ServiceRegistry serviceRegistry = (ServiceRegistry) alfApplicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
     PermissionModel permissionModel = (PermissionModel) alfApplicationContext.getBean("permissionsModelDAO");
+
+    public static int MAX_RESPONSE_ENTITY_SIZE = -1;
 
     public static HttpHost[] getConfiguredHosts() {
         try {
@@ -182,7 +187,6 @@ public class SearchServiceElastic extends SearchServiceImpl {
     }
 
     private TransportOptions.Builder getRequestOptions(TransportOptions.Builder bld) {
-
         // add trace headers to elastic request
         Context context = Context.getCurrentInstance();
         if (context != null) {
@@ -671,6 +675,10 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 for (String k : key) {
                     long count = b.docCount();
                     NodeSearch.Facet.Value value = new NodeSearch.Facet.Value();
+                    // skip duplicate entries
+                    if(values.stream().anyMatch(v -> v.getValue().equals(k))) {
+                        continue;
+                    }
                     value.setValue(k);
                     value.setCount((int) count);
                     values.add(value);
@@ -824,7 +832,9 @@ public class SearchServiceElastic extends SearchServiceImpl {
     }
 
     private <T extends NodeRefImpl> T transform(Class<T> clazz, Set<String> authorities, String user, Map<String, Object> sourceAsMap, boolean resolveCollections) throws IllegalAccessException, InstantiationException {
-        HashMap<String, MetadataSet> mdsCache = new HashMap<>();
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
+        Map<String, MetadataSet> mdsCache = new HashMap<>();
+        String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
 
         Map<String, Serializable> properties = (Map) sourceAsMap.get("properties");
 
@@ -839,7 +849,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
         String protocol = (String) storeRef.get("protocol");
         String identifier = (String) storeRef.get("identifier");
 
-        HashMap<String, Object> props = new HashMap<>();
+        Map<String, Object> props = new HashMap<>();
 
         for (Map.Entry<String, Serializable> entry : properties.entrySet()) {
 
@@ -875,7 +885,6 @@ public class SearchServiceElastic extends SearchServiceImpl {
             /**
              * metadataset translation
              */
-            String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
             Map<String, Serializable> i18n = (Map<String, Serializable>) sourceAsMap.get("i18n");
             if (i18n != null) {
                 Map<String, Serializable> i18nProps = (Map<String, Serializable>) i18n.get(currentLocale);
@@ -961,7 +970,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
         eduNodeRef.setAspects(((List<String>) sourceAsMap.get("aspects")).
                 stream().map(CCConstants::getValidGlobalName).filter(Objects::nonNull).collect(Collectors.toList()));
 
-        HashMap<String, Boolean> permissions = new HashMap<>();
+        Map<String, Boolean> permissions = new HashMap<>();
         permissions.put(CCConstants.PERMISSION_READ, true);
         String guestUser = ApplicationInfoList.getHomeRepository().getGuest_username();
         long millis = System.currentTimeMillis();
@@ -1038,7 +1047,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
         eduNodeRef.setContributors(contributorsResult);
 
 
-        if (AuthorityServiceHelper.isAdmin() || user.equals(owner)) {
+        if (isAdmin || user.equals(owner)) {
             permissions.put(CCConstants.PERMISSION_CC_PUBLISH, true);
             PermissionReference pr = permissionModel.getPermissionReference(null, "FullControl");
             Set<PermissionReference> granteePermissions = permissionModel.getGranteePermissions(pr);
@@ -1064,7 +1073,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
             if (collections != null) {
                 for (Map<String, Object> collection : collections) {
                     String colOwner = (String) collection.get("owner");
-                    boolean hasPermission = user.equals(colOwner) || AuthorityServiceHelper.isAdmin();
+                    boolean hasPermission = user.equals(colOwner) || isAdmin;
                     if (!hasPermission) {
                         Map<String, List<String>> colPermissionsElastic = (Map) collection.get("permissions");
                         for (Map.Entry<String, List<String>> entry : colPermissionsElastic.entrySet()) {
@@ -1111,7 +1120,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
     /**
      * check if the user has permissions on this element via a collection and give him all permissions as it is an usage access
      */
-    private static void processCollectionUsagePermissions(Set<String> authorities, String user, Map<String, Object> sourceAsMap, HashMap<String, Boolean> permissions) {
+    private static void processCollectionUsagePermissions(Set<String> authorities, String user, Map<String, Object> sourceAsMap, Map<String, Boolean> permissions) {
         if (permissions.size() == 1) {
             List<Map<String, Object>> collections = (List<Map<String, Object>>) sourceAsMap.get("collections");
             for (Map<String, Object> collection : Optional.ofNullable(collections).orElse(Collections.emptyList())) {
@@ -1274,6 +1283,16 @@ public class SearchServiceElastic extends SearchServiceImpl {
                     logger.error("ping failed, close failed:" + e.getMessage() + " creating new");
                 }
             }
+            if(MAX_RESPONSE_ENTITY_SIZE == -1){
+                if(LightbendConfigLoader.get().hasPath("elasticsearch.max_response_entity_size")){
+                    MAX_RESPONSE_ENTITY_SIZE = LightbendConfigLoader.get().getInt("elasticsearch.max_response_entity_size");
+                }
+                else{
+                    //100 MB
+                    MAX_RESPONSE_ENTITY_SIZE = 100 * 1048576;
+                }
+            }
+
             // Create the low-level client
             restClient = RestClient
                     .builder(getConfiguredHosts())
@@ -1281,9 +1300,13 @@ public class SearchServiceElastic extends SearchServiceImpl {
                             // new BasicHeader("Authorization", "ApiKey " + apiKey)
                     })
                     .build();
-            ElasticsearchTransport transport = new RestClientTransport(
-                    restClient, new JacksonJsonpMapper());
 
+            RequestOptions.Builder options = RequestOptions.DEFAULT.toBuilder();
+            options.setHttpAsyncResponseConsumerFactory(
+                    new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(MAX_RESPONSE_ENTITY_SIZE)
+            );
+            ElasticsearchTransport transport = new RestClientTransport(
+                    restClient, new JacksonJsonpMapper(), new RestClientOptions.Builder(options).build());
             client = new ElasticsearchClient(transport);
         }
     }

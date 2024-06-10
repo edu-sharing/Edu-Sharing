@@ -34,14 +34,14 @@ public class PermissionServiceInterceptor implements MethodInterceptor {
                 }
                 return NodeServiceInterceptor.handleInvocation(nodeId, invocation, false);
             } else if (methodName.equals("hasAllPermissions")) {
-                HashMap<String, Boolean> result = (HashMap<String, Boolean>) invocation.proceed();
+                Map<String, Boolean> result = (Map<String, Boolean>) invocation.proceed();
                 // to improve performance, if node seems to have any valid permissions, return true
                 if (result.values().stream().anyMatch((v) -> v)) {
                     return result;
                 }
                 // fetch all permissions but only allow the onces that are allowed for usages
-                result = (HashMap<String, Boolean>) NodeServiceInterceptor.handleInvocation(nodeId, invocation, false);
-                return new HashMap<String, Boolean>(result.entrySet().stream().map((e) -> {
+                result = (Map<String, Boolean>) NodeServiceInterceptor.handleInvocation(nodeId, invocation, false);
+                return new HashMap<>(result.entrySet().stream().map((e) -> {
                     e.setValue(e.getValue() && CCConstants.getUsagePermissions().contains(e.getKey()));
                     return e;
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));

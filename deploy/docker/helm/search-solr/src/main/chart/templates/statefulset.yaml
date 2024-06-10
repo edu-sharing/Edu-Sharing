@@ -187,11 +187,12 @@ spec:
     spec: {{ merge .Values.persistence.data.spec .Values.global.cluster.storage.data.spec | toYaml | nindent 6 }}
 {{- if .Values.multistage.enabled }}
 {{- range .Values.multistage.stages }}
+{{ $stage := printf "%s-stage-%s" (include "edusharing_common_lib.names.name" $) .name }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "edusharing_common_lib.names.name" $ }}-{{ .name }}
+  name: {{ $stage }}
   labels: {{ include "edusharing_common_lib.labels.app" $ | nindent 4 }}
     app.kubernetes.io/stage: {{ .name }}
 spec:
@@ -199,7 +200,7 @@ spec:
   selector:
     matchLabels: {{ include "edusharing_common_lib.labels.app" $ | nindent 6 }}
       app.kubernetes.io/stage: {{ .name }}
-  serviceName: {{ include "edusharing_common_lib.names.name" $ }}-headless-{{ .name }}
+  serviceName: {{ $stage }}-headless
   template:
     metadata:
       name: {{ include "edusharing_common_lib.names.name" $ }}

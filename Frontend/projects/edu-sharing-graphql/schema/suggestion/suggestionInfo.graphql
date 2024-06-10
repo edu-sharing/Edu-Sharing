@@ -1,6 +1,0 @@
-type SuggestionInfo {
-    status: SuggestionStatus!
-    date: Date!
-    editor: String
-}
-

@@ -122,7 +122,7 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
 
     private List<SolrStoreMapping> storeMappings;
 
-    private HashMap<StoreRef, SolrStoreMappingWrapper> mappingLookup = new HashMap<StoreRef, SolrStoreMappingWrapper>();
+    private Map<StoreRef, SolrStoreMappingWrapper> mappingLookup = new HashMap<>();
 
     private String alternativeDictionary = CMISStrictDictionaryService.DEFAULT;
 
@@ -292,7 +292,7 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
             StoreRef store = SolrClientUtil.extractStoreRef(searchParameters);
             SolrStoreMappingWrapper mapping =
                     SolrClientUtil.extractMapping(store,
-                            mappingLookup,
+                            (HashMap<StoreRef, SolrStoreMappingWrapper>) mappingLookup,
                             shardRegistry,
                             useDynamicShardRegistration,
                             beanFactory);
@@ -372,7 +372,8 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
         boolean requiresSeparator = false;
         for(StoreRef storeRef : storeRefs)
         {
-            SolrStoreMappingWrapper storeMapping = SolrClientUtil.extractMapping(storeRef, mappingLookup, shardRegistry, useDynamicShardRegistration, beanFactory);
+            SolrStoreMappingWrapper storeMapping = SolrClientUtil.extractMapping(storeRef, (HashMap<StoreRef, SolrStoreMappingWrapper>) mappingLookup, shardRegistry, useDynamicShardRegistration, beanFactory);
+
 
             if(requiresSeparator)
             {
@@ -414,7 +415,7 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
         {
             StoreRef store = SolrClientUtil.extractStoreRef(searchParameters);
             SolrStoreMappingWrapper mapping = SolrClientUtil.extractMapping(store,
-                    mappingLookup,
+                    (HashMap<StoreRef, SolrStoreMappingWrapper>) mappingLookup,
                     shardRegistry,
                     useDynamicShardRegistration,
                     beanFactory);
@@ -471,7 +472,7 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
                 {
                     SolrStoreMappingWrapper storeMapping =
                             SolrClientUtil.extractMapping(storeRef,
-                                    mappingLookup, shardRegistry,
+                                    (HashMap<StoreRef, SolrStoreMappingWrapper>) mappingLookup, shardRegistry,
                                     useDynamicShardRegistration, beanFactory);
 
                     if(requiresSeparator)
@@ -1230,11 +1231,11 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
      * @param params
      * @return
      */
-    public JSONObject execute(StoreRef storeRef, String handler, HashMap<String, String> params)
+    public JSONObject execute(StoreRef storeRef, String handler, Map<String, String> params)
     {
         try
         {
-            SolrStoreMappingWrapper mapping = SolrClientUtil.extractMapping(storeRef, mappingLookup, shardRegistry, useDynamicShardRegistration, beanFactory);
+            SolrStoreMappingWrapper mapping = SolrClientUtil.extractMapping(storeRef, (HashMap<StoreRef, SolrStoreMappingWrapper>) mappingLookup, shardRegistry, useDynamicShardRegistration, beanFactory);
 
             URLCodec encoder = new URLCodec();
             StringBuilder url = new StringBuilder();

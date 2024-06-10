@@ -23,10 +23,7 @@ import org.edu_sharing.alfresco.RestrictedAccessException;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.ActionObserver;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.HttpQueryTool;
-import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.server.tools.*;
 import org.edu_sharing.repository.server.tools.cache.PreviewCache;
 import org.edu_sharing.service.mime.MimeTypesV2;
 import org.edu_sharing.service.nodeservice.NodeService;
@@ -131,7 +128,7 @@ public class PreviewServlet extends HttpServlet {
 
 			// check nodetype for security reasons
 			String inNodeId=nodeId;
-			HashMap<String,Object> props = new HashMap<>();
+			Map<String,Object> props;
 			if (nodeId != null) {
 				try {
 					props = nodeService.getProperties(storeRef.getProtocol(),storeRef.getIdentifier(),nodeId);
@@ -212,9 +209,9 @@ public class PreviewServlet extends HttpServlet {
 			PreviewDetail getPrevResult = null;
 			// check if version is requested and version seems to be NOT the current node version
 			if(version != null && !version.trim().equals("") && !isCollection && !version.equals(props.get(CCConstants.LOM_PROP_LIFECYCLE_VERSION))){
-				HashMap<String, HashMap<String,Object>> versionHistory = nodeService.getVersionHistory(nodeId);
+				Map<String, Map<String,Object>> versionHistory = nodeService.getVersionHistory(nodeId);
 				if(versionHistory != null){
-					for(Map.Entry<String, HashMap<String,Object>> entry : versionHistory.entrySet()){
+					for(Map.Entry<String, Map<String,Object>> entry : versionHistory.entrySet()){
 						String tmpVers = (String)entry.getValue().get(CCConstants.LOM_PROP_LIFECYCLE_VERSION);
 						if(version.equals(tmpVers)){
 
@@ -273,7 +270,7 @@ public class PreviewServlet extends HttpServlet {
 				if (getPrevResult.getType().equals(PreviewDetail.TYPE_GENERATED)) {
 
 
-					HashMap<String, Object> previewProps = null;
+					Map<String, Object> previewProps = null;
 					final String fnodeId = nodeId;
 					if(isCollection) {
 						prevNodeRef = AuthenticationUtil.runAsSystem(
@@ -331,21 +328,18 @@ public class PreviewServlet extends HttpServlet {
 		 * fallback to mime first, then default
 		 */
 		try{
-			HashMap<String,Object> props;
+			Map<String,Object> props;
 			String[] aspects=new String[]{};
 			String type=null;
 			if(isCollection){
 				final String nodeIdFinal=nodeId;
-				props=AuthenticationUtil.runAsSystem(new RunAsWork<HashMap<String,Object>>() {
-					@Override
-					public HashMap<String, Object> doWork() throws Exception {
-						try{
-							return NodeServiceFactory.getLocalService().getProperties(storeRef.getProtocol(), storeRef.getIdentifier(),nodeIdFinal);
-						}catch(Throwable t){
-							throw new Exception(t);
-						}
-					}
-				});
+				props=AuthenticationUtil.runAsSystem(() -> {
+                    try{
+                        return NodeServiceFactory.getLocalService().getProperties(storeRef.getProtocol(), storeRef.getIdentifier(),nodeIdFinal);
+                    }catch(Throwable t){
+                        throw new Exception(t);
+                    }
+                });
 			}
 			else{
 				props=nodeService.getProperties(storeRef.getProtocol(), storeRef.getIdentifier(),nodeId);
@@ -366,7 +360,7 @@ public class PreviewServlet extends HttpServlet {
 			throw new AccessDeniedException("No "+CCConstants.PERMISSION_READ_PREVIEW+" on "+nodeId);
 	}
 
-	private void validateScope(HttpServletRequest req, HashMap<String, Object> props) {
+	private void validateScope(HttpServletRequest req, Map<String, Object> props) {
 		String scope=(String) req.getSession().getAttribute(CCConstants.AUTH_SCOPE);
 		// Allow only valid scope
 		if(props.containsKey(CCConstants.CCM_PROP_EDUSCOPE_NAME)){
@@ -453,7 +447,7 @@ public class PreviewServlet extends HttpServlet {
 					public void handle(InputStream httpResult) {
 						resp.setHeader("Content-Type", "image/jpeg");
 						try {
-							DataInputStream extImgTransformed = postProcessImage(nodeId, new DataInputStream(httpResult), req);
+							DataInputStream extImgTransformed = postProcessImage(nodeId, new DataInputStream(httpResult), req, null);
 							StreamUtils.copy(extImgTransformed, resp.getOutputStream());
 						} catch (IOException e) {
 							throw new RuntimeException(e);
@@ -469,7 +463,7 @@ public class PreviewServlet extends HttpServlet {
 		return true;
 	}
 
-	private DataInputStream postProcessImage(String nodeId,DataInputStream in,HttpServletRequest req){
+	private DataInputStream postProcessImage(String nodeId, DataInputStream in, HttpServletRequest req, String mimetype){
 		float quality=DEFAULT_QUALITY;
 
 		int width=0,height=0,maxHeight=0,maxWidth=0;
@@ -531,8 +525,14 @@ public class PreviewServlet extends HttpServlet {
 				byte[] img=StreamUtils.copyToByteArray(in);
 				return new DataInputStream(new ByteArrayInputStream(img));
 			}
-
-			BufferedImage img=ImageIO.read(in);
+			BufferedImage img;
+			boolean svg = false;
+			if(Objects.equals("image/svg+xml", mimetype)) {
+				svg = true;
+				img = ImageIO.read(new ByteArrayInputStream(ImageTool.convertSvgToPng(in)));
+			} else {
+				img = ImageIO.read(in);
+			}
 
 			try{
 				float aspect=Float.parseFloat(req.getParameter("aspect"));
@@ -568,7 +568,7 @@ public class PreviewServlet extends HttpServlet {
 						scale=false;
 					}
 				}
-				if(!scale)
+				if(!scale && !svg)
 					return null;
 				BufferedImage cropped=new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB); // getType() sometimes return 0
 				float aspectCrop=(float)width/(float)height;
@@ -653,7 +653,7 @@ public class PreviewServlet extends HttpServlet {
 				DataInputStream in = new DataInputStream(is);
 				if(mimetype.startsWith("image")) {
 					try {
-						DataInputStream tmp = postProcessImage(nodeRef.getId(), in, req);
+						DataInputStream tmp = postProcessImage(nodeRef.getId(), in, req, mimetype);
 						if (tmp != null) {
 							in = tmp;
 							mimetype = "image/jpeg";
@@ -684,6 +684,9 @@ public class PreviewServlet extends HttpServlet {
 		if(mimetype.startsWith("image/svg")){
 			mimetype = "image/svg+xml";
 		}
+		if(mimetype.equals("image/svg+xml")) {
+			throw new RuntimeException("svg is not supported and could not be converted");
+		}
 		resp.setContentType(mimetype);
 
 		resp.setContentLength((int) in.available());
@@ -703,7 +706,7 @@ public class PreviewServlet extends HttpServlet {
 	public static PreviewDetail getPreview(NodeService nodeService,String storeProtocol, String storeIdentifier, String nodeId){
 		return getPreview(nodeService,storeProtocol,storeIdentifier,nodeId,null);
 	}
-	public static PreviewDetail getPreview(NodeService nodeService,String storeProtocol, String storeIdentifier, String nodeId,HashMap<String, Object> nodeProps){
+	public static PreviewDetail getPreview(NodeService nodeService,String storeProtocol, String storeIdentifier, String nodeId,Map<String, Object> nodeProps){
 		StoreRef storeRef = new StoreRef(storeProtocol,storeIdentifier);
 		NodeRef nodeRef = new NodeRef(storeRef,nodeId);
 		if(!nodeService.getType(nodeId).equals(CCConstants.CCM_TYPE_IO)){

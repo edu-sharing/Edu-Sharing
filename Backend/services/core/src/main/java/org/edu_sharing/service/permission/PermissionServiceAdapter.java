@@ -17,7 +17,7 @@ public class PermissionServiceAdapter implements PermissionService {
 	protected List<String> ALLOWED_PERMISSIONS=new ArrayList<>();
 	
 	@Override
-	public void addPermissions(String _nodeId, HashMap<String, String[]> _authPerm, Boolean _inheritPermissions,
+	public void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions,
 							   String _mailText, Boolean _sendMail, Boolean _sendCopy) throws Throwable {
 	}
 
@@ -120,9 +120,9 @@ public class PermissionServiceAdapter implements PermissionService {
 	}
 
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
 			String[] permissions) {
-		HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+		Map<String, Boolean> map = new HashMap<>();
 		for(String permission : permissions){
 			if(ALLOWED_PERMISSIONS.contains(permission))
 				map.put(permission, true);
@@ -154,7 +154,7 @@ public class PermissionServiceAdapter implements PermissionService {
 	}
 
 	@Override
-	public HashMap<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String authority, String[] permissions) {
+	public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String authority, String[] permissions) {
 		return null;
 	}
 	@Override

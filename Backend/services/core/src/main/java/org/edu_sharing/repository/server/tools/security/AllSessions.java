@@ -25,7 +25,7 @@ public class AllSessions {
 				writeLock.lock();
 				//check for null again to prevent the List is created once mor by a waiter on write lock
 				if(allSessions == null){
-					allSessions = Collections.synchronizedMap(new HashMap<String,HttpSession>());
+					allSessions = Collections.synchronizedMap(new HashMap<>());
 				}
 			}finally{
 				writeLock.unlock();

@@ -108,7 +108,7 @@ public class ScopeUserHomeServiceImpl implements ScopeUserHomeService{
 					serviceRegistry.getPermissionService().setPermission(parentNodeRef, PermissionService.OWNER_AUTHORITY, PermissionService.ALL_PERMISSIONS, true);
 					serviceRegistry.getPermissionService().setPermission(parentNodeRef, username, PermissionService.ALL_PERMISSIONS, true);
 					
-					Map<QName,Serializable> personScopeProps = new HashMap<QName,Serializable>();
+					Map<QName,Serializable> personScopeProps = new HashMap<>();
 					personScopeProps.put(PROP_PERSON_SCOPE_HOMEFOLDER, parentNodeRef);
 					personScopeProps.put(PROP_PERSON_SCOPE_NAME, scope);
 					ChildAssociationRef childRef = nodeService.createNode(personNodeRef, 
@@ -160,7 +160,7 @@ public class ScopeUserHomeServiceImpl implements ScopeUserHomeService{
 		NodeRef scopeRootNodeRef = getOrCreateMap(companyHome,SCOPE_ROOT,null);
 		NodeServiceInterceptor.setEduSharingScope(currentScope);
 		
-		Map<QName,Serializable> scopeProperties = new HashMap<QName,Serializable>();
+		Map<QName,Serializable> scopeProperties = new HashMap<>();
 		scopeProperties.put(QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME), scope);
 		scopeProperties.put(ContentModel.PROP_NAME, scope);
 		NodeRef scopeNodeRef = 	getOrCreateMap(scopeRootNodeRef,scope,scopeProperties);
@@ -174,7 +174,7 @@ public class ScopeUserHomeServiceImpl implements ScopeUserHomeService{
 			String assocName = "{" + CCConstants.NAMESPACE_CCM + "}" + name;
 			
 			if(properties == null){ 
-				properties = new HashMap<QName,Serializable>();
+				properties = new HashMap<>();
 				properties.put(ContentModel.PROP_NAME, name);
 			}
 			

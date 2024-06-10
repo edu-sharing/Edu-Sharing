@@ -40,7 +40,7 @@ public interface RepoProxy {
 	boolean myTurn(String repoId);
 	RemoteRepoDetails myTurn(String repoId, String nodeId);
 
-	public HashMap<String, String> remoteAuth(ApplicationInfo repoInfo, String username, boolean validate) throws Throwable;
+	Map<String, String> remoteAuth(ApplicationInfo repoInfo, String username, boolean validate) throws Throwable;
 
 	Response prepareUsage(String repository, String node, HttpServletRequest req) throws Throwable;
 

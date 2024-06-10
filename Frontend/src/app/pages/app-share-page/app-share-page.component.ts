@@ -160,18 +160,30 @@ export class AppSharePageComponent {
             }
             this.node
                 .createNode(this.inbox.ref.id, RestConstants.CCM_TYPE_IO, [], prop, true)
-                .subscribe((data: NodeWrapper) => {
-                    this.node
-                        .uploadNodeContent(
-                            data.node.ref.id,
-                            this.file,
-                            RestConstants.COMMENT_MAIN_FILE_UPLOAD,
-                            this.mimetype,
-                        )
-                        .subscribe(() => {
-                            callback(data.node);
-                        });
-                });
+                .subscribe(
+                    (data: NodeWrapper) => {
+                        this.node
+                            .uploadNodeContent(
+                                data.node.ref.id,
+                                this.file,
+                                RestConstants.COMMENT_MAIN_FILE_UPLOAD,
+                                this.mimetype,
+                            )
+                            .subscribe(
+                                () => {
+                                    callback(data.node);
+                                },
+                                (error) => {
+                                    this.toast.error(error);
+                                    this.globalProgress = false;
+                                },
+                            );
+                    },
+                    (error) => {
+                        this.toast.error(error);
+                        this.globalProgress = false;
+                    },
+                );
         }
     }
     saveFile() {
@@ -225,9 +237,14 @@ export class AppSharePageComponent {
             this.route.queryParams.subscribe((params: any) => {
                 this.uri = params['uri'];
                 this.mimetype = params['mimetype'];
-                if (this.mimetype == 'public.image')
+                if (this.mimetype == 'public.image') {
                     // ios
                     this.mimetype = 'image/jpeg';
+                } else if (!this.mimetype.includes('/')) {
+                    // ios sends invalid mimetypes from certain apps
+                    console.info('invalid mimetype from ios', this.mimetype);
+                    this.mimetype = 'application/octet-stream';
+                }
                 this.cordovaType = params['mimetype'];
                 this.fileName = params['file'];
                 this.text = params['text']; // ios only: custom description

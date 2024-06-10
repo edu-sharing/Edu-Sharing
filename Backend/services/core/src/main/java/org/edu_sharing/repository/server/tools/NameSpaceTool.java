@@ -52,7 +52,7 @@ public class NameSpaceTool<V> {
 	public static List<String> transFormToShortQName(List<String> qnames){
 		
 	
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for(String qname : qnames){
 			if(qname.matches(CCConstants.NAMESPACE_PREFIX_REGEX_SHORT)){
 				list.add(qname);

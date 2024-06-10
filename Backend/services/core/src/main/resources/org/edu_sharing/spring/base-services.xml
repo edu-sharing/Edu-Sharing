@@ -1,105 +1,103 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:context="http://www.springframework.org/schema/context"
-		xmlns:aop = "http://www.springframework.org/schema/aop"
-		xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/context
 		http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
-	<context:annotation-config/>
-	<aop:aspectj-autoproxy/>
-	<context:component-scan base-package="org.edu_sharing"/>
+  <context:annotation-config/>
+  <aop:aspectj-autoproxy/>
+  <context:component-scan base-package="org.edu_sharing"/>
 
-	<bean id="nodeService" class="org.springframework.aop.framework.ProxyFactoryBean" >
-		<property name="targetName">
-			<value>nodeServiceImpl</value>
-		</property>
-		<property name="proxyInterfaces">
-			<list>
-				<value>org.edu_sharing.service.nodeservice.NodeService</value>
-			</list>
-		</property>
-		<property name="interceptorNames">
-			<list>
-				<value>nodeServiceInterceptor</value>
-			</list>
-		</property>
-	</bean>
+  <bean id="nodeService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="targetName">
+      <value>nodeServiceImpl</value>
+    </property>
+    <property name="proxyInterfaces">
+      <list>
+        <value>org.edu_sharing.service.nodeservice.NodeService</value>
+      </list>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>nodeServiceInterceptor</value>
+      </list>
+    </property>
+  </bean>
 
-	<bean id="archiveService" class="org.edu_sharing.service.archive.ArchiveServiceImpl" lazy-init="true"/>
-	<bean id="nodeServiceImpl" class="org.edu_sharing.service.nodeservice.NodeServiceImpl"/>
-	<bean id="nodeServiceInterceptor" class="org.edu_sharing.service.nodeservice.NodeServiceInterceptor"
-		  init-method="init"/>
+  <bean id="archiveService" class="org.edu_sharing.service.archive.ArchiveServiceImpl" lazy-init="true"/>
+  <bean id="nodeServiceImpl" class="org.edu_sharing.service.nodeservice.NodeServiceImpl"/>
+  <bean id="nodeServiceInterceptor" class="org.edu_sharing.service.nodeservice.NodeServiceInterceptor"
+        init-method="init"/>
 
-	<bean id="trackingService" class="org.springframework.aop.framework.ProxyFactoryBean" >
-		<property name="targetName">
-			<value>trackingServiceImpl</value>
-		</property>
-		<property name="proxyInterfaces">
-			<list>
-				<value>org.edu_sharing.service.tracking.TrackingService</value>
-			</list>
-		</property>
-		<property name="interceptorNames">
-			<list>
-				<value>trackingServiceInterceptor</value>
-			</list>
-		</property>
-	</bean>
-	<bean id="trackingServiceImpl" class="org.edu_sharing.service.tracking.TrackingServiceImpl">
-		<property name="nodeService">
-			<ref bean="nodeServiceImpl" />
-		</property>
-	</bean>
-	<bean id="trackingServiceInterceptor" class="org.edu_sharing.service.tracking.TrackingServiceInterceptor"
-		  init-method="init"/>
+  <bean id="trackingService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="targetName">
+      <value>trackingServiceImpl</value>
+    </property>
+    <property name="proxyInterfaces">
+      <list>
+        <value>org.edu_sharing.service.tracking.TrackingService</value>
+      </list>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>trackingServiceInterceptor</value>
+      </list>
+    </property>
+  </bean>
+  <bean id="trackingServiceInterceptor" class="org.edu_sharing.service.tracking.TrackingServiceInterceptor"
+        init-method="init"/>
 
-	<bean id="authorityService" class=" org.edu_sharing.service.authority.AuthorityServiceImpl"/>
-	<bean id="permissionService" class="org.springframework.aop.framework.ProxyFactoryBean" >
-		<property name="targetName" value="permissionServiceImpl"/>
-		<property name="proxyInterfaces">
-			<list>
-				<value>org.edu_sharing.service.permission.PermissionService</value>
-			</list>
-		</property>
-		<property name="interceptorNames">
-			<list>
-				<value>permissionServiceInterceptor</value>
-			</list>
-		</property>
-	</bean>
-	<bean id="permissionServiceImpl" class="org.edu_sharing.service.permission.PermissionServiceImpl">
-		<constructor-arg name="toolPermission" ref="toolPermissionService"/>
-		<constructor-arg name="eduNodeService" ref="nodeService"/>
-	</bean>
-	<bean id="permissionServiceInterceptor" class="org.edu_sharing.service.permission.PermissionServiceInterceptor"
-		  init-method="init"/>
+  <bean id="authorityService" class=" org.edu_sharing.service.authority.AuthorityServiceImpl"/>
+  <bean id="permissionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="targetName" value="permissionServiceImpl"/>
+    <property name="proxyInterfaces">
+      <list>
+        <value>org.edu_sharing.service.permission.PermissionService</value>
+      </list>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>permissionServiceInterceptor</value>
+      </list>
+    </property>
+  </bean>
+  <bean id="permissionServiceImpl" class="org.edu_sharing.service.permission.PermissionServiceImpl">
+    <constructor-arg name="toolPermission" ref="toolPermissionService"/>
+    <constructor-arg name="eduNodeService" ref="nodeService"/>
+  </bean>
+  <bean id="permissionServiceInterceptor" class="org.edu_sharing.service.permission.PermissionServiceInterceptor"
+        init-method="init"/>
 
-	<bean id="toolPermissionService" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<property name="targetName" value="toolPermissionServiceImpl"/>
-	</bean>
-	<bean id="toolPermissionServiceImpl" class="org.edu_sharing.service.toolpermission.ToolPermissionService">
-		<property name="eduNodeService" ref="nodeService"/>
-	</bean>
+  <bean id="toolPermissionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="targetName" value="toolPermissionServiceImpl"/>
+  </bean>
+  <bean id="toolPermissionServiceImpl" class="org.edu_sharing.service.toolpermission.ToolPermissionService">
+    <property name="eduNodeService" ref="nodeService"/>
+  </bean>
 
-	<bean id="collectionServiceConfig" class="org.edu_sharing.service.collection.CollectionServiceConfig">
-		<property name="pattern" value="yyyy/MM/dd/HH/mm/ss/SS"/>
-		<property name="path" value="/app:company_home/ccm:collections"/>
-	</bean>
-	
-	<bean id="repoProxy" class="org.edu_sharing.service.repoproxy.RepoProxyDummyImpl">
-	</bean>
+  <bean id="collectionServiceConfig" class="org.edu_sharing.service.collection.CollectionServiceConfig">
+    <property name="pattern" value="yyyy/MM/dd/HH/mm/ss/SS"/>
+    <property name="path" value="/app:company_home/ccm:collections"/>
+  </bean>
 
-	<bean id="mediacenterLicenseProvider" class="org.edu_sharing.service.mediacenter.MediacenterLicenseProviderImpl"/>
-	<bean id="ratingService" class="org.edu_sharing.service.rating.RatingServiceAdapter">
-		<constructor-arg index="0" value="notused"/>
-	</bean>
-	<bean id="relationService" class="org.edu_sharing.service.relations.RelationServiceDefaultImpl"/>
-	<bean id="notificationServiceFactory" class="org.edu_sharing.service.notification.NotificationServiceFactoryImpl"/>
-	<bean id="permissionChecking" class="org.edu_sharing.service.permission.PermissionChecking"/>
+  <bean id="repoProxy" class="org.edu_sharing.service.repoproxy.RepoProxyDummyImpl">
+  </bean>
 
+  <bean id="mediacenterLicenseProvider" class="org.edu_sharing.service.mediacenter.MediacenterLicenseProviderImpl"/>
+  <bean id="ratingService" class="org.edu_sharing.service.rating.RatingServiceAdapter">
+    <constructor-arg index="0" value="notused"/>
+  </bean>
+  <bean id="relationService" class="org.edu_sharing.service.relations.RelationServiceDefaultImpl"/>
+  <bean id="notificationServiceFactory" class="org.edu_sharing.service.notification.NotificationServiceFactoryImpl"/>
+  <bean id="permissionChecking" class="org.edu_sharing.service.permission.PermissionChecking"/>
+  <bean id="suggestionService" class="org.edu_sharing.service.suggestion.DefaultSuggestionService"/>
+  <bean id="contextRefresher" class="org.edu_sharing.spring.scope.refresh.ContextRefresher">
+    <constructor-arg name="scope" ref="refreshScope"/>
+  </bean>
 </beans>

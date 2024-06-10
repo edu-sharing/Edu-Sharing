@@ -42,7 +42,7 @@ public class ImportCleanerIdentifiersList {
 	XPath xpath = pfactory.newXPath();
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	
-	List<String> nodeAtOaiService = new ArrayList<String>();
+	List<String> nodeAtOaiService = new ArrayList<>();
 	
 	/**
 	 * <nodeuuid,replicationsourceid>
@@ -51,7 +51,7 @@ public class ImportCleanerIdentifiersList {
 	
 	MCAlfrescoAPIClient mcAlfrescoBaseClient = new MCAlfrescoAPIClient();
 	
-	List<String> toDeleteList = new ArrayList<String>();
+	List<String> toDeleteList = new ArrayList<>();
 
 	public ImportCleanerIdentifiersList(String baseUrl, String set, String metadataPrefix, boolean testMode) {
 		try {

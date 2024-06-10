@@ -9,7 +9,7 @@ import org.w3c.dom.NodeList;
 public class TmplGroup {
 
 	
-	List<TGroup> GroupList = new ArrayList<TGroup>();
+	List<TGroup> GroupList = new ArrayList<>();
 
 	public TmplGroup (){};
 

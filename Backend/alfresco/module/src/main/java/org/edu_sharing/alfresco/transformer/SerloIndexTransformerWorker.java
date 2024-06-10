@@ -1,18 +1,5 @@
 package org.edu_sharing.alfresco.transformer;
 
-import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.TransformationOptions;
-import org.alfresco.service.namespace.QName;
-import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.action.RessourceInfoExecuter;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.util.Map;
-import java.util.Set;
 public class SerloIndexTransformerWorker {};
 /*public class SerloIndexTransformerWorker extends ContentTransformerHelper implements ContentTransformerWorker {
 
@@ -33,7 +20,7 @@ public class SerloIndexTransformerWorker {};
     @Override
     public boolean isTransformable(String sourceMimetype, String targetMimetype, TransformationOptions options) {
         logger.debug("called:" +sourceMimetype +" "+targetMimetype + " use:" + options.getUse());
-        return AuthenticationUtil.runAsSystem(
+        return options.getSourceNodeRef() != null && AuthenticationUtil.runAsSystem(
                 () -> RessourceInfoExecuter.CCM_RESSOURCETYPE_SERLO.equals(nodeService.getProperty(options.getSourceNodeRef(), QName.createQName(RessourceInfoExecuter.CCM_PROP_IO_RESSOURCETYPE))) && targetMimetype.equals("text/plain")
         );
     }

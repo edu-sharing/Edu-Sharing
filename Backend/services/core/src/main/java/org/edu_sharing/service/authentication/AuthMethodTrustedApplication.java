@@ -1,9 +1,6 @@
 package org.edu_sharing.service.authentication;
 
-import java.rmi.RemoteException;
-import java.util.HashMap;
-
-import javax.xml.rpc.ServiceException;
+import java.util.Map;
 
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.apache.log4j.Logger;
@@ -17,7 +14,7 @@ public class AuthMethodTrustedApplication implements AuthMethodInterface {
 	
 	SSOAuthorityMapper ssoAuthorityMapper;
 	
-	public String authenticate(HashMap<String, String> params) throws AuthenticationException {
+	public String authenticate(Map<String, String> params) throws AuthenticationException {
 		
 		String userName = params.get(ssoAuthorityMapper.getSSOUsernameProp());
 		

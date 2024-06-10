@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.service.config.model.Context;
 import org.edu_sharing.repository.client.tools.I18nAngular;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.restservices.ApiService;
@@ -16,6 +17,7 @@ import org.edu_sharing.restservices.config.v1.model.Config;
 import org.edu_sharing.restservices.config.v1.model.Language;
 import org.edu_sharing.restservices.config.v1.model.Variables;
 import org.edu_sharing.restservices.shared.ErrorResponse;
+import org.edu_sharing.service.config.ConfigService;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.config.DynamicConfig;
 import org.json.JSONObject;
@@ -47,10 +49,16 @@ public class ConfigApi {
 	public Response getConfig() {
     	try {
 	    	Config config=new Config();
-	    	
-	    	config.setGlobal(ConfigServiceFactory.getConfigService().getConfig().values);
+			ConfigService configService = ConfigServiceFactory.getConfigService();
+	    	config.setGlobal(configService.getConfig().values);
 	    	try {
-	    		config.setCurrent(ConfigServiceFactory.getConfigService().getConfigByDomain(ConfigServiceFactory.getCurrentDomain()).values);
+				Context context = configService.getContext(ConfigServiceFactory.getCurrentDomain());
+				if(context != null) {
+					config.setContextId(context.id);
+					config.setCurrent(configService.getConfigByContext(context).values);
+				} else {
+					config.setCurrent(config.getGlobal());
+				}
 	    	}catch(IllegalArgumentException e) {
 	    		logger.debug(e.getMessage());
 	    		// context for domain does not exist -> use default
@@ -190,7 +198,7 @@ public class ConfigApi {
 	private Map<String,String> convertKeyValue(List<org.edu_sharing.alfresco.service.config.model.KeyValuePair> pairs) {
 		if(pairs==null)
 			return null;
-		Map<String,String> map=new HashMap<String, String>();
+		Map<String,String> map=new HashMap<>();
 		for(org.edu_sharing.alfresco.service.config.model.KeyValuePair pair : pairs) {
 			map.put(pair.key, pair.value);
 		}

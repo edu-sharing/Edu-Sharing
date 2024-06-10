@@ -7,6 +7,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import lombok.Getter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.repository.server.importer.PersistentHandlerInterface;
@@ -60,9 +61,11 @@ public class Test {
 	
 	private static class TestRecordHandler implements RecordHandlerInterface{
 		
-		HashMap<String,Integer> replicationIdCounter = new HashMap<String,Integer>();
+		@Getter
+        Map<String,Integer> replicationIdCounter = new HashMap<>();
 		
-		HashMap<String,Integer> replicationSourceCounter = new HashMap<String,Integer>();
+		@Getter
+        Map<String,Integer> replicationSourceCounter = new HashMap<>();
 		
 		Log logger = LogFactory.getLog(RecordHandlerLOM.class);
 		XPathFactory pfactory = XPathFactory.newInstance();
@@ -70,9 +73,10 @@ public class Test {
 		
 		
 		
-		int counter = 0;
+		@Getter
+        int counter = 0;
 		@Override
-		public HashMap<String, Object> getProperties() {
+		public Map<String, Object> getProperties() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -99,18 +103,7 @@ public class Test {
 				replicationSourceCounter.put(lomCatalogId, sourceCounter++);
 			}
 		}
-		
-		public int getCounter() {
-			return counter;
-		}
-		
-		public HashMap<String, Integer> getReplicationIdCounter() {
-			return replicationIdCounter;
-		}
-		
-		public HashMap<String, Integer> getReplicationSourceCounter() {
-			return replicationSourceCounter;
-		}
-	}
+
+    }
 
 }

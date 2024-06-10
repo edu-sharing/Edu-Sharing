@@ -1159,7 +1159,7 @@ public class NodeApi  {
     	int min = (skipCount != null) ? Math.min(sorted.size(), skipCount) : 0;
     	int max = (maxItems != null) ? Math.min(sorted.size(), min + maxItems) : sorted.size();   
     		
-    	List<Node> data = new ArrayList<Node>();
+    	List<Node> data = new ArrayList<>();
     	for (Node child : sorted.subList(min, max)) {
     		data.add(child);
     	}
@@ -1887,7 +1887,7 @@ public class NodeApi  {
 			searchToken.setFacets(facets);
 			searchToken.setSortDefinition(new SortDefinition(sortProperties, sortAscending));
     		NodeSearch search = NodeDao.search(repoDao,searchToken);
-    		List<Node> data = new ArrayList<Node>();
+    		List<Node> data = new ArrayList<>();
 	    	for (NodeRef ref : search.getResult()) {
 	    		data.add(NodeDao.getNode(repoDao, ref.getId(),filter).asNode());
 	    	}

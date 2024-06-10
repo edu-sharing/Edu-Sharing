@@ -62,6 +62,19 @@ services:
     depends_on:
       - repository-service
 
+  repository-alfresco-share:
+    image: "${docker.registry}/${docker.common}/${docker.edu_sharing.community.common.alfresco.share.name}:${docker.edu_sharing.community.common.alfresco.share.tag}"
+    container_name: "repository-alfresco-share_${COMPOSE_PROJECT_NAME}"
+    environment:
+      REPO_HOST: repository-service
+      REPO_PORT: 8080
+    expose:
+      - "8080"
+    ports:
+      - "${COMMON_BIND_HOST:-127.0.0.1}:${REPOSITORY_ALFRESCO_SHARE_PORT_HTTP:-8103}:8080"
+    depends_on:
+      - repository-service
+
   repository-service:
     image: "${docker.repository}/${docker.prefix}-deploy-docker-build-service:${docker.tag}"
     container_name: "repository-service_${COMPOSE_PROJECT_NAME}"

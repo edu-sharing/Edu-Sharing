@@ -64,7 +64,7 @@ public class RatingServiceImpl extends RatingServiceAdapter {
         checkPreconditions(nodeId);
         AuthenticationUtil.runAsSystem(() -> {
             Rating currentRating = getRatingForUser(nodeId);
-            HashMap<String, Object> props = new HashMap<>();
+            Map<String, Object> props = new HashMap<>();
             props.put(CCConstants.CCM_PROP_RATING_VALUE, rating);
             props.put(CCConstants.CCM_PROP_RATING_TEXT, text);
             if (currentRating == null) {
@@ -77,7 +77,7 @@ public class RatingServiceImpl extends RatingServiceAdapter {
 
             String nodeType = null;
             List<String> nodeAspects;
-            HashMap<String, Object> nodeProps;
+            Map<String, Object> nodeProps;
             try {
                 nodeType = nodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId);
                 nodeAspects = Arrays.asList(nodeService.getAspects(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId));
@@ -134,7 +134,7 @@ public class RatingServiceImpl extends RatingServiceAdapter {
 
                 String nodeType = null;
                 List<String> nodeAspects;
-                HashMap<String, Object> nodeProps;
+                Map<String, Object> nodeProps;
                 try {
                     nodeType = nodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId);
                     nodeAspects = Arrays.asList(nodeService.getAspects(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId));
@@ -179,7 +179,7 @@ public class RatingServiceImpl extends RatingServiceAdapter {
         RatingsCache accumulated = new RatingsCache();
         accumulated.setOverall(new RatingsCache.RatingData(ratings.stream().map(Rating::getRating).reduce(Double::sum).orElse(0.), ratings.size()));
         accumulated.setUsers(new HashMap<>(ratings.stream().collect(Collectors.toMap(Rating::getAuthority, Rating::getRating))));
-        HashMap<String, RatingsCache.RatingData> affiliation = new HashMap<>();
+        Map<String, RatingsCache.RatingData> affiliation = new HashMap<>();
         // collect counts for each affiliation group
         ratings.forEach((r) -> {
             String authorityAffiliation = (String) authorityService.getAuthorityProperty(r.getAuthority(), CCConstants.CM_PROP_PERSON_EDU_SCHOOL_PRIMARY_AFFILIATION);

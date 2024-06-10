@@ -35,11 +35,11 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 
 public class VCardTool {
 	public static String nameToVCard(String name){
-		HashMap<String,String> map=new HashMap<String,String>();
+		Map<String, String> map = new HashMap<>();
 		map.put(CCConstants.VCARD_GIVENNAME, name);
 		return hashMap2VCard(map);
 	}
-	public static String hashMap2VCard(HashMap<String,String> map){
+	public static String hashMap2VCard(Map<String,String> map){
 		
 		String uid = getValid(map.get(CCConstants.VCARD_URN_UID));
 		String surname = getValid(map.get(CCConstants.VCARD_SURNAME));

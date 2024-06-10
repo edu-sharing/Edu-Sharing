@@ -1,9 +1,6 @@
 package org.edu_sharing.service.comment;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -38,7 +35,7 @@ public class CommentServiceImpl implements CommentService{
 	@Override
 	public String addComment(String node,String commentReference, String comment) throws Exception {
 		ToolPermissionHelper.throwIfToolpermissionMissing(CCConstants.CCM_VALUE_TOOLPERMISSION_COMMENT_WRITE);
-		HashMap<String, Object> props = new HashMap<>();
+		Map<String, Object> props = new HashMap<>();
 		if(StringUtils.isNotBlank(commentReference)) {
 			props.put(CCConstants.CCM_PROP_COMMENT_REPLY,new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, commentReference));
 		}
@@ -68,7 +65,7 @@ public class CommentServiceImpl implements CommentService{
 	@Override
 	public void editComment(String commentId, String comment) {
 		throwIfNoComment(commentId);
-		HashMap<String, Object> props = new HashMap<String,Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put(CCConstants.CCM_PROP_COMMENT_CONTENT,comment);
 		NodeRef replyTo = new NodeRef(nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), commentId, CCConstants.CCM_PROP_COMMENT_REPLY));
 		nodeService.updateNodeNative(commentId, props);
@@ -99,7 +96,7 @@ public class CommentServiceImpl implements CommentService{
 	private void notify(String node, String comment, String commentReference, Status status) {
 		String nodeType = null;
 		List<String> aspects;
-		HashMap<String, Object> nodeProps;
+		Map<String, Object> nodeProps;
 		try {
 			nodeType = nodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), node);
 			aspects = Arrays.asList(nodeService.getAspects(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), node));

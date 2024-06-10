@@ -52,12 +52,12 @@ public class ImporterJobDDB extends AbstractJob{
 		MetadataSet mds=MetadataHelper.getMetadataset(app, CCConstants.metadatasetdefault_id);
 		
 		SearchToken token = new SearchToken();
-		HashMap<String, String[]> criterias = new HashMap<String,String[]>();
+		Map<String, String[]> criterias = new HashMap<>();
 		criterias.put(MetadataSet.DEFAULT_CLIENT_QUERY_CRITERIA, new String[] {query});
 		List<NodeRef> ddbObjects = new SearchServiceDDBImpl(app.getAppId()).search(mds, MetadataSet.DEFAULT_CLIENT_QUERY,criterias,token).getData();
 	
 		for(NodeRef node : ddbObjects){
-			HashMap<String, Object> ddbObject = new NodeServiceDDBImpl(app.getAppId()).getProperties(node.getStoreProtocol(), node.getStoreId(), node.getNodeId());
+			Map<String, Object> ddbObject = new NodeServiceDDBImpl(app.getAppId()).getProperties(node.getStoreProtocol(), node.getStoreId(), node.getNodeId());
 			
 			ddbObject.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID, ddbObject.get(CCConstants.SYS_PROP_NODE_UID));
 			
@@ -95,7 +95,7 @@ public class ImporterJobDDB extends AbstractJob{
 	@Override
 	public Class[] getJobClasses() {
 		// TODO Auto-generated method stub
-		ArrayList<Class> jobs = new ArrayList<Class>();
+		ArrayList<Class> jobs = new ArrayList<>();
 		jobs.addAll(Arrays.asList(allJobs));
 		jobs.add(ImporterJobDDB.class);		
 		return jobs.toArray(new Class[jobs.size()]);

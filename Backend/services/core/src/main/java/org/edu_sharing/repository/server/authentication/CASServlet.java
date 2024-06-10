@@ -3,6 +3,7 @@ package org.edu_sharing.repository.server.authentication;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -36,7 +37,7 @@ public class CASServlet extends HttpServlet {
 		
 		AuthenticationToolAPI authTool = new AuthenticationToolAPI();
 		
-		HashMap<String,String> validAuthInfo = authTool.validateAuthentication(req.getSession());
+		Map<String,String> validAuthInfo = authTool.validateAuthentication(req.getSession());
 		
 		if(validAuthInfo != null ){
 			if(validAuthInfo.get(CCConstants.AUTH_USERNAME).equals(remoteUser)){
@@ -63,7 +64,7 @@ public class CASServlet extends HttpServlet {
 			
 			SSOAuthorityMapper ssoMapper = (SSOAuthorityMapper)eduApplicationContext.getBean("ssoAuthorityMapper");
 			
-			HashMap<String,String> ssoMap = new HashMap<String,String>();
+			Map<String,String> ssoMap = new HashMap<>();
 			ssoMap.put(ssoMapper.getSSOUsernameProp(), remoteUser);
 			
 			authService.authenticateBySSO(SSOAuthorityMapper.SSO_TYPE_CAS, ssoMap);

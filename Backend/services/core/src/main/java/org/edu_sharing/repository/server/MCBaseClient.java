@@ -27,8 +27,8 @@
  */
 package org.edu_sharing.repository.server;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,12 +43,12 @@ public abstract class MCBaseClient {
 	/**
 	 * username, ticket for the current repository 
 	 */
-	protected HashMap<String, String> authenticationInfo = null;
+	protected Map<String, String> authenticationInfo = null;
 	
 	/**
 	 * @return the authenticationInfo
 	 */
-	public HashMap<String, String> getAuthenticationInfo() {
+	public Map<String, String> getAuthenticationInfo() {
 		return authenticationInfo;
 	}
 	
@@ -65,7 +65,7 @@ public abstract class MCBaseClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract String createNode(String parentID, String nodeTypeString, String childAssociation, HashMap<String,Object> _props) throws Exception;
+	public abstract String createNode(String parentID, String nodeTypeString, String childAssociation, Map<String,Object> _props) throws Exception;
 	
 	/**
 	 * Creates a node with the default ChildAssociation
@@ -75,7 +75,7 @@ public abstract class MCBaseClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract String createNode( String parentID, String nodeTypeString, HashMap<String,Object> _props) throws Exception;
+	public abstract String createNode( String parentID, String nodeTypeString, Map<String,Object> _props) throws Exception;
 	
 	/**
 	 * Adds a aspect to a node
@@ -94,7 +94,7 @@ public abstract class MCBaseClient {
 	 * @param _props the properties of the node
 	 * @throws Exception
 	 */
-	public abstract void updateNode(String nodeId, HashMap<String,Object> _props) throws Exception;
+	public abstract void updateNode(String nodeId, Map<String,Object> _props) throws Exception;
 	
 	/**
 	 * Creates an association between 2 nodes
@@ -123,7 +123,7 @@ public abstract class MCBaseClient {
 	 * @return
 	 * @throws Throwable
 	 */
-	public abstract HashMap<String, Object> getProperties(String nodeId) throws Throwable;
+	public abstract Map<String, Object> getProperties(String nodeId) throws Throwable;
 	
 	/**
 	 * get the first child that matches the params
@@ -135,7 +135,7 @@ public abstract class MCBaseClient {
 	 * @return
 	 * @throws Throwable
 	 */
-	public abstract HashMap<String,Object> getChild(String parentId, String type, String property, String value) throws Throwable;
+	public abstract Map<String,Object> getChild(String parentId, String type, String property, String value) throws Throwable;
 	
 	
 	/**
@@ -179,19 +179,19 @@ public abstract class MCBaseClient {
 	 * 
 	 * @param nodeId the node id
 	 * @param type the type of children
-	 * @return a nested HashMap of nodeIds and the corresponding properties 
+	 * @return a nested Map of nodeIds and the corresponding properties
 	 * @throws Exception
 	 */
-	public abstract HashMap<String, HashMap<String, Object>> getChildrenByType( String nodeId, String type) throws Exception;
+	public abstract Map<String, Map<String, Object>> getChildrenByType( String nodeId, String type) throws Exception;
 	
 	/**
 	 * get all properties of a person
 	 * 
 	 * @param userName the username of the person
-	 * @return property/value HashMap
+	 * @return property/value Map
 	 * @throws Exception
 	 */
-	public abstract HashMap<String, String> getUserInfo(String userName) throws Exception;
+	public abstract Map<String, String> getUserInfo(String userName) throws Exception;
 	
 	/**
 	 * remove a node from a given parent. if the node is the primary child it will be deleted. when its a secondary parent 
@@ -251,13 +251,13 @@ public abstract class MCBaseClient {
 	 * http://stackoverflow.com/questions/435553/java-reflection-performance
 	 * 
 	 * so we will do reflection constructor call only the first time for every Application. 
-	 * For every ApplicationFile we remember a Object of the configured MCBaseClient Subclass in HashMap in the 
+	 * For every ApplicationFile we remember a Object of the configured MCBaseClient Subclass in Map in the
 	 * Class org.edu_sharing.repository.server.RepoFactory. When we need a new Instance the getInstance Method of the Object will be called,
 	 * which calls the constructor directly. 
 	 * @param _authenticationInfo
 	 * @return
 	 */
-	public abstract MCBaseClient getInstance(HashMap<String, String> _authenticationInfo);
+	public abstract MCBaseClient getInstance(Map<String, String> _authenticationInfo);
 	/**
 	 * Classes that extend MCBaseClient are instantiated dynamicaly by Reflections.
 	 * Reflections constructor calls are much slower than direct constructor calls
@@ -266,11 +266,11 @@ public abstract class MCBaseClient {
 	 * http://stackoverflow.com/questions/435553/java-reflection-performance
 	 * 
 	 * so we will do reflection constructor call only the first time for every Application. 
-	 * For every ApplicationFile we remember a Object of the configured MCBaseClient Subclass in HashMap in the 
+	 * For every ApplicationFile we remember a Object of the configured MCBaseClient Subclass in Map in the
 	 * Class org.edu_sharing.repository.server.RepoFactory. When we need a new Instance the getInstance Method of the Object will be called,
 	 * which calls the constructor directly. 
 	 * @param _authenticationInfo
 	 * @return
 	 */
-	public abstract MCBaseClient getInstance(String _repositoryFile, HashMap<String, String> _authenticationInfo);
+	public abstract MCBaseClient getInstance(String _repositoryFile, Map<String, String> _authenticationInfo);
 }

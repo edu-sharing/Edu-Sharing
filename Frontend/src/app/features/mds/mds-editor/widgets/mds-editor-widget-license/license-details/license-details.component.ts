@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { Metadata } from 'ngx-edu-sharing-graphql';
 import { Node } from 'ngx-edu-sharing-api';
 import { RestConnectorService, RestConstants } from '../../../../../../core-module/core.module';
 import { NodeHelperService } from '../../../../../../services/node-helper.service';
@@ -19,7 +18,6 @@ export class LicenseDetailsComponent implements OnChanges {
     };
 
     @Input() nodes: Node[];
-    @Input() metadata: Metadata[];
     @Input() properties: Values;
     type: string;
     ccShare: string;
@@ -38,7 +36,7 @@ export class LicenseDetailsComponent implements OnChanges {
     ) {}
     ngOnChanges(changes: SimpleChanges) {
         // Set the `draggable` attribute when this directive is active.
-        if (changes.nodes?.currentValue || changes.metadata?.currentValue) {
+        if (changes.nodes?.currentValue) {
             this.readLicense();
         }
     }
@@ -89,20 +87,6 @@ export class LicenseDetailsComponent implements OnChanges {
     ) {
         if (this.properties) {
             return this.properties[prop] ? this.properties[prop][0] : fallbackIsEmpty;
-        } else if (this.metadata) {
-            const data = this.metadata.map(
-                (m) =>
-                    Helper.getDotPathFromNestedObject(
-                        m,
-                        LicenseDetailsComponent.PROPERTIES_MAPPING_GRAPHQL[prop],
-                    ) as string,
-            );
-            return this.nodeHelper.getValueForAllString(
-                data,
-                fallbackNotIdentical,
-                fallbackIsEmpty,
-                false,
-            );
         } else if (this.nodes) {
             return this.nodeHelper.getValueForAll(
                 this.nodes,

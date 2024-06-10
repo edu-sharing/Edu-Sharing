@@ -2,10 +2,7 @@ package org.edu_sharing.restservices;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -30,233 +27,227 @@ import org.edu_sharing.service.authentication.oauth2.TokenService.Token;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
+import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.springframework.context.ApplicationContext;
 
 public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
 
-	Logger logger = Logger.getLogger(ApiAuthenticationFilter.class);
-	
-	private TokenService tokenService;
-	private EduAuthentication eduAuthenticationService;
-	
-	private AuthenticationComponent authenticationComponent;
-	
-	@Override
-	public void destroy() {
-	}
-	
-	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
-		
-		HttpServletRequest httpReq = (HttpServletRequest) req;
-		HttpServletResponse httpResp = (HttpServletResponse)resp;
+    Logger logger = Logger.getLogger(ApiAuthenticationFilter.class);
 
-		if("OPTIONS".equals(httpReq.getMethod())){
-			chain.doFilter(req, resp);
-			return;
-		}
-				
-		HttpSession session = httpReq.getSession(true);
-		//session.setMaxInactiveInterval(30);
-		AuthenticationToolAPI authTool = new AuthenticationToolAPI();
-		HashMap<String, String> validatedAuth = authTool.validateAuthentication(session);
+    private TokenService tokenService;
 
-		AuthenticationFilter.handleLocale(true, httpReq.getHeader("locale"), httpReq, httpResp);
+    @Override
+    public void destroy() {
+    }
 
-		String authHdr = httpReq.getHeader("Authorization");
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse resp,
+                         FilterChain chain) throws IOException, ServletException {
 
-		// always take the header so we can auth when a guest is activated
-		if (authHdr != null) {			
-				
-				if (authHdr.length() > 5 && authHdr.substring(0, 5).equalsIgnoreCase("BASIC")) {
-					logger.debug("auth is BASIC");
-					validatedAuth = httpBasicAuth(authHdr);
-					if(validatedAuth != null) {
-						String succsessfullAuthMethod = SubsystemChainingAuthenticationService.getSuccessFullAuthenticationMethod();
-						String authMethod = ("alfrescoNtlm1".equals(succsessfullAuthMethod) || "alfinst".equals(succsessfullAuthMethod)) ? CCConstants.AUTH_TYPE_DEFAULT : CCConstants.AUTH_TYPE + succsessfullAuthMethod;
-						String username = validatedAuth.get(CCConstants.AUTH_USERNAME);
-						authTool.storeAuthInfoInSession(username, validatedAuth.get(CCConstants.AUTH_TICKET), authMethod, session);
-					}
-				} else if (authHdr.length() > 6 && authHdr.substring(0, 6).equalsIgnoreCase("Bearer")) {
-					
-					logger.info("auth is OAuth");
-					
-					String accessToken = authHdr.substring(6).trim();
-					
-					try {
-						Token token = tokenService.getToken(accessToken);
-						
-						if (token != null) {
-							logger.info("oAuthToken:"+ token.getAccessToken() +" alfresco ticket:"+ token.getTicket());
-							
-							//validate and set current user
-							authTool.storeAuthInfoInSession(
-									token.getUsername(), 
-									token.getTicket(),
-									CCConstants.AUTH_TYPE_OAUTH,
-									session);
-							
-							session.setAttribute(CCConstants.AUTH_ACCESS_TOKEN, token.getAccessToken());
-							
-							validatedAuth = authTool.validateAuthentication(session);							
-						}	
-					} catch (Exception ex) {
-						
-						logger.error(ex.getMessage(), ex);
-					}				
-				}else if (authHdr.length() > 10 && authHdr.substring(0, 10).equalsIgnoreCase(CCConstants.AUTH_HEADER_EDU_TICKET)) {
-					String ticket = authHdr.substring(10).trim();
-					if(ticket != null){
-						if(authTool.validateTicket(ticket)){
-							// Force a renew of all toolpermissions since they might have now changed!
-							ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions(true);
-		  					//if its APIClient username is ignored and is figured out with authentication service
-		  					authTool.storeAuthInfoInSession(authTool.getCurrentUser(), ticket, CCConstants.AUTH_TYPE_TICKET, httpReq.getSession());
-		  					validatedAuth = authTool.validateAuthentication(session);
-		  				}
-					}
-				}
-			
-		}
+        HttpServletRequest httpReq = (HttpServletRequest) req;
+        HttpServletResponse httpResp = (HttpServletResponse) resp;
 
-		List<String> AUTHLESS_ENDPOINTS=Arrays.asList(new String[]{"/authentication","/_about","/config","/register","/sharing",
-				"/lti/v13/oidc/login_initiations",
-				"/lti/v13/lti13",
-				"/lti/v13/registration/dynamic",
-				"/lti/v13/jwks",
-				"/lti/v13/details",
-				"/ltiplatform/v13/openid-configuration",
-				"/ltiplatform/v13/openid-registration",
-				"/ltiplatform/v13/content"});
-		List<String> ADMIN_ENDPOINTS=Arrays.asList(new String[]{"/admin", "/bulk","/lti/v13/registration/static","/lti/v13/registration/url"});
-		List<String> DISABLED_ENDPOINTS=new ArrayList<>();
+        if ("OPTIONS".equals(httpReq.getMethod())) {
+            chain.doFilter(req, resp);
+            return;
+        }
 
-		try {
-			if(!ConfigServiceFactory.getCurrentConfig(req).getValue("register.local",true)){
-				if(ConfigServiceFactory.getCurrentConfig(req).getValue("register.recoverPassword", false)) {
-					DISABLED_ENDPOINTS.add("/register/v1/register");
-					DISABLED_ENDPOINTS.add("/register/v1/activate");
-				} else {
-					// disable whole api range
-					DISABLED_ENDPOINTS.add("/register");
-				}
-			}
-		} catch (Exception e) {}
+        HttpSession session = httpReq.getSession(true);
+        //session.setMaxInactiveInterval(30);
+        AuthenticationToolAPI authTool = new AuthenticationToolAPI();
+        Map<String, String> validatedAuth = authTool.validateAuthentication(session);
 
-		boolean noAuthenticationNeeded=false;
-		for(String endpoint : AUTHLESS_ENDPOINTS){
-			String pathInfo = httpReq.getPathInfo();
-			if(pathInfo == null){
-				continue;
-			}
+        AuthenticationFilter.handleLocale(true, httpReq.getHeader("locale"), httpReq, httpResp);
 
-			if(pathInfo.startsWith(endpoint)){
-				noAuthenticationNeeded=true;
-				break;
-			}
-		}
-		boolean adminRequired=false;
-		for(String endpoint : ADMIN_ENDPOINTS){
-			String pathInfo = httpReq.getPathInfo();
-			if(pathInfo == null){
-				continue;
-			}
+        String authHdr = httpReq.getHeader("Authorization");
 
-			if(pathInfo.startsWith(endpoint)){
-				adminRequired=true;
-				break;
-			}
-		}
+        // always take the header so we can auth when a guest is activated
+        if (authHdr != null) {
 
-		for(String endpoint : DISABLED_ENDPOINTS){
-			String pathInfo = httpReq.getPathInfo();
-			if(pathInfo == null){
-				continue;
-			}
+            if (authHdr.length() > 5 && authHdr.substring(0, 5).equalsIgnoreCase("BASIC")) {
+                logger.debug("auth is BASIC");
+                validatedAuth = httpBasicAuth(authHdr);
+                if (validatedAuth != null) {
+                    String succsessfullAuthMethod = SubsystemChainingAuthenticationService.getSuccessFullAuthenticationMethod();
+                    String authMethod = ("alfrescoNtlm1".equals(succsessfullAuthMethod) || "alfinst".equals(succsessfullAuthMethod)) ? CCConstants.AUTH_TYPE_DEFAULT : CCConstants.AUTH_TYPE + succsessfullAuthMethod;
+                    String username = validatedAuth.get(CCConstants.AUTH_USERNAME);
+                    authTool.storeAuthInfoInSession(username, validatedAuth.get(CCConstants.AUTH_TICKET), authMethod, session);
+						CSRFConfig.csrfInitCookie(httpReq,httpResp);
+                }
+            } else if (authHdr.length() > 6 && authHdr.substring(0, 6).equalsIgnoreCase("Bearer")) {
 
-			if(pathInfo.startsWith(endpoint)){
-				httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				httpResp.flushBuffer();
-				httpResp.getWriter().print("This endpoint is disabled via config");
-				return;
-			}
-		}
-		
-		if(adminRequired && !AuthorityServiceFactory.getLocalService().isGlobalAdmin()){
-			httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			httpResp.flushBuffer();
-			httpResp.getWriter().print("Admin rights are required for this endpoint");
-			return;
-		}
+                logger.info("auth is OAuth");
 
-		/**
-		 * allow authless calls with AUTH_SINGLE_USE_NODEID by appauth
-		 */
-		boolean trustedAuth = false;
-		if(ContextManagementFilter.accessTool != null && ContextManagementFilter.accessTool.get() != null){
-			trustedAuth = true;
-		}
+                String accessToken = authHdr.substring(6).trim();
 
-		// ignore the auth for the login
-		if(validatedAuth == null && (!noAuthenticationNeeded && !trustedAuth)){
-			String pathInfo = httpReq.getPathInfo();
-			if(pathInfo != null && pathInfo.equals("/openapi.json"))
-				httpResp.setHeader("WWW-Authenticate", "BASIC realm=\""+ "Edu-Sharing Rest API" +"\"");
-			httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			httpResp.flushBuffer();
-			return;
-		}
-		
-		// Chain other filters
-		chain.doFilter(req, resp);
-	}
+                try {
+                    Token token = tokenService.getToken(accessToken);
 
-	public static HashMap<String, String> httpBasicAuth(String authHdr) {
-		HashMap<String, String> validatedAuth = null;
-		AuthenticationToolAPI authTool = new AuthenticationToolAPI();
+                    if (token != null) {
+                        logger.info("oAuthToken:" + token.getAccessToken() + " alfresco ticket:" + token.getTicket());
 
-		// Basic authentication details present
+                        //validate and set current user
+                        authTool.storeAuthInfoInSession(
+                                token.getUsername(),
+                                token.getTicket(),
+                                CCConstants.AUTH_TYPE_OAUTH,
+                                session);
 
-		String basicAuth = new String(java.util.Base64.getDecoder().decode(authHdr.substring(6)), StandardCharsets.ISO_8859_1);
+                        session.setAttribute(CCConstants.AUTH_ACCESS_TOKEN, token.getAccessToken());
 
-		// Split the username and password
+                        validatedAuth = authTool.validateAuthentication(session);
+                    }
+                } catch (Exception ex) {
 
-		String username = null;
-		String password = null;
+                    logger.error(ex.getMessage(), ex);
+                }
+            } else if (authHdr.length() > 10 && authHdr.substring(0, 10).equalsIgnoreCase(CCConstants.AUTH_HEADER_EDU_TICKET)) {
+                String ticket = authHdr.substring(10).trim();
+                if (ticket != null) {
+                    if (authTool.validateTicket(ticket)) {
+                        // Force a renew of all toolpermissions since they might have now changed!
+                        ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions(true);
+                        //if its APIClient username is ignored and is figured out with authentication service
+                        authTool.storeAuthInfoInSession(authTool.getCurrentUser(), ticket, CCConstants.AUTH_TYPE_TICKET, httpReq.getSession());
+                        validatedAuth = authTool.validateAuthentication(session);
+                    }
+                }
+            }
 
-		int pos = basicAuth.indexOf(":");
-		if (pos != -1) {
-			username = basicAuth.substring(0, pos);
-			password = basicAuth.substring(pos + 1);
-		} else {
-			username = basicAuth;
-			password = "";
-		}
+        }
 
-		try {
+        List<String> AUTHLESS_ENDPOINTS = Arrays.asList(new String[]{"/authentication", "/_about", "/config", "/register", "/sharing",
+                "/lti/v13/oidc/login_initiations",
+                "/lti/v13/lti13",
+                "/lti/v13/registration/dynamic",
+                "/lti/v13/jwks",
+                "/lti/v13/details",
+                "/ltiplatform/v13/openid-configuration",
+                "/ltiplatform/v13/openid-registration",
+                "/ltiplatform/v13/content"});
+        List<String> ADMIN_ENDPOINTS = Arrays.asList(new String[]{"/admin", "/bulk", "/lti/v13/registration/static", "/lti/v13/registration/url"});
+        List<String> DISABLED_ENDPOINTS = new ArrayList<>();
 
-			// Authenticate the user
-			validatedAuth = authTool.createNewSession(username, password);
-		} catch (Exception ex) {
-			Logger.getLogger(ApiAuthenticationFilter.class).error(ex.getMessage(), ex);
-		}
-		return validatedAuth;
-	}
+        try {
+            if (!ConfigServiceFactory.getCurrentConfig(req).getValue("register.local", true)) {
+                if (ConfigServiceFactory.getCurrentConfig(req).getValue("register.recoverPassword", false)) {
+                    DISABLED_ENDPOINTS.add("/register/v1/register");
+                    DISABLED_ENDPOINTS.add("/register/v1/activate");
+                } else {
+                    // disable whole api range
+                    DISABLED_ENDPOINTS.add("/register");
+                }
+            }
+        } catch (Exception e) {
+        }
 
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-		
-		ApplicationContext eduApplicationContext = 
-				org.edu_sharing.spring.ApplicationContextFactory.getApplicationContext();
+        boolean noAuthenticationNeeded = false;
+        for (String endpoint : AUTHLESS_ENDPOINTS) {
+            String pathInfo = httpReq.getPathInfo();
+            if (pathInfo == null) {
+                continue;
+            }
 
-		tokenService = (TokenService) eduApplicationContext.getBean("oauthTokenService");		
-		eduAuthenticationService = (EduAuthentication) eduApplicationContext.getBean("authenticationService");
-		
-		ApplicationContext alfApplicationContext = AlfAppContextGate.getApplicationContext();
-		
-		authenticationComponent = (AuthenticationComponent) alfApplicationContext.getBean("authenticationComponent");
+            if (pathInfo.startsWith(endpoint)) {
+                noAuthenticationNeeded = true;
+                break;
+            }
+        }
+        boolean adminRequired = false;
+        for (String endpoint : ADMIN_ENDPOINTS) {
+            String pathInfo = httpReq.getPathInfo();
+            if (pathInfo == null) {
+                continue;
+            }
 
-	}
+            if (pathInfo.startsWith(endpoint)) {
+                adminRequired = true;
+                break;
+            }
+        }
+
+        for (String endpoint : DISABLED_ENDPOINTS) {
+            String pathInfo = httpReq.getPathInfo();
+            if (pathInfo == null) {
+                continue;
+            }
+
+            if (pathInfo.startsWith(endpoint)) {
+                httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResp.flushBuffer();
+                httpResp.getWriter().print("This endpoint is disabled via config");
+                return;
+            }
+        }
+
+        if (adminRequired && !AuthorityServiceFactory.getLocalService().isGlobalAdmin()) {
+            httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResp.flushBuffer();
+            httpResp.getWriter().print("Admin rights are required for this endpoint");
+            return;
+        }
+
+        /**
+         * allow authless calls with AUTH_SINGLE_USE_NODEID by appauth
+         */
+        boolean trustedAuth = false;
+        if (ContextManagementFilter.accessTool != null && ContextManagementFilter.accessTool.get() != null) {
+            trustedAuth = true;
+        }
+
+        // ignore the auth for the login
+        if (validatedAuth == null && (!noAuthenticationNeeded && !trustedAuth)) {
+            String pathInfo = httpReq.getPathInfo();
+            if (pathInfo != null && pathInfo.equals("/openapi.json"))
+                httpResp.setHeader("WWW-Authenticate", "BASIC realm=\"" + "Edu-Sharing Rest API" + "\"");
+            httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResp.flushBuffer();
+            return;
+        }
+
+        // Chain other filters
+        chain.doFilter(req, resp);
+    }
+
+    public static Map<String, String> httpBasicAuth(String authHdr) {
+        Map<String, String> validatedAuth = null;
+        AuthenticationToolAPI authTool = new AuthenticationToolAPI();
+
+        // Basic authentication details present
+
+        String basicAuth = new String(java.util.Base64.getDecoder().decode(authHdr.substring(6)), StandardCharsets.ISO_8859_1);
+
+        // Split the username and password
+
+        String username = null;
+        String password = null;
+
+        int pos = basicAuth.indexOf(":");
+        if (pos != -1) {
+            username = basicAuth.substring(0, pos);
+            password = basicAuth.substring(pos + 1);
+        } else {
+            username = basicAuth;
+            password = "";
+        }
+
+        try {
+
+            // Authenticate the user
+            validatedAuth = authTool.createNewSession(username, password);
+        } catch (Exception ex) {
+            Logger.getLogger(ApiAuthenticationFilter.class).error(ex.getMessage(), ex);
+        }
+        return validatedAuth;
+    }
+
+    @Override
+    public void init(FilterConfig arg0) throws ServletException {
+
+        ApplicationContext eduApplicationContext =
+                org.edu_sharing.spring.ApplicationContextFactory.getApplicationContext();
+
+        tokenService = (TokenService) eduApplicationContext.getBean("oauthTokenService");
+    }
 
 }

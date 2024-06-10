@@ -4,7 +4,7 @@
   *ngIf="mdsEditorValues.editorMode === 'nodes' || mdsEditorValues.editorMode === 'inline'"
 >
   <ng-container *ngIf="!isSafe">
-    <es-license-details [nodes]="nodes" [metadata]="metadata"></es-license-details>
+    <es-license-details [nodes]="nodes"></es-license-details>
     <div class="link">
       <div>
         <button

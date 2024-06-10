@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class NetworkAuthentication {
 	
-	Map<String,Authentication> authStore = new HashMap<String,Authentication>();
+	Map<String,Authentication> authStore = new HashMap<>();
 	
 	
 	public class Authentication{

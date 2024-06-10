@@ -268,7 +268,7 @@ public class MetadataReader {
                     if (attributes.getNamedItem("asFilter") != null && attributes.getNamedItem("asFilter").getTextContent() != null) {
                         parameter.setAsFilter(new Boolean(attributes.getNamedItem("asFilter").getTextContent()));
                     }
-                    Map<String, String> statements = new HashMap<String, String>();
+                    Map<String, String> statements = new HashMap<>();
                     for (int k = 0; k < list3.getLength(); k++) {
                         Node data = list3.item(k);
                         String name = data.getNodeName();
@@ -453,6 +453,8 @@ public class MetadataReader {
                 }
                 if (name.equals("defaultvalue"))
                     widget.setDefaultvalue(value);
+                if (name.equals("countDefaultvalueAsFilter"))
+                    widget.setCountDefaultvalueAsFilter(new Boolean(value));
                 if (name.equals("format"))
                     widget.setFormat(value);
                 if (name.equals("link"))
@@ -642,6 +644,10 @@ public class MetadataReader {
             key.setI18nPrefix(valuespaceI18nPrefix);
             if (attributes != null && attributes.getNamedItem("parent") != null)
                 key.setParent(attributes.getNamedItem("parent").getTextContent());
+            if (attributes != null && attributes.getNamedItem("icon") != null)
+                key.setIcon(attributes.getNamedItem("icon").getTextContent());
+            if (attributes != null && attributes.getNamedItem("url") != null)
+                key.setUrl(attributes.getNamedItem("url").getTextContent());
             String fallback = null;
             if (!cap.isEmpty()) fallback = cap;
             key.setCaption(getTranslation(key,

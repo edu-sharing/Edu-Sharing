@@ -67,10 +67,11 @@ public class SKOSReader extends ValuespaceReader{
         String de = entry.getJSONObject(labelId).getString("de");
         key.setCaption(de);
         key.setLocale("de");
-        if("en_US".equals(locale)) {
+        if(locale != null && !"de_DE".equals(locale)) {
             try {
-                key.setCaption(entry.getJSONObject(labelId).getString("en"));
-                key.setLocale("en");
+                String[] splitted=locale.split("_");
+                key.setCaption(entry.getJSONObject(labelId).getString(splitted[0]));
+                key.setLocale(splitted[0]);
             }catch(JSONException ignored) { }
         }
         if(entry.has("notation")) {

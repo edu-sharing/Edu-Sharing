@@ -3,6 +3,7 @@ package org.edu_sharing.restservices.shared;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,7 +20,7 @@ public class NodeVersion  {
   private String modifiedAt = null;
   private Person modifiedBy = null;
   private String contentUrl = null;
-  private HashMap<String, String[]> properties = null;
+  private Map<String, String[]> properties = null;
 
   
   /**
@@ -85,10 +86,10 @@ public class NodeVersion  {
    **/
   @Schema(description = "")
   @JsonProperty(value = "properties")
-  public HashMap<String, String[]> getMetadata() {
+  public Map<String, String[]> getMetadata() {
     return properties;
   }
-  public void setProperties(HashMap<String, String[]> metadata) {
+  public void setProperties(Map<String, String[]> metadata) {
     this.properties = metadata;
   }
 

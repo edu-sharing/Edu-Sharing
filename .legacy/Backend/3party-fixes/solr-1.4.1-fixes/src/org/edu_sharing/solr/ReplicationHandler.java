@@ -107,7 +107,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
 
   private int numTimesReplicated = 0;
 
-  private final Map<String, FileInfo> confFileInfoCache = new HashMap<String, FileInfo>();
+  private final Map<String, FileInfo> confFileInfoCache = new HashMap<>();
 
   private Integer reserveCommitDuration = SnapPuller.readInterval("00:00:10");
 
@@ -210,7 +210,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
 
   private List<NamedList> getCommits() {
     Map<Long, IndexCommit> commits = core.getDeletionPolicy().getCommits();
-    List<NamedList> l = new ArrayList<NamedList>();
+    List<NamedList> l = new ArrayList<>();
 
     for (IndexCommit c : commits.values()) {
       try {
@@ -238,7 +238,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
   }
 
   private Map<String, Long> getCheckSums(String[] files, File dir, Checksum checksum) {
-    Map<String, Long> checksumMap = new HashMap<String, Long>();
+    Map<String, Long> checksumMap = new HashMap<>();
     if (files == null || files.length == 0)
       return checksumMap;
     for (String file : files) {
@@ -409,7 +409,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
     }
 
     Map<String, Object> getAsMap() {
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put(NAME, name);
       map.put(SIZE, size);
       map.put(LAST_MODIFIED, lastmodified);
@@ -459,7 +459,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
    * Collects the details such as name, size ,lastModified of a file
    */
   private Map<String, Object> getFileInfo(File file) {
-    Map<String, Object> fileMeta = new HashMap<String, Object>();
+    Map<String, Object> fileMeta = new HashMap<>();
     fileMeta.put(NAME, file.getName());
     fileMeta.put(SIZE, file.length());
     fileMeta.put(LAST_MODIFIED, file.lastModified());
@@ -631,7 +631,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
       if (isReplicating) {
         try {
           long bytesToDownload = 0;
-          List<String> filesToDownload = new ArrayList<String>();
+          List<String> filesToDownload = new ArrayList<>();
           for (Map<String, Object> file : snapPuller.getFilesToDownload()) {
             filesToDownload.add((String) file.get(NAME));
             bytesToDownload += (Long) file.get(SIZE);
@@ -648,7 +648,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
           slave.add("bytesToDownload", readableSize(bytesToDownload));
 
           long bytesDownloaded = 0;
-          List<String> filesDownloaded = new ArrayList<String>();
+          List<String> filesDownloaded = new ArrayList<>();
           for (Map<String, Object> file : snapPuller.getFilesDownloaded()) {
             filesDownloaded.add((String) file.get(NAME));
             bytesDownloaded += (Long) file.get(SIZE);
@@ -730,7 +730,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
       } catch (NumberFormatException e) {/*no op*/ }
     } else if (clzz == List.class) {
       String ss[] = s.split(",");
-      List<String> l = new ArrayList<String>();
+      List<String> l = new ArrayList<>();
       for (int i = 0; i < ss.length; i++) {
         l.add(new Date(Long.valueOf(ss[i])).toString());
       }
@@ -742,7 +742,7 @@ public class ReplicationHandler extends RequestHandlerBase implements SolrCoreAw
   }
 
   private List<String> getReplicateAfterStrings() {
-    List<String> replicateAfter = new ArrayList<String>();
+    List<String> replicateAfter = new ArrayList<>();
     if (replicateOnCommit)
       replicateAfter.add("commit");
     if (replicateOnOptimize)

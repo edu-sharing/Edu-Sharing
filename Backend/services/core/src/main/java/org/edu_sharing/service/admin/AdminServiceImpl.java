@@ -2,9 +2,15 @@ package org.edu_sharing.service.admin;
 
 import com.google.common.io.Files;
 import jakarta.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import lombok.RequiredArgsConstructor;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.module.ModuleInstallState;
 import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -15,13 +21,12 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.repository.client.exception.CCException;
 import org.edu_sharing.repository.client.rpc.ACE;
 import org.edu_sharing.repository.client.rpc.ACL;
@@ -66,29 +71,20 @@ import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.edu_sharing.service.version.RepositoryVersionInfo;
 import org.edu_sharing.service.version.VersionService;
 import org.edu_sharing.spring.ApplicationContextFactory;
-import org.springframework.context.ApplicationContext;
+import org.edu_sharing.spring.scope.refresh.ContextRefreshUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.lang.management.ManagementFactory;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.text.Collator;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.google.common.io.Files;
 
+@Component
+@RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
+
+    private final ModuleService moduleService;
+    private final VersionService versionService;
 
     //cause standard properties class does not save the values sorted
     class SortedProperties extends Properties {
@@ -111,8 +107,6 @@ public class AdminServiceImpl implements AdminService {
 
     }
 
-    ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
-    ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
     private static Logger logger = Logger.getLogger(AdminServiceImpl.class);
 
@@ -127,7 +121,7 @@ public class AdminServiceImpl implements AdminService {
                 RecurseMode.Folders
         );
 
-		/*HashMap<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
+		/*Map<String, Object> importFolderProps = mcAlfrescoBaseClient.getChild(companyHomeId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME,
 				OAIPMHLOMImporter.FOLDER_NAME_IMPORTED_OBJECTS);*/
         for (NodeRef childEntry : children) {
             Serializable value = NodeServiceHelper.getPropertyNative(childEntry, property);
@@ -218,7 +212,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public String addToolpermission(String name) throws Throwable {
         ToolPermissionService tpService = ToolPermissionServiceFactory.getInstance();
-        HashMap<String, Object> props = new HashMap<>();
+        Map<String, Object> props = new HashMap<>();
         props.put(CCConstants.CM_NAME, name);
         String nodeId = NodeServiceFactory.getLocalService().createNodeBasic(tpService.getEdu_SharingToolPermissionsFolder().getId(), CCConstants.CCM_TYPE_TOOLPERMISSION, props);
         PermissionServiceFactory.getLocalService().setPermissionInherit(nodeId, false);
@@ -269,13 +263,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
 	@Override
-	public void writePublisherToMDSXml(String vcardProps, String valueSpaceProp, String ignoreValues, String filePath, HashMap authInfo) throws Throwable {
+	public void writePublisherToMDSXml(String vcardProps, String valueSpaceProp, String ignoreValues, String filePath, Map<String,String> authInfo) throws Throwable {
 		File file = new File(filePath);
 		Result result = new StreamResult(file);
 		writePublisherToMDSXml(result,vcardProps,valueSpaceProp,ignoreValues,authInfo);
 	}
 	
-	public String getPublisherToMDSXml(List<String> vcardProps, String valueSpaceProp, String ignoreValues, HashMap authInfo) throws Throwable {
+	public String getPublisherToMDSXml(List<String> vcardProps, String valueSpaceProp, String ignoreValues, Map<String,String> authInfo) throws Throwable {
 		StringWriter writer=new StringWriter();
 		Result result = new StreamResult(writer);
 		writePublisherToMDSXml(result,StringUtils.join(vcardProps,","),valueSpaceProp,ignoreValues,authInfo);
@@ -319,16 +313,16 @@ public class AdminServiceImpl implements AdminService {
         xformer.transform(source, result);
     }
 
-    public void writePublisherToMDSXml(Result result, String vcardProps, String valueSpaceProp, String ignoreValues, HashMap authInfo) throws Throwable {
+    public void writePublisherToMDSXml(Result result, String vcardProps, String valueSpaceProp, String ignoreValues, Map<String,String> authInfo) throws Throwable {
 
         List<String> ignoreValuesList = null;
         if (ignoreValues != null && !ignoreValues.trim().equals("")) {
             ignoreValuesList = Arrays.asList(ignoreValues.split(","));
         } else {
-            ignoreValuesList = new ArrayList<String>();
+            ignoreValuesList = new ArrayList<>();
         }
 
-        ArrayList<String> allValues = new ArrayList<String>();
+        ArrayList<String> allValues = new ArrayList<>();
         String[] splittedVCardProp = vcardProps.split(",");
         for (String oneVCardProp : splittedVCardProp) {
             allValues.addAll(getAllValuesFor(oneVCardProp));
@@ -346,7 +340,7 @@ public class AdminServiceImpl implements AdminService {
             valueSpace.setAttribute("property", valueSpaceProp != null ? valueSpaceProp : splittedVCardProp[0]);
             rootElement.appendChild(valueSpace);
 
-            ArrayList<String> toSort = new ArrayList<String>();
+            ArrayList<String> toSort = new ArrayList<>();
             for (String vcardString : allValues) {
 
                 //multivalue
@@ -356,7 +350,7 @@ public class AdminServiceImpl implements AdminService {
                         if (!toSort.contains(splittedVCardString))
                             toSort.add(splittedVCardString);
                     } else {
-                        ArrayList<HashMap<String, Object>> vcardList = VCardConverter.vcardToHashMap(splittedVCardString);
+                        ArrayList<Map<String, Object>> vcardList = VCardConverter.vcardToMap(splittedVCardString);
                         if (vcardList != null && vcardList.size() > 0) {
                             Map<String, Object> map = vcardList.get(0);
                             String publisherString = (String) map.get(CCConstants.VCARD_T_FN);
@@ -414,7 +408,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void refreshApplicationInfo() {
-        RepoFactory.refresh();
+        ContextRefreshUtils.refreshContext();
     }
 
     private String getAppPropertiesApplications() throws Exception {
@@ -453,11 +447,11 @@ public class AdminServiceImpl implements AdminService {
                 PropertiesHelper.Config.getPropertyFilePath(info.getAppFileName())
         ));
         appFile.renameTo(new File(appFile.getAbsolutePath() + System.currentTimeMillis() + ".bak"));
-        RepoFactory.refresh();
+        ContextRefreshUtils.refreshContext();
     }
 
     @Override
-    public HashMap<String, String> addApplication(String appMetadataUrl) throws Exception {
+    public Map<String, String> addApplication(String appMetadataUrl) throws Exception {
 
         HttpQueryTool httpQuery = new HttpQueryTool();
         String httpQueryResult = httpQuery.query(appMetadataUrl);
@@ -470,7 +464,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public HashMap<String, String> addApplicationFromStream(InputStream is) throws Exception {
+    public Map<String, String> addApplicationFromStream(InputStream is) throws Exception {
 
         Properties props = new SortedProperties();
         props.loadFromXML(is);
@@ -483,7 +477,7 @@ public class AdminServiceImpl implements AdminService {
         return storeProperties(appId, props);
     }
 
-    public HashMap<String, String> addApplication(Map<String, String> properties) throws Exception {
+    public Map<String, String> addApplication(Map<String, String> properties) throws Exception {
         if (properties == null) {
             throw new Exception("no properties provided");
         }
@@ -522,7 +516,7 @@ public class AdminServiceImpl implements AdminService {
         return storeProperties(appId, props);
     }
 
-    private HashMap<String, String> storeProperties(String appId, Properties props) throws Exception {
+    private Map<String, String> storeProperties(String appId, Properties props) throws Exception {
         String fileNamePart = appId.replaceAll("[/:]", "");
         String filename = "app-" + fileNamePart + ".properties.xml";
 
@@ -588,12 +582,12 @@ public class AdminServiceImpl implements AdminService {
             //homeAppProps.setProperty(ApplicationInfo.KEY_PREVIEWURL, previewUrl);
 
             //overwrite
-            homeAppProps.storeToXML(new FileOutputStream(new File(homeAppPath)), " added contenturl and preview url");
+            homeAppProps.storeToXML(new FileOutputStream(homeAppPath), " added contenturl and preview url");
         }
 
-        RepoFactory.refresh();
+        ContextRefreshUtils.refreshContext();
 
-        HashMap<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         for (Object key : props.keySet()) {
             result.put((String) key, props.getProperty((String) key));
         }
@@ -618,7 +612,7 @@ public class AdminServiceImpl implements AdminService {
                 .peek((r) -> {
                     try {
                         Protocol protocol = ApplicationContextFactory.getApplicationContext().getBean(Protocol.class);
-                        HashMap<String, Object> entry = protocol.getSysUpdateEntry(r.getId());
+                        Map<String, Object> entry = protocol.getSysUpdateEntry(r.getId());
                         String date = (String) entry.get(CCConstants.CCM_PROP_SYSUPDATE_DATE);
                         r.setExecutedAt(Long.parseLong(date));
                     } catch (Throwable ignored) {
@@ -676,7 +670,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void testMail(String receiver, String template) {
         try {
-            HashMap<String, String> dummy = new HashMap<>();
+            Map<String, String> dummy = new HashMap<>();
             dummy.put("link", URLTool.getNgComponentsUrl(true) + "admin");
             dummy.put("link.static", URLTool.getNgComponentsUrl(false) + "admin");
             MailTemplate.sendMail(receiver, template, dummy);
@@ -779,12 +773,12 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<GlobalGroup> getGlobalGroups() throws Throwable {
 
-        ArrayList<GlobalGroup> result = new ArrayList<GlobalGroup>();
+        ArrayList<GlobalGroup> result = new ArrayList<>();
 
         MCAlfrescoBaseClient mcAlfrescoBaseClient = new MCAlfrescoAPIClient();
-        HashMap<String, HashMap<String, Object>> raw = mcAlfrescoBaseClient.search("TYPE:cm\\:authorityContainer AND @ccm\\:scopetype:\"global\"");
+        Map<String, Map<String, Object>> raw = mcAlfrescoBaseClient.search("TYPE:cm\\:authorityContainer AND @ccm\\:scopetype:\"global\"");
 
-        for (Map.Entry<String, HashMap<String, Object>> entry : raw.entrySet()) {
+        for (Map.Entry<String, Map<String, Object>> entry : raw.entrySet()) {
             GlobalGroup group = new GlobalGroup();
             group.setName((String) entry.getValue().get(CCConstants.CM_PROP_AUTHORITY_AUTHORITYNAME));
             group.setDisplayName((String) entry.getValue().get(CCConstants.CM_PROP_AUTHORITY_AUTHORITYDISPLAYNAME));
@@ -797,13 +791,13 @@ public class AdminServiceImpl implements AdminService {
         return result;
     }
 
-    private HashMap<String, String> getAuthInfo() {
+    private Map<String, String> getAuthInfo() {
         return new AuthenticationToolAPI().getAuthentication(Context.getCurrentInstance().getRequest().getSession());
     }
 
     @Override
-    public List<Class> getImporterClasses() throws Exception {
-        Class[] importerBaseClass = new Class[]{
+    public List<Class<?>> getImporterClasses() throws Exception {
+        Class<?>[] importerBaseClass = new Class[]{
                 org.edu_sharing.repository.server.jobs.quartz.ImporterJob.class,
                 org.edu_sharing.repository.server.jobs.quartz.OAIXMLValidatorJob.class,
                 org.edu_sharing.repository.server.jobs.quartz.ImporterJobSAX.class
@@ -827,7 +821,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String importOaiXml(InputStream xml, String recordHandlerClassName, String binaryHandlerClassName) throws Exception {
-        HashMap<String, Object> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         if (recordHandlerClassName != null && !recordHandlerClassName.trim().equals("")) {
             paramsMap.put(OAIConst.PARAM_RECORDHANDLER, recordHandlerClassName);
         }
@@ -869,7 +863,7 @@ public class AdminServiceImpl implements AdminService {
     public void importOai(String set, String fileUrl, String oaiBaseUrl, String metadataSetId, String metadataPrefix, String importerJobClassName, String importerClassName, String recordHandlerClassName, String binaryHandlerClassName, String persistentHandlerClassName, String oaiIds, boolean forceUpdate, String from, String until, String periodInDays) throws Exception {
         //new JobExecuter().start(ImporterJob.class, authInfo, setsParam.toArray(new String[setsParam.size()]));
 
-        HashMap<String, Object> paramsMap = new HashMap<String, Object>();
+        Map<String, Object> paramsMap = new HashMap<>();
         List<String> sets = new ArrayList(Arrays.asList(set.split(",")));
         if (fileUrl != null && !fileUrl.isEmpty() && !(fileUrl.startsWith("http://") || fileUrl.startsWith("https://")))
             throw new Exception("file url " + fileUrl + " is not a valid url");
@@ -936,7 +930,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ImmediateJobListener startJob(String jobClass, HashMap<String, Object> params) throws Exception {
+    public ImmediateJobListener startJob(String jobClass, Map<String, Object> params) throws Exception {
 
         if (params == null) {
             params = new HashMap<>();
@@ -956,7 +950,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
 	@Override
-	public Object startJobSync(String jobClass, HashMap<String,Object> params) throws Throwable {
+	public Object startJobSync(String jobClass, Map<String,Object> params) throws Throwable {
 		ImmediateJobListener listener = startJob(jobClass, params);
 		while(true) {
 			if(listener.wasExecuted()) {
@@ -975,7 +969,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void startCacheRefreshingJob(String folderId, boolean sticky) throws Exception {
-        HashMap<String, Object> paramsMap = new HashMap<String, Object>();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("rootFolderId", folderId);
         paramsMap.put("sticky", sticky + "");
         paramsMap.put(JobHandler.AUTH_INFO_KEY, getAuthInfo());
@@ -988,7 +982,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void removeDeletedImports(String oaiBaseUrl, String cataloges, String oaiMetadataPrefix) throws Exception {
-        HashMap<String, Object> paramsMap = new HashMap<String, Object>();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put(JobHandler.AUTH_INFO_KEY, getAuthInfo());
         paramsMap.put(OAIConst.PARAM_OAI_BASE_URL, oaiBaseUrl);
         paramsMap.put(OAIConst.PARAM_OAI_SETS, cataloges);
@@ -1017,14 +1011,14 @@ public class AdminServiceImpl implements AdminService {
         for (String key : properties.keySet()) {
             PropertiesHelper.setProperty(key, properties.get(key), appFile.getAbsolutePath(), PropertiesHelper.XML);
         }
-        RepoFactory.refresh();
+        ContextRefreshUtils.refreshContext();
     }
 
     public void exportLom(String filterQuery, String targetDir, boolean subobjectHandler) throws Exception {
-        HashMap<String, Object> paramsMap = new HashMap<String, Object>();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put(ExporterJob.PARAM_LUCENE_FILTER, filterQuery);
         paramsMap.put(ExporterJob.PARAM_OUTPUT_DIR, targetDir);
-        paramsMap.put(ExporterJob.PARAM_WITH_SUBOBJECTS, new Boolean(subobjectHandler).toString());
+        paramsMap.put(ExporterJob.PARAM_WITH_SUBOBJECTS, Boolean.toString(subobjectHandler));
         paramsMap.put(JobHandler.AUTH_INFO_KEY, getAuthInfo());
         ImmediateJobListener jobListener = JobHandler.getInstance().startJob(ExporterJob.class, paramsMap);
         if (jobListener.isVetoed()) {
@@ -1128,7 +1122,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Collection<PluginStatus> getPlugins() {
-        ModuleService moduleService = (ModuleService) applicationContext.getBean("moduleService");
         return moduleService.getAllModules().stream().map(m ->
                 new PluginStatus(m.getTitle(), m.getModuleVersionNumber().toString(), m.getInstallState().equals(ModuleInstallState.INSTALLED))
         ).collect(Collectors.toList());
@@ -1137,7 +1130,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public RepositoryVersionInfo getVersion() {
         try {
-            return VersionService.getRepositoryVersionInfo();
+            return versionService.getRepositoryVersionInfo();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

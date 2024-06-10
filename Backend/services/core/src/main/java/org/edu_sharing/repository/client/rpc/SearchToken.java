@@ -32,6 +32,7 @@ import org.edu_sharing.metadataset.v2.SearchCriterias;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SearchToken implements Serializable {
 	//private String query = "";
@@ -54,7 +55,7 @@ public class SearchToken implements Serializable {
 	/**
 	 * <property,subStringMaxIdx>
 	 */
-	private HashMap<String,Integer> countPropsSubString = null;	
+	private Map<String,Integer> countPropsSubString = null;
 	
 	
 	private SearchCriterias searchCriterias = null;
@@ -104,7 +105,7 @@ public class SearchToken implements Serializable {
 		return countProps;
 	}
 	
-	public HashMap<String, Integer> getCountPropsSubString() {
+	public Map<String, Integer> getCountPropsSubString() {
 		return countPropsSubString;
 	}
 	
@@ -118,7 +119,7 @@ public class SearchToken implements Serializable {
 	 * 
 	 * @param countPropsSubString
 	 */
-	public void setCountPropsSubString(HashMap<String, Integer> countPropsSubString) {
+	public void setCountPropsSubString(Map<String, Integer> countPropsSubString) {
 		this.countPropsSubString = countPropsSubString;
 	}
 	

@@ -32,7 +32,7 @@ public class RepositoryVersionInfo implements Serializable {
 
 
     public static class VersionMaven implements Serializable {
-        public HashMap<String, String> bom;
+        public Map<String, String> bom;
         public VersionProject project;
 
         public static class VersionProject implements Serializable {

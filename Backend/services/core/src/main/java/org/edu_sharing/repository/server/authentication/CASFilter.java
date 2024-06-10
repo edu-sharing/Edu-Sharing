@@ -2,6 +2,7 @@ package org.edu_sharing.repository.server.authentication;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -41,7 +42,7 @@ public class CASFilter  implements jakarta.servlet.Filter {
 		
 		AuthenticationToolAPI authTool = new AuthenticationToolAPI();
 		
-		HashMap<String,String> validAuthInfo = authTool.validateAuthentication(httpReq.getSession());
+		Map<String,String> validAuthInfo = authTool.validateAuthentication(httpReq.getSession());
 		
 		if (validAuthInfo != null ) {
 			if(validAuthInfo.get(CCConstants.AUTH_USERNAME).equals(remoteUser)){
@@ -68,7 +69,7 @@ public class CASFilter  implements jakarta.servlet.Filter {
 			}
 			
 			SSOAuthorityMapper ssoMapper = (SSOAuthorityMapper)eduApplicationContext.getBean("ssoAuthorityMapper");
-			HashMap<String,String> ssoMap = new HashMap<String,String>();
+			Map<String,String> ssoMap = new HashMap<>();
 			ssoMap.put(ssoMapper.getSSOUsernameProp(), remoteUser);
 			
 			authService.authenticateBySSO(SSOAuthorityMapper.SSO_TYPE_CAS, ssoMap);

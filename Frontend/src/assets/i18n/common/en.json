@@ -1041,5 +1041,9 @@
   "SKIP_LINKS": {
     "MAIN_CONTENT": "Skip to main content"
   },
-  "REPOSITORIES": {}
+  "REPOSITORIES": {},
+  "BREADCRUMBS": {
+    "YOU_ARE_HOME": "You are in the root directory",
+    "IN_HOME": "Root directory"
+  }
 }

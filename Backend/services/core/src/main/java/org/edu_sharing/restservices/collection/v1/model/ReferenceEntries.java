@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReferenceEntries {
-    private List<CollectionReference> references = new ArrayList<CollectionReference>();
+    private List<CollectionReference> references = new ArrayList<>();
     private Pagination pagination;
 
 

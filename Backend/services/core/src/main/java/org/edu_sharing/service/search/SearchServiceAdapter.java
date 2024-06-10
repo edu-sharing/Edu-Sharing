@@ -84,7 +84,7 @@ public class SearchServiceAdapter implements SearchService {
 	}
 
 	@Override
-	public HashMap<ContentType,SearchToken> getLastSearchTokens() throws Throwable {
+	public Map<ContentType,SearchToken> getLastSearchTokens() throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}
