@@ -7,7 +7,7 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { SearchService } from 'ngx-edu-sharing-api';
+import { FacetAggregation, SearchService } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
 import { Subject } from 'rxjs';
 import { first, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -360,10 +360,12 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
                     if (facets) {
                         return Object.entries(facets).reduce(
                             (acc, [property, facetAggregation]) => {
-                                acc[property] = facetAggregation.values.map(({ value, label }) => ({
-                                    id: value,
-                                    caption: label,
-                                }));
+                                acc[property] = (facetAggregation as FacetAggregation).values.map(
+                                    ({ value, label }) => ({
+                                        id: value,
+                                        caption: label,
+                                    }),
+                                );
                                 return acc;
                             },
                             {} as { [property: string]: MdsWidgetValue[] },

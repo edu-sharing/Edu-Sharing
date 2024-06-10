@@ -4,7 +4,6 @@
 
 import { Injector } from '@angular/core';
 import { Sort } from '@angular/material/sort';
-import { MatTableDataSourcePageEvent, MatTableDataSourcePaginator } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { GenericAuthority, Node, SearchResults } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
@@ -20,6 +19,8 @@ import {
     SortPanel,
 } from 'ngx-edu-sharing-ui';
 import { UserModifiableValuesService } from './user-modifiable-values';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 type Range = NodeCacheRange;
 
@@ -46,7 +47,7 @@ let nextId = 0;
 
 export class NodeDataSourceRemote<
     T extends Node | GenericAuthority = Node,
-    P extends MatTableDataSourcePaginator = MatTableDataSourcePaginator,
+    P extends MatPaginator = MatPaginator,
 > extends NodeDataSourceRemoteBase<T, P> {
     get paginator(): P | null {
         return this._paginationHandler.paginator;
@@ -238,7 +239,7 @@ export class NodeDataSourceRemote<
             ),
             this._sortHandler.initialized,
         );
-        const pageChange: Observable<MatTableDataSourcePageEvent | void> = rxjs.merge(
+        const pageChange: Observable<PageEvent | void> = rxjs.merge(
             this._paginationHandler.pageChange,
             //   this._internalPageChanges,
             this._paginationHandler.initialized,
@@ -321,7 +322,7 @@ export function fromSearchResults(searchResults: SearchResults): NodeResponse<No
  * to send its first request. Also, the data source would not be able to function without the
  * paginator component or directive constantly available in the DOM.
  */
-class PaginationHandler<P extends MatTableDataSourcePaginator = MatTableDataSourcePaginator> {
+class PaginationHandler<P extends MatPaginator = MatPaginator> {
     private _paginator: P;
     get paginator(): P {
         return this._paginator;
@@ -365,7 +366,7 @@ class PaginationHandler<P extends MatTableDataSourcePaginator = MatTableDataSour
     private readonly _initialized = new ReplaySubject<void>();
     initialized = this._initialized.asObservable();
     private _isInitialized = false;
-    private readonly _pageChange = new Subject<MatTableDataSourcePageEvent>();
+    private readonly _pageChange = new Subject<PageEvent>();
     pageChange = this._pageChange.asObservable();
     private readonly _paginatorReset = new Subject<void>();
 
@@ -455,7 +456,7 @@ class PaginationHandler<P extends MatTableDataSourcePaginator = MatTableDataSour
         });
     }
 
-    private _initPaginator(paginator: MatTableDataSourcePaginator): void {
+    private _initPaginator(paginator: MatPaginator): void {
         this._paginatorReset.next();
         if (paginator) {
             paginator.pageIndex = this.pageIndex;

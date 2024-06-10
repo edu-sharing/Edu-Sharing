@@ -64,8 +64,12 @@ export class MultiLineLabelComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.input = this.parent._elementRef.nativeElement.querySelector('input');
-        this.parent._elementRef.nativeElement.classList.add('has-multi-line-label');
+        const ref =
+            (this.parent as MatCheckbox)._elementRef ||
+            (this.parent as MatRadioButton)._inputElement ||
+            (this.parent as MatSlideToggle)._switchElement;
+        this.input = ref.nativeElement.querySelector('input');
+        ref.nativeElement.classList.add('has-multi-line-label');
     }
 
     ngAfterViewInit() {

@@ -99,19 +99,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-edusharing:build",
-            "proxyConfig": "src/proxy.conf.js"
+            "proxyConfig": "src/proxy.conf.js",
+            "buildTarget": "angular-edusharing:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "angular-edusharing:build:production"
+              "buildTarget": "angular-edusharing:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular-edusharing:build"
+            "buildTarget": "angular-edusharing:build"
           }
         },
         "test": {
@@ -284,10 +284,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "embed:build:production"
+              "buildTarget": "embed:build:production"
             },
             "development": {
-              "browserTarget": "embed:build:development"
+              "buildTarget": "embed:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -295,7 +295,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "embed:build"
+            "buildTarget": "embed:build"
           }
         },
         "test": {
@@ -426,10 +426,10 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "app-as-web-component:build:production"
+              "buildTarget": "app-as-web-component:build:production"
             },
             "development": {
-              "browserTarget": "app-as-web-component:build:development"
+              "buildTarget": "app-as-web-component:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -437,7 +437,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app-as-web-component:build"
+            "buildTarget": "app-as-web-component:build"
           }
         },
         "test": {

@@ -1,10 +1,11 @@
 import { NodeDataSource } from './node-data-source';
 import { GenericAuthority, Node } from 'ngx-edu-sharing-api';
-import { MatTableDataSourcePaginator } from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { PaginationStrategy } from './node-entries-global.service';
 import { Sort } from '@angular/material/sort';
 import { SortPanel } from '../types/list-item';
+import { MatPaginator } from '@angular/material/paginator';
 
 export interface PaginationConfig {
     defaultPageSize: number;
@@ -13,7 +14,7 @@ export interface PaginationConfig {
 
 export abstract class NodeDataSourceRemote<
     T extends Node | GenericAuthority = Node,
-    P extends MatTableDataSourcePaginator = MatTableDataSourcePaginator,
+    P extends MatPaginator = MatPaginator,
 > extends NodeDataSource<T> {
     abstract get paginator(): P | null;
     abstract set paginator(value: P | null);
