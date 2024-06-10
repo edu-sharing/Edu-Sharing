@@ -9,11 +9,8 @@ import { MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS } from '@angular/material/slide-toggle
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { InMemoryCache } from '@apollo/client/core';
 import { MaterialCssVarsModule } from 'angular-material-css-vars';
 import { ResizableModule } from 'angular-resizable-element';
-import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
-import { HttpLink } from 'apollo-angular/http';
 import {
     EDU_SHARING_API_CONFIG,
     EduSharingApiConfigurationParams,
@@ -57,7 +54,6 @@ const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
 @NgModule({
     declarations: [AppComponent, CustomGlobalExtensionsComponent, extensionDeclarations],
     imports: [
-        ApolloModule,
         AppRoutingModule,
         BrowserAnimationsModule,
         BrowserModule,
@@ -87,17 +83,7 @@ const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
             useFactory: (errorHandler: ErrorHandlerService) =>
                 ({
                     onError: (err, req) => errorHandler.handleError(err, req),
-                }) as EduSharingApiConfigurationParams,
-        },
-        {
-            provide: APOLLO_OPTIONS,
-            useFactory: (httpLink: HttpLink) => {
-                return {
-                    link: httpLink.create({ uri: '/edu-sharing/graphql' }),
-                    cache: new InMemoryCache(),
-                };
-            },
-            deps: [HttpLink],
+                } as EduSharingApiConfigurationParams),
         },
         { provide: LocationStrategy, useClass: AppLocationStrategy },
         { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
