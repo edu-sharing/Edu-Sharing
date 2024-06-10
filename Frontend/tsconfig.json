@@ -17,10 +17,12 @@
         "dist/edu-sharing-ui"
       ],
       "ngx-rendering-service": [
-        "projects/rendering-service/dist"
+        "projects/rendering-service/dist",
+        "projects/rendering-service"
       ],
       "ngx-rendering-service-api": [
-        "projects/rendering-service/projects/rendering-service-api/dist"
+        "projects/rendering-service/projects/rendering-service-api/dist",
+        "projects/rendering-service/projects/rendering-service-api"
       ],
       // Prevent imports from `projects` directory.
       //
