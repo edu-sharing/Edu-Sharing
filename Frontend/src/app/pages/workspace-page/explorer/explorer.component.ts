@@ -381,7 +381,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
             )
             .subscribe(async (data) => {
                 if (data) {
-                    this.addNodes(data);
+                    this.addNodes(data as NodeList);
                 }
             });
     }

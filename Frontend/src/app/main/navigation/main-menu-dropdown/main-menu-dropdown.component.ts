@@ -25,7 +25,7 @@ export class MainMenuDropdownComponent implements OnChanges, AfterViewInit, OnDe
 
     @Input() currentScope: string;
 
-    private readonly destroyed$ = new Subject();
+    private readonly destroyed$ = new Subject<void>();
     optionItems$: Observable<OptionItem[]>;
     @Output() onClose = new EventEmitter<void>();
 

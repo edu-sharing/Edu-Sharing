@@ -23,7 +23,7 @@ import { Subject } from 'rxjs';
 export class MainMenuSidebarComponent implements OnInit, OnDestroy {
     readonly ROUTER_PREFIX = UIConstants.ROUTER_PREFIX;
     readonly ME = RestConstants.ME;
-    private readonly destroyed$ = new Subject();
+    private readonly destroyed$ = new Subject<void>();
 
     @Input() currentScope: string;
 
@@ -36,10 +36,7 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
     loginInfo: LoginInfo;
     currentUser: User;
 
-    constructor(
-        public iam: RestIamService,
-        private user: UserService,
-    ) {
+    constructor(public iam: RestIamService, private user: UserService) {
         this.user
             .observeCurrentUser()
             .pipe(takeUntil(this.destroyed$))

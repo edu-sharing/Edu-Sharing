@@ -2,6 +2,7 @@ import {
     BehaviorSubject,
     Notification,
     Observable,
+    ObservableNotification,
     OperatorFunction,
     ReplaySubject,
     Subject,
@@ -32,7 +33,7 @@ export function switchReplay<T, R>(
 ): OperatorFunction<T, R> {
     return (source: Observable<T>) => {
         const inFlightSubject = new BehaviorSubject(false);
-        const lastSubject = new ReplaySubject<Notification<R>>(1);
+        const lastSubject = new ReplaySubject<ObservableNotification<R>>(1);
         const trigger = new Subject<T>();
         let subscription: Subscription;
         let refCount = 0;
@@ -64,7 +65,7 @@ export function switchReplay<T, R>(
                             missedEmission = { value };
                         }
                     },
-                    error: (err) => lastSubject.next(new Notification<R>('E', void 0, err)),
+                    error: (err) => lastSubject.next({ kind: 'E', error: err }),
                     complete: () => trigger.complete(),
                 });
             }
