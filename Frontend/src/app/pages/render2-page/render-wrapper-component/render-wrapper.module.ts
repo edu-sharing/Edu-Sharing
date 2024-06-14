@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RenderComponent, RenderingModule } from 'ngx-rendering-service';
 import { RenderingServiceApiModule } from 'ngx-rendering-service-api';
 import { RenderWrapperComponent } from './render-wrapper.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 
 /**
  * new module for (kotlin based) rendering backend
@@ -9,6 +11,8 @@ import { RenderWrapperComponent } from './render-wrapper.component';
 @NgModule({
     declarations: [RenderWrapperComponent],
     imports: [
+        BrowserModule,
+        CommonModule,
         RenderingModule,
         RenderComponent,
         RenderingServiceApiModule.forRoot({

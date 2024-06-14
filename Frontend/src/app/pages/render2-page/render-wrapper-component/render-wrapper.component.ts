@@ -1,6 +1,5 @@
 import { Component, Input, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NodeService, Node } from 'ngx-edu-sharing-api';
+import { Node, NodeService } from 'ngx-edu-sharing-api';
 import { RenderDataRequest } from 'ngx-rendering-service-api';
 
 @Component({
@@ -13,7 +12,7 @@ export class RenderWrapperComponent {
 
     node = signal<Node>(null);
     dummyRequest = signal<RenderDataRequest>(null);
-    constructor(private route: ActivatedRoute, private nodeApi: NodeService) {
+    constructor(private nodeApi: NodeService) {
         this.dummyRequest.set({
             nodeId: 'TEST_lviv.jpg',
             size: -1,
@@ -23,6 +22,7 @@ export class RenderWrapperComponent {
             version: '1.0',
             repoId: '',
         });
+        /*
         this.dummyRequest.set({
             nodeId: 'TEST_4k.mp4',
             size: -1,

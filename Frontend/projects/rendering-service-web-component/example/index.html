@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rendering Service Example</title>
+    <base href="/" />
+    <script>
+      // Provide the backend URL for edu-sharing.
+      //
+      // For testing with development builds use '/edu-sharing/rest' for a proxy to the URL
+      // configured the `.env` file.
+      //
+      window.__env = {
+        EDU_SHARING_API_URL: '/edu-sharing/rest',
+        //  EDU_SHARING_API_URL: 'http://repository.127.0.0.1.nip.io:8100/edu-sharing/rest',
+      };
+    </script>
+    <script src="vendor/render-component/runtime.js" type="module"></script>
+    <script src="vendor/render-component/polyfills.js" type="module"></script>
+    <script src="vendor/render-component/main.js" type="module"></script>
+    <!-- Only for dev builds. Could also set `vendorChunk: false` in `angular.json` to omit
+    altogether. -->
+    <script src="vendor/render-component/vendor.js" type="module"></script>
+    <link rel="stylesheet" href="vendor/render-component/styles.css" />
+    <script>
+      function onSubmit(event) {
+        event.preventDefault();
+        const data = new FormData(event.target);
+        const searchString = data.get('searchString');
+        console.log('submit', searchString);
+        const eduSharingApp = document.getElementsByTagName('edu-sharing-app')[0];
+        eduSharingApp.setAttribute('search-string', searchString);
+      }
+    </script>
+    <style>
+      body {
+        padding: 100px;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Render Component Example</h1>
+    <main class="main-container">
+      <edu-sharing-render nodeId="uuid"></edu-sharing-render>
+    </main>
+  </body>
+</html>

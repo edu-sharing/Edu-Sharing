@@ -1,3 +1,4 @@
+
 {
   "name": "angular-edusharing",
   "version": "1.0.0",
@@ -18,7 +19,7 @@
     "copy-build-to-docker": "docker container cp ./dist/. $(docker ps --filter name=^repository-service --quiet):/opt/bitnami/tomcat/temp/0-edu-sharing/",
     "build-and-copy-to-docker": "npm run build && npm run copy-build-to-docker",
     "prebuild-dev": "npm run build:edu-sharing-api:dev && npm run build:edu-sharing-ui",
-    "build-dev": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build --delete-output-path false --base-href /edu-sharing/",
+    "build-dev": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build --delete-output-path false --base-href /edu-sharing/ --configuration=development",
     "check:lint": "ng lint --max-warnings=835",
     "fix:lint": "ng lint --fix",
     "check:format": "prettier --check src projects/*/src",
@@ -49,6 +50,7 @@
     "@angular/compiler": "^18.0.2",
     "@angular/core": "^18.0.2",
     "@angular/forms": "^18.0.2",
+    "@angular/elements": "^18.0.2",
     "@angular/material": "^17.3.10",
     "@angular/platform-browser": "^18.0.2",
     "@angular/platform-browser-dynamic": "^18.0.2",
