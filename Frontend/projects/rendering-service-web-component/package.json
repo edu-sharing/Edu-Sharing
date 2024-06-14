@@ -9,9 +9,9 @@
   "scripts": {
     "start": "ng serve",
     "preview": "npm run build && npm run serve",
-    "build": "cd ../.. && npm run build rendering-service-web-component",
-    "build-dev": "cd ../.. && ng build rendering-service-web-component --configuration=development",
-    "serve": "source ../../.env && http-server --port 4200 --proxy $BACKEND_URL example"
+    "build": "ng build rendering-service-web-component --configuration=production",
+    "build-dev": "ng build rendering-service-web-component --configuration=development",
+    "serve": "source ../../.env && http-server --gzip --port 4200 --proxy $BACKEND_URL example"
   },
   "devDependencies": {
     "@angular/elements": "^18.0.3"
