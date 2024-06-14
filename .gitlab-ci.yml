@@ -84,7 +84,7 @@ check linting:
 unittest frontend:
   <<: *frontend_job
   variables:
-    NODE_VERSION: 16
+    NODE_VERSION: 20
     CHROME_BIN: /usr/bin/chromium-browser
   before_script:
     - apk add chromium
