@@ -44,6 +44,15 @@ export class Render2PageComponent {
                             version: '1.0',
                             repoId: '',
                         });
+                        this.dummyRequest.set({
+                            nodeId: 'TEST_4k.mp4',
+                            size: -1,
+                            type: 'file-video',
+                            hash: '' + Math.random(),
+                            mimeType: 'video/mpeg',
+                            version: '1.0',
+                            repoId: '',
+                        });
                     });
             },
         );
