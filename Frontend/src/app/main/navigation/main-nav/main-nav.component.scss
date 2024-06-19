@@ -19,6 +19,9 @@
 .topBar {
     width: 100%;
     max-width: 100%;
+    :host ::ng-deep &.topBar-safe > div {
+        background: $workspaceTopBarSafeBackground;
+    }
 }
 .dialog {
     z-index: $dialogZIndex + 5;

@@ -50,7 +50,7 @@
       "MORE_LINK": "Vai al sito web di edu-sharing"
     },
     "GLOBAL_CONFIG": {
-      "EDIT_DISABLED": "La configurazione è stata impostata in sola lettura. Non è possibile apportare modifiche tramite questo strumento. Il parametro {{chiave}} deve essere impostato su true per poter modificare i parametri tramite questo strumento.",
+      "EDIT_DISABLED": "La configurazione è stata impostata in sola lettura. Non è possibile apportare modifiche tramite questo strumento. Il parametro {{key}} deve essere impostato su true per poter modificare i parametri tramite questo strumento.",
       "SHOW_RO": "Visualizzare i file di configurazione di sola lettura",
       "INHERIT_INFO": "Le configurazioni visualizzate vengono lette dall'alto verso il basso. I valori di configurazione possono essere sovrascritti dai file sottostanti a quello in cui sono dichiarati",
       "VOLATILE_WARNING": "Le modifiche a questo file di configurazione sono volatili e saranno rimosse al successivo riavvio. Non è prevista la propagazione nel cluster. Si prega di utilizzarlo solo a scopo di test.",
@@ -87,7 +87,7 @@
       "TEST_MAIL_TEMPLATE": "Modello per e-mail:",
       "TEST_MAIL_TEMPLATE_LABEL": "Selezionare il modello",
       "TEST_MAIL_SEND": "Inviare",
-      "MAIL_SENT": "Email di prova inviata a {{destinatario}}"
+      "MAIL_SENT": "Email di prova inviata a {{receiver}}"
     },
     "APPLICATIONS": {
       "ADD_APPLICATION": "Aggiungere una nuova applicazione (tramite URL o file)",
@@ -217,7 +217,7 @@
         },
         "MAIL_REPORT": {
           "TITLE": "\"Funzione \"Segnala un problema",
-          "STATUS_OK": "La funzione è attiva, le richieste in arrivo vengono inviate all'indirizzo {{ricevitore}}.",
+          "STATUS_OK": "La funzione è attiva, le richieste in arrivo vengono inviate all'indirizzo {{receivers}}.",
           "STATUS_FAIL": "La funzione è attiva, ma la configurazione non è valida.",
           "SOLUTION": "Navigare nella sezione \"configurazione globale del sistema\" e aggiungere le informazioni sul ricevitore di report nella configurazione di edu-sharing"
         },
@@ -288,7 +288,7 @@
       "OAI_PERIOD_IN_DAYS": "periodo in giorni (congedo da/finché non è vuoto)",
       "REMOVE_IMPORTS": "Rimuovere le importazioni eliminate",
       "IMPORTS_REMOVED": "Gli elementi OAI eliminati saranno rimossi.\n Controllare l'elenco delle attività per vedere lo stato",
-      "EXCEL_IMPORTED": "File Excel importato ({{{ righe }} righe importate)",
+      "EXCEL_IMPORTED": "File Excel importato ({{{ rows }} righe importate)",
       "COLLECTIONS_IMPORTED": "{{ count }} Collezioni importate"
     },
     "TOOLKIT": {
@@ -407,15 +407,15 @@
       "UPLOAD_DONE": "Il modello della cartella è stato memorizzato come {{filename}} sul server.",
       "MISSING_GROUP": "È necessario selezionare almeno un'organizzazione.",
       "MISSING_TEMPLATE": "È necessario selezionare un modello di cartella.",
-      "TEMPLATE_APPLIED": "Il template {{templatename}} è stato applicato per {{nome gruppo}}.",
-      "TEMPLATE_NOTAPPLIED": "Il modello di cartella {{templatename}} non può essere applicato a {{nome gruppo}}. Verificare la correttezza del modello di cartella.",
+      "TEMPLATE_APPLIED": "Il template {{templatename}} è stato applicato per {{groupname}}.",
+      "TEMPLATE_NOTAPPLIED": "Il modello di cartella {{templatename}} non può essere applicato a {{groupname}}. Verificare la correttezza del modello di cartella.",
       "UPLOAD_HINT": "È possibile caricare altri modelli di cartella e selezionarli.",
       "UPLOAD_TEMPLATE": "Caricare un nuovo modello di cartella",
       "GOTO_FOLDERTEMPLATES": "Gestione dei modelli di cartella"
     },
     "STATISTICS": {
       "NO_DATA": "Nessun dato per il periodo selezionato",
-      "CSV_FILENAME": "Statistiche ({{da}} - {{a}})",
+      "CSV_FILENAME": "Statistiche ({{from}} - {{to}})",
       "CSV_FILENAME_MZ": "Statistiche {{mz}} ({{from}} - {{to}})",
       "GROUPED": "Per periodo di tempo",
       "SINGLE": "Valutazione individuale",
@@ -486,7 +486,7 @@
     "MEDIACENTER": {
       "MANAGE": "Centro multimediale",
       "SELECT": "Selezionare Media Center",
-      "UPDATED": "Media Center \"{{nome}}\" è stato aggiornato",
+      "UPDATED": "Media Center \"{{name}}\" è stato aggiornato",
       "ADD_MEDIACENTER": "Aggiungi Media Center",
       "ADD_MEDIACENTER_TITLE": "Aggiungi Media Center",
       "ADD_MEDIACENTER_MESSAGE": "Immettere l'ID del Media Center. Tutti gli altri parametri possono essere configurati dopo la creazione",
@@ -496,8 +496,8 @@
       "DELETE": "Eliminare Media Center",
       "DELETE_TITLE": "Eliminare Media Center",
       "DELETE_MESSAGE": "Si vuole davvero eliminare il media center \"{\"}\"{nome}\"?",
-      "CREATED": "È stato creato il Media Center \"{{nome}}\".",
-      "DELETED": "Media Center \"{{nome}}\"è stato cancellato",
+      "CREATED": "È stato creato il Media Center \"{{name}}\".",
+      "DELETED": "Media Center \"{{name}}\"è stato cancellato",
       "DATA": {
         "TITLE": "Dati di base",
         "EDIT_NOT_ALLOWED": "All'utente corrente manca l'autorizzazione per la modifica del mediacenter. Per apportare ulteriori modifiche ai dati, contattare l'amministratore responsabile del sistema.",
@@ -524,11 +524,11 @@
       "GROUPS": {
         "TITLE": "Gruppi gestiti",
         "REMOVE": "Cancellare",
-        "REMOVED": "Il gruppo \"{{nome}}\" non è più assegnato al Media Center.",
-        "ADDED": "Il gruppo \"{{nome}}\" è ora assegnato al Media Center.",
+        "REMOVED": "Il gruppo \"{{name}}\" non è più assegnato al Media Center.",
+        "ADDED": "Il gruppo \"{{name}}\" è ora assegnato al Media Center.",
         "REMOVE_TITLE": "Rimuovere il gruppo",
-        "REMOVE_MESSAGE": "Si desidera rimuovere il gruppo selezionato \"{{nome}}\" dall'associazione per il Media Center corrente (il gruppo stesso non viene eliminato)?",
-        "ADD": "Aggiungere il gruppo \"{{nome}}\"",
+        "REMOVE_MESSAGE": "Si desidera rimuovere il gruppo selezionato \"{{name}}\" dall'associazione per il Media Center corrente (il gruppo stesso non viene eliminato)?",
+        "ADD": "Aggiungere il gruppo \"{{name}}\"",
         "ADD_LABEL": "Gruppo di ricerca",
         "DESCRIPTION": "Tutti i membri dei seguenti gruppi possono accedere ai media di questo centro multimediale"
       },
@@ -546,19 +546,19 @@
         "TITLE": "Importazione di Media Center",
         "CHOOSE_MEDIACENTERS": "Selezionare il file CSV",
         "MEDIACENTERS_START": "Eseguire l'importazione",
-        "IMPORTED": "{{ righe }} Media Center importato"
+        "IMPORTED": "{{ rows }} Media Center importato"
       },
       "ORGIMPORT": {
         "TITLE": "Organizzazione Importazione",
         "CHOOSE_ORGANISATIONS": "Selezionare il file CSV",
         "ORGANISATIONS_START": "Eseguire l'importazione",
-        "IMPORTED": "{{ righe }} Organizzazione importata"
+        "IMPORTED": "{{ rows }} Organizzazione importata"
       },
       "ORG_MC_CONNECT": {
         "TITLE": "Importanza delle associazioni tra centri media e organizzazioni",
         "CHOOSE": "Selezionare il file CSV",
         "ORGANISATIONS_START": "Eseguire l'importazione",
-        "IMPORTED": "{{ righe }} associazioni importate",
+        "IMPORTED": "{{ rows }} associazioni importate",
         "REMOVE_SCHOOLS_FROM_MC": "Aggiornare le associazioni eliminate"
       }
     },

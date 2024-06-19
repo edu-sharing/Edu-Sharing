@@ -10,6 +10,7 @@ import { CardDialogConfig, CARD_DIALOG_DATA } from './card-dialog-config';
 import { CardDialogContainerComponent } from './card-dialog-container/card-dialog-container.component';
 import { CardDialogRef } from './card-dialog-ref';
 import { CardDialogState, ViewMode } from './card-dialog-state';
+import { ConfigurableFocusTrap } from '@angular/cdk/a11y';
 
 const MOBILE_BACKGROUND_CLASS = 'card-dialog-pane-mobile-background';
 // export const CARD_DIALOG_STATE = new InjectionToken<CardDialogState>('CardDialogState');
@@ -27,6 +28,7 @@ export class CardDialogService {
     );
     // FIXME: Do we need this, or could we always use `openDialogsBeforeClosedSubject`?
     private readonly openDialogsSubject = new BehaviorSubject<readonly CardDialogRef[]>([]);
+    private focusTraps: ConfigurableFocusTrap[] = [];
     get openDialogs(): readonly CardDialogRef[] {
         return this.openDialogsSubject.value;
     }
@@ -219,5 +221,16 @@ export class CardDialogService {
         } else {
             overlayRef.addPanelClass(MOBILE_BACKGROUND_CLASS);
         }
+    }
+
+    getFocusTraps() {
+        return this.focusTraps;
+    }
+    registerFocusTrap(focusTrap: ConfigurableFocusTrap) {
+        this.focusTraps.push(focusTrap);
+    }
+
+    unregisterFocusTrap(focusTrap: ConfigurableFocusTrap) {
+        this.focusTraps.splice(this.focusTraps.indexOf(focusTrap), 1);
     }
 }

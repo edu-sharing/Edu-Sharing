@@ -434,6 +434,7 @@ public class GroupDao {
                         return GroupSignupResult.AlreadyInList;
                     }
                     list.add(userRef);
+                    NodeServiceHelper.setProperty(ref, CCConstants.CCM_PROP_GROUP_SIGNUP_LIST, list, false);
 
                     if (StringUtils.isNotBlank(groupEmail)) {
                         notifyGroupSignup(getDisplayName(), userRef, groupEmail, "groupSignupList");

@@ -14,7 +14,7 @@ import {
     RestNodeService,
 } from '../../../core-module/core.module';
 import { Node } from '../../../core-module/rest/data-object';
-import { MdsHelper } from '../../../core-module/rest/mds-helper';
+import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 import { ConfigurationService } from '../../../core-module/rest/services/configuration.service';
 import { RestAdminService } from '../../../core-module/rest/services/rest-admin.service';
@@ -83,7 +83,7 @@ export class AdminFrontpageComponent implements AfterViewInit {
                 : this.form.get('timespan').enable({ emitEvent: false });
         });
         this.mdsService.getSet().subscribe((set) => {
-            this.previewColumns = MdsHelper.getColumns(this.translate, set, 'search');
+            this.previewColumns = MdsHelperService.getColumns(this.translate, set, 'search');
         });
         this.adminService
             .getToolpermissions()

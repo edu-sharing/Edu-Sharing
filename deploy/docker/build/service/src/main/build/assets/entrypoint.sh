@@ -5,7 +5,7 @@ set -eu
 ########################################################################################################################
 
 my_admin_pass="${REPOSITORY_SERVICE_ADMIN_PASS:-admin}"
-my_admin_pass_md4="$(printf '%s' "$my_admin_pass" | iconv -t utf16le | openssl md4 | awk '{ print $2 }')"
+my_admin_pass_md4="$(printf '%s' "$my_admin_pass" | iconv -t utf16le | openssl md4 -provider legacy | awk '{ print $2 }')"
 
 my_guest_user="${REPOSITORY_SERVICE_GUEST_USER:-}"
 my_guest_pass="${REPOSITORY_SERVICE_GUEST_PASS:-}"

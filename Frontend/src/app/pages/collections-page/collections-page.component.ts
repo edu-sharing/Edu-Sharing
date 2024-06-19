@@ -502,22 +502,26 @@ export class CollectionsPageComponent implements OnDestroy {
             if (this.tabSelected === RestConstants.COLLECTIONSCOPE_MY) {
                 return allowed;
             }
-            // for anything else, the user must be able to invite everyone
-            allowed =
-                allowed &&
-                this.connector.hasToolPermissionInstant(
-                    RestConstants.TOOLPERMISSION_INVITE_ALLAUTHORITIES,
-                );
             if (this.tabSelected === RestConstants.COLLECTIONSCOPE_ORGA) {
-                allowed = false;
-            } else if (this.tabSelected === RestConstants.COLLECTIONSCOPE_TYPE_EDITORIAL) {
-                allowed = allowed && this.adminMediacenters?.length === 1;
-            } else if (this.tabSelected === RestConstants.COLLECTIONSCOPE_TYPE_EDITORIAL) {
+                allowed =
+                    allowed &&
+                    this.connector.hasToolPermissionInstant(RestConstants.TOOLPERMISSION_INVITE);
+            } else {
+                // for anything else, the user must be able to invite everyone
                 allowed =
                     allowed &&
                     this.connector.hasToolPermissionInstant(
-                        RestConstants.TOOLPERMISSION_COLLECTION_EDITORIAL,
+                        RestConstants.TOOLPERMISSION_INVITE_ALLAUTHORITIES,
                     );
+                if (this.tabSelected === RestConstants.COLLECTIONSCOPE_TYPE_MEDIA_CENTER) {
+                    allowed = allowed && this.adminMediacenters?.length === 1;
+                } else if (this.tabSelected === RestConstants.COLLECTIONSCOPE_TYPE_EDITORIAL) {
+                    allowed =
+                        allowed &&
+                        this.connector.hasToolPermissionInstant(
+                            RestConstants.TOOLPERMISSION_COLLECTION_EDITORIAL,
+                        );
+                }
             }
             return allowed;
         } else {

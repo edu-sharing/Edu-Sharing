@@ -93,11 +93,6 @@ export class MdsViewerComponent implements OnChanges {
                 // Initialization was interrupted. Probably, this method was called again before it
                 // could finish.
                 return;
-            } else if (editor === 'legacy') {
-                console.error(
-                    'mds viewer component is only supported for groups with angular rendering',
-                );
-                return;
             }
         } catch (e) {
             return;

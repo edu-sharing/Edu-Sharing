@@ -365,7 +365,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 .index(WORKSPACE_INDEX)
                 .scroll(Time.of(time -> time.time("60s")))
                 .source(src -> src
-                        .filter(filter -> filter.excludes(searchToken.getExcludes()))
+                        .filter(filter -> filter.excludes(appendDefaultExcludes(searchToken.getExcludes())))
                 )
                 .size(100)
                 .query(q->q
@@ -414,6 +414,16 @@ public class SearchServiceElastic extends SearchServiceImpl {
         return data;
     }
 
+    private List<String> appendDefaultExcludes(List<String> excludes){
+        if(excludes == null) excludes = new ArrayList<>();
+        else excludes = new ArrayList<>(excludes);
+
+        if(!excludes.contains("content.fulltext")){
+            excludes.add("content.fulltext");
+        }
+        return excludes;
+    }
+
     @Override
     public SearchResultNodeRef search(MetadataSet mds, String query, Map<String, String[]> criterias,
                                       SearchToken searchToken) throws Throwable {
@@ -451,7 +461,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
 
             SearchRequest.Builder searchRequestBuilder = new SearchRequest.Builder()
                     .index(WORKSPACE_INDEX)
-                    .source(src -> src.filter(filter -> filter.excludes(searchToken.getExcludes())));
+                    .source(src -> src.filter(filter -> filter.excludes(appendDefaultExcludes(searchToken.getExcludes()))));
 
             SearchResponse<Map> searchResponseAggregations = null;
             if (searchToken.getFacets() != null) {
@@ -518,7 +528,6 @@ public class SearchServiceElastic extends SearchServiceImpl {
             if (searchToken.getSortDefinition() != null) {
                 searchToken.getSortDefinition().applyToSearchSourceBuilder(searchRequestBuilder);
             }
-
 
             // logger.info("query: "+searchSourceBuilder.toString());
             SearchRequest searchRequest = searchRequestBuilder.build();
@@ -1444,6 +1453,9 @@ public class SearchServiceElastic extends SearchServiceImpl {
         searchRequestBuilder.from(skipCount);
         searchRequestBuilder.size(maxItems);
         searchRequestBuilder.trackTotalHits(new TrackHits.Builder().enabled(true).build());
+        searchRequestBuilder.source(src -> src
+                .filter(filter -> filter.excludes(appendDefaultExcludes(new ArrayList<>())))
+        );
         if (sortDefinition != null) {
             sortDefinition.applyToSearchSourceBuilder(searchRequestBuilder);
         }

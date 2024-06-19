@@ -6,6 +6,7 @@ import { ListItem } from '../../types/list-item';
 import { ListWidget } from '../list-widget';
 import { NodeHelperService } from '../../services/node-helper.service';
 import * as Constants from 'ngx-edu-sharing-api';
+import { MdsHelperService } from '../../mds/mds-helper.service';
 
 @Component({
     selector: 'es-list-text',
@@ -91,9 +92,7 @@ export class ListTextComponent extends ListWidget implements OnInit {
                 metadataSet: node.metadataset || Constants.DEFAULT,
             })
             .toPromise();
-        // @TODO
-        /*
-        const widget = MdsHelper.getWidget(this.item.name, null, mds.widgets);
+        const widget = MdsHelperService.getWidget(this.item.name, null, mds.widgets);
         if (widget?.values) {
             const i18n = node.properties[this.item.name]
                 ?.map((prop) => widget.values.filter((v) => v.id === prop)?.[0]?.caption)
@@ -102,6 +101,5 @@ export class ListTextComponent extends ListWidget implements OnInit {
                 this.displayName$.next(i18n.join(', '));
             }
         }
-         */
     }
 }

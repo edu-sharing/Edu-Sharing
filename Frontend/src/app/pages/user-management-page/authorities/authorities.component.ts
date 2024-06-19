@@ -1413,8 +1413,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
         source: NodeEntriesWrapperComponent<GenericAuthority>,
         event: NodeClickEvent<GenericAuthority>,
     ) {
-        source.getSelection().clear();
-        source.getSelection().select(event.element);
+        source.getSelection().toggle(event.element);
     }
 
     private async initMembersList() {

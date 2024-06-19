@@ -860,6 +860,13 @@ public class WebDAVHelper
     
     public String determineSiteId(NodeRef rootNodeRef, String path)
     {
+        /**
+         * edu-sharing fix
+         * For regular users, an AccessDenied Exception is thrown which might causes a (silent) transaction rollback when a Delete was requested
+         * Since we don't use different sites anyway, we simply return the default value
+         */
+        return EMPTY_SITE_ID;
+        /*
         SiteService siteService = getServiceRegistry().getSiteService();
         String siteId;
         try
@@ -876,6 +883,7 @@ public class WebDAVHelper
             siteId = EMPTY_SITE_ID;
         }
         return siteId;
+         */
     }
     
     @Deprecated

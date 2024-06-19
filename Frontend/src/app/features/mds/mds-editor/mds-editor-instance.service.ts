@@ -1159,9 +1159,15 @@ export class MdsEditorInstanceService implements OnDestroy {
             !widget.definition.values &&
             widget.getInitialValues().jointValues
         ) {
-            const mdsValueList = await widget.getValuesForKeys(
+            let mdsValueList = (await widget.getValuesForKeys(
                 widget.getInitialValues().jointValues,
-            );
+            )) || { values: [] };
+            if (widget.getInitialValues().individualValues) {
+                mdsValueList.values = mdsValueList.values.concat(
+                    (await widget.getValuesForKeys(widget.getInitialValues().individualValues))
+                        ?.values,
+                );
+            }
             if (mdsValueList) {
                 widget.setInitialDisplayValues(mdsValueList);
             }
@@ -1351,35 +1357,32 @@ export class MdsEditorInstanceService implements OnDestroy {
     private mapWidgetValues(widgets: Widget[], node?: Node): { [id: string]: string[] } {
         return widgets
             .filter((widget) => widget.relation === null)
-            .reduce(
-                (acc, widget) => {
-                    const property = widget.definition.id;
-                    const newValue = this.getNewPropertyValue(widget, node?.properties[property]);
-                    // filter null values in search
-                    if (
-                        this.editorMode === 'search' &&
-                        newValue?.length === 1 &&
-                        newValue[0] === null
-                    ) {
-                        return acc;
-                    } else if (newValue) {
-                        if (widget.definition.type === MdsWidgetType.Range) {
-                            acc[`${property}_from`] = [newValue[0]];
-                            acc[`${property}_to`] = [newValue[1]];
-                        } else {
-                            if (acc[property]) {
-                                console.error(
-                                    'Encountered more than one widget setting the same property',
-                                    property,
-                                );
-                            }
-                            acc[property] = newValue;
-                        }
-                    }
+            .reduce((acc, widget) => {
+                const property = widget.definition.id;
+                const newValue = this.getNewPropertyValue(widget, node?.properties[property]);
+                // filter null values in search
+                if (
+                    this.editorMode === 'search' &&
+                    newValue?.length === 1 &&
+                    newValue[0] === null
+                ) {
                     return acc;
-                },
-                {} as { [key: string]: string[] },
-            );
+                } else if (newValue) {
+                    if (widget.definition.type === MdsWidgetType.Range) {
+                        acc[`${property}_from`] = [newValue[0]];
+                        acc[`${property}_to`] = [newValue[1]];
+                    } else {
+                        if (acc[property]) {
+                            console.error(
+                                'Encountered more than one widget setting the same property',
+                                property,
+                            );
+                        }
+                        acc[property] = newValue;
+                    }
+                }
+                return acc;
+            }, {} as { [key: string]: string[] });
     }
 
     /**
@@ -1676,8 +1679,8 @@ export class MdsEditorInstanceService implements OnDestroy {
                     ? nodes.some((n) => pattern.test(n.properties[condition.value])) !==
                           condition.negate
                     : values
-                      ? widget.condition.negate === !values[widget.condition.value]
-                      : true;
+                    ? widget.condition.negate === !values[widget.condition.value]
+                    : true;
             }
             if (nodes) {
                 return nodes.every(

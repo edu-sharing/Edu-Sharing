@@ -28,8 +28,8 @@
     "SAVE_SEARCH_ACTION": "Risparmiare",
     "FILTER": "Filtro",
     "FILTERS": "Filtri",
-    "FILTER_BY": "Filtrare per: {{proprietà}}",
-    "NUMBER_RESULTS": "{{ risultati }}} risultato/i",
+    "FILTER_BY": "Filtrare per: {{property}}",
+    "NUMBER_RESULTS": "{{ results }}} risultato/i",
     "CLICK_TO_REMOVE": "Fare clic per rimuovere",
     "PREVIEWIMAGE_FOR": "Immagine di anteprima per",
     "INFORMATION_AND_PREVIEW_FOR": "Informazioni e anticipazioni per",
@@ -46,7 +46,7 @@
     "RENDER": {
       "BACK_TO_SEARCH": "Torna alla ricerca"
     },
-    "ADD_INTO_COLLECTION": "Aggiungere alla raccolta \"{{titolo}}\".",
+    "ADD_INTO_COLLECTION": "Aggiungere alla raccolta \"{{title}}\".",
     "ADD_INTO_COLLECTION_SHORT": "Aggiungi alla collezione",
     "NODE_IMPORTED": "Oggetto importato",
     "NODE_IMPORTED_VIEW": "Vista",
@@ -54,7 +54,7 @@
     "ADD_TO_COLLECTION_SHORT": "Aggiungi",
     "SHOW_NODE_STORE": "elenco dei promemoria",
     "ADDED_TO_NODE_STORE": "{{count}} Gli elementi sono stati aggiunti all'elenco.",
-    "ADDED_TO_NODE_STORE_EXISTS": "L'elemento {{nome}} è già presente nell'elenco dei memo.",
+    "ADDED_TO_NODE_STORE_EXISTS": "L'elemento {{name}} è già presente nell'elenco dei memo.",
     "NODE_STORE": {
       "TITLE": "Elenco dei promemoria",
       "LIST_EMPTY": "L'elenco dei memo è vuoto",

@@ -27,6 +27,7 @@ import org.edu_sharing.alfresco.authentication.HttpContext;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfresco.policy.NodeCustomizationPolicies;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.alfresco.policy.OnCopyIOPolicy;
 import org.edu_sharing.alfresco.service.handleservice.HandleService;
 import org.edu_sharing.alfresco.service.search.CMISSearchHelper;
 import org.edu_sharing.alfresco.tools.EduSharingNodeHelper;
@@ -140,6 +141,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 					new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, toNodeId),
 					QName.createQName(CCConstants.CM_ASSOC_FOLDER_CONTAINS),
 					QName.createQName(originalName), copyChildren);
+
 			int renameCounter = 1;
 			while(true) {
 				try {
@@ -311,10 +313,25 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 				logger.info("will save property "+widget.getId()+" with predefined defaultvalue "+widget.getDefaultvalue());
 				toSafe.put(id,widget.getDefaultvalue());
 				continue;
-			} else if("date".equals(widget.getType())){
+			} else if("date".equals(widget.getType()) && props.containsKey(id)){
 				try {
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 					values = Arrays.stream(propsCopy.get(id)).map((p) -> {
+						try {
+							return sdf.parse(p);
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					}).collect(Collectors.toList());
+
+				}catch(Throwable t){
+					logger.info("Could not parse date for widget id " + widget.getId() + ": " + t.getMessage());
+					values = new ArrayList<>();
+				}
+			}else if("datetime".equals(widget.getType()) && props.containsKey(id)){
+				try {
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+					values = Arrays.stream(props.get(id)).map((p) -> {
 						try {
 							return sdf.parse(p);
 						} catch (ParseException e) {
@@ -651,23 +668,18 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 		try {
 			NodeRef nodeRef = new NodeRef(store, nodeId);
 			Map<QName, Serializable> props = transformPropMap(_props);
-			Map<String, Object> propsNotNull = new HashMap<>();
+			Map<String, Object> propsConverted = new HashMap<>();
+			Set<QName> propsNull = new HashSet<>();
 
 			// do in transaction to disable behaviour
 			// otherwise interceptors might be called multiple times -> the final update props is enough!
-			serviceRegistry.getRetryingTransactionHelper().doInTransaction(() -> {
-				policyBehaviourFilter.disableBehaviour(nodeRef);
-				for(Map.Entry<QName, Serializable> prop : props.entrySet()){
-					// instead of storing props as null (which can cause solr erros), remove them completely from the node!
-					if(prop.getValue()==null) {
-						nodeService.removeProperty(nodeRef, prop.getKey());
-					}else
-						propsNotNull.put(prop.getKey().toString(),prop.getValue());
+			for(Map.Entry<QName, Serializable> prop : props.entrySet()){
+				// instead of storing props as null (which can cause solr erros), remove them completely from the node!
+				if(prop.getValue()==null) {
+					propsNull.add(prop.getKey());
 				}
-				policyBehaviourFilter.enableBehaviour(nodeRef);
-				return null;
-			});
-
+				propsConverted.put(prop.getKey().toString(),prop.getValue());
+			}
 
 			// don't do this cause it's slow:
 			/*
@@ -677,15 +689,15 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 			 */
 
 			// prevent overwriting of properties that don't come with param _props
-			Set<String> changedProps = propsNotNull.keySet();
+			Set<String> changedProps = propsConverted.keySet();
 			Map<QName, Serializable> currentProps = nodeService.getProperties(nodeRef);
 			for (Map.Entry<QName, Serializable> entry : currentProps.entrySet()) {
 				if (!changedProps.contains(entry.getKey().toString())) {
-					propsNotNull.put(entry.getKey().toString(), entry.getValue());
+					propsConverted.put(entry.getKey().toString(), entry.getValue());
 				}
 			}
 
-			Map<String, Object> propsFinal = propsNotNull;
+			Map<String, Object> propsFinal = propsConverted;
 
 			for (PropertiesSetInterceptor i : PropertiesInterceptorFactory.getPropertiesSetInterceptors()) {
 				try {
@@ -703,7 +715,17 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 					HashMap::putAll
 			);
 			nodeService.setProperties(nodeRef, propsStore);
-
+			// do in transaction to disable behaviour
+			// otherwise interceptors might be called multiple times -> the final update props is enough!
+			// to it AFTER set properties so the values can be sent as NULL-Values into setProperties to be read by interceptors
+			serviceRegistry.getRetryingTransactionHelper().doInTransaction(() -> {
+				policyBehaviourFilter.disableBehaviour(nodeRef);
+				for(QName prop : propsNull){
+					nodeService.removeProperty(nodeRef, prop);
+				}
+				policyBehaviourFilter.enableBehaviour(nodeRef);
+				return null;
+			});
 		} catch (Exception e) {
 			// this occurs sometimes in workspace
 			// it seems it is an alfresco bug:
@@ -1188,6 +1210,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 				NodeRef newNode;
 				try {
 					newNode = copyNode(nodeId, container, true);
+					OnCopyIOPolicy.removeCopiedUsages(nodeService, newNode);
 				} catch (Throwable t) {
 					throw new RuntimeException(t);
 				}

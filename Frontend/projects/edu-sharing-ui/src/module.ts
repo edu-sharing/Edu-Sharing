@@ -4,6 +4,7 @@
 
 export * from './lib/actionbar/actionbar.component';
 export * from './lib/common/edu-sharing-ui-common.module';
+export * from './lib/mds/mds.module';
 export * from './lib/directives/border-box-observer.directive';
 export * from './lib/directives/check-text-overflow.directive';
 export * from './lib/directives/drag-nodes/drag-nodes';
@@ -80,3 +81,4 @@ export * from './lib/util/isNumeric';
 export * from './lib/util/rest-helper';
 export * from './lib/util/ui-animation';
 export * from './lib/util/ui-constants';
+export * from './lib/mds/mds-helper.service';

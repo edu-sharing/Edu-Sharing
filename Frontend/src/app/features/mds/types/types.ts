@@ -122,7 +122,7 @@ export type MdsEditorWidgetComponent = {
     mapGraphqlSuggestionId: (definition: MdsWidget) => string[];
 } & Type<MdsEditorWidgetBase>;
 
-export type EditorType = 'angular' | 'legacy';
+export type EditorType = 'angular';
 
 export interface MdsList {
     columns: MdsListColumn[];

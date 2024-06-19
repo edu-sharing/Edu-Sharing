@@ -13,7 +13,6 @@ import { Subject } from 'rxjs';
 import { first, map, switchMap, takeUntil } from 'rxjs/operators';
 import { Node, RestConstants } from '../../../../core-module/core.module';
 import { Toast } from '../../../../services/toast';
-import { MdsComponent } from '../../legacy/mds/mds.component';
 import { MdsEditorInstanceService } from '../mds-editor-instance.service';
 import {
     BulkBehavior,
@@ -42,9 +41,6 @@ import { valuesDictIsEquivalent } from './values-dict-is-equivalent';
 })
 export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
     // tslint:disable: no-output-on-prefix  // Keep API compatibility.
-
-    // Properties compatible to legacy MdsComponent.
-    @ViewChild(MdsComponent) mdsRef: MdsComponent;
 
     @Input() addWidget = false;
     @Input() allowReplacing = true;
@@ -92,9 +88,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
     isLoading = true;
     editorType: EditorType;
 
-    legacySuggestions: { [property: string]: MdsWidgetValue[] };
-    legacySuggestionsRegistered = false;
-
     private destroyed$ = new Subject<void>();
     private values: Values;
 
@@ -135,8 +128,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
     /** @deprecated compatibility to legacy `mds` component */
     handleKeyboardEvent(event: KeyboardEvent): boolean {
         switch (this.editorType) {
-            case 'legacy':
-                return this.mdsRef.handleKeyboardEvent(event);
             case 'angular':
                 // Tell the outer component that we handle all keyboard events. This prevents the
                 // dialog to be closed from outside on Escape without confirmation.
@@ -149,8 +140,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
 
     async getValues(node: Node = null): Promise<{ [property: string]: string[] }> {
         switch (this.editorType) {
-            case 'legacy':
-                return this.mdsRef.getValues(node?.properties);
             case 'angular':
                 return this.mdsEditorInstance.getValues(node);
             default:
@@ -166,8 +155,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
      */
     async saveValues(): Promise<{ [property: string]: string[] }> {
         switch (this.editorType) {
-            case 'legacy':
-                return this.mdsRef.saveValues();
             case 'angular':
                 const values = await this.mdsEditorInstance.getValues();
                 this.onDone.emit(values);
@@ -181,8 +168,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
     /** @deprecated compatibility to legacy `mds` component */
     get currentWidgets(): MdsWidget[] {
         switch (this.editorType) {
-            case 'legacy':
-                return this.mdsRef.currentWidgets;
             case 'angular':
                 return this.mdsEditorInstance.widgets.value.map((widget) => widget.definition);
             default:
@@ -221,12 +206,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
 
     private loadMdsAfterInit(onlyLegacy: boolean): void {
         switch (this.editorType) {
-            case 'legacy':
-                // Wait for mdsRef
-                setTimeout(() => {
-                    return this.mdsRef.loadMds();
-                });
-                return;
             case 'angular':
                 if (onlyLegacy) {
                     return;
@@ -315,67 +294,16 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
                 }
             }
             if (!this.editorType) {
-                console.warn(
+                console.info(
                     `mds ${this.setId} at ${this.repository} did not specify any rendering type (group ${this.groupId})`,
                 );
-                this.editorType = 'legacy';
-            }
-            if (this.editorType === 'legacy') {
-                console.warn(
-                    `mds ${this.setId} at ${this.repository} is configured for legacy rendering`,
-                );
-            }
-            if (this.editorType === 'legacy' && !this.legacySuggestionsRegistered) {
-                this.registerLegacySuggestions();
-                this.legacySuggestionsRegistered = true;
+                this.editorType = 'angular';
             }
         } catch (error) {
             this.handleError(error);
         } finally {
             this.isLoading = false;
         }
-    }
-
-    private registerLegacySuggestions(): void {
-        // FIXME: Using `search.observeFacets`, we register the needed facets with the search
-        // service, so when a search is requested, the needed facets are fetched as well. By doing
-        // this, we race whichever module does the search request. We might be in time to register
-        // our facets but we don't know if we are. The result is, that modules that do search
-        // requests need to explicitly wait for `getNeededFacets` to provide a value.
-        //
-        // Possible solutions:
-        //  1. Don't do the implicit registration on facets at all and require modules doing search
-        //     requests to explicitly get needed facets from here.
-        //  2. When registering with the search service, pass and handle the information that we
-        //     will have needed facets but we don't know their values yet, so the search service can
-        //     block requests until we provide the values.
-        this.mdsEditorInstance
-            .getNeededFacets()
-            .pipe(
-                takeUntil(this.destroyed$),
-                switchMap((neededFacets) =>
-                    neededFacets ? this.search.observeFacets(neededFacets) : rxjs.of({}),
-                ),
-                map((facets) => {
-                    if (facets) {
-                        return Object.entries(facets).reduce(
-                            (acc, [property, facetAggregation]) => {
-                                acc[property] = (facetAggregation as FacetAggregation).values.map(
-                                    ({ value, label }) => ({
-                                        id: value,
-                                        caption: label,
-                                    }),
-                                );
-                                return acc;
-                            },
-                            {} as { [property: string]: MdsWidgetValue[] },
-                        );
-                    } else {
-                        return null;
-                    }
-                }),
-            )
-            .subscribe((facets) => (this.legacySuggestions = facets));
     }
 
     private handleError(error: any): void {

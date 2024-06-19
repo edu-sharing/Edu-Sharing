@@ -99,6 +99,11 @@
             margin-bottom: 20px;
         }
     }
+    .card-edit-wrapper {
+        .mdc-card__actions {
+            min-height: 70px;
+        }
+    }
     .card-edit {
         mat-form-field {
             width: 100%;

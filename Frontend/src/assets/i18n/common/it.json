@@ -31,9 +31,9 @@
   "FIELD_REQUIRED": "Richiesto",
   "FIELD_VALIDATION_ERROR_INTEGER": "Utilizzare numeri interi",
   "EXTENSION_NOT_MATCH": "Cambiare l'estensione del file?",
-  "EXTENSION_NOT_MATCH_INFO": "Siete sicuri di voler cambiare l'estensione del file da '{{estensioneVecchia}} a '{{estensioneNuova}}'?\n\n{{warning}}",
-  "EXTENSION_NOT_MATCH_INFO_OLD": "Siete sicuri di voler rimuovere l'estensione del file '{{extensionOld}}'?\n\n{{avviso}}",
-  "EXTENSION_NOT_MATCH_INFO_NEW": "Si è sicuri di voler aggiungere l'estensione del file '{{extensionNew}}'?\n\n{{avviso}}",
+  "EXTENSION_NOT_MATCH_INFO": "Siete sicuri di voler cambiare l'estensione del file da '{{extensionOld}} a '{{extensionNew}}'?\n\n{{warning}}",
+  "EXTENSION_NOT_MATCH_INFO_OLD": "Siete sicuri di voler rimuovere l'estensione del file '{{extensionOld}}'?\n\n{{warning}}",
+  "EXTENSION_NOT_MATCH_INFO_NEW": "Si è sicuri di voler aggiungere l'estensione del file '{{extensionNew}}'?\n\n{{warning}}",
   "EXTENSION_NOT_MATCH_WARNING": "Il file potrebbe diventare inutilizzabile quando viene scaricato o aperto.",
   "EXTENSION_CHANGE": "Sì, cambiare",
   "EXTENSION_KEEP": "Mantenere l'estensione",
@@ -62,9 +62,9 @@
   "INFORMATION": "informazioni",
   "TODAY": "oggi",
   "YESTERDAY": "ieri",
-  "DAYS_AGO": "{{ giorni }} giorni fa",
-  "HOURS_AGO": "{ore }} ore fa",
-  "MINUTES_AGO": "{minuti }} minuti fa",
+  "DAYS_AGO": "{{ days }} giorni fa",
+  "HOURS_AGO": "{{ hours }} ore fa",
+  "MINUTES_AGO": "{{ minutes }} minuti fa",
   "JUST_NOW": "Solo ora",
   "CREATE": "creare",
   "LOGOUT": "Disconnettersi",
@@ -76,13 +76,13 @@
   "CLEAR_FILTERS": "Cancella tutti i filtri",
   "EDIT_ACCOUNT": "Gestione dell'account",
   "CHANGE_LANGUAGE": "Cambiare la lingua",
-  "DEFAULT_METADATASET": "Metadato predefinito ({{nome}})",
+  "DEFAULT_METADATASET": "Metadato predefinito ({{name}})",
   "NO_MATCHES": "Nessuna corrispondenza trovata",
   "NO_CC_PUBLISH": "Nessun permesso di pubblicazione per l'oggetto",
-  "SELECT": "selezionare {{ elemento }}",
+  "SELECT": "selezionare {{ element }}",
   "EDIT": "modifica {{ thing }}",
-  "EXPAND": "espandere {{ elemento }}",
-  "COLLAPSE": "collasso {{ elemento }}",
+  "EXPAND": "espandere {{ element }}",
+  "COLLAPSE": "collasso {{ element }}",
   "CHECKBOX_CHECKED": "casella di controllo selezionata",
   "CHECKBOX_NOT_CHECKED": "casella di controllo non selezionata",
   "RADIO_BUTTON_SELECTED": "pulsante di opzione selezionato",
@@ -97,11 +97,9 @@
     "ADD_TO_SELECTED_COLLECTION": "Aggiungi qui",
     "NO_RECENT_COLLECTIONS": "Non sono disponibili collezioni usate di recente"
   },
-  "ADD_TO_RECENT_COLLECTION": "Aggiungi alla collezione recente",
-  "SEARCH_COLLECTIONS": "Ricerca collezione...",
   "SUB_CATEGORY_ARIA": "sottocategoria",
   "ASK_CC_PUBLISH": "Chiedere",
-  "ASK_CC_PUBLISH_SUBJECT": "Richiesta di permessi per l'elemento {{nome}}.",
+  "ASK_CC_PUBLISH_SUBJECT": "Richiesta di permessi per l'elemento {{name}}.",
   "ORIGINAL_DELETE": "Rimuovere",
   "ORIGINAL_DELETED": "Contenuto eliminato",
   "ORIGINAL_DELETED_INFO": "Solo i metadati sono accessibili",
@@ -120,13 +118,12 @@
   "TOOLPERMISSION_ERROR_INLINE": "Non è possibile eseguire questa azione perché manca l'autorizzazione \"{{permission}}\".",
   "TOOLPERMISSION_ERROR_TITLE": "Autorizzazioni insufficienti",
   "TOOLPERMISSION_ERROR_HEADER": "Per il vostro account manca la seguente autorizzazione:",
-  "TOOLPERMISSION_ERROR_FOOTER": "Se si ritiene che si tratti di un errore, contattare l'amministratore e chiedere il permesso {{permesso}}.",
+  "TOOLPERMISSION_ERROR_FOOTER": "Se si ritiene che si tratti di un errore, contattare l'amministratore e chiedere il permesso {{permission}}.",
   "TOOLPERMISSION": {
     "TOOLPERMISSION_INVITE": "Il permesso di condividere i contenuti",
     "TOOLPERMISSION_INVITE_STREAM": "Il permesso di aggiungere contenuti allo stream",
     "TOOLPERMISSION_INVITE_LINK": "Il permesso di creare collegamenti ai contenuti",
     "TOOLPERMISSION_INVITE_HISTORY": "L'autorizzazione a visualizzare la cronologia delle condivisioni",
-    "TOOLPERMISSION_INVITED": "Il permesso di vedere l'elenco degli utenti invitati",
     "TOOLPERMISSION_INVITE_SHARE": "L'autorizzazione a condividere i contenuti nelle cartelle condivise",
     "TOOLPERMISSION_INVITE_ALLAUTHORITIES": "Il permesso di condividere i contenuti a tutti gli utenti",
     "TOOLPERMISSION_PUBLISH_COPY": "Il permesso di creare copie pubblicate dei materiali",
@@ -140,7 +137,7 @@
     "TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_SHARE_SAFE": "Cercare e invitare utenti esterni all'organizzazione in cartelle condivise in sicurezza",
     "TOOLPERMISSION_COLLECTION_PINNING": "Appuntare le collezioni e gestire le collezioni appuntate",
     "TOOLPERMISSION_COLLECTION_CURRICULUM": "Creazione di raccolte di curriculum (attualmente non utilizzate)",
-    "TOOLPERMISSION_COLLECTION_FEEDBACK": "Dare un feedback su altre collezioni",
+    "TOOLPERMISSION_MATERIAL_FEEDBACK": "Dare un feedback su altre materiali",
     "TOOLPERMISSION_CONFIDENTAL": "Accesso all'area protetta (cassaforte)",
     "TOOLPERMISSION_UNCHECKEDCONTENT": "Mostra fonti come YouTube nella ricerca",
     "TOOLPERMISSION_WORKSPACE": "Accesso all'area di lavoro",
@@ -157,8 +154,8 @@
     "TOOLPERMISSION_VIDEO_AUDIO_CUT": "I file video e audio possono essere tagliati quando vengono aggiunti alle collezioni.",
     "TOOLPERMISSION_COLLECTION_CHANGE_OWNER": "Autorizzazione a modificare il nome proprio di una collezione",
     "TOOLPERMISSION_RATE": "Il permesso di valutare i materiali",
-    "TOOLPERMISSION_CONNECTOR": "È possibile utilizzare l'editor \"{{connettore}}\".",
-    "TOOLPERMISSION_CONNECTOR_SAFE": "L'editor \"{{connettore}}\" può essere usato in modo sicuro",
+    "TOOLPERMISSION_CONNECTOR": "È possibile utilizzare l'editor \"{{connector}}\".",
+    "TOOLPERMISSION_CONNECTOR_SAFE": "L'editor \"{{connector}}\" può essere usato in modo sicuro",
     "TOOLPERMISSION_REPOSITORY": "Il repository \"{{repository}}\" può essere visualizzato e sfogliato e i media possono essere recuperati da esso.",
     "TOOLPERMISSION_CREATE_MAP_LINK": "Creare cartelle che rimandano ad altre cartelle",
     "TOOLPERMISSION_SIGNUP_GROUP": "Iscrizione a un'organizzazione/gruppo (si applica solo alle organizzazioni/gruppi configurati per l'iscrizione)"
@@ -185,7 +182,7 @@
   "NEW_PASSWORD": "Nuova password",
   "NEW_PASSWORD_REPEAT": "Confermare la nuova password",
   "WRONG_PASSWORD": "La password inserita non è valida",
-  "PASSWORD_MIN_LENGTH": "La password deve essere composta da almeno {{lunghezza}} di caratteri.",
+  "PASSWORD_MIN_LENGTH": "La password deve essere composta da almeno {{length}} di caratteri.",
   "PASSWORD_NOT_MATCH": "Le password non corrispondono",
   "LEARNINGAGE_YEAR": "Anni",
   "PROGRESS_DIALOG_DEFAULT_TITLE": "Il compito viene eseguito...",
@@ -281,13 +278,13 @@
   "NODE_VARIANT": {
     "TITLE": "Creare una nuova variante",
     "NEW_VARIANT": "Nuovo titolo:",
-    "DEFAULT_NAME": "Variante di {{nome}}",
+    "DEFAULT_NAME": "Variante di {{name}}",
     "BREADCRUMB_INFO": "Salva la variante in:",
     "CHOOSE": "Posizione di stoccaggio",
     "FILE_PICKER_TITLE": "Scegliere il luogo di stoccaggio",
     "CREATE": "Creare",
     "CREATE_EDIT": "Creare e aprire",
-    "CREATED": "La nuova variante è stata creata e salvata nella cartella \"{{cartella}}\".",
+    "CREATED": "La nuova variante è stata creata e salvata nella cartella \"{{folder}}\".",
     "CREATED_LINK": "mostra",
     "WARNING": {
       "NO_LICENSE": "Questo materiale non ha una licenza allegata.\nSi prega di contattare l'autore del materiale per evitare violazioni della licenza.",
@@ -304,14 +301,13 @@
     "CHOOSE": "Posizione di stoccaggio",
     "FILE_PICKER_TITLE": "Scegliere il luogo di stoccaggio",
     "CREATE": "Crea collegamento",
-    "CREATED": "Il link è stato creato e salvato nella cartella \"{{cartella}}\".",
+    "CREATED": "Il link è stato creato e salvato nella cartella \"{{folder}}\".",
     "CREATED_LINK": "mostra"
   },
   "NODE_REPORT": {
     "TITLE": "Segnala il problema",
-    "SUBTITLE": "Segnalare un problema",
     "REPORT": "rapporto",
-    "REPORT_INFO": "Segnala un problema con \"{{nome}}\".",
+    "REPORT_INFO": "Segnala un problema con \"{{name}}\".",
     "COMMENT": "Fornire ulteriori informazioni sul problema che si è verificato",
     "COMMENT_PLACEHOLDER": "Fornisci i dettagli...",
     "EMAIL": "il vostro indirizzo e-mail",
@@ -359,7 +355,7 @@
   },
   "CREATE_NODE": {
     "tool_definition": "Aggiungere la descrizione di un nuovo strumento",
-    "tool_instance": "Creare una nuova configurazione per lo strumento {{ genitore }}"
+    "tool_instance": "Creare una nuova configurazione per lo strumento {{ parent }}"
   },
   "MEDIATYPE": {
     "file-image": "immagine",
@@ -403,12 +399,11 @@
       "IMPORTANT": "Mostra solo i messaggi importanti.",
       "ALL": "Mostra tutti i messaggi."
     },
-    "TOAST_DURATION_SECONDS": "{{secondi}} secondi",
+    "TOAST_DURATION_SECONDS": "{{seconds}} secondi",
     "TOAST_DURATION_INFINITE": "Non nascondetevi.",
     "TOAST_DURATION_INFINITE_INFO": "I messaggi di stato non vengono nascosti automaticamente e devono essere chiusi manualmente.",
     "TOAST_DURATION_TITLE": "visualizzazione dell'ora",
     "TOAST_DURATION_MESSAGE": "I messaggi di stato scompaiono automaticamente dopo un determinato periodo di tempo o possono essere chiusi manualmente facendo clic.",
-    "SAVED": "Le impostazioni sono state salvate.",
     "DISMISS_TOAST": "Nascondere"
   },
   "AUTHORITY_TYPE_GROUP": "Gruppo",
@@ -528,7 +523,7 @@
   "LIST": {
     "REORDER_TITLE": "Modifica delle colonne",
     "REORDER_DRAG_DROP": "È possibile modificare l'ordine degli elementi tramite il drag & drop.",
-    "TOTAL_COUNT_TOOLTIP": "{{selezionato}} elementi selezionati da un totale di {{totale}}"
+    "TOTAL_COUNT_TOOLTIP": "{{selected}} elementi selezionati da un totale di {{total}}"
   },
   "DIALOG": {
     "COLLECTION_SHARE_PUBLIC": "Aggiungere materiale alla collezione?",
@@ -546,8 +541,8 @@
     "EDIT_SIMPLE": "Modifica rapida",
     "COLLECTION_EDIT": "Modifica",
     "COLLECTION_PIN": "Collezione di spille",
-    "COLLECTION_FEEDBACK": "Feedback...",
-    "COLLECTION_FEEDBACK_VIEW": "Visualizza il feedback",
+    "MATERIAL_FEEDBACK": "Feedback...",
+    "MATERIAL_FEEDBACK_VIEW": "Visualizza il feedback",
     "OPEN": "Aperto",
     "DOWNLOAD": "Scaricare",
     "DOWNLOAD_ALL": "scaricare zip",
@@ -613,21 +608,18 @@
     "LICENSE_NO_PERMISSIONS_SAFE": "Non è possibile cambiare le licenze in un ambiente sicuro",
     "ADD_CHILD_OBJECT": "Aggiungere altri materiali",
     "ADD_CHILD_OBJECT_DESCRIPTION": "Creare una serie collegando altri materiali a questo oggetto.",
-    "ADD_CHILD_OBJECT_QUOTA_REACHED": "Errore durante il caricamento di \"{{ nome }}\": Quota di caricamento raggiunta",
-    "ADD_CHILD_OBJECT_VIRUS_DETECTED": "Errore durante il caricamento di \"{{ nome }}\": Rilevato virus. Il file è stato eliminato",
-    "CONFIRM_DISCARD_TITLE": "Scartare le modifiche?",
-    "CONFIRM_DISCARD_MESSAGE": "Chiudere la finestra di dialogo senza salvare le modifiche?",
+    "ADD_CHILD_OBJECT_QUOTA_REACHED": "Errore durante il caricamento di \"{{ name }}\": Quota di caricamento raggiunta",
+    "ADD_CHILD_OBJECT_VIRUS_DETECTED": "Errore durante il caricamento di \"{{ name }}\": Rilevato virus. Il file è stato eliminato",
     "REQUIRED_MESSAGE": "Il campo è obbligatorio",
     "REQUIRED_FOR_PUBLISH_MESSAGE": "Il campo è obbligatorio per la pubblicazione",
-    "INDETERMINATE_NOTICE": "Fare clic sul chip per aggiungere il valore \"{{ valore }}\" a tutti gli elementi, oppure rimuoverlo per eliminarlo da tutti gli elementi.",
+    "INDETERMINATE_NOTICE": "Fare clic sul chip per aggiungere il valore \"{{ value }}\" a tutti gli elementi, oppure rimuoverlo per eliminarlo da tutti gli elementi.",
     "SHOW_OPTIONS_BUTTON": "Mostra le opzioni",
     "FILTER_FOR": "Filtro per \"{{value}}\" ({{count}} elementi corrispondenti)",
-    "FILTER_TREE": "Filtro...",
-    "OPEN_CLOSE_EXTENDED": "Vista aperta/chiusa"
+    "FILTER_TREE": "Filtro..."
   },
   "SIMPLE_EDIT": {
     "TITLE": "Modifica rapida",
-    "SAVED": "L'elemento {{nome}} è stato modificato",
+    "SAVED": "L'elemento {{name}} è stato modificato",
     "SAVED_MULTIPLE": "{{count}} Gli elementi sono stati modificati",
     "METADATA": {
       "TITLE": "Metadati",
@@ -647,8 +639,8 @@
       "UNSET": "Non aggiungere nulla",
       "PUBLISH": "Tutti (Pubblica)",
       "GROUP_TYPES": {
-        "ORG_ADMINISTRATORS": "Amministratori di\n{{scuola}}",
-        "TEACHER": "Insegnanti di\n{{scuola}}"
+        "ORG_ADMINISTRATORS": "Amministratori di\n{{school}}",
+        "TEACHER": "Insegnanti di\n{{school}}"
       }
     },
     "LICENSE": {
@@ -709,7 +701,7 @@
   "TOAST": {
     "NODE_LOCKED": "Il documento è attualmente utilizzato da un altro utente e non può essere aperto.",
     "RENDER_NOT_FOUND": "L'elemento richiesto è cancellato o non esiste",
-    "FIELD_REQUIRED": "Il campo {{ nome }} è obbligatorio",
+    "FIELD_REQUIRED": "Il campo {{ name }} è obbligatorio",
     "API_FORBIDDEN": "Nessun permesso per accedere a questo contenuto",
     "API_FORBIDDEN_LOGIN": "Effettuare il login per accedere a questa sezione"
   },
@@ -771,7 +763,7 @@
       "AlreadyInList": "Siete già in lista d'attesa per questo gruppo. Riceverete una notifica via e-mail non appena sarete stati accettati.",
       "AlreadyMember": "L'utente è già membro del gruppo selezionato.",
       "ADDED_TO_LIST": "Siete stati inseriti nella lista d'attesa e l'amministratore del gruppo ne sarà informato. Riceverete una notifica via e-mail quando sarete stati approvati.",
-      "ADDED_TO_GROUP": "Ora sei un membro del gruppo {{gruppo}}."
+      "ADDED_TO_GROUP": "Ora sei un membro del gruppo {{group}}."
     }
   },
   "KEY_MODIFIER": {

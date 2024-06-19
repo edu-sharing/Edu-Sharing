@@ -50,7 +50,7 @@ public class EduLocalTransformClient extends LocalTransformClient {
 
             if (original instanceof TransformDefinition) {
                 TransformDefinition td = ((TransformDefinition) original);
-                result = new TransformDefinition(td.getTransformName(),options,td.getClientData(),td.getReplyQueue(),td.getRequestId());
+                result = new TransformDefinition(td.getTransformName(),original.getTargetMimetype(),options,td.getClientData(),td.getReplyQueue(),td.getRequestId(),null);
             }else{
                 result = new RenditionDefinition2Impl(original.getRenditionName()
                         ,original.getTargetMimetype(),

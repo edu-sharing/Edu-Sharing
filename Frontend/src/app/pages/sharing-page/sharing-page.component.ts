@@ -166,6 +166,9 @@ export class SharingPageComponent {
     }
     private loadChildren() {
         if (this.sharingInfo.password && !this.sharingInfo.passwordMatches) return;
+        if (!this.sharingInfo.node.isDirectory) {
+            return;
+        }
         this.nodesDataSource.reset();
         this.nodesDataSource.isLoading = true;
         const request = {

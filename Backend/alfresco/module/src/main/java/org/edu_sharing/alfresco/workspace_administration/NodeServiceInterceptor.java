@@ -69,7 +69,7 @@ public class NodeServiceInterceptor implements MethodInterceptor {
 		if (methodName.equals("getChildAssocs")) {
 
 			String currentScope = NodeServiceInterceptor.eduSharingScope.get();
-			logger.info("runAsUser:" + runAsUser + " currentScope:" + currentScope);
+			logger.debug("runAsUser:" + runAsUser + " currentScope:" + currentScope);
 			List<ChildAssociationRef> childAssocs = (List<ChildAssociationRef>) invocation.proceed();
 			List<ChildAssociationRef> childAssocsResult = new ArrayList<>();
 			for (ChildAssociationRef childRef : childAssocs) {
@@ -83,7 +83,7 @@ public class NodeServiceInterceptor implements MethodInterceptor {
 
 				String scope = (String) nodeService.getProperty(nodeRef,
 						QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME));
-				logger.info("child scope:" + scope + " id:" + nodeRef.getId());
+				logger.debug("child scope:" + scope + " id:" + nodeRef.getId());
 				if (scope != null && !scope.equals("")) {
 					// System.out.println("getChildAssocs currentScope:"+currentScope);
 					if (scope.equals(currentScope)) {

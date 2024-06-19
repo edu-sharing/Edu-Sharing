@@ -21,7 +21,7 @@ import {
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, map, switchMap, takeUntil } from 'rxjs/operators';
-import { MdsHelper } from '../../../core-module/rest/mds-helper';
+import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import { SearchFieldFacetsComponent } from '../../../features/mds/mds-editor/search-field-facets/search-field-facets.component';
 import {
     MdsWidgetTree,
@@ -310,7 +310,11 @@ export class SearchFieldComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     getTooltip(property: string, value: LabeledValue) {
-        const widget = MdsHelper.getWidget(property, undefined, this.mds.widgets) as MdsWidgetTree;
+        const widget = MdsHelperService.getWidget(
+            property,
+            undefined,
+            this.mds.widgets,
+        ) as MdsWidgetTree;
         if (
             [
                 MdsWidgetType.MultiValueTree.toString(),

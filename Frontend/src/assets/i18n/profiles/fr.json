@@ -1,13 +1,13 @@
 {
   "PROFILES": {
-    "TITLE": "Profil de {{ nom }}",
+    "TITLE": "Profil de {{ name }}",
     "TITLE_NAV": "Profil",
     "LOAD_ERROR": "Le profil n'a pas pu être trouvé.",
     "EDIT": "éditer",
     "CANCEL_EDIT": "annuler",
     "ABOUT_LABEL": "à propos de moi",
     "PERSISTENT_ID_INFO": "Grâce à ces informations, les éléments que vous avez créés peuvent être attribués à votre personne, même au-delà des frontières du système.",
-    "NO_ABOUT": "Cet utilisateur n'a pas encore créé de description.",
+    "NO_ABOUT": "Cet-te utilisateur-trice n'a pas encore créé de description.",
     "NO_ABOUT_ME": "La description de votre profil est vide\nModifiez votre profil pour créer une description.",
     "STATS": {
       "MATERIALS": "Matériaux",
@@ -17,7 +17,7 @@
     "ERROR": {
       "FIRST_NAME": "Veuillez saisir votre prénom",
       "LAST_NAME": "Veuillez saisir votre nom de famille",
-      "EMAIL": "Veuillez saisir l'e-mail"
+      "EMAIL": "Veuillez saisir votre adresse e-mail"
     },
     "IMG_CHANGE": "changer"
   }

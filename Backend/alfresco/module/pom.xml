@@ -293,6 +293,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-1.2-api</artifactId>
     </dependency>
@@ -377,11 +382,6 @@
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
     </dependency>
 
     <!-- provided -->
@@ -584,49 +584,49 @@
     <dependency>
       <groupId>org.openapitools</groupId>
       <artifactId>jackson-databind-nullable</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-cbor</artifactId>
-      <scope>provided</scope>
+      <scope>import</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-smile</artifactId>
-      <scope>provided</scope>
+      <scope>import</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-xml</artifactId>
-      <scope>provided</scope>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
       <artifactId>jackson-jakarta-rs-json-provider</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet-core</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
       <exclusions>
         <exclusion>
           <groupId>org.glassfish.hk2.external</groupId>

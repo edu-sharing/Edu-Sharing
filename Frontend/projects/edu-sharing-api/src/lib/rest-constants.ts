@@ -114,6 +114,7 @@ export class RestConstants {
     public static CCM_PROP_CCRESSOURCEVERSION = 'ccm:ccressourceversion';
     public static AUTHORITY_NAME = 'authorityName';
     public static AUTHORITY_DISPLAYNAME = 'displayName';
+    public static AUTHORITY_GROUPTYPE = 'groupType';
     public static AUTHORITY_FIRSTNAME = 'firstName';
     public static AUTHORITY_LASTNAME = 'lastName';
     public static AUTHORITY_EMAIL = 'email';

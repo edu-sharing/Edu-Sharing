@@ -50,7 +50,20 @@ public class NgErrorServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		handleRequest(req, resp);
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String method = req.getMethod();
+		//prevent webdav methods 404 is transformed to 501
+		if ("PROPFIND".equals(method)
+				|| "PROPPATCH".equals(method)
+				|| "COPY".equals(method)
+				|| "LOCK".equals(method)
+				|| "MKCOL".equals(method)
+				|| "MOVE".equals(method)
+				|| "UNLOCK".equals(method)) {
+			handleRequest(req, resp);
+		}else {
+			super.service(req, resp);
+		}
+
 	}
 }

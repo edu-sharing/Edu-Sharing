@@ -16,7 +16,7 @@ import { debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
 import { RestSearchService } from '../../../../../core-module/rest/services/rest-search.service';
 import { Node, SearchRequestCriteria } from '../../../../../core-module/rest/data-object';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
-import { MdsHelper } from '../../../../../core-module/rest/mds-helper';
+import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import { RestMdsService } from '../../../../../core-module/rest/services/rest-mds.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ListItem, NodesRightMode, UIAnimation } from 'ngx-edu-sharing-ui';
@@ -134,7 +134,7 @@ export class NodeSearchSelectorComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         this.mdsService.getSet().subscribe((set) => {
-            this.columns = MdsHelper.getColumns(this.translate, set, this.columnsIds);
+            this.columns = MdsHelperService.getColumns(this.translate, set, this.columnsIds);
         });
         combineLatest([this.input.valueChanges, this.mdsEditor.mdsEditorInstance.values])
             .pipe(

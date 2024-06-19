@@ -33,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -565,19 +566,29 @@ public class MetadataTemplateRenderer {
 					// wrong data or text
 				}
 			} else if (widget.getType().equals("duration")){
+				NumberFormat nf = NumberFormat.getInstance();
+				nf.setMaximumFractionDigits(0);
+				nf.setMinimumIntegerDigits(1);
+				long time = -1;
 				try {
-					NumberFormat nf = NumberFormat.getInstance();
-					nf.setMaximumFractionDigits(0);
-					nf.setMinimumIntegerDigits(1);
-					long time = Long.parseLong(value) / 1000 / 60;
-					long mins = time % 60;
-					long hours = time / 60;
-					value = nf.format(hours) + "h ";
-					nf.setMinimumIntegerDigits(2);
-					value += nf.format(mins) + "m";
-
+					time = Math.round(Long.parseLong(value) / 1000. / 60.);
 				}catch(Throwable ignored) {
+					try {
+						time = Math.round(Duration.parse(value).getSeconds() / 60.);
+					} catch(Throwable ignored2) {
 
+					}
+				}
+				if(time != -1) {
+					try {
+						long mins = time % 60;
+						long hours = time / 60;
+						value = nf.format(hours) + "h ";
+						nf.setMinimumIntegerDigits(2);
+						value += nf.format(mins) + "m";
+					}catch(Throwable ignored) {
+
+					}
 				}
 			}
 			if("number".equals(widget.getType()) && "bytes".equals(widget.getFormat())) {

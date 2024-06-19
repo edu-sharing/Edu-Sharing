@@ -3,11 +3,9 @@ package org.edu_sharing.service.permission;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;

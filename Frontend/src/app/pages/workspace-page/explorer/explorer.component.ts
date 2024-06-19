@@ -292,6 +292,8 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
                 nodes: this.nodeApi.getChildren(this.node$.value.ref.id, {
                     skipCount: offset,
                     maxItems: event?.amount || RestConnectorService.DEFAULT_NUMBER_PER_REQUEST,
+                    sortProperties: [this.sort.active],
+                    sortAscending: [this.sort.direction === 'asc'],
                     propertyFilter: [PROPERTY_FILTER_ALL],
                 }),
             });

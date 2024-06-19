@@ -16,7 +16,6 @@ import org.alfresco.repo.management.subsystems.SwitchableApplicationContextFacto
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.search.impl.solr.ESSearchParameters;
-import org.alfresco.repo.search.impl.solr.SolrJSONResultSet;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.authority.AuthorityInfo;
@@ -52,7 +51,6 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ISO9075;
 import org.alfresco.util.Pair;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.alfresco.HasPermissionsWork;
 import org.edu_sharing.alfresco.fixes.VirtualEduGroupFolderTool;

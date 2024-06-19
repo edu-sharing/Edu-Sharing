@@ -72,9 +72,11 @@ public abstract class TrackingServiceDefault implements TrackingService{
                 nodeService.setProperty(nodeRef.getStoreRef().getProtocol(),nodeRef.getStoreRef().getIdentifier(),nodeRef.getId(),qname,finalValue, false);
                 policyBehaviourFilter.enableBehaviour(nodeRef);
                 // change the value in cache
-                Map<String, Object> cache = new RepositoryCache().get(nodeRef.getId());
+                RepositoryCache cacheService = new RepositoryCache();
+                Map<String, Object> cache = cacheService.get(nodeRef.getId());
                 if(cache!=null) {
                     cache.put(qname, finalValue);
+                    new RepositoryCache().put(nodeRef.getId(), cache);
                 }
                 return null;
             });

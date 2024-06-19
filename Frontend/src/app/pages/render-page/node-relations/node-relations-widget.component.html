@@ -34,10 +34,18 @@
         </es-node-url>
       </div>
     </div>
-
+    <div class="empty" *ngIf="!isFromHomeRepo">
+      {{ 'NODE_RELATIONS.NOT_SUPPORTED_REMOTELY' | translate }}
+    </div>
     <div
       class="empty"
-      *ngIf="!versions?.length && !relations?.length && !forkedChilds?.length && !forkedOrigin"
+      *ngIf="
+        isFromHomeRepo &&
+        !versions?.length &&
+        !relations?.length &&
+        !forkedChilds?.length &&
+        !forkedOrigin
+      "
     >
       {{ 'NODE_RELATIONS.NO_RELATIONS' | translate }}
     </div>

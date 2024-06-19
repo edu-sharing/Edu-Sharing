@@ -1,5 +1,5 @@
 <div
-  *ngIf="(entriesService.globalOptionsSubject | async)?.length"
+  *ngIf="(getEnabledOptions() | async)?.length"
   role="listitem"
   class="global-options"
   [class.global-options-small]="displayType === NodeEntriesDisplayType.SmallGrid"
@@ -7,7 +7,7 @@
 >
   <button
     mat-button
-    *ngFor="let option of entriesService.globalOptionsSubject | async"
+    *ngFor="let option of getEnabledOptions() | async"
     (click)="option.callback()"
     class="global-option-btn"
     attr.data-test="card-button-{{ option.name }}"

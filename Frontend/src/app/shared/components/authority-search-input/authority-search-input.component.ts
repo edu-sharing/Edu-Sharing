@@ -31,7 +31,7 @@ interface SuggestionGroup {
     label: string;
     values: SuggestItem[];
 }
-
+type SuggestionResult = SuggestionGroup[] | 'NO_RECENT' | 'NO_MATCHES';
 @Component({
     selector: 'es-authority-search-input',
     templateUrl: 'authority-search-input.component.html',
@@ -74,7 +74,7 @@ export class AuthoritySearchInputComponent {
     @Output() onChooseAuthority = new EventEmitter<Authority | any>();
 
     input = new UntypedFormControl('');
-    suggestionGroups$: Observable<SuggestionGroup[]>;
+    suggestionGroups$: Observable<SuggestionResult>;
     suggestionLoading = new BehaviorSubject<boolean>(false);
 
     constructor(
@@ -89,10 +89,10 @@ export class AuthoritySearchInputComponent {
             startWith(''),
             debounceTime(500),
             filter(() => {
-                if (this.input.value?.length < 2) {
+                /*if (this.input.value?.length < 2) {
                     this.suggestionLoading.next(false);
                     return false;
-                }
+                }*/
                 return true;
             }),
             tap(() => this.suggestionLoading.next(true)),
@@ -123,26 +123,32 @@ export class AuthoritySearchInputComponent {
         this.input.setValue('');
     }
 
-    getSuggestions(inputValue: string): Observable<SuggestionGroup[]> {
+    getSuggestions(inputValue: string): Observable<SuggestionResult> {
         if (inputValue.length < 2) {
             if (this.showRecent && this.restConnector.getCurrentLogin()?.currentScope == null) {
                 return this.getRecentSuggestions();
             } else {
-                return of(null);
+                return of('NO_MATCHES');
             }
         } else {
+            let data: Observable<SuggestionGroup[]>;
             switch (this.mode) {
                 case AuthoritySearchMode.Users:
-                    return this.getUsersSuggestions(inputValue);
+                    data = this.getUsersSuggestions(inputValue);
+                    break;
                 case AuthoritySearchMode.UsersAndGroups:
-                    return this.getUsersAndGroupsSuggestions(inputValue);
+                    data = this.getUsersAndGroupsSuggestions(inputValue);
+                    break;
                 case AuthoritySearchMode.Organizations:
-                    return this.getOrganizationsSuggestions(inputValue);
+                    data = this.getOrganizationsSuggestions(inputValue);
+                    break;
             }
+
+            return data.pipe(map((d) => (d?.length ? d : 'NO_MATCHES')));
         }
     }
 
-    private getRecentSuggestions(): Observable<SuggestionGroup[]> {
+    private getRecentSuggestions(): Observable<SuggestionResult> {
         return this.iam.getRecentlyInvited().pipe(
             map(({ authorities }) => {
                 if (authorities.length > 0) {
@@ -153,7 +159,7 @@ export class AuthoritySearchInputComponent {
                         },
                     ];
                 } else {
-                    return [];
+                    return 'NO_RECENT';
                 }
             }),
         );

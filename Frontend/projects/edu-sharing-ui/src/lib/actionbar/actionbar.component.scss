@@ -40,14 +40,15 @@ button {
     }
 }
 .actionbar-background-primary {
-    .mat-button {
+    .mdc-button {
         color: rgb(var(--palette-foreground-text-dark));
     }
-    .mat-flat-button {
+    .mat-mdc-unelevated-button {
         background-color: #fff;
         color: var(--primary);
         &:disabled {
-            color: var(--textLight);
+            color: rgba(0, 0, 0, 0.5);
+            background-color: #eee;
         }
     }
 }

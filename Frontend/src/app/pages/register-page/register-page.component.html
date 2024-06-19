@@ -1,6 +1,4 @@
-<es-global-progress *ngIf="isLoading"></es-global-progress>
 <es-card
-  *ngIf="!isLoading"
   role="main"
   esSkipTarget="MAIN_CONTENT"
   avatar="assets/images/app-icon.svg"
@@ -15,7 +13,7 @@
   }}"
   subtitle="{{ 'REGISTER.ORGANIZATION_TITLE' | translate }}"
   width="normal"
-  height="large"
+  height="auto"
   (onCancel)="cancel()"
   [isCancelable]="false"
 >

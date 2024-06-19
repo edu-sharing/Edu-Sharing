@@ -9,6 +9,12 @@ public class RepositoryVersionInfo implements Serializable {
     public VersionMaven maven;
     public VersionGit git;
 
+    public VersionBuild build;
+
+    public static class VersionBuild implements Serializable {
+        public String timestamp;
+    }
+
     public static class Version implements Serializable {
         public String full;
         public String major;

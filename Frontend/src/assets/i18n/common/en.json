@@ -97,8 +97,6 @@
     "ADD_TO_SELECTED_COLLECTION": "Add here",
     "NO_RECENT_COLLECTIONS": "No recently used collections available"
   },
-  "ADD_TO_RECENT_COLLECTION": "Add to recent collection",
-  "SEARCH_COLLECTIONS": "Search collection...",
   "SUB_CATEGORY_ARIA": "sub category",
   "ASK_CC_PUBLISH": "Ask",
   "ASK_CC_PUBLISH_SUBJECT": "Request for permissions of element {{name}}",
@@ -126,7 +124,6 @@
     "TOOLPERMISSION_INVITE_STREAM": "The permission to add content to the stream",
     "TOOLPERMISSION_INVITE_LINK": "The permission to create content links",
     "TOOLPERMISSION_INVITE_HISTORY": "The permission to view the sharing history",
-    "TOOLPERMISSION_INVITED": "The permission to see the list of invited users",
     "TOOLPERMISSION_INVITE_SHARE": "The permission to share content in shared folders",
     "TOOLPERMISSION_INVITE_ALLAUTHORITIES": "The permission to share content to all users",
     "TOOLPERMISSION_PUBLISH_COPY": "The permission to create published copies of materials",
@@ -140,7 +137,7 @@
     "TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_SHARE_SAFE": "Searching and inviting users outside the organization in shared folders in the safe",
     "TOOLPERMISSION_COLLECTION_PINNING": "Pinning collections and managing pinned collections",
     "TOOLPERMISSION_COLLECTION_CURRICULUM": "Creating curriculum collections (currently not used)",
-    "TOOLPERMISSION_COLLECTION_FEEDBACK": "Give feedback on other collections",
+    "TOOLPERMISSION_MATERIAL_FEEDBACK": "Give feedback on other materials",
     "TOOLPERMISSION_CONFIDENTAL": "Access to the secure area (safe)",
     "TOOLPERMISSION_UNCHECKEDCONTENT": "Show sources like YouTube in your search",
     "TOOLPERMISSION_WORKSPACE": "Access to the workspace",
@@ -309,7 +306,6 @@
   },
   "NODE_REPORT": {
     "TITLE": "Report problem",
-    "SUBTITLE": "Report an issue or problem",
     "REPORT": "report",
     "REPORT_INFO": "Report problem with \"{{name}}\"",
     "COMMENT": "Provide additional information about the problem that has occurred",
@@ -335,6 +331,7 @@
     "COMMENT_EMPTY": "Please enter a comment",
     "NO_COMMENTS": "No comments yet",
     "NO_PERMISSION": "Commenting is disabled for this element",
+    "NOT_SUPPORTED_REMOTELY": "Commenting is not supported for external elements",
     "OPTION_EDIT": "edit",
     "OPTION_DELETE": "delete",
     "DELETE_COMMENT": "Delete comment?",
@@ -408,7 +405,6 @@
     "TOAST_DURATION_INFINITE_INFO": "Status messages are not automatically hidden and must be closed manually.",
     "TOAST_DURATION_TITLE": "display time",
     "TOAST_DURATION_MESSAGE": "Status messages disappear automatically after a specified time or can be closed manually by clicking.",
-    "SAVED": "Settings have been saved.",
     "DISMISS_TOAST": "Hide"
   },
   "AUTHORITY_TYPE_GROUP": "Group",
@@ -546,8 +542,8 @@
     "EDIT_SIMPLE": "Quick-Edit",
     "COLLECTION_EDIT": "Edit",
     "COLLECTION_PIN": "Pin collection",
-    "COLLECTION_FEEDBACK": "Feedback...",
-    "COLLECTION_FEEDBACK_VIEW": "View feedback",
+    "MATERIAL_FEEDBACK": "Feedback...",
+    "MATERIAL_FEEDBACK_VIEW": "View feedback",
     "OPEN": "Open",
     "DOWNLOAD": "Download",
     "DOWNLOAD_ALL": "download zip",
@@ -615,15 +611,12 @@
     "ADD_CHILD_OBJECT_DESCRIPTION": "Create a series by attaching more materials to this object",
     "ADD_CHILD_OBJECT_QUOTA_REACHED": "Error while uploading \"{{ name }}\": Upload quota reached",
     "ADD_CHILD_OBJECT_VIRUS_DETECTED": "Error while uploading \"{{ name }}\": Virus detected. File was deleted",
-    "CONFIRM_DISCARD_TITLE": "Discard changes?",
-    "CONFIRM_DISCARD_MESSAGE": "Close the dialog without saving any changes?",
     "REQUIRED_MESSAGE": "Field is required",
     "REQUIRED_FOR_PUBLISH_MESSAGE": "Field is required for publishing",
     "INDETERMINATE_NOTICE": "Click on the chip in order to add the value \"{{ value }}\" to all elements, or remove it in order to delete it from all elements.",
     "SHOW_OPTIONS_BUTTON": "Show options",
     "FILTER_FOR": "Filter for \"{{value}}\" ({{count}} matching element(s))",
-    "FILTER_TREE": "Filter...",
-    "OPEN_CLOSE_EXTENDED": "Open/close view"
+    "FILTER_TREE": "Filter..."
   },
 
   "SIMPLE_EDIT": {
@@ -714,6 +707,12 @@
     "FIELD_REQUIRED": "The field {{ name }} is required",
     "API_FORBIDDEN": "No permissions to access this content",
     "API_FORBIDDEN_LOGIN": "Please login to access this section"
+  },
+  "NODE_SEARCH_SELECTOR": {
+    "MORE_FILTERS": "Extended search filters",
+    "NO_MATCHES": "No elements machted",
+    "NO_RECENT": "No recently invited users or groups",
+    "NO_PERMISSIONS": "You're having insufficient permissions on the given element"
   },
   "VCARD": {
     "Givenname": "First name",

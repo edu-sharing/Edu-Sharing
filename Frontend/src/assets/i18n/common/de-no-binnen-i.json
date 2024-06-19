@@ -1,0 +1,32 @@
+{
+  "NODE": {
+    "ccm:lifecyclecontributer_publisher": "Herausgeberschaft",
+    "ccm:lifecyclecontributer_authorFN": "Autorin/Autor",
+    "ccm:author_freetext": "Weitere Angaben zur Urheberschaft"
+  },
+
+  "LICENSE": {
+    "LINK_AUTHOR": "Link zur Autorin/zum Autor",
+    "DESCRIPTION": {
+      "CC_BY": "Autorin/Autor muss genannt werden."
+    }
+  },
+  "ACCESSIBILITY": {
+    "AUTHOR": "Autorin/Autor"
+  },
+  "NODE_VARIANT": {
+    "WARNING": {
+      "NO_LICENSE": "Dieses Material besitzt noch keine Lizenz.\nSetzen Sie sich ggf. mit der Autorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden.",
+      "COPYRIGHT": "Dieses Material besitzt eine Copyright-Lizenz.\nSetzen Sie sich ggf. mit der Autorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden.",
+      "ND": "Dieses Material besitzt eine Non Derivative Lizenz. Diese Lizenz legt fest, dass das Material nicht verändert werden darf.\nSetzen Sie sich ggf. mit der AUtorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden."
+    }
+  },
+  "FEEDBACK": {
+    "CREATOR": "Autorin/Autor {{creator}}"
+  },
+  "MDS": {
+    "AUTHOR_LABEL": "Angaben zur Urheberschaft",
+    "AUTHOR_FREETEXT": "Weitere Angaben zur Urheberschaft",
+    "AUTHOR_PERSON": "Beteiligte"
+  }
+}

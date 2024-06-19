@@ -1440,7 +1440,7 @@ public class AdminApi {
 	public Response changeLogging(
 			@Parameter(description = "name", required = true) @QueryParam("name") String name,
 			@Parameter(description = "loglevel", required = true) @QueryParam("loglevel") String loglevel,
-			@Parameter(description = "appender", schema = @Schema(defaultValue="File") ) @QueryParam("appender") String appender,
+			@Parameter(description = "appender", schema = @Schema(defaultValue="ConsoleAppender") ) @QueryParam("appender") String appender,
 			@Context HttpServletRequest req) {
 		try {
 

@@ -34,21 +34,23 @@
       (optionSelected)="setOption($event)"
     >
       <ng-container *ngIf="suggestionGroups$ | async as groups">
-        <mat-option *ngIf="groups.length === 0" [disabled]="true">
-          <div class="no-match">{{ 'NODE_SEARCH_SELECTOR.NO_MATCHES' | translate }}</div>
+        <mat-option *ngIf="groups === 'NO_RECENT' || groups === 'NO_MATCHES'" [disabled]="true">
+          <div class="no-match">{{ 'NODE_SEARCH_SELECTOR.' + groups | translate }}</div>
         </mat-option>
-        <mat-optgroup *ngFor="let group of groups" label="{{ group.label | translate }}">
-          <mat-option
-            class="authority-search-input-option"
-            *ngFor="let suggestion of group.values"
-            [value]="suggestion"
-          >
-            <es-authority-row
-              [authority]="suggestion.originalObject"
-              [secondaryTitle]="suggestion.secondaryTitle"
-            ></es-authority-row>
-          </mat-option>
-        </mat-optgroup>
+        <ng-container *ngIf="!(groups === 'NO_RECENT' || groups === 'NO_MATCHES')">
+          <mat-optgroup *ngFor="let group of groups" label="{{ group.label | translate }}">
+            <mat-option
+              class="authority-search-input-option"
+              *ngFor="let suggestion of group.values"
+              [value]="suggestion"
+            >
+              <es-authority-row
+                [authority]="suggestion.originalObject"
+                [secondaryTitle]="suggestion.secondaryTitle"
+              ></es-authority-row>
+            </mat-option>
+          </mat-optgroup>
+        </ng-container>
       </ng-container>
     </mat-autocomplete>
   </mat-form-field>

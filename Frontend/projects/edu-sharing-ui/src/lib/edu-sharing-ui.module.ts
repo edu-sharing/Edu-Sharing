@@ -10,6 +10,7 @@ import { NodeImageSizePipe } from './pipes/node-image-size.pipe';
 import { FormatDatePipe } from './pipes/format-date.pipe';
 import { ListItemLabelPipe } from './node-entries/list-item-label.pipe';
 import { SortDropdownComponent } from './sort-dropdown/sort-dropdown.component';
+import { MdsModule } from './mds/mds.module';
 
 @NgModule({
     declarations: [],
@@ -25,6 +26,7 @@ import { SortDropdownComponent } from './sort-dropdown/sort-dropdown.component';
     ],
     exports: [
         CommonModule,
+        MdsModule,
         MatTooltipModule,
         TranslateModule,
         EduSharingUiCommonModule,

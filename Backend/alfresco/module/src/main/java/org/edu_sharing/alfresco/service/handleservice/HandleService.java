@@ -50,6 +50,13 @@ public class HandleService {
 			handleServerPrefix = config.getString("prefix");
 			handleServerRepoId = config.getString("repoid");
 			privkeyPath = config.getString("privkey");
+			/**
+			 * config dir: must be writeable
+			 */
+			String configDir = config.getString("configDir");
+			if(configDir != null){
+				System.setProperty("net.handle.configDir", configDir);
+			}
 			id = "0.NA/"+handleServerPrefix;
 		}else {
 			throw new HandleServiceNotConfiguredException();

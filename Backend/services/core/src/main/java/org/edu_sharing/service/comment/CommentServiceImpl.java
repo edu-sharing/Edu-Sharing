@@ -67,11 +67,16 @@ public class CommentServiceImpl implements CommentService{
 		throwIfNoComment(commentId);
 		Map<String, Object> props = new HashMap<>();
 		props.put(CCConstants.CCM_PROP_COMMENT_CONTENT,comment);
-		NodeRef replyTo = new NodeRef(nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), commentId, CCConstants.CCM_PROP_COMMENT_REPLY));
-		nodeService.updateNodeNative(commentId, props);
+        NodeRef replyTo = null;
+        try {
+            replyTo = (NodeRef) nodeService.getPropertyNative(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), commentId, CCConstants.CCM_PROP_COMMENT_REPLY);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        nodeService.updateNodeNative(commentId, props);
 		String parentNode = nodeService.getPrimaryParent(commentId);
 
-		notify(parentNode, comment, replyTo.getId(), Status.CHANGED);
+		notify(parentNode, comment, replyTo == null ? null : replyTo.getId(), Status.CHANGED);
 	}
 
 	private void throwIfNoComment(String commentId) {
@@ -85,12 +90,16 @@ public class CommentServiceImpl implements CommentService{
 		throwIfNoComment(commentId);
 		String parentNode = nodeService.getPrimaryParent(commentId);
 		String comment = nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), commentId, CCConstants.CCM_TYPE_COMMENT);
-		NodeRef replyTo = new NodeRef(nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), commentId, CCConstants.CCM_PROP_COMMENT_REPLY));
-
+		NodeRef replyTo = null;
+		try {
+			replyTo = (NodeRef) nodeService.getPropertyNative(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), commentId, CCConstants.CCM_PROP_COMMENT_REPLY);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
 		new RepositoryCache().remove(parentNode);
 		nodeService.removeNode(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),commentId);
 
-		notify(parentNode, comment, replyTo.getId(), Status.REMOVED);
+		notify(parentNode, comment, replyTo == null ? null : replyTo.getId(), Status.REMOVED);
 	}
 
 	private void notify(String node, String comment, String commentReference, Status status) {

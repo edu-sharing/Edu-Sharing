@@ -103,6 +103,10 @@
             <artifactId>edu_sharing-community-repository-backend-services-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.edu_sharing</groupId>
+            <artifactId>edu_sharing-community-repository-backend-alfresco-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.drewnoakes</groupId>
             <artifactId>metadata-extractor</artifactId>
             <version>2.16.0</version>

@@ -127,6 +127,17 @@
       ]
     },
     {
+      "transformerName": "EduSharingZipTextExecuter",
+      "supportedSourceAndTargetList": [
+        {"sourceMediaType": "application/octet-stream", "priority": 49, "targetMediaType": "text/plain"},
+        {"sourceMediaType": "application/zip", "priority": 49, "targetMediaType": "text/plain"},
+        {"sourceMediaType": "application/gzip", "targetMediaType": "text/plain"}
+      ],
+      "transformOptions": [
+        "eduResourceType"
+      ]
+    },
+    {
       "transformerName": "EduSharingVideoMetadataExecutor",
       "supportedSourceAndTargetList": [
         {"sourceMediaType": "video/quicktime", "targetMediaType": "alfresco-metadata-extract"},
@@ -138,13 +149,12 @@
       ]
     },
     {
-      "transformerName": "EduSharingZipTextExecuter",
+      "transformerName": "EduSharingZipMetadataExtractor",
       "supportedSourceAndTargetList": [
-        {"sourceMediaType": "application/octet-stream", "priority": 49, "targetMediaType": "text/plain"},
-        {"sourceMediaType": "application/zip", "priority": 49, "targetMediaType": "text/plain"},
-        {"sourceMediaType": "application/gzip", "targetMediaType": "text/plain"}
+        {"sourceMediaType": "application/zip", "priority": 49, "targetMediaType": "alfresco-metadata-extract"}
       ],
       "transformOptions": [
+        "metadataOptions",
         "eduResourceType"
       ]
     }

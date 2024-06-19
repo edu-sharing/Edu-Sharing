@@ -1,6 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NodeEntriesDisplayType, Scope, TemporaryStorageService } from 'ngx-edu-sharing-ui';
-import { ActionbarComponent } from 'ngx-edu-sharing-ui';
+import {
+    ActionbarComponent,
+    NodeEntriesDisplayType,
+    Scope,
+    TemporaryStorageService,
+} from 'ngx-edu-sharing-ui';
 import { SearchPageResultsService } from './search-page-results.service';
 import { SearchPageService } from './search-page.service';
 import { GlobalSearchPageServiceInternal } from './global-search-page.service';
@@ -31,7 +35,7 @@ export class SearchPageResultsComponent implements OnInit, OnDestroy {
     readonly collectionsDataSource = this.results.collectionsDataSource;
     readonly resultColumns = this.results.resultColumns;
     readonly collectionColumns = this.results.collectionColumns;
-    readonly sortConfig = this.results.sortConfig;
+    readonly state = this.results.state;
     readonly addToCollectionMode = this.searchPage.addToCollectionMode;
     readonly customTemplates = this.globalSearchPageInternal.customTemplates;
 
@@ -82,5 +86,9 @@ export class SearchPageResultsComponent implements OnInit, OnDestroy {
             return 'count-ngsearchword';
         }
         return '';
+    }
+
+    setDisplayType(displayType: NodeEntriesDisplayType) {
+        this.results.patchState({ displayType });
     }
 }

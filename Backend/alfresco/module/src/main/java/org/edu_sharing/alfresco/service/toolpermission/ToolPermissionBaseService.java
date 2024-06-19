@@ -96,6 +96,10 @@ public class ToolPermissionBaseService {
         /**
          * try to use session cache
          */
+        // system user is not restricted
+        if(AuthenticationUtil.isRunAsUserTheSystemUser()) {
+            return true;
+        }
         Boolean hasToolPerm = false;
         HttpSession session = null;
         if(Context.getCurrentInstance() != null){

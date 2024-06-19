@@ -289,7 +289,7 @@
       "OAI_PERIOD_IN_DAYS": "period in days (leave from/until empty)",
       "REMOVE_IMPORTS": "Remove deleted imports",
       "IMPORTS_REMOVED": "Deleted OAI items will be removed.\n Check the task list to see the status",
-      "EXCEL_IMPORTED": "Excel file imported ({{{ rows }} rows imported)",
+      "EXCEL_IMPORTED": "Excel file imported ({{ rows }} rows imported)",
       "COLLECTIONS_IMPORTED": "{{ count }} Collections imported"
     },
     "TOOLKIT": {
@@ -408,7 +408,7 @@
       "UPLOAD_DONE": "Folder template was stored as {{filename}} on the server.",
       "MISSING_GROUP": "At least one organisation must be selected.",
       "MISSING_TEMPLATE": "A folder template must be selected.",
-      "TEMPLATE_APPLIED": "Template {{{templatename}} was applied for {{{groupname}}.",
+      "TEMPLATE_APPLIED": "Template {{templatename}} was applied for {{groupname}}.",
       "TEMPLATE_NOTAPPLIED": "Folder template {{{templatename}} could not be applied to {{{groupname}}. Check the folder template for correctness.",
       "UPLOAD_HINT": "You can upload additional folder templates and then select them.",
       "UPLOAD_TEMPLATE": "Upload new folder template",
@@ -497,7 +497,7 @@
       "SAVE": "Update data",
       "DELETE": "Delete Media Center",
       "DELETE_TITLE": "Delete Media Center",
-      "DELETE_MESSAGE": "Do you really want to delete the media center \"{\"}\"{name}\" ? ",
+      "DELETE_MESSAGE": "Do you really want to delete the media center \"{{name}}\"?",
       "CREATED": "Media Center \"{{name}}\"was created",
       "DELETED": "Media Center \"{{name}}\"was deleted",
       "DATA": {

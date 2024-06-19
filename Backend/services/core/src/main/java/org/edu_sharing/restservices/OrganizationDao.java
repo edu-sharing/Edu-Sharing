@@ -82,6 +82,9 @@ public class OrganizationDao {
         try {
             return new OrganizationDao(repoDao,AuthorityServiceFactory.getAuthorityService(repoDao.getId()).getEduGroup(groupName));
         } catch (Throwable t) {
+			if(t instanceof NullPointerException) {
+				throw new DAOMissingException(t);
+			}
             throw DAOException.mapping(t);
         }
 

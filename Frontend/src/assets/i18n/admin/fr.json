@@ -60,12 +60,12 @@
       "BASE_CONFIG_HINT": "Ce fichier sert uniquement de modèle et ne doit pas être modifié. Veuillez saisir les valeurs modifiées dans la configuration spécifique",
       "PARSED_TITLE": "Valeurs de configuration actives",
       "PARSED_HINT": "Le résultat JSON de la configuration actuellement active, y compris toutes les étapes héritées des fichiers individuels.",
-      "CLUSTER_DEPLOYMENT_CONFIG_TITLE": "Déploiement en grappe",
+      "CLUSTER_DEPLOYMENT_CONFIG_TITLE": "Déploiement en grappe/cluster",
       "CLUSTER_DEPLOYMENT_CONFIG_HINT": "Déploiement - Configuration prédéfinie pour tous les nœuds du cluster",
       "NODE_DEPLOYMENT_CONFIG_TITLE": "Déploiement des nœuds",
       "NODE_DEPLOYMENT_CONFIG_HINT": "Déploiement-Configuration prédéfinie pour l'ensemble de ce nœud (vérifier l'adresse IP !)",
       "CLUSTER_OVERRIDE_CONFIG_TITLE": "Cluster-Override",
-      "CLUSTER_OVERRIDE_CONFIG_HINT": "Override-Configuration pour tous les nœuds de la grappe",
+      "CLUSTER_OVERRIDE_CONFIG_HINT": "Override-Configuration pour tous les nœuds du cluster",
       "NODE_OVERRIDE_CONFIG_TITLE": "Node-Override",
       "NODE_OVERRIDE_CONFIG_HINT": "Override-Configuration pour ce nœud de cluster (vérifiez l'adresse IP !)",
       "EXTENSION_CONFIG_TITLE": "Configuration de l'extension (valeurs spécifiques au client/projet)",
@@ -87,7 +87,7 @@
       "TEST_MAIL_TEMPLATE": "Modèle de courrier électronique :",
       "TEST_MAIL_TEMPLATE_LABEL": "Sélectionner un modèle",
       "TEST_MAIL_SEND": "Envoyer",
-      "MAIL_SENT": "Test-E-Mail envoyé à {{récepteur}}"
+      "MAIL_SENT": "Test-E-Mail envoyé à {{receiver}}"
     },
     "APPLICATIONS": {
       "ADD_APPLICATION": "Ajouter une nouvelle application (via une URL ou un fichier)",
@@ -185,7 +185,7 @@
           "TITLE": "Version du référentiel + Renderingservice",
           "STATUS_OK": "La version des deux systèmes correspond : {{repository}}",
           "STATUS_WARN": "La version du référentiel n'a pas pu être récupérée (Renderingservice : {{renderservice}}).\nVous êtes probablement en mode développement pour le moment, la version ne peut donc pas être récupérée.",
-          "STATUS_FAIL": "La version du référentiel ({{référentiel}}) et du service de rendu ({{renderservice}}) ne correspondent pas ou le service de rendu n'a pas été trouvé. Le contenu peut être affiché de manière incorrecte ou ne pas être affiché du tout.",
+          "STATUS_FAIL": "La version du référentiel ({{repository}}) et du service de rendu ({{renderservice}}) ne correspondent pas ou le service de rendu n'a pas été trouvé. Le contenu peut être affiché de manière incorrecte ou ne pas être affiché du tout.",
           "SOLUTION": "Vérifier si un service de rendu est connecté (systèmes distants) et si la bonne version est installée.",
           "SOLUTION_LINK": "Passage à des systèmes distants"
         },
@@ -211,7 +211,7 @@
         },
         "MAIL_SETUP": {
           "TITLE": "Configuration du serveur de messagerie",
-          "STATUS_OK": "Le serveur de messagerie {{{hôte}} est utilisé pour l'envoi de courriers électroniques.",
+          "STATUS_OK": "Le serveur de messagerie {{{host}} est utilisé pour l'envoi de courriers électroniques.",
           "STATUS_FAIL": "Aucun serveur de messagerie n'a encore été enregistré",
           "SOLUTION": "Naviguez jusqu'à la section \"configuration globale du système\" et ajoutez la configuration du courrier dans la configuration edu-sharing."
         },
@@ -288,7 +288,7 @@
       "OAI_PERIOD_IN_DAYS": "période en jours (congé de/jusqu'à vide)",
       "REMOVE_IMPORTS": "Supprimer les importations supprimées",
       "IMPORTS_REMOVED": "Les éléments OAI supprimés seront supprimés.\n Consultez la liste des tâches pour connaître l'état d'avancement",
-      "EXCEL_IMPORTED": "Fichier Excel importé ({{{ lignes }} lignes importées)",
+      "EXCEL_IMPORTED": "Fichier Excel importé ({{ rows }} lignes importées)",
       "COLLECTIONS_IMPORTED": "{{ count }} Collections importées"
     },
     "TOOLKIT": {
@@ -310,7 +310,7 @@
       "UPLOAD_TEMP": "Téléchargement de fichiers dans un répertoire temporaire",
       "CHOOSE_UPLOAD_TEMP": "Sélectionner un fichier",
       "UPLOAD_TEMP_START": "Télécharger",
-      "UPLOAD_TEMP_DONE": "Le fichier a été stocké sur le serveur en tant que {{nom du fichier}}",
+      "UPLOAD_TEMP_DONE": "Le fichier a été stocké sur le serveur en tant que {{filename}}",
       "AUTHENTICATE": "Début de la session",
       "AUTHENTICATE_AS_USER": "Démarrer la session en tant qu'utilisateur",
       "AUTHENTICATE_AS_USER_DETAILS": "Si vous continuez, la session d'administration en cours sera fermée et vous serez authentifié en tant qu'utilisateur coosen. Vous devrez vous reconnecter en tant qu'administrateur après avoir terminé votre test. Voulez-vous continuer ?"
@@ -343,14 +343,14 @@
         "HINT": "Enregistrer et charger le contenu des champs \"Lucene-Query\" et \"Properties to be included in the export\" dans des modèles nommés.",
         "LOAD_BUTTON": "Charger le modèle",
         "NEW_BUTTON": "Nouveau modèle",
-        "UPDATE_BUTTON": "Remplacer \"{{ modèle }}\"",
+        "UPDATE_BUTTON": "Remplacer \"{{ template }}\"",
         "CONFIRM_UPDATE_BUTTON": "Écraser",
         "CONFIRM_UPDATE_TITLE": "Remplacer \"{{ template }}\" ?",
         "CONFIRM_UPDATE_MESSAGE": "Voulez-vous remplacer le modèle par les valeurs actuelles ?",
         "CONFIRM_DELETE_BUTTON": "Supprimer",
-        "CONFIRM_DELETE_TITLE": "Supprimer le modèle \"{{ modèle }}\" ?",
+        "CONFIRM_DELETE_TITLE": "Supprimer le modèle \"{{ template }}\" ?",
         "CONFIRM_DELETE_MESSAGE": "Voulez-vous supprimer le modèle ?",
-        "DELETE_BUTTON": "Supprimer le modèle \"{{ modèle }}\"",
+        "DELETE_BUTTON": "Supprimer le modèle \"{{ template }}\"",
         "CREATE_BUTTON": "Créer",
         "CHOOSE_NAME_TEXT": "Choisissez un nom pour le nouveau modèle.",
         "CHOOSE_NAME_INPUT_LABEL": "Nom"
@@ -404,11 +404,11 @@
     "FOLDERTEMPLATES": {
       "EDUGROUP": "Organisation",
       "APPLYTEMPLATE": "Appliquer le modèle de dossier",
-      "UPLOAD_DONE": "Le modèle de dossier a été stocké en tant que {{nom de fichier}} sur le serveur.",
+      "UPLOAD_DONE": "Le modèle de dossier a été stocké en tant que {{filename}} sur le serveur.",
       "MISSING_GROUP": "Au moins une organisation doit être sélectionnée.",
       "MISSING_TEMPLATE": "Un modèle de dossier doit être sélectionné.",
-      "TEMPLATE_APPLIED": "Le modèle {{nom du modèle}} a été appliqué pour {{nom du groupe}}.",
-      "TEMPLATE_NOTAPPLIED": "Le modèle de dossier {{{templatename}} n'a pas pu être appliqué à {{{groupname}}. Vérifiez que le modèle de dossier est correct.",
+      "TEMPLATE_APPLIED": "Le modèle {{templatename}} a été appliqué pour {{groupname}}.",
+      "TEMPLATE_NOTAPPLIED": "Le modèle de dossier {{templatename}} n'a pas pu être appliqué à {{groupname}}. Vérifiez que le modèle de dossier est correct.",
       "UPLOAD_HINT": "Vous pouvez télécharger des modèles de dossiers supplémentaires et les sélectionner.",
       "UPLOAD_TEMPLATE": "Télécharger un nouveau modèle de dossier",
       "GOTO_FOLDERTEMPLATES": "Gérer les modèles de dossiers"
@@ -486,7 +486,7 @@
     "MEDIACENTER": {
       "MANAGE": "Centre des médias",
       "SELECT": "Sélectionnez Media Center",
-      "UPDATED": "Media Center \"{{nom}}\" a été mis à jour",
+      "UPDATED": "Media Center \"{{name}}\" a été mis à jour",
       "ADD_MEDIACENTER": "Ajouter un centre multimédia",
       "ADD_MEDIACENTER_TITLE": "Ajouter un centre multimédia",
       "ADD_MEDIACENTER_MESSAGE": "Entrez l'ID du Media Center. Tous les autres paramètres peuvent être configurés après la création",
@@ -495,9 +495,9 @@
       "SAVE": "Mise à jour des données",
       "DELETE": "Supprimer le Media Center",
       "DELETE_TITLE": "Supprimer le Media Center",
-      "DELETE_MESSAGE": "Voulez-vous vraiment supprimer le centre multimédia \"{\"}\"{nom}\" ?",
-      "CREATED": "Le centre multimédia \"{{nom}}\" a été créé",
-      "DELETED": "Le centre de médias \"{{nom}}\" a été supprimé",
+      "DELETE_MESSAGE": "Voulez-vous vraiment supprimer le centre multimédia \"{{name}}\"?",
+      "CREATED": "Le centre multimédia \"{{name}}\" a été créé",
+      "DELETED": "Le centre de médias \"{{name}}\" a été supprimé",
       "DATA": {
         "TITLE": "Données de base",
         "EDIT_NOT_ALLOWED": "L'utilisateur actuel n'a pas l'autorisation d'éditer mediacenter. Pour apporter d'autres modifications aux données, veuillez contacter l'administrateur responsable du système",
@@ -524,11 +524,11 @@
       "GROUPS": {
         "TITLE": "Groupes gérés",
         "REMOVE": "Supprimer",
-        "REMOVED": "Le groupe \"{{{nom}}\" n'est plus assigné au Media Center",
-        "ADDED": "Le groupe \"{{{nom}}\" est maintenant assigné au Media Center",
+        "REMOVED": "Le groupe \"{{{name}}\" n'est plus assigné au Media Center",
+        "ADDED": "Le groupe \"{{{name}}\" est maintenant assigné au Media Center",
         "REMOVE_TITLE": "Supprimer le groupe",
-        "REMOVE_MESSAGE": "Voulez-vous supprimer le groupe sélectionné \"{{nom}}\" de l'association pour le centre multimédia actuel (le groupe lui-même n'est pas supprimé) ?",
-        "ADD": "Ajouter le groupe \"{{nom}}\"",
+        "REMOVE_MESSAGE": "Voulez-vous supprimer le groupe sélectionné \"{{name}}\" de l'association pour le centre multimédia actuel (le groupe lui-même n'est pas supprimé) ?",
+        "ADD": "Ajouter le groupe \"{{name}}\"",
         "ADD_LABEL": "Groupe de recherche",
         "DESCRIPTION": "Tous les membres des groupes suivants peuvent accéder aux médias de ce centre de médias"
       },
@@ -546,19 +546,19 @@
         "TITLE": "Importation du Media Center",
         "CHOOSE_MEDIACENTERS": "Sélectionner un fichier CSV",
         "MEDIACENTERS_START": "Effectuer l'importation",
-        "IMPORTED": "{{ rangées }} Media Center importé"
+        "IMPORTED": "{{ rows }} Media Center importé"
       },
       "ORGIMPORT": {
         "TITLE": "Organisation Importation",
         "CHOOSE_ORGANISATIONS": "Sélectionner un fichier CSV",
         "ORGANISATIONS_START": "Effectuer l'importation",
-        "IMPORTED": "{{ rangs }} Organisation importée"
+        "IMPORTED": "{{ rows }} Organisation importée"
       },
       "ORG_MC_CONNECT": {
         "TITLE": "Importance des associations entre centres et organisations de médias",
         "CHOOSE": "Sélectionner un fichier CSV",
         "ORGANISATIONS_START": "Effectuer l'importation",
-        "IMPORTED": "{{ rangs }} associations importées",
+        "IMPORTED": "{{ rows }} associations importées",
         "REMOVE_SCHOOLS_FROM_MC": "Mise à jour des associations supprimées"
       }
     },

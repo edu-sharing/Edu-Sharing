@@ -110,7 +110,11 @@ export class JoinGroupDialogComponent implements OnInit {
                 this.toast.closeProgressSpinner();
             },
             (error) => {
-                this.toast.error(error);
+                if (error.status === RestConstants.DUPLICATE_NODE_RESPONSE) {
+                    this.toast.error(null, 'SIGNUP_GROUP.TOAST.AlreadyMember');
+                } else {
+                    this.toast.error(error);
+                }
                 this.toast.closeProgressSpinner();
             },
         );

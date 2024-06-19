@@ -12,7 +12,7 @@ import * as rxjs from 'rxjs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Repository, RestConstants } from '../../core-module/core.module';
-import { MdsHelper } from '../../core-module/rest/mds-helper';
+import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import {
     fromSearchResults,
     NodeDataSourceRemote,
@@ -135,12 +135,16 @@ export class SearchPageResultsAllService implements SearchPageResults, OnDestroy
             this._translate
                 // Make sure translations are initialized when MdsHelper calls `instant`.
                 .get('dummy')
-                .pipe(map(() => MdsHelper.getColumns(this._translate, mdsDefinition, 'search')))
+                .pipe(
+                    map(() =>
+                        MdsHelperService.getColumns(this._translate, mdsDefinition, 'search'),
+                    ),
+                )
         );
     }
 
     private _getDefaultSort(mdsDefinition: MdsDefinition): MdsSortDefault {
-        return MdsHelper.getSortInfo(mdsDefinition, 'search')?.default;
+        return MdsHelperService.getSortInfo(mdsDefinition, 'search')?.default;
     }
 
     private _getSearchRemote(

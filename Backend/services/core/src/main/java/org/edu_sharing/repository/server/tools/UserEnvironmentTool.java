@@ -10,19 +10,13 @@ import java.util.Map;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
-import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
-import org.edu_sharing.repository.server.RepoFactory;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 public class UserEnvironmentTool {
 
@@ -188,6 +182,10 @@ public class UserEnvironmentTool {
 
     public String getEdu_SharingMediacenterFolder() throws Throwable {
         return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_MEDIACENTER, CCConstants.I18n_SYSTEMFOLDER_MEDIACENTER);
+    }
+
+    public String getEdu_SharingReportsFolder() throws Throwable {
+        return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_REPORTS, CCConstants.I18n_SYSTEMFOLDER_REPORTS);
     }
 
     public String getEdu_SharingServiceFolder() throws Throwable {

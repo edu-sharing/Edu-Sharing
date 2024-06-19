@@ -90,7 +90,7 @@ describe('TranslationsService', () => {
             );
             expect(configurationServiceSpy.calls.mostRecent().args).toEqual([
                 'supportedLanguages',
-                ['de', 'de-informal', 'en', 'fr', 'it', 'none'], // Translation.DEFAULT_SUPPORTED_LANGUAGES
+                ['de', 'de-informal', 'de-no-binnen-i', 'en', 'fr', 'it', 'none'], // Translation.DEFAULT_SUPPORTED_LANGUAGES
             ]);
         });
 

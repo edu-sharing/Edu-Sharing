@@ -1,0 +1,88 @@
+{
+  "PERMISSIONS": {
+    "EDIT_MEMBER_GROUPS": "Nutzende Person ist Mitglied von",
+    "USER_EXISTS_IN_GROUP": "Nutzende Person ist bereits Mitglied dieser Gruppe",
+    "USER_EDITED": "Nutzende Person gespeichert",
+    "USER_CREATED": "Nutzende Person erstellt",
+    "DELETED_USER": "Nutzende Person erfolgreich entfernt",
+    "MEMBER_REMOVED": "Nutzende Person aus Gruppe entfernt",
+    "DOWNLOAD_MEMBER_FILENAME": "Nutzende Person",
+    "ADD_MEMBER_TO_GROUP": "Nutzende Person hinzufügen",
+    "EXPORT_MEMBER": "Nutzende Person exportieren",
+    "MENU_ADD_GROUP_MEMBERS": "Nutzende Person hinzufügen",
+    "SEARCH_USER": "Nutzende Person suchen...",
+    "EDIT_USER": "Nutzende Person bearbeiten",
+    "CREATE_USER": "Nutzende Person erstellen",
+    "USER_ADDED_FAILED_MULTI": "{{error}} Zuordnung(en) sind fehlgeschlagen, da die Nutzende Person bereits Mitglied sind<br>{{count}} Zuordnung(en) wurden vorgenommen",
+    "USER_ADDED_FAILED": "{{error}} Nutzende Person(en) war(en) bereits Mitglied und wurden nicht hinzugefügt<br>{{count}} Nutzende Person(en) wurde(n) zur Gruppe {{group}} hinzugefügt",
+    "DELETE_USER_SINGLE": "Möchten Sie den/die Nutzende Person {{name}} aus der Organisation ausschließen?",
+    "DELETE_USER": "Möchten Sie die gewählten Nutzenden aus der Organisation ausschließen?",
+    "DELETE_ORG_SINGLE": "Möchten Sie die Organisation {{name}} entfernen? Alle Nutzenden bleiben bestehen und der Organisationsordner wird nicht gelöscht",
+    "INFO_GLOBAL_USER": "Sie sehen aktuell Nutzende aller Organisationen sowie noch nicht zugeordnete",
+    "INFO_ORG_USER": "Sie sehen aktuell Nutzende der Organisation {{ org }}",
+    "SET_STATUS": "Nutzenden-Status festlegen",
+    "STATUS_LABEL": "Nutzenden-Status Status",
+    "ORG_SIGNUP_ADD_CONFIRM": "Nutzende Person(en) wurde(n) der Gruppe hinzugefügt",
+    "ORG_SIGNUP_REJECT_CONFIRM": "Nutzende Person(en) wurde(n) von der Warteliste entfernt und nicht in die Gruppe hinzugefügt",
+    "TAB": {
+      "USER": "Nutzende Person"
+    },
+    "DELETE": {
+      "MAIN_HEADING": "Nutzende Person & Daten löschen",
+      "RECEIVER": "Nutzende Person suchen..."
+    },
+
+    "TOOLPERMISSIONS": {
+      "EVERYONE_ALLOWED": "Ausgangswert für alle Nutzenden",
+      "USER_ALLOWED": "Gilt für gewählten Nutzenden"
+    },
+
+    "DELETE": {
+      "CONFIRM": {
+        "USERS": "Die Aktion wird für alle folgenden Nutzenden und deren gespeicherte Daten angewandt:",
+        "RECEIVER_CAPTION": "Die gewählte Person wird als erstellende Person in der Daten & Sammlungen angezeigt"
+      },
+
+      "HOME_FOLDER": {
+        "CAPTION": "Stamm-Verzeichnisse der Nutzenden & enthaltene Daten"
+      },
+
+      "SHARED_FOLDERS": {
+        "CAPTION": "Dateien & Ordner der Nutzenden in gemeinsamen & fremden Verzeichnissen"
+      },
+
+      "COLLECTIONS": {
+        "CAPTION": "Sammlungen der Nutzenden"
+      },
+
+      "USER_INTERACTIONS": {
+        "COMMENTS_HINT": "Wenn gesetzt, werden alle Kommentare inkl. der Inhalte dieser von den betroffenen Nutzenden entfernt",
+        "RATINGS_HINT": "Wenn gesetzt, werden die Bewertungen der Nutzenden von Elementen entfernt. Dadurch können sich die Gesamtbewertungen der Elemente ändern",
+        "CAPTION": "Nutzenden-Interaktionen und Statistik-Daten",
+        "STREAM_HINT": "Wenn gesetzt, werden alle Stream-Einträge, diese nutzende Person in den Stream hinzugefügt hat, entfernt. Dies betrifft nicht die Elemente, auf die die jeweiligen Stream-Einträge verweisen",
+        "STATISTICS_HINT": "Wenn gesetzt, werden alle Nutzenden-Interaktionen (Logins, Zugriffe auf Elemente) entfernt. Dadurch können sich Statistiken (auch rückwirkend) ändern",
+        "COLLECTION_FEEDBACK_HINT": "Wenn gesetzt, wird jegliches Feedback, welches diese nutzende Person an Sammlungen abgegeben hat, entfernt.",
+        "DELETE_COLLECTIONS": "Es wurde festgelegt, dass erstellte Sammlungen dieser nutzenden Person entfernt werden soll. Sollten sich unterhalb dieser Sammlung Sammlungen oder Materialien anderer anderer Nutzender befinden, werden diese ebenfalls entfernt",
+        "HOME_FOLDER_DELETE": "Wenn der Home-Ordner gelöscht wird werden möglicherweise Objekte anderer Nutzender, die darin abgelegt wurden, ebenfalls gelöscht",
+        "ASSIGNING_DELETED_USER": "Für alle Elemente, die nicht gelöscht werden, wird zukünftig als nutzende Person \"gelöschte Person angezeigt"
+      },
+
+      "METADATA": {
+        "HINT": "Beachten Sie, dass nur die/der letzte Nutzende an den Metadaten gefunden & entfernt werden können"
+      },
+
+      "STATE": {
+        "NO_USERS": "Bislang sind keine Konten für eine Löschung freigegeben. Nutzende können freigegeben werden, indem der Nutzers{{GENDER_SEPARATOR}}in-Status auf den entsprechenden Wert gesetzt wird",
+        "NO_RECEIVER": "Es wurde festgelegt, dass ein oder mehrere Elemente anderer Nutzenden zugewiesen werden sollen, jedoch wurde kein(e) Ziel-Nutzer{{GENDER_SEPARATOR}}in bzw. eine Ziel-Organisation ausgewählt. Bitte legen Sie eine(n) Zielnutzer{{GENDER_SEPARATOR}}in sowie die verantwortliche Organisation fest",
+        "DELETE_COLLECTIONS": "Es wurde festgelegt, dass erstellte Sammlungen dieser nutzenden Person entfernt werden soll. Sollten sich unterhalb dieser Sammlung Sammlungen oder Materialien anderer Nutzender Personen befinden, werden diese ebenfalls entfernt"
+      }
+    },
+
+    "ORG_SIGNUP_METHODS": {
+      "disabled_DETAILS": "Nutzende können sich nicht selbstständig in die Organisation/Gruppe einschreiben, sondern müssen manuell von einem Administrierenden hinzugefügt werden.",
+      "simple_DETAILS": "Nutzende können sich selbstständig in die Organisation/Gruppe einschreiben und werden sofort Mitglied.",
+      "password_DETAILS": "Nutzende können sich selbstständig in die Organisation/Gruppe einschreiben und werden sofort Mitglied, sofern sie das korrekte Passwort kennen.",
+      "list_DETAILS": "Nutzende können sich selbstständig in die Organisation/Gruppe einschreiben und werden auf eine Warteliste gesetzt. Eine Person mit Admin-Rechten muss die Einschreibung anschließend bestätigen."
+    }
+  }
+}

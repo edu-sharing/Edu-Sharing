@@ -1,6 +1,6 @@
 {
   "PROFILES": {
-    "TITLE": "Profilo di {{ nome }}",
+    "TITLE": "Profilo di {{ name }}",
     "TITLE_NAV": "Profilo",
     "LOAD_ERROR": "Il profilo non è stato trovato.",
     "EDIT": "modifica",

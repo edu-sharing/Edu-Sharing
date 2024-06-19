@@ -48,6 +48,10 @@ export class CardComponent implements AfterContentInit, OnDestroy {
      */
     @Input() title: string;
     /**
+     * custom css class(es)
+     */
+    @Input() class: string = '';
+    /**
      * The subtitle of the card (optional)
      * You may also use the "node" binding to automatically fill this field
      */

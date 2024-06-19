@@ -23,7 +23,12 @@
     </div>
   </div>
   <div class="new-no-permission" *ngIf="!canComment()">
-    <div class="no-permission">{{ 'NODE_COMMENTS.NO_PERMISSION' | translate }}</div>
+    <div class="no-permission">
+      {{
+        'NODE_COMMENTS.' + (this.isFromHomeRepo ? 'NO_PERMISSION' : 'NOT_SUPPORTED_REMOTELY')
+          | translate
+      }}
+    </div>
   </div>
   <div class="comments comments-loading" *ngIf="loading"><es-spinner></es-spinner></div>
   <div class="comments" [class.commentsLong]="!canComment()" *ngIf="comments">

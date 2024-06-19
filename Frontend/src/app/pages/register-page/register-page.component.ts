@@ -3,6 +3,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    OnDestroy,
     OnInit,
     ViewChild,
 } from '@angular/core';
@@ -22,6 +23,8 @@ import { RegisterDoneComponent } from './register-done/register-done.component';
 import { RegisterFormComponent } from './register-form/register-form.component';
 import { RegisterRequestComponent } from './register-request/register-request.component';
 import { RegisterResetPasswordComponent } from './register-reset-password/register-reset-password.component';
+import { LoadingScreenService } from '../../main/loading-screen/loading-screen.service';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'es-register-page',
@@ -29,15 +32,15 @@ import { RegisterResetPasswordComponent } from './register-reset-password/regist
     styleUrls: ['register-page.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterPageComponent implements OnInit {
+export class RegisterPageComponent implements OnInit, OnDestroy {
     @ViewChild('registerForm') registerForm: RegisterFormComponent;
     @ViewChild('registerDone') registerDone: RegisterDoneComponent;
     @ViewChild('request') request: RegisterRequestComponent;
     @ViewChild('resetPassword') resetPassword: RegisterResetPasswordComponent;
-    public isLoading = true;
     state: 'register' | 'request' | 'reset-password' | 'done' | 'done-reset' = 'register';
     buttons: DialogButton[];
     params: Params;
+    private destroyed = new Subject<void>();
 
     public cancel() {
         RestHelper.goToLogin(this.router, this.configService, null, null);
@@ -62,10 +65,18 @@ export class RegisterPageComponent implements OnInit {
         private uiService: UIService,
         private configService: ConfigurationService,
         private changes: ChangeDetectorRef,
+        private loadingScreen: LoadingScreenService,
         private route: ActivatedRoute,
     ) {}
 
+    ngOnDestroy(): void {
+        this.destroyed.next();
+        this.destroyed.complete();
+    }
+
     ngOnInit() {
+        const loadingTask = this.loadingScreen.addLoadingTask({ until: this.destroyed });
+        this.toast.showProgressSpinner();
         this.updateButtons();
         this.route.params.subscribe((params) => {
             this.params = params;
@@ -85,7 +96,9 @@ export class RegisterPageComponent implements OnInit {
         });
 
         this.translations.waitForInit().subscribe(() => {
-            this.isLoading = false;
+            loadingTask.done();
+            this.toast.closeProgressSpinner();
+            console.log('done');
             if (['request', 'reset-password', 'done-reset'].indexOf(this.params.status) !== -1) {
                 if (
                     this.configService.instant('register.local', true as boolean) === false &&

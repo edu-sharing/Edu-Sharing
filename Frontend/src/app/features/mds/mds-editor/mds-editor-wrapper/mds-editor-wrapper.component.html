@@ -1,32 +1,6 @@
-<es-mds
-  *ngIf="editorType === 'legacy'"
-  [addWidget]="addWidget"
-  [allowReplacing]="allowReplacing"
-  [bulkBehaviour]="bulkBehaviour"
-  [create]="create"
-  [currentValues]="currentValues"
-  [customTitle]="customTitle"
-  [embedded]="embedded"
-  [extended]="extended"
-  [groupId]="groupId"
-  [invalidate]="invalidate"
-  [labelNegative]="labelNegative"
-  [labelPositive]="labelPositive"
-  [mode]="mode"
-  [nodes]="nodes"
-  [parentNode]="parentNode"
-  [priority]="priority"
-  [repository]="repository"
-  [setId]="setId"
-  [suggestions]="legacySuggestions"
-  (extendedChange)="extendedChange.emit($event)"
-  (onCancel)="onCancel.emit($event)"
-  (onDone)="onDone.emit($event)"
-  (onMdsLoaded)="onMdsLoaded.emit($event)"
-  (openContributor)="openContributor.emit($event)"
-  (openLicense)="openLicense.emit($event)"
-  (openTemplate)="openTemplate.emit($event)"
-></es-mds>
+<es-info-message *ngIf="$any(editorType) === 'legacy'" mode="warning"
+  >Legacy mds not supported anymore</es-info-message
+>
 
 <es-mds-editor-embedded *ngIf="editorType === 'angular' && embedded"></es-mds-editor-embedded>
 <es-spinner *ngIf="isLoading && embedded"></es-spinner>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
     AuthorityProfile,
     ConfigurationService,
@@ -14,7 +14,6 @@ import {
     STREAM_STATUS,
 } from '../../../core-module/core.module';
 import { Toast } from '../../../services/toast';
-import { MdsComponent } from '../../../features/mds/legacy/mds/mds.component';
 import { trigger } from '@angular/animations';
 import { Helper } from '../../../core-module/rest/helper';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
@@ -30,7 +29,6 @@ import { UIAnimation } from 'ngx-edu-sharing-ui';
     ],
 })
 export class AddStreamComponent {
-    @ViewChild('mds') mdsRef: MdsComponent;
     private streamEntry: any = {};
     reloadMds = new Boolean(true);
     AUDIENCE_MODE_EVERYONE = '0';
@@ -47,11 +45,8 @@ export class AddStreamComponent {
     @Output() onDone = new EventEmitter();
     constructor(
         private connector: RestConnectorService,
-        private iam: RestIamService,
         private streamApi: RestStreamService,
-        private config: ConfigurationService,
         private toast: Toast,
-        private nodeApi: RestNodeService,
     ) {
         this.buttons = [
             new DialogButton('CANCEL', { color: 'standard' }, () => this.cancel()),
@@ -73,7 +68,7 @@ export class AddStreamComponent {
         this.invite.splice(this.invite.indexOf(event), 1);
     }
     public save() {
-        let values = this.mdsRef.getValues();
+        let values = null; // this.mdsRef.getValues();
         if (!values) {
             return;
         }

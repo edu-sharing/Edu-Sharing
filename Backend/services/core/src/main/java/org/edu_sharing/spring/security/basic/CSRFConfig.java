@@ -40,7 +40,9 @@ public class CSRFConfig {
     }
 
     public static void csrfInitCookie(HttpServletRequest request, HttpServletResponse response){
-        if(config.hasPath("security.sso.disableCsrf") && !config.getBoolean("security.sso.disableCsrf")){
+        if(eduSessionAuthenticationStrategy != null
+                && config.hasPath("security.sso.disableCsrf")
+                && !config.getBoolean("security.sso.disableCsrf")){
             eduSessionAuthenticationStrategy.onAuthentication(null,request,response);
         }
     }

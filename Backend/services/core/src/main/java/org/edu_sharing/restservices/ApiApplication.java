@@ -1,5 +1,6 @@
 package org.edu_sharing.restservices;
 
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 import io.swagger.v3.jaxrs2.SwaggerSerializers;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -9,7 +10,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -75,7 +75,7 @@ public class ApiApplication extends ResourceConfig {
         //this.packages("io.swagger.jaxrs.listing");
         this.packages("io.swagger.v3.jaxrs2.integration.resources");
         // required in order to catch invalid json data exception
-        this.register(JacksonJaxbJsonProvider.class);
+        this.register(JacksonXmlBindJsonProvider.class);
 
         //final BeanConfig beanConfig = new BeanConfig();
 

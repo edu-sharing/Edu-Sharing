@@ -2,15 +2,15 @@
   "COLLECTIONS": {
     "TITLE": "Collections",
     "TUTORIAL_HEADING": "Rassemblez ce que vous aimez",
-    "TUTORIAL_DESCRIPTION": "Créez vos propres collections et remplissez-les de matériel intéressant - en privé ou avec d'autres.",
+    "TUTORIAL_DESCRIPTION": "Créez vos propres collections et remplissez-les de matériel intéressant - en mode privé ou en partageant avec d'autres.",
     "ERROR_DELETE": "Une erreur s'est produite lors de la suppression de la collection.",
     "ENTER_NAME": "Veuillez saisir un nom pour cette collection.",
     "NO_EDITORIAL_GROUPS": "Aucun groupe éditorial n'a été trouvé",
-    "ORDER_ELEMENTS": "Modifier l'ordre des matériaux manuellement",
+    "ORDER_ELEMENTS": "Modifier l'ordre des ressources manuellement",
     "ORDER_ELEMENTS_INFO": "Les visiteurs de la collection voient les documents contenus dans un certain ordre.",
     "ORDER_COLLECTIONS": "Modifier manuellement l'ordre des collections",
-    "ORDER_COLLECTIONS_INFO": "Les spectateurs de la collection voient les sous-collections qu'elle contient dans un certain ordre.",
-    "SORT_SLIDER": "Umsortieren",
+    "ORDER_COLLECTIONS_INFO": "Les visiteurs de la collection voient les sous-collections qu'elle contient dans un certain ordre.",
+    "SORT_SLIDER": "Trier",
     "CUSTOM_ORDER": "modifier l'ordre des éléments",
     "PERMISSIONS": "Sur invitation",
     "DETAILS": "Détails de la collection",
@@ -43,7 +43,7 @@
       "EDU_GROUPS_LONG": " qui ont été partagées avec vous.",
       "EDU_ALL_LONG": " toutes les collections accessibles au public",
       "TYPE_EDITORIAL": "Éditorial",
-      "TYPE_MEDIA_CENTER": "Mediacenter",
+      "TYPE_MEDIA_CENTER": "centre de médias",
       "MY": "Mon",
       "EDU_GROUPS": "Sur invitation",
       "EDU_ALL": "Public",
@@ -57,7 +57,7 @@
       "PRIVATE": "collection privée",
       "PRIVATE_DESCRIPTION": "Personne d'autre que vous ne peut voir la collection. Vous pouvez toujours partager ou publier la collection avec d'autres personnes ultérieurement.",
       "SHARED": "collection en collaboration",
-      "SHARED_DESCRIPTION": "Collectionnez avec vos amis et collègues. Vous pouvez déterminer qui est autorisé à faire quoi avec la collection.",
+      "SHARED_DESCRIPTION": "Créer une collection avec vos collègues. Vous pouvez déterminer qui est autorisé à faire quoi avec la collection.",
       "PUBLIC": "collection publique",
       "PUBLIC_DESCRIPTION": "Créez une collection publique et montrez au monde vos plus beaux contenus.",
       "EDITORIAL": "collection éditoriale",
@@ -65,7 +65,7 @@
       "CURRICULUM": "collection de programmes d'études",
       "CURRICULUM_DESCRIPTION": "Créer une collection (modérée) selon des structures de programme prédéfinies.",
       "MEDIA_CENTER": "centre de médias",
-      "MEDIA_CENTER_DESCRIPTION": "créer une collection pour votre media center. Tous les utilisateurs connectés à ce media center verront cette collection dans l'onglet \"media center\"."
+      "MEDIA_CENTER_DESCRIPTION": "créer une collection pour votre centre de médias. Tous les utilisateurs connectés à ce centre de médias verront cette collection dans l'onglet \"media center\"."
     },
     "PINNING": {
       "TITLE": "collections épinglées",
@@ -96,7 +96,7 @@
       "INVALID_NAME": "Le nom donné n'est pas valide. N'utilisez pas de caractères spéciaux"
     },
     "NEW": {
-      "AUTHOR_FREETEXT": "Nom de l'auteur",
+      "AUTHOR_FREETEXT": "Nom de l'auteur-trice",
       "IMAGE": {
         "UPLOAD": "Télécharger l'image",
         "SEARCH": "Sélectionner une image à partir de la recherche",
@@ -108,7 +108,7 @@
       "DUPLICATE_MESSAGE": "La collection contient déjà {{count}} de(s) élément(s). Voulez-vous les ajouter à nouveau ?"
     },
     "PROPOSALS": {
-      "TITLE": "Matériel proposé par les utilisateurs",
+      "TITLE": "Matériel proposé par les utilisateur-trices",
       "TOAST": {
         "ACCEPTED": "L'élément a été ajouté à la collection.",
         "DECLINED": "La proposition a été refusée."

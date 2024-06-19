@@ -302,7 +302,7 @@
   </div>
   <div class="group group-buttons" *ngIf="!usersDataSource.isLoading">
     <button
-      mat-raised-button
+      mat-flat-button
       color="primary"
       [disabled]="!(canSubmit$ | async)"
       (click)="prepareStart()"

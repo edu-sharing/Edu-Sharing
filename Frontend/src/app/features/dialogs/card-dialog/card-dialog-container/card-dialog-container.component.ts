@@ -31,6 +31,7 @@ import { JumpMark, JumpMarksService } from '../../../../services/jump-marks.serv
 import { CardDialogConfig, Closable } from '../card-dialog-config';
 import { CardDialogRef } from '../card-dialog-ref';
 import { AutoSavingState } from '../card-dialog-state';
+import { CardDialogService } from '../card-dialog.service';
 
 let idCounter = 0;
 
@@ -166,6 +167,7 @@ export class CardDialogContainerComponent implements OnInit, OnDestroy {
         @Optional() @Inject(DOCUMENT) private document: any,
         private elementRef: ElementRef<HTMLElement>,
         private focusTrapFactory: ConfigurableFocusTrapFactory,
+        private cardDialogService: CardDialogService,
         private _interactivityChecker: InteractivityChecker,
         private _ngZone: NgZone,
         private breakpointObserver: BreakpointObserver,
@@ -247,6 +249,7 @@ export class CardDialogContainerComponent implements OnInit, OnDestroy {
     initializeWithAttachedContent() {
         this.initObservables();
         this.focusTrap = this.focusTrapFactory.create(this.elementRef.nativeElement);
+        this.cardDialogService.registerFocusTrap(this.focusTrap);
 
         // Save the previously focused element. This element will be re-focused
         // when the dialog closes.
@@ -343,6 +346,7 @@ export class CardDialogContainerComponent implements OnInit, OnDestroy {
 
         if (this.focusTrap) {
             this.focusTrap.destroy();
+            this.cardDialogService.unregisterFocusTrap(this.focusTrap);
         }
     }
 

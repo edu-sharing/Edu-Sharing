@@ -22,8 +22,14 @@ import {
     takeUntil,
     tap,
 } from 'rxjs/operators';
-import { ListItem, ListItemSort, ListSortConfig, notNull } from 'ngx-edu-sharing-ui';
-import { MdsHelper } from '../../core-module/rest/mds-helper';
+import {
+    ListItem,
+    ListItemSort,
+    ListSortConfig,
+    MdsHelperService,
+    NodeEntriesDisplayType,
+    notNull,
+} from 'ngx-edu-sharing-ui';
 import {
     fromSearchResults,
     NodeDataSourceRemote,
@@ -42,6 +48,10 @@ export interface SearchPageResults {
     loadingProgress: Observable<number>;
     addNodes: (nodes: Node[]) => void;
 }
+export interface SearchPageState {
+    displayType: NodeEntriesDisplayType;
+    sortConfig: ListSortConfig;
+}
 
 @Injectable()
 export class SearchPageResultsService implements SearchPageResults, OnDestroy {
@@ -50,12 +60,16 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
     readonly collectionsDataSource = new NodeDataSourceRemote(this._injector);
     readonly resultColumns = new BehaviorSubject<ListItem[]>([]);
     readonly collectionColumns = new BehaviorSubject<ListItem[]>([]);
-    readonly sortConfig = new BehaviorSubject<ListSortConfig>(null);
     readonly loadingParams = new BehaviorSubject<boolean>(true);
     readonly loadingContent = new BehaviorSubject<boolean>(true);
     readonly loadingCollections = new BehaviorSubject<boolean>(true);
     readonly loadingProgress = new BehaviorSubject<number>(0);
     readonly diffCount = new BehaviorSubject<number>(0);
+    // stores the state of the primary, configurable node entries component
+    readonly state = new BehaviorSubject<SearchPageState>({
+        displayType: NodeEntriesDisplayType.Grid,
+        sortConfig: null,
+    });
 
     private readonly _destroyed = new Subject<void>();
 
@@ -84,8 +98,13 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
     }
 
     private _registerPageRestore() {
+        // restore last state
+        if (this._searchPageRestore.getRestoreEntry()) {
+            this.state.next(this._searchPageRestore.getRestoreEntry().searchState);
+        }
         this._searchPageRestore.registerDataSource('materials', this.resultsDataSource);
         this._searchPageRestore.registerDataSource('collections', this.collectionsDataSource);
+        this._searchPageRestore.registerSearchState(this.state);
     }
 
     private _registerSearchObservables() {
@@ -180,24 +199,37 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 ),
             );
         // Register columns.
-        mds.pipe(map((mds) => MdsHelper.getColumns(this._translate, mds, 'search'))).subscribe(
-            this.resultColumns,
-        );
         mds.pipe(
-            map((mds) => MdsHelper.getColumns(this._translate, mds, 'searchCollections')),
+            map((mds) => MdsHelperService.getColumns(this._translate, mds, 'search')),
+        ).subscribe(this.resultColumns);
+        mds.pipe(
+            map((mds) => MdsHelperService.getColumns(this._translate, mds, 'searchCollections')),
         ).subscribe(this.collectionColumns);
         // Register sort.
-        mds.pipe(map((mds) => MdsHelper.getSortInfo(mds, 'search'))).subscribe((sortInfo) => {
-            this.sortConfig.next({
-                allowed: true,
-                active: sortInfo.default.sortBy,
-                direction: sortInfo.default.sortAscending ? 'asc' : 'desc',
-                columns: sortInfo.columns?.map(
-                    ({ id, mode }) =>
-                        new ListItemSort('NODE', id, mode as 'ascending' | 'descending'),
-                ),
-            });
-        });
+        mds.pipe(map((mds) => MdsHelperService.getSortInfo(mds, 'search'))).subscribe(
+            (sortInfo) => {
+                if (this.state.value.sortConfig === null) {
+                    this.patchState({
+                        sortConfig: {
+                            allowed: true,
+                            active: sortInfo.default.sortBy,
+                            direction: sortInfo.default.sortAscending ? 'asc' : 'desc',
+                            columns: sortInfo.columns?.map(
+                                ({ id, mode }) =>
+                                    new ListItemSort(
+                                        'NODE',
+                                        id,
+                                        mode as 'ascending' | 'descending',
+                                    ),
+                            ),
+                        },
+                    });
+                }
+            },
+        );
+    }
+    patchState(data: Partial<SearchPageState>) {
+        this.state.next({ ...this.state.value, ...data });
     }
 
     private _getSearchRemote(params: SearchRequestParams): NodeRemote<Node> {

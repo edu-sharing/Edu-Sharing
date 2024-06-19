@@ -25,6 +25,7 @@
     "MENU_ADD_TO_GROUP": "In Gruppe",
     "MENU_MANAGE_GROUP": "Mitglieder Verwalten",
     "MENU_ADD_GROUP_MEMBERS": "Nutzer{{GENDER_SEPARATOR}}in hinzufügen",
+
     "MENU_EDIT_GROUPS": "Mitgliedschaften verwalten",
     "MENU_EXCLUDE": "Ausschließen",
     "MENU_REMOVE_MEMBERSHIP": "Aus Gruppe(n) entfernen",

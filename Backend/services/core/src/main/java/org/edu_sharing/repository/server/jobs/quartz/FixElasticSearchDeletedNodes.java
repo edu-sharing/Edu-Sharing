@@ -48,9 +48,6 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
     ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
     ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
     NodeService nodeService = serviceRegistry.getNodeService();
-
-    public static String INDEX_WORKSPACE = "workspace";
-
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         execute = Boolean.parseBoolean( (String) jobExecutionContext.getJobDetail().getJobDataMap().get("execute"));
@@ -75,7 +72,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
         int page = 0;
         do{
             if(response == null) {
-                response = search(INDEX_WORKSPACE, queryBuilder, scroll);
+                response = search(SearchServiceElastic.WORKSPACE_INDEX, queryBuilder, scroll);
             }else {
                 response = scroll(scroll,response.scrollId());
             }
@@ -148,7 +145,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
 
                 if(execute){
                     searchServiceElastic.deleteNative(DeleteRequest.of(req->req
-                            .index(INDEX_WORKSPACE)
+                            .index(SearchServiceElastic.WORKSPACE_INDEX)
                             .id(dbid)));
                 }
             }
@@ -202,7 +199,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
 
             if(execute) {
                 update(UpdateRequest.of(req->req
-                        .index(INDEX_WORKSPACE)
+                        .index(SearchServiceElastic.WORKSPACE_INDEX)
                         .id(searchHit.id())
                         .script(src->src.inline(il->il.lang("painless").source("ctx._source.remove(params.get('value'))").params(params)))));
             }
@@ -226,7 +223,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
 
             if(execute) {
                 update(UpdateRequest.of(req->req
-                        .index(INDEX_WORKSPACE)
+                        .index(SearchServiceElastic.WORKSPACE_INDEX)
                         .id(searchHit.id())
                         .doc(data)));
             }

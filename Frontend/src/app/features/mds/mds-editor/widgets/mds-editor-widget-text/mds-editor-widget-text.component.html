@@ -31,41 +31,46 @@
 </es-mds-editor-widget-container>
 
 <!-- es-mds-editor-widget-container causes issues with textarea -->
-<mat-form-field
+<es-mds-editor-widget-container
   *ngIf="widget.definition.type === 'textarea'"
-  class="mat-form-textarea"
-  [hideRequiredMarker]="true"
+  [injectedView]="this"
+  [widget]="widget"
+  [label]="false"
+  [wrapInFormField]="false"
+  [valueType]="valueType"
 >
-  <mat-label>
-    {{ widget.definition.caption }}
-    <!-- We use our own required marker to show it even on disabled controls for bulk editing.
-  -->
-    <span
-      *ngIf="widget.definition.isRequired === 'mandatory'"
-      class="required-marker"
-      aria-hidden="true"
-      >*</span
-    >
-  </mat-label>
-  <textarea matInput #textAreaElement *ngIf="showBulkMixedValues()" disabled>{{
-    'MDS.DIFFERENT_VALUES' | translate
-  }}</textarea>
-  <textarea
-    matInput
-    #textAreaElement
-    *ngIf="!showBulkMixedValues()"
-    [placeholder]="widget.definition.placeholder"
-    [formControl]="formControl"
-    (blur)="blur()"
-    (keydown.enter)="submit()"
-  ></textarea>
-  <mat-hint [hidden]="!widget.definition.bottomCaption">
-    {{ widget.definition.bottomCaption }}
-  </mat-hint>
-  <mat-error [hidden]="!formControl.errors?.required">
-    <ng-container *ngTemplateOutlet="error"></ng-container>
-  </mat-error>
-</mat-form-field>
+  <mat-form-field class="mat-form-textarea" [hideRequiredMarker]="true">
+    <mat-label>
+      {{ widget.definition.caption }}
+      <!-- We use our own required marker to show it even on disabled controls for bulk editing.
+    -->
+      <span
+        *ngIf="widget.definition.isRequired === 'mandatory'"
+        class="required-marker"
+        aria-hidden="true"
+        >*</span
+      >
+    </mat-label>
+    <textarea matInput #textAreaElement *ngIf="showBulkMixedValues()" disabled>{{
+      'MDS.DIFFERENT_VALUES' | translate
+    }}</textarea>
+    <textarea
+      matInput
+      #textAreaElement
+      *ngIf="!showBulkMixedValues()"
+      [placeholder]="widget.definition.placeholder"
+      [formControl]="formControl"
+      (blur)="blur()"
+      (keydown.enter)="submit()"
+    ></textarea>
+    <mat-hint [hidden]="!widget.definition.bottomCaption">
+      {{ widget.definition.bottomCaption }}
+    </mat-hint>
+    <mat-error [hidden]="!formControl.errors?.required">
+      <ng-container *ngTemplateOutlet="error"></ng-container>
+    </mat-error>
+  </mat-form-field>
+</es-mds-editor-widget-container>
 <div class="suggestions" *ngIf="getSuggestions()?.length">
   <h5 class="mat-heading-5">{{ 'MDS.SUGGESTIONS.LIST_TITLE' | translate }}</h5>
   <div class="suggestion" *ngFor="let suggestion of getSuggestions()">

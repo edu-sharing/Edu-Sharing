@@ -122,6 +122,7 @@ export class LicenseAgreementService {
                         this.onAccepted(data.version);
                     } else if (data.result === 'declined') {
                         this.onDeclined();
+                        this.setup();
                     }
                 },
             );

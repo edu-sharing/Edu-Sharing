@@ -13,8 +13,16 @@ import {
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Repository, UIConstants } from '../../core-module/core.module';
-import { CustomOptions, DefaultGroups, ElementType, notNull, OptionItem } from 'ngx-edu-sharing-ui';
+import { Repository, RestConstants, UIConstants } from '../../core-module/core.module';
+import {
+    CustomOptions,
+    DefaultGroups,
+    ElementType,
+    HideMode,
+    NodesRightMode,
+    notNull,
+    OptionItem,
+} from 'ngx-edu-sharing-ui';
 import { OptionsHelperService } from '../../services/options-helper.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
 import {
@@ -310,6 +318,9 @@ export class SearchPageService implements OnDestroy {
             );
         });
         addTo.elementType = OptionsHelperService.ElementTypesAddToCollection;
+        addTo.permissions = [RestConstants.ACCESS_CC_PUBLISH];
+        addTo.permissionsRightMode = NodesRightMode.Effective;
+        addTo.permissionsMode = HideMode.Disable;
         addTo.group = DefaultGroups.Reuse;
         addTo.showAlways = true;
         const cancel = new OptionItem('CANCEL', 'close', () =>

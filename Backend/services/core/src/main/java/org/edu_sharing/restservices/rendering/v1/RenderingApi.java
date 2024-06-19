@@ -28,8 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 
 @Path("/rendering/v1")
@@ -117,18 +116,27 @@ public class RenderingApi {
 
 		try {
 			RepoProxy.RemoteRepoDetails remote = RepoProxyFactory.getRepoProxy().myTurn(repository, node);
-			if(remote != null) {
-				return RepoProxyFactory.getRepoProxy().getDetailsSnippetWithParameters(remote.getRepository(), remote.getNodeId(), nodeVersion, displayMode, parameters, req);
-			}
-			
+
+
 			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
 			if (repoDao == null) {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-			String detailsSnippet = new RenderingDao(repoDao).getDetails(node,nodeVersion, displayMode,parameters);
 
 			NodeDao nodeDao = NodeDao.getNodeWithVersion(repoDao, node, nodeVersion);
 			Node nodeJson = nodeDao.asNode();
+
+			if(remote != null) {
+				org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry entity = (org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry) RepoProxyFactory.getRepoProxy().getDetailsSnippetWithParameters(remote.getRepository(), remote.getNodeId(), nodeVersion, displayMode, parameters, req).getEntity();
+				RenderingDetailsEntry response = new RenderingDetailsEntry();
+				response.setDetailsSnippet(entity.getDetailsSnippet());
+				response.setMimeType(entity.getMimeType());
+				response.setNode(nodeJson);
+				return Response.status(Response.Status.OK).entity(response).build();
+			}
+
+			String detailsSnippet = new RenderingDao(repoDao).getDetails(node,nodeVersion, displayMode,parameters);
+
 			String mimeType = nodeJson.getMimetype();
 
 			if(repoDao.isHomeRepo()) {

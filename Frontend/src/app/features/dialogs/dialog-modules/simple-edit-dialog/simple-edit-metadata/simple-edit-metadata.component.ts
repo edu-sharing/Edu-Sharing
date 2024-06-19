@@ -40,9 +40,6 @@ export class SimpleEditMetadataComponent {
     constructor(private nodeApi: RestNodeService, private toast: Toast) {}
 
     isDirty() {
-        if (this.mds.mdsRef) {
-            return this.mds.mdsRef.isDirty();
-        }
         return this.mds.mdsEditorInstance.getHasUserChanges();
     }
 

@@ -649,12 +649,17 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
 		props.addAll(MetadataReader.getWidgetsByNode(ref,"de_DE").stream().
 				map(MetadataWidget::getId).map(CCConstants::getValidGlobalName).
 				collect(Collectors.toList()));
+		props.addAll(MetadataReader.getWidgetsByNode(ref,"de_DE").stream().
+				map(MetadataWidget::getSuggestDisplayProperty).filter(Objects::nonNull).map(CCConstants::getValidGlobalName).
+				collect(Collectors.toList()));
 
 		Set<QName> propSet = Stream.concat(before.keySet().stream(), after.keySet().stream()).collect(Collectors.toSet());
 
 		for(QName entry : propSet){
-			if(entry.getLocalName().startsWith("lifecyclecontributer")
-					|| entry.getLocalName().startsWith("metadatacontributer")){
+			if(
+					entry.getLocalName().startsWith("lifecyclecontributer")
+					|| entry.getLocalName().startsWith("metadatacontributer")
+			){
 				props.add(entry.toString());
 			}
 		}

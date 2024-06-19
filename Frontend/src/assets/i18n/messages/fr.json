@@ -9,7 +9,7 @@
     "share_file_deleted": "L'objet a été supprimé.",
     "invalid_share": "lien invalide",
     "share_empty": "L'objet ne peut pas être chargé.",
-    "usage_missing": "Partager supprimé",
+    "usage_missing": "Partage supprimé",
     "LTI_ERROR": "Échec de la procédure LTI",
     "LTI_REG_ERROR": "Échec de la connexion à la plate-forme LTI",
     "DETAILS": {

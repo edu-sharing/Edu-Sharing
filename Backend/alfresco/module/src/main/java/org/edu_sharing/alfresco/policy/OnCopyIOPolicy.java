@@ -1,5 +1,7 @@
 package org.edu_sharing.alfresco.policy;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.copy.CopyServicePolicies;
@@ -46,6 +48,16 @@ public class OnCopyIOPolicy implements OnCopyCompletePolicy, CopyServicePolicies
 		}
 	}
 
+	public static void removeCopiedUsages(NodeService nodeService, NodeRef targetNodeRef) {
+		if(!nodeService.getType(targetNodeRef).equals(QName.createQName(CCConstants.CCM_TYPE_IO))) {
+			return;
+		}
+		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(targetNodeRef, Collections.singleton(QName.createQName(CCConstants.CCM_TYPE_USAGE)));
+		for(ChildAssociationRef assoc: assocs) {
+			Logger.getLogger(OnCopyIOPolicy.class).debug("Deleting usage: " + assoc.getChildRef() + " from node " + assoc.getParentRef());
+			nodeService.deleteNode(assoc.getChildRef());
+		}
+	}
 	@Override
 	public void onCopyComplete(QName classRef, NodeRef sourceNodeRef, NodeRef targetNodeRef, boolean copyToNewNode, Map<NodeRef, NodeRef> copyMap) {
 		logger.info("will set " + versionProp.toPrefixString() + " to 1.0");
@@ -77,6 +89,8 @@ public class OnCopyIOPolicy implements OnCopyCompletePolicy, CopyServicePolicies
 			nodeService.removeProperty(targetNodeRef, QName.createQName(CCConstants.CCM_PROP_TRACKING_DOWNLOADS));
 			nodeService.removeProperty(targetNodeRef, QName.createQName(CCConstants.CCM_PROP_TRACKING_VIEWS));
 		}
+
+		removeCopiedUsages(nodeService, targetNodeRef);
 	}
 	
 	

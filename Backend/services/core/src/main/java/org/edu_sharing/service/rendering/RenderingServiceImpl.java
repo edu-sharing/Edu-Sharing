@@ -218,10 +218,11 @@ public class RenderingServiceImpl implements RenderingService{
 		data.setNode(node);
 		if(CCConstants.CCM_TYPE_SAVED_SEARCH.equals(nodeService.getType(nodeId))){
 			SearchResult<Node> search = nodeDao.runSavedSearch(0,
-					options.savedSearch.getMaxItems(),
+					//options.savedSearch.getMaxItems(),
+                    Integer.parseInt(options.parameters.get("maxItems")),
 					SearchService.ContentType.FILES,
-					new SortDefinition(Collections.singletonList(options.savedSearch.getSortBy()),
-							Collections.singletonList(options.savedSearch.getSortAscending())),
+					new SortDefinition(Collections.singletonList(options.parameters.get("sortBy")),
+							Collections.singletonList(Boolean.valueOf(options.parameters.get("sortAscending")))),
 					null);
 			data.setChildren(search.getNodes());
 		}else{

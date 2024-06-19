@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { EditorModule } from '@tinymce/tinymce-angular';
 import { SharedModule } from '../../shared/shared.module';
-import { MdsComponent } from './legacy/mds/mds.component';
 import { MdsEditorCoreComponent } from './mds-editor/mds-editor-core/mds-editor-core.component';
 import { MdsEditorEmbeddedComponent } from './mds-editor/mds-editor-embedded/mds-editor-embedded.component';
 import { MdsEditorViewComponent } from './mds-editor/mds-editor-view/mds-editor-view.component';
@@ -56,7 +55,6 @@ import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-e
         HighlightPipe,
         LabelPipe,
         LicenseDetailsComponent,
-        MdsComponent,
         MdsEditorComponent,
         MdsEditorCoreComponent,
         MdsEditorEmbeddedComponent,
@@ -98,7 +96,6 @@ import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-e
     ],
     imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule, EduSharingUiModule],
     exports: [
-        MdsComponent,
         MdsEditorWidgetAuthorComponent,
         MdsEditorWidgetCollectionsComponent,
         MdsEditorWrapperComponent,

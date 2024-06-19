@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.ServletContext;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.search.impl.solr.SolrJSONResultSet;
@@ -25,7 +23,6 @@ import org.alfresco.service.cmr.security.*;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO9075;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.alfresco.policy.GuestCagePolicy;
@@ -44,10 +41,8 @@ import org.edu_sharing.repository.client.rpc.User;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.server.tools.*;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
-import org.edu_sharing.repository.server.tools.mailtemplates.MailTemplate;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
@@ -60,7 +55,6 @@ import org.edu_sharing.service.share.ShareService;
 import org.edu_sharing.service.share.ShareServiceImpl;
 import org.edu_sharing.service.toolpermission.ToolPermissionService;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
-import org.springframework.beans.BeanInstantiationException;
 import org.springframework.context.ApplicationContext;
 
 import com.google.gson.Gson;

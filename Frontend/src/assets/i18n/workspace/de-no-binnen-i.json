@@ -1,0 +1,40 @@
+{
+  "WORKSPACE": {
+    "SHARE": {
+      "PUBLISH": {
+        "AUTHOR_REQUIRED": "Um das Material zu veröffentlichen muss eine Autorin/ein Autor definiert werden"
+      }
+    },
+
+    "EDITOR": {
+      "AUTHOR_FIRST": "Autorin/ein Autor: Vorname"
+    },
+
+    "LICENSE": {
+      "CHECKBOX_AUTHOR": "Ich bin Autorin/Autor des Materials",
+      "CC": {
+        "PROFILE_URL": "Profil der Autorin/des Autors"
+      }
+    },
+
+    "WORKFLOW": {
+      "RECEIVERS": "Nutzende Person/Redaktionsgruppe"
+    },
+
+    "CONTRIBUTOR": {
+      "TYPE": {
+        "AUTHOR": "Autorin/Autor",
+        "ADD_TITLE": "Neue beteiligte Person angeben",
+        "PUBLISHER": "Herausgeberschaft",
+        "INITIATOR": "Auftrag",
+        "GRAPHICAL_DESIGNER": "Grafik",
+        "CONTENT_PROVIDER": "Inhaltlicher Beitrag",
+        "TECHNICAL_VALIDATOR": "Technik-Validation",
+        "EDUCATIONAL_VALIDATOR": "Bildungsvalidation",
+        "SCRIPT_WRITER": "Scriptwriting",
+        "CREATOR": "Erstellung",
+        "PROVIDER": "Herausgeberschaft"
+      }
+    }
+  }
+}

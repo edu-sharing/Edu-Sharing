@@ -1427,7 +1427,11 @@
           "default_operator": "and"
           }
           },
-          {"wildcard":{"nodeRef.id": {"value":"*${value}*", "case_insensitive": true }}}
+          {"wildcard":{"nodeRef.id": {"value":"*${value}*", "case_insensitive": true }}},
+          {"wildcard":{"properties.cm:name.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.cclom:title.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.cclom:general_description.keyword": {"value": "*${value}*", "case_insensitive": true}}},
+          {"wildcard":{"properties.cclom:general_keyword.keyword": {"value": "*${value}*", "case_insensitive": true}}}
           ]
           }}
         </statement>

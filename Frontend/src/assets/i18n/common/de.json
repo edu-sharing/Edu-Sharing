@@ -444,7 +444,8 @@
     "TITLE": "Kommentare",
     "NEW_COMMENT_PLACEHOLDER": "Neuer Kommentar...",
     "NO_COMMENTS": "Noch keine Kommentare vorhanden",
-    "NO_PERMISSION": "Das Kommentieren ist für dieses Element deaktivert",
+    "NO_PERMISSION": "Das Kommentieren ist für dieses Element deaktiviert",
+    "NOT_SUPPORTED_REMOTELY": "Das Kommentieren von externen Elementen wird nicht unterstützt",
     "COMMENT_EMPTY": "Bitte einen Kommentar eingeben",
     "OPTION_EDIT": "Bearbeiten",
     "OPTION_DELETE": "Löschen",
@@ -505,7 +506,7 @@
     "Coordinator": "Koordinator",
     "CCPublish": "veröffentlichen"
   },
-  "ACCESSIBILITY": {
+  "ACCESSIB ILITY": {
     "LASTMODIFIED": "Letztes Änderungsdatum",
     "AUTHOR": "Autor{{GENDER_SEPARATOR}}in",
     "SOURCE": "Quelle",
@@ -870,6 +871,7 @@
   "NODE_SEARCH_SELECTOR": {
     "MORE_FILTERS": "Erweiterte Suchfilter",
     "NO_MATCHES": "Keine Elemente entsprechen der Suchanfrage",
+    "NO_RECENT": "Keine zuletzt eingeladenen Personen oder Gruppen",
     "NO_PERMISSIONS": "Ihre Berechtigungen an diesem Element sind unzureichend"
   },
   "NODE_RELATIONS": {
@@ -879,6 +881,7 @@
     "RELATION_SEARCH_LABEL": "Suchen nach Ziel-Element",
     "EXISTING_RELATIONS": "Bestehende Beziehungen",
     "NO_RELATIONS": "Für dieses Element existieren noch keine Beziehungen.",
+    "NOT_SUPPORTED_REMOTELY": "Beziehungen von externen Elementen werden aktuell nicht unterstützt",
     "SWAP": "Umkehren",
     "RESELECT": "Zurücksetzen",
     "CREATE_CONFIRM": "Beziehung erstellen",

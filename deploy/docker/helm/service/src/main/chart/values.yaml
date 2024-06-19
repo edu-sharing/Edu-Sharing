@@ -347,6 +347,15 @@ persistence:
           requests:
             storage: 5Gi
 
+    safe:
+      enabled: false
+      create: true
+      spec:
+        accessModes: [ "ReadWriteMany" ]
+        resources:
+          requests:
+            storage: 5Gi
+
 ########################################################################################################################
 
 nodeAffinity: {}

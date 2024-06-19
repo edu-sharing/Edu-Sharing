@@ -153,7 +153,7 @@ export class PermissionsDeleteComponent implements OnInit, AfterViewInit {
                 this.usersDataSource.setData(users.users as unknown as User[], users.pagination);
                 this.applicationRef.tick();
                 this.nodeEntriesWrapperComponent
-                    .getSelection()
+                    ?.getSelection()
                     .changed.subscribe(() => this.canSubmit$.next(this.canSubmit()));
                 this.usersDataSource.isLoading = false;
             },

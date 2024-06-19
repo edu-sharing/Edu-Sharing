@@ -127,7 +127,7 @@ public class NotificationServiceImpl implements NotificationService {
                 MailTemplate.applyNodePropertiesToMap("nodeId.", nodeProperties, replace);
 
                 String template = "invited_workflow";
-                MailTemplate.sendMail(sender.getFullName(), sender.getEmail(), receiver, template, replace);
+                MailTemplate.sendMail(sender.getFullName(), sender.getEmail(), receiverMail.getEmail(), template, replace);
             } catch (Throwable t) {
                 logger.warn("Mail send failed", t);
             }

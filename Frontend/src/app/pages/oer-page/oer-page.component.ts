@@ -12,7 +12,7 @@ import {
     TemporaryStorageService,
 } from '../../core-module/core.module';
 import { MainNavService } from '../../main/navigation/main-nav.service';
-import { MdsHelper } from '../../core-module/rest/mds-helper';
+import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import { Helper } from '../../core-module/rest/helper';
 import { NodeHelperService } from '../../services/node-helper.service';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -72,7 +72,11 @@ export class OerPageComponent implements OnInit, OnDestroy {
             this.columns[this.COLLECTIONS].push(new ListItem('COLLECTION', 'info'));
             this.columns[this.COLLECTIONS].push(new ListItem('COLLECTION', 'scope'));
             this.mdsService.getSet().subscribe((mds: any) => {
-                this.columns[this.MATERIALS] = MdsHelper.getColumns(this.translate, mds, 'search');
+                this.columns[this.MATERIALS] = MdsHelperService.getColumns(
+                    this.translate,
+                    mds,
+                    'search',
+                );
             });
             /*
           this.config.get("searchColumns").subscribe((data:any)=>{
