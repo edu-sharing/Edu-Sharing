@@ -1,3 +1,50 @@
+@import 'projects/edu-sharing-ui/assets/scss/variables-scss';
+$rsPaddingHorizontal: 30px;
 rs-root {
     height: 100%;
+}
+.render-before {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    // background-color: var(--palette-primary-50);
+    background-color: #f8f8f8;
+    padding: 10px $rsPaddingHorizontal;
+    gap: 10px;
+    > * {
+        width: 0;
+        flex-grow: 1;
+    }
+    > es-actionbar {
+        display: flex;
+        justify-content: flex-end;
+    }
+    > .back,
+    > es-actionbar {
+        min-width: 200px;
+        @media screen and (max-width: ($mobileWidth)) {
+            min-width: 50px;
+            .back-caption {
+                display: none;
+            }
+        }
+    }
+
+    h2 {
+        flex-grow: 3;
+        text-align: center;
+        margin: 0;
+        color: var(--textMain);
+        font-size: 110%;
+    }
+}
+:host ::ng-deep {
+    es-mds-editor-wrapper es-mds-editor-core {
+        display: grid;
+        width: 100%;
+        padding: 0 $rsPaddingHorizontal;
+        grid-gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    }
 }

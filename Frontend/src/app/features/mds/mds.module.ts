@@ -16,7 +16,7 @@ import { MdsEditorWidgetAuthorComponent } from './mds-editor/widgets/mds-editor-
 import { MdsEditorWidgetAuthorityComponent } from './mds-editor/widgets/mds-editor-widget-authority/mds-editor-widget-authority.component';
 import { MdsEditorWidgetCheckboxComponent } from './mds-editor/widgets/mds-editor-widget-checkbox/mds-editor-widget-checkbox.component';
 import { MdsEditorWidgetCheckboxesComponent } from './mds-editor/widgets/mds-editor-widget-checkboxes/mds-editor-widget-checkboxes.component';
-import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-editor-widget-childobjects/mds-editor-widget-childobjects.component';
+import { MdsEditorWidgetCollectionsComponent } from './mds-editor/widgets/mds-editor-widget-collections/mds-editor-widget-collections.component';
 import {
     MdsEditorWidgetChipsComponent,
     MdsEditorWidgetChipsRangedValueComponent,
@@ -48,6 +48,8 @@ import { MdsEditorWidgetVersionComponent } from './mds-editor/widgets/mds-editor
 import { MdsEditorWidgetTinyMCE } from './mds-editor/widgets/mds-editor-widget-wysiwyg-html/mds-editor-widget-tinymce.component';
 import { MdsViewerComponent } from './mds-viewer/mds-viewer.component';
 import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
+import { EduSharingUiModule } from 'ngx-edu-sharing-ui';
+import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-editor-widget-childobjects/mds-editor-widget-childobjects.component';
 
 @NgModule({
     declarations: [
@@ -60,6 +62,7 @@ import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
         MdsEditorEmbeddedComponent,
         MdsEditorViewComponent,
         MdsEditorWidgetAuthorComponent,
+        MdsEditorWidgetCollectionsComponent,
         MdsEditorWidgetAuthorityComponent,
         MdsEditorWidgetCheckboxComponent,
         MdsEditorWidgetCheckboxesComponent,
@@ -93,10 +96,11 @@ import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
         SearchFieldFacetsComponent,
         MdsDurationPipe,
     ],
-    imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule],
+    imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule, EduSharingUiModule],
     exports: [
         MdsComponent,
         MdsEditorWidgetAuthorComponent,
+        MdsEditorWidgetCollectionsComponent,
         MdsEditorWrapperComponent,
         MdsViewerComponent,
         MdsEditorCoreComponent,

@@ -40,16 +40,9 @@ import { MdsEditorCoreComponent } from '../mds-editor-core/mds-editor-core.compo
 import { MdsEditorInstanceService, Widget } from '../mds-editor-instance.service';
 import { Attributes, getAttributesArray } from '../util/parse-attributes';
 import { replaceElementWithDiv } from '../util/replace-element-with-div';
-import { MdsEditorWidgetAuthorComponent } from '../widgets/mds-editor-widget-author/mds-editor-widget-author.component';
 import { MdsEditorWidgetBase } from '../widgets/mds-editor-widget-base';
-import { MdsEditorWidgetChildobjectsComponent } from '../widgets/mds-editor-widget-childobjects/mds-editor-widget-childobjects.component';
 import { MdsEditorWidgetErrorComponent } from '../widgets/mds-editor-widget-error/mds-editor-widget-error.component';
-import { MdsEditorWidgetFileUploadComponent } from '../widgets/mds-editor-widget-file-upload/mds-editor-widget-file-upload.component';
-import { MdsEditorWidgetLicenseComponent } from '../widgets/mds-editor-widget-license/mds-editor-widget-license.component';
-import { MdsEditorWidgetLinkComponent } from '../widgets/mds-editor-widget-link/mds-editor-widget-link.component';
-import { MdsEditorWidgetPreviewComponent } from '../widgets/mds-editor-widget-preview/mds-editor-widget-preview.component';
 import { MdsEditorWidgetSuggestionChipsComponent } from '../widgets/mds-editor-widget-suggestion-chips/mds-editor-widget-suggestion-chips.component';
-import { MdsEditorWidgetVersionComponent } from '../widgets/mds-editor-widget-version/mds-editor-widget-version.component';
 import { ViewInstanceService } from './view-instance.service';
 import { JumpMark, JumpMarksService } from '../../../../services/jump-marks.service';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
@@ -85,19 +78,7 @@ type NativeWidgetClass = {
     providers: [ViewInstanceService],
 })
 export class MdsEditorViewComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-    private static readonly nativeWidgets: {
-        [widgetType in NativeWidgetType]: NativeWidgetClass;
-    } = {
-        preview: MdsEditorWidgetPreviewComponent,
-        author: MdsEditorWidgetAuthorComponent,
-        version: MdsEditorWidgetVersionComponent,
-        childobjects: MdsEditorWidgetChildobjectsComponent,
-        maptemplate: MdsEditorWidgetLinkComponent,
-        contributor: MdsEditorWidgetLinkComponent,
-        license: MdsEditorWidgetLicenseComponent,
-        fileupload: MdsEditorWidgetFileUploadComponent,
-        workflow: null as null,
-    };
+    private static readonly nativeWidgets = NativeWidgets;
     private static readonly suggestionWidgetComponents: {
         [type in MdsWidgetType]?: Type<object>;
     } = {

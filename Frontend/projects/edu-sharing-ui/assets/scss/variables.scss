@@ -1,3 +1,4 @@
+@import './variables-scss';
 /**
     declarations of dynamic css variabled
     will only be included once via angular to prevent duplicate :root entries
@@ -18,7 +19,7 @@
     --transitionNormal: 0.2s;
     --focusWidth: 2px;
     --fontSizeXSmall: 85%;
-    --mobileWidth: 700px;
+    --mobileWidth: $mobileWidth;
     --mobileStage: 100px;
     --itemSelectedTextColor: var(--palette-primary-700);
     --listItemSelectedBackground: var(--palette-primary-50);

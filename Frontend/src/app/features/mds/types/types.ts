@@ -110,6 +110,7 @@ export enum NativeWidgetType {
     Workflow = 'workflow',
     Author = 'author',
     Contributor = 'contributor',
+    Collections = 'collections',
 }
 
 export type MdsEditorWidgetComponent = {

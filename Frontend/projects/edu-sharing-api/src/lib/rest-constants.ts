@@ -27,6 +27,7 @@ export class RestConstants {
         PDM: 'https://creativecommons.org/choose/mark/',
     };
     public static CCM_ASPECT_COLLECTION = 'ccm:collection';
+    public static CCM_ASPECT_IO_REFERENCE = 'ccm:collection_io_reference';
 
     public static TOOLPERMISSION_INVITE = 'TOOLPERMISSION_INVITE';
     public static TOOLPERMISSION_INVITE_STREAM = 'TOOLPERMISSION_INVITE_STREAM';
@@ -97,6 +98,7 @@ export class RestConstants {
     public static STATUS_CODE_PERSON_BLOCKED = 'PERSON_BLOCKED';
     public static CM_ARCHIVED_DATE = 'sys:archivedDate';
     public static CM_PROP_C_CREATED = 'cm:created';
+    public static CCM_PROP_IO_ORIGINAL = 'ccm:original';
     public static CCM_PROP_EAF_PRODUCTIONYEAR = 'ccm:eaf_productionyear';
     public static EXIF_PROP_DATE_TIME_ORIGINAL = 'exif:dateTimeOriginal';
     public static CCM_TYPE_COLLECTION_PROPOSAL = 'ccm:collection_proposal';

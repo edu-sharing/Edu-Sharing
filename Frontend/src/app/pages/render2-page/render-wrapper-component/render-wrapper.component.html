@@ -1,1 +1,27 @@
+<div class="render-before">
+  <div class="back">
+    <button mat-button color="primary" (click)="goBack()">
+      <i esIcon="keyboard_arrow_left"></i>
+      <span class="back-caption">{{ 'BACK' | translate }}</span>
+    </button>
+  </div>
+  <h2 *ngIf="node()">
+    {{ node() | nodeTitle }}
+  </h2>
+  <es-actionbar
+    [numberOfAlwaysVisibleOptions]="1"
+    [numberOfAlwaysVisibleOptionsMobile]="0"
+  ></es-actionbar>
+</div>
 <rs-root *ngIf="dummyRequest() || node()" [node]="node()" [request]="dummyRequest()"></rs-root>
+<es-mds-editor-wrapper
+  *ngIf="node()"
+  [embedded]="true"
+  [editorMode]="'viewer'"
+  [groupId]="'io_render'"
+  [nodes]="[node()]"
+>
+  <!--
+  [editorMode]="'inline'"
+   -->
+</es-mds-editor-wrapper>

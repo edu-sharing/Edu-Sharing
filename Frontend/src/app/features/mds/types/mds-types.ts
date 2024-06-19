@@ -30,6 +30,7 @@ import {
 import { MdsEditorWidgetDurationComponent } from '../mds-editor/widgets/mds-editor-widget-duration/mds-editor-widget-duration.component';
 import { MdsEditorWidgetTreeComponent } from '../mds-editor/widgets/mds-editor-widget-tree/mds-editor-widget-tree.component';
 import { MdsEditorWidgetFacetListComponent } from '../mds-editor/widgets/mds-editor-widget-facet-list/mds-editor-widget-facet-list.component';
+import { MdsEditorWidgetCollectionsComponent } from '../mds-editor/widgets/mds-editor-widget-collections/mds-editor-widget-collections.component';
 
 /**
  * - `nodes`:
@@ -53,7 +54,6 @@ import { MdsEditorWidgetFacetListComponent } from '../mds-editor/widgets/mds-edi
  *   - Triggered via mds-viewer
  */
 export type EditorMode = 'nodes' | 'search' | 'form' | 'inline' | 'viewer';
-
 export const NativeWidgets: {
     [widgetType in NativeWidgetType]: NativeWidgetClass;
 } = {
@@ -66,6 +66,8 @@ export const NativeWidgets: {
     license: MdsEditorWidgetLicenseComponent,
     fileupload: MdsEditorWidgetFileUploadComponent,
     workflow: null as null,
+    // rendering specific
+    collections: MdsEditorWidgetCollectionsComponent,
 };
 
 export const WidgetComponents: {

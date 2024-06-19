@@ -1,4 +1,4 @@
-<div [class.display-none]="isInHiddenState()">
+<div [class.display-none]="isInHiddenState()" class="view-wrapper">
   <button
     id="{{ view.id }}_header"
     *ngIf="view.isExtended"
@@ -21,7 +21,7 @@
 
 <ng-template #heading>
   <h3 *ngIf="view.caption" class="heading">
-    <i [esIcon]="view.icon" class="header-icon"></i>
+    <i [esIcon]="view.icon" class="header-icon" *ngIf="view.icon"></i>
     <span class="heading-caption">{{ view.caption }}</span>
     <i
       class="toggle-icon"
