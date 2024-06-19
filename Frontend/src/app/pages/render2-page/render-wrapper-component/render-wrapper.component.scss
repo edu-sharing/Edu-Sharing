@@ -2,6 +2,7 @@
 $rsPaddingHorizontal: 30px;
 rs-root {
     height: 100%;
+    min-height: 50vh;
 }
 .render-before {
     display: flex;

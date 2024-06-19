@@ -40,7 +40,7 @@ export class RenderWrapperComponent implements OnChanges {
             version: '1.0',
             repoId: '',
         });
-        /*
+
         this.dummyRequest.set({
             nodeId: 'TEST_portrait.pdf',
             size: -1,
@@ -50,6 +50,7 @@ export class RenderWrapperComponent implements OnChanges {
             version: '1.0',
             repoId: '',
         });
+
         /*this.dummyRequest.set({
             nodeId: 'TEST_lorem_ipsum.odt',
             size: -1,

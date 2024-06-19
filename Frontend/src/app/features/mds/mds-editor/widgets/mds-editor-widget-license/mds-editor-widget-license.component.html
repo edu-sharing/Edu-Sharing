@@ -1,11 +1,15 @@
 <es-mds-editor-widget-container
   [widget]="widget"
   [label]="false"
-  *ngIf="mdsEditorValues.editorMode === 'nodes' || mdsEditorValues.editorMode === 'inline'"
+  *ngIf="
+    mdsEditorValues.editorMode === 'nodes' ||
+    mdsEditorValues.editorMode === 'inline' ||
+    mdsEditorValues.editorMode === 'viewer'
+  "
 >
   <ng-container *ngIf="!isSafe">
     <es-license-details [nodes]="nodes"></es-license-details>
-    <div class="link">
+    <div class="link" *ngIf="mdsEditorValues.editorMode !== 'viewer'">
       <div>
         <button
           mat-button
