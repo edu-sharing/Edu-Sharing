@@ -47,5 +47,24 @@ rs-root {
         padding: 0 $rsPaddingHorizontal;
         grid-gap: 10px;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+
+        es-mds-editor-view {
+            padding: 0;
+            border: 1px solid var(--palette-primary-100);
+            border-radius: 25px;
+            overflow: hidden;
+            .view-wrapper {
+                .content {
+                    padding: 0 10px;
+                }
+                .heading-container {
+                    > h3 {
+                        background-color: var(--palette-primary-50);
+                        border: none;
+                        margin: 0;
+                    }
+                }
+            }
+        }
     }
 }
