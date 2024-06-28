@@ -1163,7 +1163,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 	}
 	@Override
 	public HashMap<String, Object> getPropertiesPersisting(String storeProtocol, String storeId, String nodeId) throws Throwable{
-		throw new NotImplementedException("getPropertiesPersisting may not be called for the local repository (was the remote repo removed?)");
+		throw new NotImplementedException("getPropertiesPersisting may not be called for the local repository (was the remote repo removed or is it missing the remote_provider setting?)");
 	}
 
 	@Override
