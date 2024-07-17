@@ -168,6 +168,7 @@ public class NodeDao {
 
     public static String getJWT(String nodeId) throws GeneralSecurityException {
         org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory.getLocalService();
+
 //        ToolPermissionService toolPermissionService = ToolPermissionServiceFactory.getInstance();
         String user = AuthenticationUtil.getFullyAuthenticatedUser();
         List<String> nodePermissions = null;
@@ -178,7 +179,7 @@ public class NodeDao {
         }
 //        java.util.Collection<String> toolPermissions = toolPermissionService.getAllToolPermissions(false);
 
-        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions);
+        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimeType(), getMediaType());
     }
 
     public org.edu_sharing.service.model.NodeRef getNodeRef() {
