@@ -4,12 +4,6 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -18,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.edu_sharing.metadataset.v2.MetadataWidget;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.tracking.TrackingService;
@@ -25,9 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.util.*;
@@ -68,7 +60,7 @@ public class XApiTool {
             .put("verb",new JSONObject())
             .put("object",new JSONObject()
                 .put("definition",new JSONObject())
-                .put("id",URLTool.getNgRenderNodeUrl(nodeId,nodeVersion)));
+                .put("id", URLHelper.getNgRenderNodeUrl(nodeId,nodeVersion)));
     }
     private static String queryStore(JSONArray query) throws Exception {
         ApplicationInfo learningLocker = ApplicationInfoList.getLearningLocker();

@@ -1,4 +1,4 @@
 [submodule "Frontend/src/app/core-module"]
 	path = Frontend/src/app/core-module
 	url = ../edu-sharing-angular-core-module.git
-	branch = maven/fixes/9.0
+	branch = maven/fixes/9.1

@@ -35,6 +35,7 @@ import java.util.*;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.ServiceRegistry;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.server.importer.*;
@@ -100,19 +101,19 @@ public class ImporterJob extends AbstractInterruptableJob {
 			}
 			sets = splitted.toArray(new String[splitted.size()]);
 		}
-		String oaiBaseUrl = (String) jobDataMap.get(OAIConst.PARAM_OAI_BASE_URL);
-		String metadataPrefix = (String) jobDataMap.get(OAIConst.PARAM_OAI_METADATA_PREFIX);
+		String oaiBaseUrl = getParam(OAIConst.PARAM_OAI_BASE_URL,jobDataMap);
+		String metadataPrefix = getParam(OAIConst.PARAM_OAI_METADATA_PREFIX,jobDataMap);
 		metadataPrefix = (metadataPrefix == null || metadataPrefix.trim().equals("")) ? "oai_lom-de" : metadataPrefix;
-		String metadataSetId = (String) jobDataMap.get(OAIConst.PARAM_METADATASET_ID);
+		String metadataSetId = getParam(OAIConst.PARAM_METADATASET_ID,jobDataMap);
 
-		String recordHandlerClass = (String) jobDataMap.get(OAIConst.PARAM_RECORDHANDLER);
-		String binaryHandlerClass = (String) jobDataMap.get(OAIConst.PARAM_BINARYHANDLER);
+		String recordHandlerClass = getParam(OAIConst.PARAM_RECORDHANDLER,jobDataMap);
+		String binaryHandlerClass = getParam(OAIConst.PARAM_BINARYHANDLER,jobDataMap);
 
-		String persistentHandlerClass = (String) jobDataMap.get(OAIConst.PARAM_PERSISTENTHANDLER);
+		String persistentHandlerClass = getParam(OAIConst.PARAM_PERSISTENTHANDLER,jobDataMap);
 
-		String importerClass = (String) jobDataMap.get(OAIConst.PARAM_IMPORTERCLASS);
+		String importerClass = getParam(OAIConst.PARAM_IMPORTERCLASS,jobDataMap);
 		
-		String oaiIds = (String) jobDataMap.get(OAIConst.PARAM_OAI_IDS);
+		String oaiIds = getParam(OAIConst.PARAM_OAI_IDS,jobDataMap);
 		
 		String[] idArr = (oaiIds != null) ? oaiIds.split(",") : null;
 
@@ -133,10 +134,10 @@ public class ImporterJob extends AbstractInterruptableJob {
 		}
 
 		if(from == null && until == null){
-			String periodInDaysStr = (String)jobDataMap.get(OAIConst.PARAM_PERIOD_IN_DAYS);
+			String periodInDaysStr = getParam(OAIConst.PARAM_PERIOD_IN_DAYS,jobDataMap);
 			if(periodInDaysStr != null && !periodInDaysStr.trim().equals("")) {
 				try {
-					Long periodInDays = new Long(periodInDaysStr);
+					Long periodInDays = Long.parseLong(periodInDaysStr);
 					Long periodInMs = periodInDays * 24 * 60 * 60 * 1000;
 					until = new Date();
 					from = new Date((until.getTime() - periodInMs));
@@ -163,6 +164,10 @@ public class ImporterJob extends AbstractInterruptableJob {
 		}
 		start(finalUrlImport, oaiBaseUrl, metadataSetId, finalMetadataPrefix, finalSets, recordHandlerClass, binaryHandlerClass,persistentHandlerClass, importerClass, idArr, from, until);
 		return null;
+	}
+
+	private String getParam(String key, Map jobDataMap){
+		return StringUtils.trim((String) jobDataMap.get(key));
 	}
 
 	private String start(byte[] xmlData, String recordHandlerClass, String binaryHandlerClass){

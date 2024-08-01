@@ -444,6 +444,7 @@
     "TITLE": "Kommentare",
     "NEW_COMMENT_PLACEHOLDER": "Neuer Kommentar...",
     "NO_COMMENTS": "Noch keine Kommentare vorhanden",
+    "NO_GUEST_COMMENTING": "Bitte einloggen, um Elemente zu kommentieren",
     "NO_PERMISSION": "Das Kommentieren ist für dieses Element deaktiviert",
     "NOT_SUPPORTED_REMOTELY": "Das Kommentieren von externen Elementen wird nicht unterstützt",
     "COMMENT_EMPTY": "Bitte einen Kommentar eingeben",
@@ -506,7 +507,7 @@
     "Coordinator": "Koordinator",
     "CCPublish": "veröffentlichen"
   },
-  "ACCESSIB ILITY": {
+  "ACCESSIBILITY": {
     "LASTMODIFIED": "Letztes Änderungsdatum",
     "AUTHOR": "Autor{{GENDER_SEPARATOR}}in",
     "SOURCE": "Quelle",
@@ -934,7 +935,7 @@
     "X-ORCID": "Verweis auf einen persistenten ORCID-Identifier. <a target='blank' href='https://orcid.org/'>Registrierung & Infos</a>",
     "X-GND-URI": "Verweis auf eine persistente GND-URI der Deutschen Nationalbibliothek. <a target='blank' href='https://portal.dnb.de/opac.htm'>Personen suchen</a>",
     "X-ROR": "Verweis auf einen Eintrag bei Research Organization Registry. <a target='blank' href='https://ror.org/'>Infos</a>",
-    "X-Wikidata": "Verweis auf einen Eintag bei Wikidata. <a target='blank' href='https://www.wikidata.org/wiki/Wikidata:Main_Page'>Infos</a>"
+    "X-Wikidata": "Verweis auf einen Eintrag bei Wikidata. <a target='blank' href='https://www.wikidata.org/wiki/Wikidata:Main_Page'>Infos</a>"
   },
   "ICON_LABELS": {
     "more_vert": "Optionen",
@@ -1320,26 +1321,26 @@
     "SUBTITLE": "Einstellungen zu Benachrichtigungen & Aktualisierungen",
     "CONFIG": {
       "uniformly": "Für alle Benachrichtigungstypen",
-      "uniformly_DESCRIPTION": "Der Intervall für Benachrichtigungen wird, unabhängig von der Art der Nachricht, global festgelegt",
+      "uniformly_DESCRIPTION": "Das Intervall für Benachrichtigungen wird, unabhängig von der Art der Nachricht, global festgelegt",
       "individual": "Pro Benachrichtigungstyp",
-      "individual_DESCRIPTION": "Der Intervall für Benachrichtigungen kann pro Benachrichtigungstyp individuell festgelegt werden"
+      "individual_DESCRIPTION": "Das Intervall für Benachrichtigungen kann pro Benachrichtigungstyp individuell festgelegt werden"
     },
     "PERMISSION": {
       "consumer": "Sie haben Leserechte auf das Objekt.",
       "collaborator": "Sie haben Änderungsrechte für das Objekt.",
-      "read": "read",
-      "write": "write",
-      "delete": "delete",
-      "deletechildren": "delete subordinate elements",
-      "deletenode": "delete node",
-      "addchildren": "add subordinate elements",
-      "editor": "editor",
-      "contributer": "contributor",
+      "read": "lesen",
+      "write": "schreiben",
+      "delete": "löschen",
+      "deletechildren": "untergeordnete Elemente löschen",
+      "deletenode": "Element löschen",
+      "addchildren": "untergeordnete Elemente hinzufügen",
+      "editor": "Editor",
+      "contributer": "Beteiligte(r)",
       "coordinator": "Sie haben alle Rechte auf das Objekt.",
       "ccpublish": "Sie können das Objekt in einem angebundenen System (z.B. ein Lernmanagementsystem) verwenden.",
-      "readpermissions": "read permissions",
-      "changepermissions": "change permissions",
-      "all": "all"
+      "readpermissions": "Leserechte",
+      "changepermissions": "Anderungsrechte",
+      "all": "alle"
     },
     "SAVED": "Benachrichtigungs-Einstellungen wurden gespeichert",
     "INTERVAL_LABEL": "Benachrichtigungsintervall",
@@ -1363,6 +1364,6 @@
   "API_ERROR": {
     "RELOAD_NOTICE_TITLE": "Seite muss neugeladen werden",
     "RELOAD_NOTICE": "Beim Laden von wichtigen Informationen ist etwas schief gegangen. Bitte laden Sie die Seite neu.",
-    "RELOAD_BUTTON_LABEL": "Seite neuladen"
+    "RELOAD_BUTTON_LABEL": "Seite neu laden"
   }
 }

@@ -719,6 +719,8 @@ export class DialogsService {
             title: 'WORKSPACE.WORKFLOW.TITLE',
             ...(await this.cardDialogUtils.configForNodes(data.nodes)),
             width: 700,
+            // is handled in component
+            autoFocus: false,
             data,
             closable: Closable.Standard,
         });

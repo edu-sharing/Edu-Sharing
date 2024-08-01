@@ -23,7 +23,9 @@
       "INVALID": "Si ce problème persiste, contactez le responsable du système.",
       "403": "L'accès à la ressource donnée est restreint.",
       "404": "Erreur 404",
-      "500": "Erreur 500"
-    }
+      "500": "Erreur 500",
+      "SHARING_ERROR": "Malheureusement, edu-sharing ne peut actuellement partager que des fichiers de taille limitée. Veuillez essayer avec un autre fichier"
+    },
+    "SHARING_ERROR": "Le partage a échoué"
   }
 }

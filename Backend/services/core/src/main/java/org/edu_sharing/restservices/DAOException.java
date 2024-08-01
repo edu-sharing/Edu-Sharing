@@ -1,5 +1,6 @@
 package org.edu_sharing.restservices;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.domain.node.NodeExistsException;
 import org.alfresco.repo.security.authentication.AuthenticationException;
@@ -10,18 +11,23 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.usage.ContentQuotaException;
+import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.RestrictedAccessException;
 import org.edu_sharing.alfresco.policy.NodeFileExtensionValidationException;
 import org.edu_sharing.alfresco.policy.NodeFileSizeExceededException;
 import org.edu_sharing.alfresco.policy.NodeMimetypeValidationException;
+import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.NotAnAdminException;
 import org.edu_sharing.service.collection.DuplicateNodeException;
+import org.edu_sharing.service.handleservicedoi.DOIServiceException;
 import org.edu_sharing.service.permission.PermissionException;
 import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.alfresco.RestrictedAccessException;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.security.InvalidKeyException;
 
 import java.lang.reflect.UndeclaredThrowableException;
@@ -95,6 +101,15 @@ public class DAOException extends RuntimeException {
 				&& t.getCause().getClass().getName().contains("VirusScanFailedException")
 		){
 			return new DAOVirusScanFailedException(t.getCause(),nodeId);
+		}
+		if(t instanceof AlfrescoRuntimeException
+				&& t.getCause() != null
+				&& t.getCause() instanceof DOIServiceException
+		){
+			return DAODOIException.instance((DOIServiceException)t.getCause(),nodeId);
+		}
+		if(t instanceof ElasticsearchException) {
+			Logger.getLogger(DAOException.class).info("Elasticsearch error details: " + ((ElasticsearchException)t).response());
 		}
 		if (t instanceof NodeExistsException) {
 			

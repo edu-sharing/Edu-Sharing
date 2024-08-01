@@ -41,6 +41,7 @@
       "REST_INFO": "Entrez votre nouveau mot de passe.",
       "BUTTON": "Modifier le mot de passe",
       "TOAST": "Le mot de passe a été modifié."
-    }
+    },
+    "TOAST_INVALID_RESET_KEY": "Le code précédemment saisi a expiré ou n'est pas valable."
   }
 }

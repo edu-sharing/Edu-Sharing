@@ -1,4 +1,3 @@
-import { trigger } from '@angular/animations';
 import {
     Component,
     ElementRef,
@@ -9,7 +8,9 @@ import {
     ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+import { ConfigService, ConfigTutorial } from 'ngx-edu-sharing-api';
 import { AppContainerService, UIAnimation } from 'ngx-edu-sharing-ui';
+import { trigger } from '@angular/animations';
 
 interface Dimensions {
     size: number;
@@ -33,6 +34,7 @@ export class TutorialComponent {
     @Input() showSkip = true;
     @Input() heading: string;
     @Input() description: string;
+    config: ConfigTutorial;
     @Input() set element(element: ElementRef) {
         this.setElement(element);
     }
@@ -49,7 +51,11 @@ export class TutorialComponent {
 
     private interval: any;
 
-    constructor(private sanitizer: DomSanitizer, private appContainer: AppContainerService) {}
+    constructor(
+        private sanitizer: DomSanitizer,
+        private appContainer: AppContainerService,
+        private configService: ConfigService,
+    ) {}
 
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -86,7 +92,11 @@ export class TutorialComponent {
         this.onNext.emit();
     }
 
-    private setElement(element: ElementRef) {
+    private async setElement(element: ElementRef) {
+        this.config = await this.configService.get<ConfigTutorial>('tutorial', { enabled: true });
+        if (!this.config?.enabled) {
+            return;
+        }
         if (!element) {
             return;
         }

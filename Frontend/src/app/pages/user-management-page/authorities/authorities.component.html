@@ -55,6 +55,25 @@
   </div>
 </es-card>
 <es-card
+  *ngIf="resetPassword"
+  title="{{ 'PERMISSIONS.MENU_RESET_PASSWORD' | translate }}"
+  subtitle="{{ resetPassword | authorityName }}"
+  width="small"
+  height="auto"
+  [isCancelable]="true"
+  [buttons]="resetPasswordButtons"
+  (onCancel)="resetPassword = null"
+>
+  <div class="card-content-padding card-reset-password">
+    <es-input-password
+      #passwordRef
+      label="{{ 'PERMISSIONS.NEW_PASSWORD' | translate }}"
+      [(value)]="newPassword"
+      [displayStrength]="true"
+    ></es-input-password>
+  </div>
+</es-card>
+<es-card
   *ngIf="groupSignupDetails"
   title="{{ 'PERMISSIONS.ORG_SIGNUP' | translate }}"
   height="auto"

@@ -27,6 +27,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.stream.Stream;
+import org.edu_sharing.repository.tools.URLHelper;
 
 public class ShareServlet extends HttpServlet {
 
@@ -35,7 +36,7 @@ public class ShareServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		if(!"download".equals(req.getParameter("mode"))){
-			resp.sendRedirect(URLTool.getNgComponentsUrl()+"sharing?"+req.getQueryString());
+			resp.sendRedirect(URLHelper.getNgComponentsUrl()+"sharing?"+req.getQueryString());
 			return;
 		}
 		ServletOutputStream op = resp.getOutputStream();
@@ -113,7 +114,7 @@ public class ShareServlet extends HttpServlet {
 					}
 				}
 				if (share.getPassword() != null && (!share.getPassword().equals(ShareServiceImpl.encryptPassword(password)))) {
-					resp.sendRedirect(URLTool.getNgComponentsUrl() + "sharing?" + req.getQueryString());
+					resp.sendRedirect(URLHelper.getNgComponentsUrl() + "sharing?" + req.getQueryString());
 				}
 				String wwwUrl = (String) serviceRegistry.getNodeService().getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_IO_WWWURL));
 				if (wwwUrl != null && !wwwUrl.trim().equals("")) {

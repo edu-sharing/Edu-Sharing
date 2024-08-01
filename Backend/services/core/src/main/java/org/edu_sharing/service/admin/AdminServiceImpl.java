@@ -79,6 +79,8 @@ import org.w3c.dom.Element;
 
 import com.google.common.io.Files;
 
+import org.edu_sharing.repository.tools.URLHelper;
+
 @Component
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
@@ -671,8 +673,8 @@ public class AdminServiceImpl implements AdminService {
     public void testMail(String receiver, String template) {
         try {
             Map<String, String> dummy = new HashMap<>();
-            dummy.put("link", URLTool.getNgComponentsUrl(true) + "admin");
-            dummy.put("link.static", URLTool.getNgComponentsUrl(false) + "admin");
+            dummy.put("link", URLHelper.getNgComponentsUrl(true) + "admin");
+            dummy.put("link.static", URLHelper.getNgComponentsUrl(false) + "admin");
             MailTemplate.sendMail(receiver, template, dummy);
         } catch (Exception e) {
             throw new RuntimeException(e);

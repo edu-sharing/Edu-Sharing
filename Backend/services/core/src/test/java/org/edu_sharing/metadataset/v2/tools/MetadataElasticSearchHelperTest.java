@@ -185,7 +185,12 @@ class MetadataElasticSearchHelperTest {
         );
 
         // multi term facet
-        parameter.setFacets(Arrays.asList("facet1", "facet2"));
+        parameter.setFacets(
+                Arrays.asList(
+                        new MetadataQueryParameter.MetadataQueryFacet("facet1", null),
+                        new MetadataQueryParameter.MetadataQueryFacet("facet2", null)
+                )
+        );
         query.setParameters(Collections.singletonList(parameter));
 
         result = MetadataElasticSearchHelper.getAggregations(mds, query, Collections.emptyMap(),
@@ -257,7 +262,12 @@ class MetadataElasticSearchHelperTest {
         );
 
         // multi term facet
-        parameter.setFacets(Arrays.asList("facet1", "facet2"));
+        parameter.setFacets(
+                Arrays.asList(
+                        new MetadataQueryParameter.MetadataQueryFacet("facet1", null),
+                        new MetadataQueryParameter.MetadataQueryFacet("facet2", null)
+                )
+        );
         query.setParameters(Collections.singletonList(parameter));
 
         result = MetadataElasticSearchHelper.getAggregations(mds, query, Collections.emptyMap(),
@@ -271,6 +281,91 @@ class MetadataElasticSearchHelperTest {
                         "\"aggregations\":{\"test_facet\":{\"multi_terms\":{\"min_doc_count\":4,\"size\":250,\"terms\":[{\"field\":\"facet1\",\"missing\":\"\"},{\"field\":\"facet2\",\"missing\":\"\"}]}}}," +
                         "\"meta\":{\"type\":\"multi_terms\"}," +
                         "\"filter\":{\"bool\":{\"must\":[{\"bool\":{\"must\":[{\"wrapper\":{\"query\":\"eyJleGlzdHMiOnsiZmllbGQiOiAidHlwZSJ9fQ==\"}}]}},{\"bool\":{}},{\"bool\":{}},{\"bool\":{\"should\":[{\"bool\":{\"minimum_should_match\":\"1\",\"should\":[{\"wildcard\":{\"facet1\":{\"case_insensitive\":true,\"value\":\"*A B C*\"}}}]}},{\"bool\":{\"minimum_should_match\":\"1\",\"should\":[{\"wildcard\":{\"facet2\":{\"case_insensitive\":true,\"value\":\"*A B C*\"}}}]}}]}}]}}" +
+                        "}",
+                result.get("test_facet")
+        );
+
+        // nested facet
+        parameter.setFacets(
+                Arrays.asList(
+                        new MetadataQueryParameter.MetadataQueryFacet("contributor.displayname.keyword", "contributor")
+                )
+        );
+        query.setParameters(Collections.singletonList(parameter));
+
+        result = MetadataElasticSearchHelper.getAggregations(mds, query, Collections.emptyMap(),
+                Collections.singletonList("test_facet"), Collections.emptySet(),
+                new BoolQuery.Builder().build()._toQuery(),
+                token
+        );
+        assertEquals(1, result.size());
+        SearchServiceElasticTestUtils.assertFacet(
+                "{\n" +
+                        "  \"aggregations\": {\n" +
+                        "    \"test_facet\": {\n" +
+                        "      \"aggregations\": {\n" +
+                        "        \"test_facet_nested\": {\n" +
+                        "          \"terms\": {\n" +
+                        "            \"field\": \"contributor.displayname.keyword\",\n" +
+                        "            \"min_doc_count\": 4,\n" +
+                        "            \"size\": 250\n" +
+                        "          }\n" +
+                        "        }\n" +
+                        "      },\n" +
+                        "      \"nested\": {\n" +
+                        "        \"path\": \"contributor\"\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  },\n" +
+                        "  \"filter\": {\n" +
+                        "    \"bool\": {\n" +
+                        "      \"must\": [\n" +
+                        "        {\n" +
+                        "          \"bool\": {\n" +
+                        "            \"must\": [\n" +
+                        "              {\n" +
+                        "                \"bool\": {\n" +
+                        "                  \"must\": [\n" +
+                        "                    {\n" +
+                        "                      \"wrapper\": {\n" +
+                        "                        \"query\": \"eyJleGlzdHMiOnsiZmllbGQiOiAidHlwZSJ9fQ==\"\n" +
+                        "                      }\n" +
+                        "                    }\n" +
+                        "                  ]\n" +
+                        "                }\n" +
+                        "              },\n" +
+                        "              {\n" +
+                        "                \"bool\": {}\n" +
+                        "              },\n" +
+                        "              {\n" +
+                        "                \"bool\": {}\n" +
+                        "              }\n" +
+                        "            ]\n" +
+                        "          }\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"nested\": {\n" +
+                        "            \"path\": \"contributor\",\n" +
+                        "            \"query\": {\n" +
+                        "              \"bool\": {\n" +
+                        "                \"minimum_should_match\": \"1\",\n" +
+                        "                \"should\": [\n" +
+                        "                  {\n" +
+                        "                    \"wildcard\": {\n" +
+                        "                      \"contributor.displayname.keyword\": {\n" +
+                        "                        \"case_insensitive\": true,\n" +
+                        "                        \"value\": \"*A B C*\"\n" +
+                        "                      }\n" +
+                        "                    }\n" +
+                        "                  }\n" +
+                        "                ]\n" +
+                        "              }\n" +
+                        "            }\n" +
+                        "          }\n" +
+                        "        }\n" +
+                        "      ]\n" +
+                        "    }\n" +
+                        "  }\n" +
                         "}",
                 result.get("test_facet")
         );

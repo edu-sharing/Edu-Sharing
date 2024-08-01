@@ -50,7 +50,7 @@
     "NO_SUB_NODES": "Niente più elementi",
     "NO_NODES_IN_FOLDER": "Questa cartella è vuota.",
     "UPLOAD_TITLE": "Caricare",
-    "UPLOAD_SUBTITLE": "{{progress}}/{total}} elaborato",
+    "UPLOAD_SUBTITLE": "{{progress}}/{{total}} elaborato",
     "UPLOAD_REMAINING": "{{time}} sinistra",
     "UPLOAD_FINISHING": "Quasi finito...",
     "UPLOAD_ERROR": {
@@ -60,7 +60,8 @@
       "VIRUS": "Rilevato un virus. Il file è stato eliminato.",
       "VIRUS_SCAN_FAILED": "Errore nella verifica del file. Riprovare.",
       "MIMETYPE_VERIFICATION": "Il contenuto del file non era consentito o non poteva essere verificato. Il file è stato eliminato.",
-      "FILETYPE_VERIFICATION": "Non è stato possibile verificare l'estensione del file. Il file è stato eliminato."
+      "FILETYPE_VERIFICATION": "Non è stato possibile verificare l'estensione del file. Il file è stato eliminato.",
+      "FILE_SIZE_EXCEEDED": "Dimensione massima consentita del file s1uperata (dimensione del file: {{actualSize}}, massima consentita: {{maxSize}})"
     },
     "ADD_FOLDER_TITLE": "Aggiungere una nuova cartella",
     "ADD_FOLDER_METADATASET": "Metadataset di cartelle",
@@ -143,6 +144,8 @@
       "NO_FUZZY": "Inserire l'indirizzo e-mail completo per aggiungere gli utenti",
       "DOI": "Fornire con DOI",
       "DOI_INFO": "DOI (Digital Object Identifier) è un ID standardizzato per l'identificazione globale e unica del materiale recuperato.",
+      "HANDLE": "Fornire con handle",
+      "HANDLE_INFO": "handle (Digital Object Identifier) è un ID standardizzato per l'identificazione globale e unica del materiale recuperato.",
       "PUBLISHING_WARNING_TITLE": "Pubblicare un elemento?",
       "PUBLISHING_WARNING_MESSAGE": "Se si continua, l'elemento corrente verrà condiviso con tutti gli utenti del sistema e sarà accessibile a tutti.\n\nSiete sicuri di voler pubblicare questo elemento?",
       "ERROR_INVALID_TYPE_COMBINATION": "elementi di tipo diverso non possono essere condivisi in blocco",
@@ -226,7 +229,9 @@
         "EXTEND_DESCRIPTION": "Le autorizzazioni selezionate saranno aggiunte alle autorizzazioni esistenti degli utenti/gruppi.",
         "REPLACE": "Sovrascrivere le autorizzazioni esistenti",
         "REPLACE_DESCRIPTION": "Le autorizzazioni selezionate sostituiranno le autorizzazioni esistenti degli utenti/gruppi."
-      }
+      },
+      "DOI_MISSING_ATTRIBUTE": "Per pubblicare questo materiale come DOI è necessario il seguente campo: {{key}}",
+      "DOI_METADATA": "Metadati aperti"
     },
     "INHERIT_DISABLED": "L'ereditarietà è attualmente disabilitata",
     "INHERIT_ACCESS_DENIED": "I diritti ereditati non possono essere mostrati perché non si ha accesso all'elemento genitore.",
@@ -299,7 +304,8 @@
       "REPLACE_MATERIAL": "Sostituire il materiale",
       "REPLACE_PREVIEW": "Sostituire l'anteprima",
       "DELETE_PREVIEW": "Cancellare l'anteprima",
-      "UPDATED": "Informazioni aggiornate"
+      "UPDATED": "Informazioni aggiornate",
+      "PREVIEW_DELETED": "La miniatura viene eliminata"
     },
     "REVERTED_VERSION": "La versione è stata ripristinata con successo",
     "NODE_TEMPLATE": {
@@ -343,7 +349,9 @@
       "USER_NO_PERMISSION": "Autorizzazioni mancanti",
       "USER_NO_PERMISSION_INFO": "L'utente/gruppo responsabile '{{user}}' non ha attualmente alcun permesso per accedere a questo documento/questi documenti. Si desidera concedere loro i permessi di coordinatore?\n\nI coordinatori possono modificare il materiale e concedere l'accesso ad altri utenti.",
       "PROCEED": "Sì, concedere le autorizzazioni",
-      "BULK_WORKFLOWS_EXIST": "Alcuni dei documenti selezionati hanno già un flusso di lavoro attivo. Si prega di modificare questi documenti separatamente."
+      "BULK_WORKFLOWS_EXIST": "Alcuni dei documenti selezionati hanno già un flusso di lavoro attivo. Si prega di modificare questi documenti separatamente.",
+      "INFO_MESSAGE": "Si prega di notare che la persona/il gruppo prescelto dovrà ottenere l'accesso completo a questo materiale nel processo, al fine di modificare e aggiornare il materiale e il flusso di lavoro.",
+      "SAVE": "Risparmiare"
     },
     "CONTRIBUTOR": {
       "TITLE": "Contributori del set",
@@ -488,6 +496,23 @@
       "LTI_FIELDS_REQUIRED_LINK": "Creare un collegamento regolare",
       "TO_ME_SHARED_PERSONAL": "I contenuti condivisi con me vengono visualizzati",
       "TO_ME_SHARED_ALL": "I contenuti condivisi con me o con i miei gruppi vengono visualizzati"
+    },
+    "LTI_TOOLS": {
+      "TITLE": "Strumenti LTI",
+      "TITLE_TOOL": "Info per lo strumento {{ tool }}",
+      "TITLE_CONFIG": "Configurazioni per lo strumento {{ tool }}",
+      "TITLE_CREATE_LTI": "Creare un nuovo oggetto {{ tool }}",
+      "NEW_TOOL": "Nuovo strumento",
+      "EDIT_TOOL": "Modifica delle informazioni sullo strumento",
+      "CREATE_LOCATION": "Posizione del file:",
+      "MANAGE_CONFIGS": "Gestire le configurazioni",
+      "CREATE_NAME_PLACEHOLDER": "Inserire il nome...",
+      "NEW_CONFIG": "Creare la configurazione",
+      "EDIT_CONFIG": "Modifica della configurazione",
+      "USE_TOOL": "Candidarsi ora",
+      "DELETE_CONFIG": "Cancellare la configurazione",
+      "DELETE_CONFIG_TITLE": "Cancellare la configurazione?",
+      "DELETE_CONFIG_MESSAGE": "Si è sicuri di voler eliminare la configurazione dello strumento selezionata?\nGli oggetti già creati con questa configurazione non saranno più validi."
     }
   }
 }

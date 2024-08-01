@@ -12,6 +12,7 @@
     "MENU_CREATE_GROUP": "Create group",
     "MENU_EDIT_GROUP": "Edit",
     "MENU_EDIT_PERSON": "Edit",
+    "MENU_RESET_PASSWORD": "Reset password",
     "MENU_DELETE": "Delete",
     "MENU_TOOLPERMISSIONS": "Permissions",
     "MENU_TOOLPERMISSIONS_GLOBAL": "Global Permissions",
@@ -85,6 +86,9 @@
     "STATUS_LABEL": "User status",
     "STATUS_NOTIFY": "Inform user via mail about status change",
     "STATUS_LAST_CHANGE": "Last change of status",
+    "NEW_PASSWORD": "New password",
+    "ERROR_PASSWORD_TO_WEAK": "The given password is too weak",
+    "TOAST_PASSWORD_RESET": "Password has been reset",
     "GROUP_TYPE": {
       "null": "none / regular group",
       "EDITORIAL": "editorial group",

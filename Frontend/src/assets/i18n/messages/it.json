@@ -23,7 +23,9 @@
       "INVALID": "Se il problema si presenta in modo anomalo, contattare il responsabile del sistema.",
       "403": "L'accesso alla risorsa data è limitato.",
       "404": "Errore 404",
-      "500": "Errore 500"
-    }
+      "500": "Errore 500",
+      "SHARING_ERROR": "Purtroppo, al momento edu-sharing può condividere solo file di dimensioni limitate. Provare con un altro file"
+    },
+    "SHARING_ERROR": "Condivisione fallita"
   }
 }

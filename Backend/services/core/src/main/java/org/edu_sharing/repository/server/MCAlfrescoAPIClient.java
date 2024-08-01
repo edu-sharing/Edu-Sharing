@@ -50,6 +50,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ISO9075;
 import org.alfresco.util.Pair;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.alfresco.HasPermissionsWork;
@@ -75,6 +76,7 @@ import org.edu_sharing.repository.server.tools.cache.Cache;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
 import org.edu_sharing.repository.server.tools.cache.UserCache;
 import org.edu_sharing.repository.server.tools.forms.DuplicateFinder;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.restservices.shared.NodeSearch;
 import org.edu_sharing.service.authentication.ScopeUserHomeServiceFactory;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
@@ -856,7 +858,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         boolean isSubOfContent = serviceRegistry.getDictionaryService().isSubClass(QName.createQName(nodeType), QName.createQName(CCConstants.CM_TYPE_CONTENT));
 
         log.debug("setting external URL");
-        String contentUrl = URLTool.getNgRenderNodeUrl(nodeRef.getId(), null);
+        String contentUrl = URLHelper.getNgRenderNodeUrl(nodeRef.getId(),null);
 
         contentUrl = URLTool.addOAuthAccessToken(contentUrl);
         propsCopy.put(CCConstants.CONTENTURL, contentUrl);
@@ -1328,7 +1330,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 version = (String) properties.get(CCConstants.CM_PROP_VERSIONABLELABEL);
 
             //String permaLink = URLTool.getBaseUrl() + "/node/" + nodeRef.getId();
-            String permaLink = URLTool.getNgComponentsUrl() + "render/" + nodeRef.getId();
+			String permaLink = URLHelper.getNgComponentsUrl()+"render/" + nodeRef.getId();
             permaLink = (version != null) ? permaLink + "/" + version : permaLink;
             properties.put(CCConstants.VIRT_PROP_PERMALINK, permaLink);
         }
@@ -1963,18 +1965,12 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         TransactionService transactionService = serviceRegistry.getTransactionService();
         return transactionService.getRetryingTransactionHelper().doInTransaction(callback, false);
     }
-
-    /**
-     * @param store
-     * @param nodeID
-     * @param content
-     * @param mimetype
-     * @param _encoding
-     * @param property
-     * @throws Exception
-     */
     public void writeContent(final StoreRef store, final String nodeID, final InputStream content, final String mimetype, String _encoding,
                              final String property) throws Exception {
+        writeContent(store,nodeID, content,mimetype, _encoding,property, null);
+    }
+    public void writeContent(final StoreRef store, final String nodeID, final InputStream content, final String mimetype, String _encoding,
+                             final String property, final Runnable onComplete) throws Exception {
 
         final String encoding = (_encoding == null) ? "UTF-8" : _encoding;
         log.debug("called nodeID:" + nodeID + " store:" + store + " mimetype:" + mimetype + " property:" + property);
@@ -1993,6 +1989,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                                 ", URL:" + contentWriter.getContentData().getContentUrl() +
                                 ", MimeType:" + contentWriter.getContentData().getMimetype() + "" +
                                 ", ContentData ToString:" + contentWriter.getContentData().toString());
+                        if(onComplete != null) {
+                            onComplete.run();
+                        }
                     }
                 });
 
@@ -3409,9 +3408,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 (String) nodeService.getProperty(
                         new NodeRef(storeRef, nodeId),
                         QName.createQName(CCConstants.CM_NAME));
-
-        nodeService.setProperty(new NodeRef(storeRef, nodeId), QName.createQName(CCConstants.CM_NAME), UUID.randomUUID().toString());
-        nodeService.setProperty(new NodeRef(storeRef, nodeId), QName.createQName(CCConstants.CM_NAME), UUID.randomUUID().toString());
+		String extension = FilenameUtils.getExtension(originalName);
+		// keep the filename so that a possible mimetype verification is valid
+		nodeService.setProperty(new NodeRef(storeRef, nodeId), QName.createQName(CCConstants.CM_NAME), UUID.randomUUID().toString() + "." + extension);
         try {
             nodeService.moveNode(
                     new NodeRef(storeRef, nodeId),
@@ -3557,7 +3556,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
                 props.put(CCConstants.ALFRESCO_MIMETYPE, getAlfrescoMimetype(version.getFrozenStateNodeRef()));
                 // contenturl
-                String contentUrl = URLTool.getNgRenderNodeUrl(nodeId, version.getVersionLabel());
+				String contentUrl = URLHelper.getNgRenderNodeUrl(nodeId,version.getVersionLabel());
                 contentUrl = URLTool.addOAuthAccessToken(contentUrl);
 
                 props.put(CCConstants.CONTENTURL, contentUrl);

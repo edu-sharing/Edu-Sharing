@@ -1,7 +1,7 @@
 package org.edu_sharing.service.license;
 
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 
 public class LicenseService {
 
@@ -9,7 +9,7 @@ public class LicenseService {
 		if(license==null || license.isEmpty())
 			license="none";
 		String ccImageName = license.toLowerCase().replace("_", "-")+".svg";
-		String url = URLTool.getBaseUrl(dynamic) + "/ccimages/licenses/" + ccImageName;
+		String url = URLHelper.getBaseUrl(dynamic) + "/ccimages/licenses/" + ccImageName;
 
 		return url;
 	}

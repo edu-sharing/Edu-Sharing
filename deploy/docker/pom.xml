@@ -39,7 +39,7 @@
     </docker.edu_sharing.community.common.alfresco.search.service.name>
 
     <docker.edu_sharing.community.common.alfresco.search.service.tag>
-      2.0.8.2-5
+      2.0.10
     </docker.edu_sharing.community.common.alfresco.search.service.tag>
 
     <docker.edu_sharing.community.common.alfresco.share.name>
@@ -63,7 +63,7 @@
     </docker.edu_sharing.community.common.postgresql.exporter.name>
 
     <docker.edu_sharing.community.common.postgresql.exporter.tag>
-      0.11.1
+      0.15.0
     </docker.edu_sharing.community.common.postgresql.exporter.tag>
 
     <docker.edu_sharing.community.common.mailcatcher.name>
@@ -114,7 +114,7 @@
       ${docker.registry}/${docker.common}/edu_sharing-community-common-docker-alfresco-repository:23.2.0_1
     </docker.from.edu_sharing.community.common.alfresco.repository>
 
-    <helm.kube.version>&gt;= 1.20.0</helm.kube.version>
+    <helm.kube.version>&gt;= 1.20.0-0</helm.kube.version>
     <helm.version>3.14.2</helm.version>
 
   </properties>

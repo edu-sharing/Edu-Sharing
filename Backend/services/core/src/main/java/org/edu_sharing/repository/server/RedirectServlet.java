@@ -36,7 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
-import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.rendering.RenderingServiceFactory;
 
@@ -61,7 +61,7 @@ public class RedirectServlet extends HttpServlet {
 			}
 			throw new ServletException("Repository "+appId+" does not support rendering and didn't provide a "+CCConstants.LOM_PROP_TECHNICAL_LOCATION+" property! Please make sure that a property is provided");
 		}
-		String url=URLTool.getNgRenderNodeUrl(nodeId,req.getParameter("version"), false, appId);
+		String url= URLHelper.getNgRenderNodeUrl(nodeId,req.getParameter("version"), false, appId);
 		String params = req.getParameter("params");
 		if (params != null && !params.trim().equals("")) {
 			url=UrlTool.setParamEncode(url,"params",params);

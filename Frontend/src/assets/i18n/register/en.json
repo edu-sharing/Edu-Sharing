@@ -16,6 +16,7 @@
     "TOAST_DUPLICATE": "This e-mail adress is already in use.",
     "TOAST_INVALID_MAIL": "No account was found for the given e-mail adress.",
     "TOAST_INVALID_KEY": "The activation key is already used or invalid.",
+    "TOAST_INVALID_RESET_KEY": "The previously entered code has expired or is invalid.",
     "DONE": {
       "TITLE": "Almost done!",
       "MAIL_INFO": "We have sent you an e-mail to ",

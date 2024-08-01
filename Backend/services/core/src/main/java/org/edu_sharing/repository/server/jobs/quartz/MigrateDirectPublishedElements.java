@@ -9,18 +9,21 @@ import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.edu_sharing.service.handleservice.HandleServiceFactory;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.jobs.helper.NodeRunner;
 import org.edu_sharing.repository.server.jobs.quartz.annotation.JobDescription;
 import org.edu_sharing.repository.server.jobs.quartz.annotation.JobFieldDescription;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
+import org.edu_sharing.service.handleservice.HandleServiceImpl;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.permission.HandleMode;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
@@ -39,6 +42,9 @@ public class MigrateDirectPublishedElements extends AbstractJobMapAnnotationPara
 	private NodeService nodeService;
 	private BehaviourFilter policyBehaviourFilter;
 	private ServiceRegistry serviceRegistry;
+
+	@Autowired
+	HandleServiceFactory handleServiceFactory;
 
 	@Override
 	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -110,7 +116,7 @@ public class MigrateDirectPublishedElements extends AbstractJobMapAnnotationPara
 				NodeServiceHelper.setProperty(copy, CCConstants.CM_PROP_C_MODIFIED, NodeServiceHelper.getPropertyNative(ref, CCConstants.CM_PROP_C_MODIFIED), true);
 				// now, fake the current history of copies to the directly published element so its handle id gets the update
 				logger.info("Update old handle " + handleId + " from " + ref + " to " + copy);
-				nodeService.createHandle(copy, Collections.singletonList(ref.getId()), HandleMode.update);
+				nodeService.createHandle(copy, Collections.singletonList(ref.getId()), handleServiceFactory.instance(HandleServiceFactory.IMPLEMENTATION.handle), HandleMode.update);
 
 				// copy the old publish date
 				if (finalDate != null) {

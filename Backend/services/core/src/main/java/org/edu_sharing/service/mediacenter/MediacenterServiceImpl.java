@@ -595,6 +595,10 @@ public class MediacenterServiceImpl implements MediacenterService {
 
         for (String group : allGroups) {
             NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(group);
+            if(authorityNodeRef == null){
+                logger.warn("no authority node found for " + group);
+                continue;
+            }
             if (nodeService.hasAspect(authorityNodeRef, QName.createQName(CCConstants.CCM_ASPECT_MEDIACENTER))) {
                 String mediacenterId = (String) nodeService.getProperty(authorityNodeRef, QName.createQName(CCConstants.CCM_PROP_MEDIACENTER_ID));
                 result.add(mediacenterId);

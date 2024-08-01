@@ -9,7 +9,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.server.SecurityHeadersFilter;
-import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.rendering.RenderingService;
 import org.edu_sharing.service.rendering.RenderingServiceFactory;
@@ -60,7 +60,7 @@ public class RenderingServlet extends HttpServlet {
             String response;
             try {
                 response = renderingService.getDetails(node_id, version,DEFAULT_DISPLAY_MODE, params);
-                response = response.replace("{{{LMS_INLINE_HELPER_SCRIPT}}}",URLTool.getNgRenderNodeUrl(node_id,version)+"?");
+                response = response.replace("{{{LMS_INLINE_HELPER_SCRIPT}}}", URLHelper.getNgRenderNodeUrl(node_id,version)+"?");
                 TrackingServiceFactory.getTrackingService().trackActivityOnNode(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, node_id), null, TrackingService.EventType.VIEW_MATERIAL_EMBEDDED);
             } catch (Throwable t) {
                 RenderingException exception = RenderingException.fromThrowable(t);

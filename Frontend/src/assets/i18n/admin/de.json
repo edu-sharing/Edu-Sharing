@@ -662,7 +662,7 @@
       "MANUAL_INFO": "Sollte ihr LTI-Kompatibles Tool die dynamische Registrierung nicht unterstützen oder diese nicht funktionieren, können Sie die manuelle Registrierung nutzen.\n\nNach Klick auf \"Speichern\" wird mit den gegebenen Daten eine Anbindung vorbereitet.",
       "DATA": {
         "loginInitiationUrl": "Login Initiation (oidc) Url",
-        "redirectionUrls": "Redirection Url's",
+        "redirectionUrls": "Redirection Urls",
         "targetLinkUri": "Target Link Url",
         "keysetUrl": "Keyset Url",
         "clientName": "Tool Bezeichnung"

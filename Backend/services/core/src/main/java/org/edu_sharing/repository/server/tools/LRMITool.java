@@ -12,6 +12,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.forms.VCardTool;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.NodeRefVersion;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.license.LicenseService;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.json.JSONArray;
@@ -48,7 +49,7 @@ public class LRMITool {
                 lrmi.put(vcard.getKey(), data);
             }
         }
-        lrmi.put("url",URLTool.getNgRenderNodeUrl(node.getNodeRef().getId(),node.getVersion()));
+        lrmi.put("url", URLHelper.getNgRenderNodeUrl(node.getNodeRef().getId(),node.getVersion()));
         lrmi.put("thumbnailUrl",NodeServiceHelper.getPreview(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,node.getNodeRef().getId())).getUrl());
         lrmi.put("dateCreated",getDate(getProperty(props, Collections.singletonList(CCConstants.CM_PROP_C_CREATED+CCConstants.LONG_DATE_SUFFIX))));
         lrmi.put("dateModified",getDate(getProperty(props, Collections.singletonList(CCConstants.CM_PROP_C_MODIFIED+CCConstants.LONG_DATE_SUFFIX))));

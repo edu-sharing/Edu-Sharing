@@ -41,6 +41,7 @@
       "REST_INFO": "Immettere la nuova password.",
       "BUTTON": "Modifica della password",
       "TOAST": "La password è stata modificata."
-    }
+    },
+    "TOAST_INVALID_RESET_KEY": "Il codice precedentemente inserito è scaduto o non è valido."
   }
 }

@@ -4,9 +4,11 @@ import lombok.NonNull;
 import org.alfresco.service.cmr.repository.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.repository.client.rpc.User;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
 import org.edu_sharing.service.permission.HandleMode;
+import org.edu_sharing.service.permission.HandleParam;
 import org.edu_sharing.service.search.model.SortDefinition;
 
 import java.io.InputStream;
@@ -188,11 +190,11 @@ public interface NodeService {
 
 	/**
 	 * create a published copy of the node
-	 * if handle mode is set, a handle should also be generated
+	 * if handle mode is set, a handle and or doi should also be generated
 	 */
-	String publishCopy(String nodeId, HandleMode handleMode) throws Throwable;
+	String publishCopy(String nodeId, HandleParam handleParam) throws Throwable;
 
-	default void createHandle(NodeRef nodeRef, List<String> publishedCopies, HandleMode handleMode) throws Exception {
+	default void createHandle(NodeRef nodeRef, List<String> publishedCopies, HandleService service, HandleMode handleMode) throws Exception {
 		throw new NotImplementedException();
 	}
 	/**

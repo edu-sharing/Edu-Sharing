@@ -87,6 +87,8 @@ es-info-message {
                 color: $textLight;
                 width: 40px;
                 display: flex;
+                flex-direction: column;
+                gap: 5px;
                 justify-content: flex-end;
             }
             .version-date {
@@ -110,7 +112,10 @@ es-info-message {
         }
     }
 }
-.doi {
+.handle {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     background-color: $cardLightBackground;
     margin: 0 0 20px 0;
     padding: 10px $cardPadding + 33px;

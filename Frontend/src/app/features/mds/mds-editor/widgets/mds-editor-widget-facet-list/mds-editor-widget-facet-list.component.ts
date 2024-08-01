@@ -131,6 +131,9 @@ export class MdsEditorWidgetFacetListComponent
             // console.log(this.widget.definition.id, facetValues, this.filter.value);
             if (facetValues) {
                 this.facetValues = facetValues.values;
+                if (this.widget.definition.allowempty === false) {
+                    this.facetValues = this.facetValues.filter((f) => !!f.value);
+                }
                 this.formArray = this.generateFormArray(facetValues.values);
                 this.updateFilteredValues();
                 // expand collapsed field if a value is active/selected

@@ -1,5 +1,31 @@
 {
   "SERVICES": {
-    "TITLE": "Services"
+    "TITLE": "Services",
+    "REGISTER": "Register new service",
+    "REGISTERED_SERVICES": "Already registered Services",
+    "URL": "URL",
+    "LOGO": "Logo",
+    "NAME": "Name",
+    "ID": "ID",
+    "INTERFACE_TYPES": {
+      "Generic_Api": "API",
+      "Statistics": "Statistics",
+      "Sitemap": "Sitemap",
+      "Search": "Search",
+      "OAI": "OAI"
+    },
+    "TAB": {
+      "LICENSES": "Licence",
+      "MATERIALS": "Type of material"
+    },
+    "TYPE": "Type",
+    "MATERIALS": "Materials",
+    "REGISTERED": "The service was successfully registered",
+    "ERROR": {
+      "LOADJSON": "The service URL could not be opened",
+      "REGISTERED": "The service could not be registered (JSON format error or similar)",
+      "DUPLICATE": "This service URL has already been registered",
+      "ENTERURL": "Enter a URL"
+    }
   }
 }

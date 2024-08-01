@@ -125,6 +125,14 @@ public class VersionService implements ApplicationListener<RefreshScopeRefreshed
 			value=getRepositoryVersion();
 		}else if(type.equals(Type.RENDERSERVICE)) {
 			value=getRenderserviceVersion();
+			// cleanup version and only keep major + minor
+			try {
+				Pattern pattern = Pattern.compile("(\\d\\.\\d)\\..*");
+				Matcher m = pattern.matcher(value);
+				value = m.replaceAll("$1");
+			}catch(Exception e) {
+				logger.warn("Error while escaping rs version:", e);
+			}
 		}else {
 			throw new IllegalArgumentException("Unknown type "+type);
 		}

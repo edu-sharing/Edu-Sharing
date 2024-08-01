@@ -158,7 +158,12 @@
     "TOOLPERMISSION_CONNECTOR_SAFE": "L'éditeur \"{{connector}}\" peut être utilisé en toute sécurité",
     "TOOLPERMISSION_REPOSITORY": "Le référentiel \"{{repository}}\" peut être visualisé et parcouru et les médias peuvent en être extraits.",
     "TOOLPERMISSION_CREATE_MAP_LINK": "Créer des dossiers qui renvoient à d'autres dossiers",
-    "TOOLPERMISSION_SIGNUP_GROUP": "S'inscrire à une organisation/un groupe (ne s'applique qu'aux organisations/groupes configurés pour l'inscription)"
+    "TOOLPERMISSION_SIGNUP_GROUP": "S'inscrire à une organisation/un groupe (ne s'applique qu'aux organisations/groupes configurés pour l'inscription)",
+    "TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_FUZZY": "Rechercher et trouver des utilisateurs en dehors de l'organisation sans avoir à saisir l'intégralité de l'identifiant de l'utilisateur",
+    "TOOLPERMISSION_MANAGE_RELATIONS": "Gérer et créer des relations entre les éléments",
+    "TOOLPERMISSION_RATE_WRITE": "L'autorisation de noter les matériaux (nécessite TOOLPERMISSION_RATE_READ)",
+    "TOOLPERMISSION_COLLECTION_PROPOSAL": "Suggérer des documents pour des collections pour lesquelles l'utilisateur n'a pas de droits d'écriture",
+    "TOOLPERMISSION_RATE_READ": "Le droit de consulter les revues de matériel"
   },
   "NO_WRITE_PERMISSIONS": "Aucune autorisation",
   "NODE_SEARCH": "Éléments de recherche...",
@@ -221,7 +226,8 @@
   },
   "LIST_TABLE": {
     "DUMMY_ICON_LABEL": "Type de fichier",
-    "TOGGLE_ALL": "Sélectionner tous/aucun"
+    "TOGGLE_ALL": "Sélectionner tous/aucun",
+    "CONFIGURE_COLUMNS": "Configurer les colonnes"
   },
   "NODE": {
     "cm:name": "nom de fichier",
@@ -258,8 +264,19 @@
       "VIEW_MATERIAL": "Accès",
       "VIEW_MATERIAL_EMBEDDED": "Emboîtements",
       "DOWNLOAD_MATERIAL": "Téléchargements",
-      "VIEW_MATERIAL_PLAY_MEDIA": "Lectures"
-    }
+      "VIEW_MATERIAL_PLAY_MEDIA": "Lectures",
+      "VIEW_COLLECTION": "Vues de la collection",
+      "OPEN_EXTERNAL_LINK": "Vues des liens externes"
+    },
+    "cm:title": "titre",
+    "ccm:replicationsource": "source",
+    "ccm:replicationsourcetimestamp": "dernière modification",
+    "ccm:eaf_subtitle": "sous-titre",
+    "ccm:replicationmodified": "dernière modification",
+    "ccm:taxonid": "Domaine d'expertise",
+    "ccm:educationalintendedenduserrole": "Groupe cible",
+    "ccm:eaf_sequence_title": "Titre de la séquence",
+    "ccm:collection_ordered_position": "Tri manuel"
   },
   "COOKIE_INFO": {
     "ACCEPT": " Accepter",
@@ -334,7 +351,9 @@
     "OPTION_EDIT": "éditer",
     "OPTION_DELETE": "supprimer",
     "DELETE_COMMENT": "Supprimer le commentaire ?",
-    "DELETE_COMMENT_MESSAGE": "Êtes-vous sûr de vouloir supprimer le commentaire sélectionné ?"
+    "DELETE_COMMENT_MESSAGE": "Êtes-vous sûr de vouloir supprimer le commentaire sélectionné ?",
+    "NO_GUEST_COMMENTING": "Veuillez vous connecter pour commenter des éléments",
+    "NOT_SUPPORTED_REMOTELY": "Les commentaires ne sont pas pris en charge pour les éléments externes"
   },
   "COLLECTION": {
     "INFO_REFERENCES": "collection",
@@ -378,7 +397,11 @@
     "folder": "Dossier",
     "file": "Inconnu",
     "collection": "Collection",
-    "saved_search": "Recherche"
+    "saved_search": "Recherche",
+    "tool_object": "Outil LTI",
+    "file-csv": "Fichier CSV",
+    "file-serlo": "Dossier Serlo",
+    "file-geogebra": "Fichier Geogebra"
   },
   "PERMISSION_TYPE": {
     "Consumer": "Visionneuse",
@@ -404,7 +427,19 @@
     "TOAST_DURATION_INFINITE_INFO": "Les messages d'état ne sont pas automatiquement masqués et doivent être fermés manuellement.",
     "TOAST_DURATION_TITLE": "afficher l'heure",
     "TOAST_DURATION_MESSAGE": "Les messages d'état disparaissent automatiquement au bout d'un certain temps ou peuvent être fermés manuellement en cliquant.",
-    "DISMISS_TOAST": "Cacher"
+    "DISMISS_TOAST": "Cacher",
+    "INDICATOR_ICONS_TITLE": "Symboles significatifs",
+    "INDICATOR_ICONS_MESSAGE": "Communiquer le contenu à l'aide de symboles. La signification d'un symbole est affichée lorsque le pointeur de la souris est déplacé sur le symbole. Toutefois, cela n'est pas possible lorsque l'on utilise uniquement le clavier.",
+    "INDICATOR_ICONS_OPTION": {
+      "ICONS": "Afficher les symboles",
+      "TEXT_ONLY": "Afficher uniquement le texte"
+    },
+    "CONTRAST_MODE_TITLE": "Mode contraste",
+    "CONTRAST_MODE_MESSAGE": "En mode contraste, les éléments de la page sont plus distincts les uns des autres.",
+    "CONTRAST_MODE_OPTION": {
+      "CONTRAST": "Amélioration du contraste",
+      "STANDARD": "Contraste standard"
+    }
   },
   "AUTHORITY_TYPE_GROUP": "Groupe",
   "AUTHORITY_TYPE_ORG": "Organisation",
@@ -436,12 +471,14 @@
       "extern": "utilisateur-trice externe",
       "system": "compte système",
       "function": "compte de fonction"
-    }
+    },
+    "status": "statut"
   },
   "PROFILE_SETTINGS": {
     "SHOW_EMAIL_LABEL": "Adresse e-mail publique",
     "SHOW_EMAIL": "L'adresse e-mail est affichée",
-    "HIDE_EMAIL": "L'adresse e-mail est cachée"
+    "HIDE_EMAIL": "L'adresse e-mail est cachée",
+    "SHOW_EMAIL_TOOLTIP": "Contrôle si les autres utilisateurs peuvent voir l'adresse électronique, par exemple dans la boîte de dialogue d'invitation ou lors de l'accès au profil."
   },
   "CONNECTOR": {
     "ONLY_OFFICE": {
@@ -473,6 +510,18 @@
       "application/vnd.oasis.opendocument.spreadsheet": "feuille de calcul (.ods)",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation": "présentation (.pptx)",
       "application/vnd.oasis.opendocument.presentation": "présentation (.odp)"
+    },
+    "H5P": {
+      "TITLE": "nouveau contenu H5P",
+      "FILENAME": "le fichier suivant est créé",
+      "NAME": "H5P",
+      "PLACEHOLDER": "Nom du contenu"
+    },
+    "MOODLE": {
+      "TITLE": "nouveau contenu Moodle",
+      "FILENAME": "le fichier suivant est créé",
+      "NAME": "MOODLE",
+      "PLACEHOLDER": "Nom du contenu"
     }
   },
   "LICENSE": {
@@ -506,7 +555,8 @@
       "CC_0": "Vous pouvez copier, modifier, distribuer et exécuter l'œuvre, même à des fins commerciales, sans demander d'autorisation.",
       "COPYRIGHT_FREE": "L'œuvre est accessible gratuitement.<br />Utilisation et attribution selon les règles légales généralement applicables.",
       "COPYRIGHT_LICENSE": "L'œuvre ne peut être utilisée que par le groupe d'utilisateur-trices sous licence, conformément aux conditions stipulées dans le contrat de licence.<br />La transmission à des tiers est interdite.<br />L'attribution est conforme aux pratiques généralement applicables.",
-      "SCHULFUNK": "Offre à accès restreint et à durée limitée pour les radios scolaires, conformément à l'article 47 de la loi allemande sur les droits d'auteur et les droits voisins (UrhG).<br />La transmission à des tiers est interdite.<br />Attribution conformément aux pratiques généralement applicables."
+      "SCHULFUNK": "Offre à accès restreint et à durée limitée pour les radios scolaires, conformément à l'article 47 de la loi allemande sur les droits d'auteur et les droits voisins (UrhG).<br />La transmission à des tiers est interdite.<br />Attribution conformément aux pratiques généralement applicables.",
+      "UNTERRICHTS_UND_LEHRMEDIEN": "(1) Les producteurs de collections de médias pour l'enseignement peuvent reproduire, distribuer ou mettre à la disposition du public jusqu'à 10 pour cent d'une œuvre publiée pour de telles collections.<br />(2) L'article 60a (2) et (3) phrase 1 s'applique en conséquence.<br />(3) Aux fins de la présente loi, ʻcollections de médias pour l'enseignementʼ signifie des collections qui rassemblent un nombre significatif d'auteurs et qui sont adaptées, prévues et étiquetées en conséquence à des fins exclusives d'illustration non commerciale dans l'enseignement dans les établissements d'enseignement (article 60a).<br />source : https://www.gesetze-im-internet.de/englisch_urhg/englisch_urhg.html#p0475"
     },
     "GROUPS": {
       "NONE": "Pas de licence choisie",
@@ -517,7 +567,19 @@
       "CC_0": "CC 0 / Domaine public",
       "SCHULFUNK": "Licence de radio/télévision éducative allemande (§47 UrhG)",
       "EDU": "Licences d'edu-sharing",
-      "CUSTOM": "définir une licence personnalisée"
+      "CUSTOM": "définir une licence personnalisée",
+      "UNTERRICHTS_UND_LEHRMEDIEN": "§60b Collections de médias pour l'enseignement"
+    },
+    "URLS": {
+      "CC_BY_ABOUT": "https://creativecommons.org/licenses/list.de",
+      "CC_BY": "https://creativecommons.org/licenses/by/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_ND": "https://creativecommons.org/licenses/by-nd/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_SA": "https://creativecommons.org/licenses/by-sa/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_NC": "https://creativecommons.org/licenses/by-nc/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_NC_ND": "https://creativecommons.org/licenses/by-nc-nd/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_NC_SA": "https://creativecommons.org/licenses/by-nc-sa/{{version}}/{{locale}}legalcode.de",
+      "CC_0": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.de",
+      "PDM": "https://creativecommons.org/public-domain/pdm/"
     }
   },
   "LIST": {
@@ -527,7 +589,14 @@
   },
   "DIALOG": {
     "COLLECTION_SHARE_PUBLIC": "Ajouter une ressource à la collection ?",
-    "COLLECTION_SHARE_PUBLIC_INFO": "En ajoutant cette ressource à la collection \"{{collection}}\", tous ceux qui ont accès à cette collection peuvent y accéder."
+    "COLLECTION_SHARE_PUBLIC_INFO": "En ajoutant cette ressource à la collection \"{{collection}}\", tous ceux qui ont accès à cette collection peuvent y accéder.",
+    "SAVING": "Sauvegarder...",
+    "SAVED": "Modifications enregistrées",
+    "SAVING_ERROR": "Erreur lors de l'enregistrement des modifications",
+    "CONFIRM_DISCARD_TITLE": "Rejeter les modifications ?",
+    "CONFIRM_DISCARD_MESSAGE": "Fermer le dialogue sans enregistrer les modifications ?",
+    "COLLECTION_PROPSE": "Soumettre une proposition ?",
+    "COLLECTION_PROPSE_INFO": "Vous ne disposez pas de droits suffisants sur la collection \"{{collection}}\". Toutefois, vous pouvez soumettre le matériel en tant que proposition. Souhaitez-vous poursuivre ?"
   },
   "OPTIONS": {
     "SHOW_ALL_OPTIONS": "Plus d'actions",
@@ -577,7 +646,15 @@
     "SWITCH_TO_LIST_VIEW": "Passer à l'affichage en liste",
     "SWITCH_TO_CARDS_VIEW": "Passer à l'affichage des cartes",
     "LIST_SETTINGS": "Configurer la liste",
-    "METADATA_SIDEBAR": "Détails des matériaux"
+    "METADATA_SIDEBAR": "Détails des matériaux",
+    "DOWNLOAD_SAFE": "Archives",
+    "ACCESSIBILITY": "Accessibilité",
+    "COLLECTION_PROPOSAL_ACCEPT": "Accepter la proposition",
+    "LTI": "Adopter dans la plateforme LTI",
+    "EMBED": "Embarquer",
+    "OPEN_ORIGINAL_NODE": "Ouvrir l'original",
+    "COLLECTION_PROPOSAL_DECLINE": "Refuser la proposition",
+    "RELATIONS": "Gérer les relations"
   },
   "NO_SIZE": "-",
   "VERSION_COMMENT": "Commentaire sur la version",
@@ -615,7 +692,19 @@
     "INDETERMINATE_NOTICE": "Cliquez sur la puce pour ajouter la valeur \"{{ value }}\" à tous les éléments, ou retirez-la pour la supprimer de tous les éléments.",
     "SHOW_OPTIONS_BUTTON": "Afficher les options",
     "FILTER_FOR": "Filtre pour \"{{value}}\" ({{count}} élément(s) correspondant(s))",
-    "FILTER_TREE": "Filtre..."
+    "FILTER_TREE": "Filtre...",
+    "OPEN_CLOSE_EXTENDED": "Vue ouverte/fermée",
+    "FILTER_FACET": "Filtre...",
+    "SHOW_EXTENDED_TRUE": "Afficher des informations supplémentaires",
+    "NO_ARBITRARY_VALUES_NOTICE": "Vous ne pouvez pas sélectionner librement des valeurs pour ce champ. Veuillez sélectionner des valeurs dans la liste.",
+    "DELETE_KEY_NOTICE": "Supprimer avec la touche Delete",
+    "SHOW_EXTENDED_FALSE": "cacher des informations supplémentaires",
+    "SUGGEST_VALUE_SEND": "suggérer",
+    "SUGGESTION_TOOLTIP": "Valeur \"{{ valeur }}\" suggérée par \"{{ créateur }}\"",
+    "NO_MATCHING_VALUES": "Pas de valeurs correspondantes",
+    "ERROR_PREVIEW": "L'image de prévisualisation n'a pas pu être remplacée. Veuillez essayer un autre fichier image",
+    "SUGGEST_VALUE_SENT": "La suggestion a été soumise et est en cours d'examen par l'équipe éditoriale. La suggestion n'apparaîtra que lorsqu'elle aura été activée par l'équipe éditoriale. Nous vous remercions de votre attention.",
+    "SUGGEST_VALUE_LABEL": "Proposer une nouvelle valeur"
   },
   "SIMPLE_EDIT": {
     "TITLE": "Édition rapide",
@@ -703,7 +792,15 @@
     "RENDER_NOT_FOUND": "L'élément demandé est supprimé ou n'existe pas",
     "FIELD_REQUIRED": "Le champ {{ name }} est obligatoire",
     "API_FORBIDDEN": "Aucune autorisation pour accéder à ce contenu",
-    "API_FORBIDDEN_LOGIN": "Veuillez vous connecter pour accéder à cette section"
+    "API_FORBIDDEN_LOGIN": "Veuillez vous connecter pour accéder à cette section",
+    "NO_CONNECTION": "Connexion internet instable, le contenu n'a pas pu être chargé. Veuillez réessayer plus tard",
+    "DOWNLOAD_STARTED": "Le téléchargement de \"{{nom}}\" a commencé",
+    "DOWNLOAD_FINISHED_ANDROID": "Le téléchargement de \"{{nom}}\" est terminé.\nVous pouvez trouver l'élément dans le dossier de téléchargement de l'appareil.",
+    "DOWNLOAD_FINISHED_IOS": "Le téléchargement de \"{{nom}}\" est terminé.\nVous pouvez trouver l'élément dans l'application des fichiers",
+    "DOWNLOAD_FAILED": "Le téléchargement de \"{{nom}}\" a échoué.\nVérifiez votre connexion Internet et réessayez",
+    "DOWNLOAD_TRY_AGAIN": "Réessayer",
+    "STORAGE_LOCATION_SAVED": "Le dossier \"{{nom}}\" sera utilisé par défaut pour les téléchargements à l'avenir.",
+    "STORAGE_LOCATION_RESET": "Le dossier par défaut pour les téléchargements a été réinitialisé"
   },
   "VCARD": {
     "Givenname": "Prénom",
@@ -717,7 +814,11 @@
     "Zip": "Code postal",
     "City": "Ville",
     "Region": "Canton/État/Région",
-    "Country": "Pays"
+    "Country": "Pays",
+    "X-GND-URI": "GND-URI",
+    "X-Wikidata": "Entrée Wikidata",
+    "X-ORCID": "ORCID",
+    "X-ROR": "ROR (Registre des organisations de recherche)"
   },
   "ICON_LABELS": {
     "more_vert": "Options",
@@ -737,7 +838,8 @@
   "FILL_STATUS": {
     "REQUIRED": "champs obligatoires",
     "REQUIREDPUBLISH": "pour la publication des champs obligatoires",
-    "SHOW": "montrer"
+    "SHOW": "montrer",
+    "MESSAGE": "champs remplis"
   },
   "SIGNUP_GROUP": {
     "TITLE": "S'inscrire dans un groupe",
@@ -923,7 +1025,10 @@
     "zh_CN": "Chinois (Chine)",
     "zh_HK": "Chinois (Hong Kong)",
     "zh_SG": "Chinois (Singapour)",
-    "zh_TW": "Chinois (Taiwan)"
+    "zh_TW": "Chinois (Taiwan)",
+    "ancient_greek": "Vert antique",
+    "ancient_indian": "L'Inde ancienne",
+    "latin": "Latin"
   },
   "COUNTRY_CODE": {
     "INTERNATIONAL": "International",
@@ -1029,7 +1134,236 @@
     "COLLECTIONS": "collections"
   },
   "SKIP_LINKS": {
-    "MAIN_CONTENT": "Aller au contenu principal"
+    "MAIN_CONTENT": "Aller au contenu principal",
+    "ACCESSIBILITY_SETTINGS": "Paramètres d'accessibilité"
   },
-  "REPOSITORIES": {}
+  "REPOSITORIES": {
+    "de_fwu": "FWU",
+    "ddb": "Bibliothèque nationale allemande",
+    "geogebra": "GeoGebra",
+    "memucho": "Memucho",
+    "omega": "Oméga",
+    "pixabay": "Pixabay",
+    "tutory": "Tutoriel",
+    "youtube": "YouTube",
+    "zum": "ZUM Wiki"
+  },
+  "MONTHS_AGO": "{{ mois }} il y a un mois",
+  "YEARS_AGO": "{{ ans }} il y a un an(s)",
+  "STORAGE_LOCATION_SAVE": "Utiliser cet emplacement par défaut à l'avenir",
+  "SEARCH_CLEAR": "Clair",
+  "TOGGLE_SEARCH_FILTERS": "Afficher ou masquer les filtres de recherche",
+  "PAGINATOR": {
+    "getRangeLabel": "Page {{page}} de {{pageCount}}",
+    "itemsPerPageLabel": "Entrées par page :",
+    "nextPageLabel": "Page suivante",
+    "previousPageLabel": "Page précédente"
+  },
+  "PUBLISHED_COPY_TOOLTIP": "Exemplaire publié",
+  "CHILDOBJECT_COUNT": "Éléments {{count}} (séquence)",
+  "OPTIONS_FOR": "Actions pour {{element}}",
+  "NO_AVAILABLE_OPTIONS": "Aucune action n'est disponible pour les éléments sélectionnés",
+  "NODE_SEARCH_SELECTOR": {
+    "MORE_FILTERS": "Filtres de recherche étendus",
+    "NO_MATCHES": "Aucun élément n'a été modifié",
+    "NO_RECENT": "Pas d'utilisateurs ou de groupes récemment invités",
+    "NO_PERMISSIONS": "Vous n'avez pas les permissions suffisantes sur l'élément donné"
+  },
+  "BREADCRUMBS": {
+    "YOU_ARE_HOME": "Vous êtes dans le répertoire racine",
+    "IN_HOME": "Répertoire racine"
+  },
+  "API_ERROR": {
+    "RELOAD_NOTICE_TITLE": "La page doit être rechargée",
+    "RELOAD_NOTICE": "Un problème s'est produit lors du chargement d'informations importantes. Veuillez recharger la page.",
+    "RELOAD_BUTTON_LABEL": "Recharger la page"
+  },
+  "PROPOSAL_STATUS": {
+    "DECLINED": "décliné",
+    "ACCEPTED": "acceptée",
+    "PENDING": "en attente"
+  },
+  "NODE_PROPOSAL": {
+    "cm:created": "Date de la proposition",
+    "ccm:collection_proposal_status": "Statut de la proposition",
+    "cm:creator": "proposé par"
+  },
+  "RATING": {
+    "TOAST": {
+      "LIKE_REMOVED": "Recommandation pour le matériau \"{{nom}}\" supprimée",
+      "RATING_REMOVED": "Suppression du classement du matériau \"{{nom}}\".",
+      "RATED": "Le matériau \"{{nom}}\" a été évalué {{rating}}. Nous vous en remercions !",
+      "LIKED": "Matériau \"{{nom}}\" recommandé. Nous vous remercions de votre attention."
+    },
+    "COUNT_RATINGS": "Nombre d'examens",
+    "STARS_RATE": "Noter avec {{rating}}",
+    "LIKES": "Recommander",
+    "COUNT_LIKES": "Nombre de recommandations",
+    "DELETE_RATING": "Supprimer l'avis"
+  },
+  "NOTIFICATION_LIST": {
+    "UNREAD_COUNT": "{{count}} notifications non lues",
+    "TITLE": "Notifications",
+    "SETTINGS": "Paramètres de notification",
+    "RELOAD": "rafraîchir",
+    "MARK_ALL_READ": "Marquer tous les textes comme lus",
+    "SHOW_READ": "Afficher les notifications de lecture",
+    "EMPTY_UNREAD": "Il n'y a pas de notifications non lues",
+    "EMPTY_ALL": "Aucune notification",
+    "DESCRIPTIONS": {
+      "AddToCollectionEvent": "{{créateur}} a ajouté le matériau \"{{titre}}\" à la collection {{collection}}.",
+      "ProposeForCollectionEvent": "{{créateur}} a proposé le matériel \"{{titre}}\" pour la collection {{collection}}.",
+      "CommentEvent": "{{creator}} a écrit un commentaire sur le matériel \"{{title}}\".",
+      "InviteEvent": "{{créateur}} vous a remis l'objet \"{{titre}}\".",
+      "NodeIssueEvent": "{{créateur}} a signalé le problème \"{{motif}}\" sur le matériau \"{{titre}}\".",
+      "RatingEvent": "Une note a été attribuée à l'article \"{{titre}}\".",
+      "WorkflowEvent": "{{créateur}} a modifié l'état du flux de travail de la matière \"{{titre}}\" en \"{{état du flux de travail}}\".",
+      "MetadataSuggestionEvent": ""
+    }
+  },
+  "ADD_TO_STREAM": {
+    "TITLE": "Ajouter au flux",
+    "AUDIENCE_TYPE": "Au courant de ...",
+    "AUDIENCE_EVERYONE": "Tous",
+    "AUDIENCE_EVERYONE_INFO": "L'entrée apparaîtra dans le flux pour tous les utilisateurs.",
+    "AUDIENCE_CUSTOM": "Utilisateurs ou groupes",
+    "SUCCESSFUL": "Un ou plusieurs éléments ont été ajoutés au flux",
+    "ERROR": {
+      "NO_PERSON_INVITED": "Aucun utilisateur sélectionné"
+    }
+  },
+  "FEEDBACK": {
+    "TITLE": "Donner un retour d'information sur le matériel",
+    "VIEW_TITLE": "Retour d'information sur le matériel",
+    "VIEW_EMPTY": "Aucun retour d'information n'a encore été donné sur le matériel",
+    "CREATOR": "Auteur {{créateur}}",
+    "SAVE": "Envoyer",
+    "TOAST": "Feedback envoyé. Nous vous remercions de votre attention."
+  },
+  "VCARD_HINT": {
+    "X-ORCID": "Référence à un identifiant ORCID persistant. <a target='blank' href='https://orcid.org/'>Inscription et informations</a>",
+    "X-GND-URI": "Référence à un URI GND persistant de la Bibliothèque nationale allemande. <a target='blank' href='https://portal.dnb.de/opac.htm'>Recherche de personnes</a>",
+    "X-ROR": "Référence à une entrée dans le registre des organismes de recherche. <a target='blank' href='https://ror.org/'>Info</a>",
+    "X-Wikidata": "Référence à une entrée sur Wikidata. <a target='_blank' href='https://www.wikidata.org/wiki/Wikidata:Main_Page'>Info</a>"
+  },
+  "EMBED": {
+    "SIZE_CONSTRAINTS_ERROR_NOTICE": "Veuillez choisir une valeur entre {{ min }} et {{ max }}.",
+    "VERSION_OPTION": {
+      "FIXED": "cette version",
+      "NEWEST": "toujours la version la plus récente"
+    },
+    "NOT_PUBLIC_WARNING": "Ce matériel n'est pas accessible au public.",
+    "VERSION": "Version",
+    "WIDTH": "Largeur",
+    "CODE_LABEL": "Code d'intégration",
+    "HEIGHT": "Hauteur",
+    "COPIED_TO_CLIPBOARD_NOTICE": "Le code d'intégration a été copié dans le presse-papiers."
+  },
+  "NODE_INFO": {
+    "TITLE": "Nœud \"{{nom}}\"",
+    "LOCATION": "Chemin d'accès à l'article",
+    "NODE_ASPECTS": "Aspects",
+    "NODE_PROPERTIES": "Propriétés",
+    "NODE_TYPE": "Type d'objet",
+    "JSON": "Tout l'objet",
+    "PERMISSIONS": "Permissions",
+    "PERMISSIONS_INHERITED": "Permissions héritées",
+    "PERMISSIONS_INHERIT_DISABLED": "Héritage désactivé",
+    "PERMISSIONS_INHERIT_EMPTY": "Aucune autorisation héritée du parent",
+    "PERMISSIONS_LOCAL": "Permissions explicites",
+    "PERMISSIONS_LOCAL_EMPTY": "Aucune autorisation n'a été définie pour l'objet",
+    "CHILDREN": "Les enfants",
+    "CHILDREN_NONE": "Cet élément n'a pas d'objet enfant",
+    "CUSTOM_PROPERTY_NAME": "Saisir le nom de la propriété personnalisée",
+    "CUSTOM_PROPERTY_VALUE": "Saisir la valeur de la propriété personnalisée"
+  },
+  "NOTIFICATION": {
+    "MENU": "Notifications",
+    "TITLE": "Paramètres de notification",
+    "SUBTITLE": "Paramètres pour les notifications et les mises à jour",
+    "CONFIG": {
+      "uniformly": "pour tous les types de notifications",
+      "uniformly_DESCRIPTION": "L'intervalle de notification est défini globalement, quel que soit le type de message.",
+      "individual": "par type de notifications",
+      "individual_DESCRIPTION": "L'intervalle de notification peut être réglé individuellement pour chaque type de notification"
+    },
+    "PERMISSION": {
+      "consumer": "Vous avez des droits de lecture sur l'objet.",
+      "collaborator": "Vous avez des droits de modification sur l'objet.",
+      "read": "lire",
+      "write": "écrire",
+      "delete": "supprimer",
+      "deletechildren": "supprimer les éléments subordonnés",
+      "deletenode": "supprimer le nœud",
+      "addchildren": "ajouter des éléments subordonnés",
+      "editor": "éditeur",
+      "contributer": "contributeur",
+      "coordinator": "Vous disposez de toutes les autorisations pour l'objet.",
+      "ccpublish": "Vous êtes autorisé à utiliser l'objet dans un système connecté (par exemple, un système de gestion de l'apprentissage).",
+      "readpermissions": "autorisations de lecture",
+      "changepermissions": "modifier les autorisations",
+      "all": "tous"
+    },
+    "SAVED": "Les paramètres de notification ont été sauvegardés",
+    "INTERVAL_LABEL": "Intervalle de notification",
+    "INTERVAL": {
+      "immediately": "immédiatement",
+      "daily": "quotidien",
+      "weekly": "hebdomadaire",
+      "disabled": "désactiver entièrement les notifications"
+    },
+    "GROUP": {
+      "addToCollectionEvent": "Contenu ajouté à la collection",
+      "commentEvent": "Commentaires sur le contenu",
+      "inviteEvent": "Invitations au matériel",
+      "nodeIssueEvent": "Rapports de problèmes sur les matériaux",
+      "ratingEvent": "Évaluations des matériaux",
+      "workflowEvent": "Assigné comme propriétaire du flux de travail",
+      "metadataSuggestionEvent": "Proposition de métadonnées",
+      "proposeForCollectionEvent": "Suggestions de collections"
+    }
+  },
+  "LTI": {
+    "REGISTERED": {
+      "TITLE": "Plate-forme LTI enregistrée",
+      "DESCRIPTION": "edu-sharing est désormais connecté à votre système et le contenu peut être intégré via LTI."
+    }
+  },
+  "NODE_RELATIONS": {
+    "TITLE": "Gérer les relations",
+    "CREATE_RELATION": "Créer une nouvelle relation",
+    "RELATION_TYPE_LABEL": "Type de relation",
+    "RELATION_SEARCH_LABEL": "Recherche de l'élément cible",
+    "EXISTING_RELATIONS": "Relations existantes",
+    "NO_RELATIONS": "Il n'y a pas de relations pour cet article.",
+    "SWAP": "Échange",
+    "RESELECT": "Remise à zéro",
+    "CREATE_CONFIRM": "Créer une relation",
+    "NO_PERMISSIONS": "Vous ne pouvez pas relier ce poste en raison d'un nombre insuffisant de droits",
+    "RELATION_CREATED": "créé",
+    "RELATION_CREATOR": "créateur",
+    "VARIANT_CREATED": "créé",
+    "VARIANT_CREATOR": "créateur",
+    "OPEN_NODE": "Afficher l'article",
+    "REMOVE_RELATION": "Supprimer la relation",
+    "RESTORE_RELATION": "Rétablir la relation",
+    "CURRENT_VERSION": "Version actuelle",
+    "RELATION_EXISTS": "Cette relation existe déjà.",
+    "RELATION_COPY_HINT": "Les relations d'une copie publiée sont gérées. Notez que ces relations s'appliquent à toutes les versions publiées ainsi qu'à l'élément original.",
+    "RELATION_TYPE": {
+      "VERSIONS": "Versions",
+      "FORKED_CHILDS": "A des variantes",
+      "FORKED_ORIGIN": "Est une variante de",
+      "isPartOf": "fait partie de",
+      "isBasedOn": "est basé sur",
+      "references": "se réfère à",
+      "hasPart": "a une partie de",
+      "isBasisFor": "est la base de"
+    },
+    "RELATION_TYPE_FULLY": {
+      "isPartOf": "fait partie de (isPartOf)",
+      "isBasedOn": "est basé sur (isBasedOn)",
+      "references": "se réfère à (références)"
+    }
+  }
 }

@@ -36,6 +36,7 @@ import org.edu_sharing.service.editlock.LockedException;
 import org.edu_sharing.service.nodeservice.AssocInfo;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.permission.HandleMode;
+import org.edu_sharing.service.permission.HandleParam;
 import org.edu_sharing.service.repoproxy.RepoProxy;
 import org.edu_sharing.service.repoproxy.RepoProxyFactory;
 import org.edu_sharing.service.search.model.SearchToken;
@@ -216,12 +217,21 @@ public class NodeApi  {
 			@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
 			@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
 			@Parameter(description = "handle mode, if a handle should be created. Skip this parameter if you don't want an handle",required=false ) @QueryParam("handleMode") HandleMode handleMode,
+			@Parameter(description = "handle parameter, if a handle and/or doi should be created. Skip this parameter if you don't want a handle or doi,",required = false) HandleParam handleParam,
 			@Context HttpServletRequest req) {
 
 		try {
+			if(handleParam == null){
+				if(handleMode != null){
+					handleParam = HandleParam.builder()
+							.doiService(handleMode)
+							.handleService(handleMode)
+							.build();
+				}
+			}
 			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
 			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
-			NodeDao published = nodeDao.publishCopy(handleMode);
+			NodeDao published = nodeDao.publishCopy(handleParam);
 			NodeEntry response = new NodeEntry();
 			response.setNode(published.asNode());
 

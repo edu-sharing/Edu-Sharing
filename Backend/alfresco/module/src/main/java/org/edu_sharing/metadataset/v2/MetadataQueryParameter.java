@@ -1,5 +1,9 @@
 package org.edu_sharing.metadataset.v2;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,7 +20,7 @@ public class MetadataQueryParameter implements Serializable {
 	private boolean exactMatching = true;
 	private String multiplejoin;
 	private int ignorable;
-	private List<String> facets;
+	private List<MetadataQueryFacet> facets;
 	private String preprocessor;
 	private boolean mandatory = true;
 	//only DSL
@@ -121,11 +125,11 @@ public class MetadataQueryParameter implements Serializable {
 	}
 
 
-    public void setFacets(List<String> facets) {
+    public void setFacets(List<MetadataQueryFacet> facets) {
         this.facets = facets;
     }
 
-    public List<String> getFacets() {
+    public List<MetadataQueryFacet> getFacets() {
         return facets;
     }
 
@@ -148,4 +152,13 @@ public class MetadataQueryParameter implements Serializable {
 	public void setAsFilter(boolean asFilter) { this.asFilter = asFilter; }
 
 	public boolean isAsFilter() { return asFilter; }
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class MetadataQueryFacet implements Serializable {
+		String value;
+		String nested;
+	}
 }

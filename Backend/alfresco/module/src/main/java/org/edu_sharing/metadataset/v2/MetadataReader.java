@@ -61,11 +61,11 @@ public class MetadataReader {
     public static Collection<MetadataWidget> getWidgetsByNode(NodeRef node, String locale) throws Exception {
         ApplicationContext alfApplicationContext = AlfAppContextGate.getApplicationContext();
         ServiceRegistry serviceRegistry = (ServiceRegistry) alfApplicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        String mdsSet = serviceRegistry.getNodeService().getProperty(node, QName.createQName(CCConstants.CM_PROP_METADATASET_EDU_METADATASET)).toString();
-        if (mdsSet == null || mdsSet.isEmpty()) {
+        Object mdsSet = serviceRegistry.getNodeService().getProperty(node, QName.createQName(CCConstants.CM_PROP_METADATASET_EDU_METADATASET));
+        if (mdsSet == null || mdsSet.toString().isEmpty()) {
             mdsSet = CCConstants.metadatasetdefault_id;
         }
-        MetadataSet metadata = MetadataReader.getMetadataset(ApplicationInfoList.getHomeRepository(), mdsSet, locale);
+        MetadataSet metadata = MetadataReader.getMetadataset(ApplicationInfoList.getHomeRepository(), (String) mdsSet, locale);
         return metadata.getWidgetsByNode(serviceRegistry.getNodeService().getType(node).toString(),
                 serviceRegistry.getNodeService().getAspects(node).stream().map(QName::toString).collect(Collectors.toList()),
                 true);
@@ -279,14 +279,21 @@ public class MetadataReader {
                         }
                         if (name.equals("facets")) {
                             NodeList facets = data.getChildNodes();
-                            List<String> facetsList = new ArrayList<>();
+                            List<MetadataQueryParameter.MetadataQueryFacet> facetsList = new ArrayList<>();
                             for (int l = 0; l < facets.getLength(); l++) {
                                 String facetName = facets.item(l).getNodeName();
                                 String facetValue = facets.item(l).getTextContent();
-                                if (facetName.equals("facet"))
-                                    facetsList.add(facetValue);
+                                if (facetName.equals("facet")) {
+                                    MetadataQueryParameter.MetadataQueryFacet facet = new MetadataQueryParameter.MetadataQueryFacet();
+                                    facet.setValue(facetValue);
+                                    NamedNodeMap att = facets.item(l).getAttributes();
+                                    if(att != null && att.getNamedItem("nested") != null) {
+                                        facet.setNested(att.getNamedItem("nested").getTextContent());
+                                    }
+                                    facetsList.add(facet);
+                                }
                             }
-                            if (facetsList.size() > 0)
+                            if (!facetsList.isEmpty())
                                 parameter.setFacets(facetsList);
                         }
                         if (name.equals("ignorable"))

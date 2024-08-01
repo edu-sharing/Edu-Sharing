@@ -2,83 +2,119 @@
 # GLOBAL
 ########################################################################################################################
 
+## @section Global parameters
 global:
 
+  ## @param global.annotations Define global annotations
   annotations: {}
 
   cluster:
 
     cert:
+      ## @param global.cluster.cert.annotations Set custom global cert annotations
       annotations: {}
 
+    ## @param global.cluster.domain Set global domain for the cluster
     domain: cluster.local
 
     ingress:
+      ## @param global.cluster.ingress.ingressClassName Set global ingress class name
       ingressClassName: ""
 
     istio:
+      ## @param global.cluster.istio.enabled Enable Istio Service mesh
       enabled: false
       gateway:
         selector:
+          ## @param global.cluster.istio.gateway.selector.app Set global app selector for istio gateway
           app: istio-ingressgateway
 
     pdb:
+      ## @param global.cluster.pdb.enabled Enable PDB
       enabled: false
 
     storage:
 
       data:
+        ## @param global.cluster.storage.data.permission Enable global custom data storage permissions
         permission: false
+        ## @param global.cluster.storage.data.spec Set data storage spec
         spec: {}
 
       share:
+        ## @param global.cluster.storage.share.permission Enable global custom share storage permissions
         permission: false
+        ## @param global.cluster.storage.share.spec Set share storage spec
         spec: {}
 
+  ## @param global.debug Enable global debugging
   debug: false
 
   image:
+    ## @param global.image.pullPolicy Set global image pullPolicy
     pullPolicy: Always
+    ## @param global.image.pullSecrets Set global image pullSecrets
     pullSecrets: []
+    ## @param global.image.registry Set global image container registry
     registry: ${docker.registry}
+    ## @param global.image.repository Set global image container repository
     repository: ${docker.repository}
+    ## @param global.image.common Set global image container common
     common: ${docker.common}
 
   metrics:
     scrape:
+      ## @param global.metrics.scrape.interval Set prometheus scrape interval
       interval: 60s
+      ## @param global.metrics.scrape.timeout Set prometheus scrape timeout
       timeout: 60s
     servicemonitor:
+      ## @param global.metrics.servicemonitor.enabled Enable metrics service monitor
       enabled: false
 
   patroni:
+    ## @param global.patroni.enabled Enable PSQL patroni
     enabled: false
+    ## @param global.patroni.name Name of patroni
     name: edusharing-repository-postgresql
+    ## @param global.patroni.secrets Set patroni secrets
     secrets: "credentials.postgresql.acid.zalan.do"
+    ## @param global.patroni.team Set patroni team
     team: edusharing
 
+  ## @param global.password Set global password
   password: ""
 
+  ## @param global.security Set global custom security parameters
   security: {}
 
 ########################################################################################################################
 # LOCAL
 ########################################################################################################################
 
+## @section Local parameters
+## @param nameOverride Override name
 nameOverride: edusharing-repository-service
 
 image:
+  ## @param image.name Set image name
   name: ${docker.prefix}-deploy-docker-build-service
+  ## @param image.tag Set image tag
   tag: ${docker.tag}
 
 ########################################################################################################################
 
+## @param replicaCount Define amount of parallel replicas to run
 replicaCount: 1
 
 autoscaling:
+  ## @param autoscaling.enabled Enable autoscaling
   enabled: false
+  ## @param autoscaling.minReplicas Define minimum number of replicas to have running
   minReplicas: 3
+  ## @param autoscaling.maxReplicas Define maximum number of replicas to have running
   maxReplicas: 5
+  ## @param autoscaling.targetCPU Set CPU limit when to scale
   targetCPU: 80
 
 ########################################################################################################################
@@ -87,11 +123,16 @@ service:
 
   port:
     api:
+      ## @param service.port.api.internal Set internal port for service API
       internal: 8080
+      ## @param service.port.api.external Set external port for service API
       external: 8081
+    ## @param service.port.gossip Set port for service gossip
     gossip: 5701
     metrics:
+      ## @param service.port.metrics.api Set port for metrics API
       api: 9090
+      ## @param service.port.metrics.proxy Set port for metrics proxy
       proxy: 9091
 
 ########################################################################################################################
@@ -99,22 +140,32 @@ service:
 ingress:
 
   annotations:
+    ## @param ingress.annotations.kubernetes.io/ingress.class Set kubernetes ingress class name
     kubernetes.io/ingress.class: nginx
+    ## @param ingress.annotations.nginx.ingress.kubernetes.io/affinity Set affinity on nginx ingress
     nginx.ingress.kubernetes.io/affinity: cookie
+    ## @param ingress.annotations.nginx.ingress.kubernetes.io/app-root Set app-root on nginx ingress
     nginx.ingress.kubernetes.io/app-root: /edu-sharing
+    ## @param ingress.annotations.nginx.ingress.kubernetes.io/proxy-body-size Set proxy-body-size on nginx ingress
     nginx.ingress.kubernetes.io/proxy-body-size: "5g"
+    ## @param ingress.annotations.nginx.ingress.kubernetes.io/proxy-connect-timeout Set proxy-connect-timeout on nginx ingress
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    ## @param ingress.annotations.nginx.ingress.kubernetes.io/proxy-read-timeout Set proxy-read-timeout on nginx ingress
     nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
+    ## @param ingress.annotations.nginx.ingress.kubernetes.io/proxy-send-timeout Set proxy-send-timeout on nginx ingress
     nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
 
+  ## @param ingress.hosts Set ingress hosts
   hosts:
   - repository.127.0.0.1.nip.io
 
+  ## @param ingress.tls Set TLS for ingress
+  #  - secretName: edusharing-repository-tls
+  #    hosts:
+  #    - repository.127.0.0.1.nip.io
   tls: []
-#  - secretName: edusharing-repository-tls
-#    hosts:
-#    - repository.127.0.0.1.nip.io
 
+  ## @param ingress.paths Set paths for ingress
   paths:
   - /edu-sharing
 
@@ -122,17 +173,25 @@ ingress:
 
 proxy:
 
+  ## @param proxy.enabled Enable proxy
   enabled: false
   config:
     backend:
+      ## @param proxy.config.backend.connectTimeout Set proxy connection timeout
       connectTimeout: 60
+      ## @param proxy.config.backend.firstByteTimeout Set proxy first byte timeout
       firstByteTimeout: 180
+      ## @param proxy.config.backend.betweenBytesTimeout Set proxy between bytes timeout
       betweenBytesTimeout: 180
+      ## @param proxy.config.backend.maxConnections Set maximum connections on proxy
       maxConnections: 200
     cache:
+      ## @param proxy.config.cache.control Set proxy cache control
       control: public
+      ## @param proxy.config.cache.ttl Set proxy cache ttl
       ttl: 3600
     deliver:
+      ## @param proxy.config.deliver.gzip Enable proxy to deliver gzip compressed
       gzip: false
 
 ########################################################################################################################
@@ -140,181 +199,274 @@ proxy:
 config:
 
   admin:
+    ## @param config.admin.password Set admin password
     password: ""
 
   antivirus:
+    ## @param config.antivirus.enabled Enable antivirus
     enabled: false
+    ## @param config.antivirus.host Set antivirus host
     host: edusharing-repository-antivirus
+    ## @param config.antivirus.port Set antivirus port
     port: 1344
+    ## @param config.antivirus.service Set antivirus service
     service: squidclamav
 
   cache:
+    ## @param config.cache.cluster Set cache as cluster
     cluster: true
+    ## @param config.cache.database Set cache database
     database: 0
+    ## @param config.cache.host Set cache host
     host: edusharing-rediscluster
+    ## @param config.cache.port Set cache port
     port: 6379
 
   cluster:
+    ## @param config.cluster.enabled Enable clustering
     enabled: false
     backup:
+      ## @param config.cluster.backup.count Set cluster backup count
       count: 1
+      ## @param config.cluster.backup.read Set cluster backup as read
       read: false
 
   connector:
 
     external:
+      ## @param config.connector.external.threads Set external connector threads
       threads: 200
+      ## @param config.connector.external.timeout Set external connector timeout
       timeout: 20000
 
     internal:
+      ## @param config.connector.internal.threads Set internal connector threads
       threads: 200
+      ## @param config.connector.internal.timeout Set internal connector timeout
       timeout: -1
 
   database:
+    ## @param config.database.driver Set database driver
     driver: org.postgresql.Driver
+    ## @param config.database.host Set database host
     host: edusharing-repository-postgresql
+    ## @param config.database.port Set database port
     port: 5432
+    ## @param config.database.database Set database name
     database: repository
+    ## @param config.database.username Set database username
     username: repository
+    ## @param config.database.password Set database password
     password: ""
+    ## @param config.database.protocol Set database protocol
     protocol: postgresql
+    ## @param config.database.options Set database options
     options: "?sslmode=disable"
+    ## @param config.database.patroni Set patroni options
     patroni: {}
 
     pool:
+      ## @param config.database.pool.max Set maximum connection pools
       max: 80
+      ## @param config.database.pool.sql Set maximum connection sql
       sql: "SELECT 1"
 
   guest:
+    ## @param config.guest.username Set guest username
     username: ""
+    ## @param config.guest.password Set guest password
     password: ""
 
   hazelcast:
     heartbeat:
       failuredetector:
+        ## @param config.hazelcast.heartbeat.failuredetector.type Set hazelcast heartbeat failure detector type
         type: deadline
       interval:
+        ## @param config.hazelcast.heartbeat.interval.seconds Set hazelcast heartbeat interval in seconds
         seconds: 5
     max:
-      "no":
-        heartbeat:
-          seconds: 15
+      heartbeat:
+        ## @param config.hazelcast.max.heartbeat.seconds Set hazelcast max missing heartbeats in seconds
+        seconds: 15
     phiaccrual:
       failuredetector:
         min:
           std:
             dev:
+              ## @param config.hazelcast.phiaccrual.failuredetector.min.std.dev.millis Set milliseconds on hazelcast phiaccrual failure detector minimum standard deviation
               millis: 100
+        ## @param config.hazelcast.phiaccrual.failuredetector.threshold Set threshold for hazelcast phiaccrual failure detector
         threshold: 10
         sample:
+          ## @param config.hazelcast.phiaccrual.failuredetector.sample.size Set hazelcast phiaccrual failuredetector sample size
           size: 200
 
   home:
+    ## @param config.home.appid Set home app id
     appid: local
+    ## @param config.home.cookieAttributes Set home cookie attributes
     cookieAttributes: ""
+    urlDynamic: false
 
   jvm:
     ram:
+      ## @param config.jvm.ram.minPercentage Set minimum memory in percentages
       minPercentage: "75.0"
+      ## @param config.jvm.ram.maxPercentage Set maximum memory in percentages
       maxPercentage: "75.0"
 
   metrics:
+    ## @param config.metrics.enabled Enable metrics
     enabled: true
+    ## @param config.metrics.relabelings Relable metrics
     relabelings: []
 
   http:
     client:
+      ## @param config.http.client.disablesni4host Disable SNI for host in http client
       disablesni4host: ""
       proxy:
+        ## @param config.http.client.proxy.host Set http client proxy host
         host: ""
+        ## @param config.http.client.proxy.nonproxyhosts Set list of non-proxy hosts in http client
         nonproxyhosts: []
+        ## @param config.http.client.proxy.proxyhost Set http client proxyhost
         proxyhost: ""
+        ## @param config.http.client.proxy.proxyport Set http client proxyport
         proxyport: ""
+        ## @param config.http.client.proxy.proxyuser Set http client proxyuser
         proxyuser: ""
+        ## @param config.http.client.proxy.proxypass Set http client proxypass
         proxypass: ""
     server:
-      # additional, allowed origins to allow CORS-Access from
+      ## @param config.http.server.allowOrigin Set allowed origins to allow CORS-Access from
       allowOrigin: []
       csp:
+        ## @param config.http.server.csp.connect Set connect CSP for http server
         connect: ""
+        ## @param config.http.server.csp.default Set default CSP for http server
         default: ""
+        ## @param config.http.server.csp.font Set font CSP for http server
         font: ""
+        ## @param config.http.server.csp.frame Set frame CSP for http server
         frame: ""
+        ## @param config.http.server.csp.img Set image CSP for http server
         img: ""
+        ## @param config.http.server.csp.media Set media CSP for http server
         media: ""
+        ## @param config.http.server.csp.object Set object CSP for http server
         object: ""
+        ## @param config.http.server.csp.script Set script CSP for http server
         script: ""
+        ## @param config.http.server.csp.style Set style CSP for http server
         style: ""
       session:
+        ## @param config.http.server.session.timeout Set session timeout for http server
         timeout: 60
 
   mail:
+    ## @param config.mail.from Set mail FROM header
     from: ""
+    ## @param config.mail.addReplyTo Add ReplyTo header to mail
     addReplyTo: true
     register:
+      ## @param config.mail.register.receiver Register a mail receiver
       receiver: ""
     report:
+      ## @param config.mail.report.receiver Report a mail receiver
       receiver: ""
     server:
       smtp:
+        ## @param config.mail.server.smtp.host Set mail STMP server host
         host: ""
+        ## @param config.mail.server.smtp.port Set mail STMP server port
         port: ""
+        ## @param config.mail.server.smtp.username Set mail STMP server username
         username: ""
+        ## @param config.mail.server.smtp.password Set mail STMP server password
         password: ""
+        ## @param config.mail.server.smtp.authtype Set mail STMP server authtype
         authtype: ""
 
   mongo:
+    ## @param config.mongo.enabled Enable mongo DB
     enabled: false
+    ## @param config.mongo.host Set mongo DB host
     host: edusharing-repository-mongo
+    ## @param config.mongo.port Set mongo DB port
     port: 27017
+    ## @param config.mongo.database Set mongo DB name
     database: repository
+    ## @param config.mongo.username Set mongo DB username
     username: repository
+    ## @param config.mongo.password Set mongo DB password
     password: ""
 
   oidc:
+    ## @param config.oidc.enabled Enable OpenID Connect authentication
     enabled: false
 
   override:
     config:
       application:
+        ## @param config.override.config.application.client Override application client
         client: ""
+        ## @param config.override.config.application.mds Override application mds
         mds: ""
+        ## @param config.override.config.application.settings Override application settings
         settings: ""
     logging:
+      ## @param config.override.logging.application Override logging application
       application: ""
+      ## @param config.override.logging.server Override logging server
       server: ""
 
   saml:
+    ## @param config.saml.enabled Enable SAML authentication
     enabled: false
 
   search:
 
     elastic:
+      ## @param config.search.elastic.enabled Enable elasticsearch
       enabled: false
+      ## @param config.search.elastic.host Set elasticsearch host
       host: edusharing-repository-search-elastic-index
+      ## @param config.search.elastic.port Set elasticsearch port
       port: 9200
 
     solr:
+      ## @param config.search.solr.host Set solr host
       host: edusharing-repository-search-solr
+      ## @param config.search.solr.port Set solr port
       port: 8080
 
   transform:
 
     aio:
+      ## @param config.transform.aio.host Set transform-aio host
       host: edusharing-repository-transform-aio
+      ## @param config.transform.aio.port Set transform-aio port
       port: 8090
 
     es:
+      ## @param config.transform.es.host Set transform-es host
       host: edusharing-repository-transform-es
+      ## @param config.transform.es.port Set transform-es port
       port: 8091
 
     server:
+      ## @param config.transform.server.enabled Enable transform server
       enabled: false
+      ## @param config.transform.server.host Set transform server host
       host: edusharing-repository-transform
+      ## @param config.transform.server.port Set transform server port
       port: 8080
 
 ########################################################################################################################
 
+## @param debug Enable debugging
 debug: false
 
 ########################################################################################################################
@@ -325,86 +477,120 @@ persistence:
 
     config:
       spec:
+        ## @param persistence.data.config.spec.accessModes Set access modes for persistent data
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
+            ## @param persistence.data.config.spec.resources.requests.storage Set storage request for persistent data
             storage: 1Gi
 
   share:
 
     config:
+      ## @param persistence.share.config.create Create persistent share
       create: true
       spec:
+        ## @param persistence.share.config.spec.accessModes Set access modes for persistent share
         accessModes: [ "ReadWriteMany" ]
         resources:
           requests:
+            ## @param persistence.share.config.spec.resources.requests.storage Set storage request for persistent share
             storage: 1Gi
     data:
+      ## @param persistence.share.data.create Create persistent data share
       create: true
       spec:
+        ## @param persistence.share.data.spec.accessModes Set access modes for persistent data share
         accessModes: [ "ReadWriteMany" ]
         resources:
           requests:
+            ## @param persistence.share.data.spec.resources.requests.storage Set storage request for persistent data share
             storage: 5Gi
 
     safe:
+      ## @param persistence.share.safe.enabled Enable safe data share
       enabled: false
+      ## @param persistence.share.safe.create Create safe data share
       create: true
       spec:
+        ## @param persistence.share.safe.spec.accessModes Set access modes for persistent safe share
         accessModes: [ "ReadWriteMany" ]
         resources:
           requests:
+            ## @param persistence.share.safe.spec.resources.requests.storage Set storage request for persistent safe share
             storage: 5Gi
 
 ########################################################################################################################
 
+
+## @param nodeAffinity Set node affinity
 nodeAffinity: {}
+## @param podAntiAffinity Set pod antiaffinity
 podAntiAffinity: "soft"
 
+## @param tolerations Set tolerations
 tolerations: []
 
 ########################################################################################################################
 
+## @param podAnnotations Set custom pod annotations
 podAnnotations: {}
 
 podSecurityContext:
 
+  ## @param podSecurityContext.fsGroup Set fs group for access
   fsGroup: 1000
+  ## @param podSecurityContext.fsGroupChangePolicy Set change policy for fs group
   fsGroupChangePolicy: OnRootMismatch
 
 securityContext:
 
+  ## @param securityContext.allowPrivilegeEscalation Allow privilege escalation
   allowPrivilegeEscalation: false
   capabilities:
+    ## @param securityContext.capabilities.drop Set drop capabilities
     drop:
     - ALL
+  ## @param securityContext.runAsUser Set drop capabilities
   runAsUser: 1000
 
 ########################################################################################################################
 
+## @param terminationGracePeriod Define grace period for termination
 terminationGracePeriod: 120
 
 startupProbe:
-
-  failureThreshold: 30
+  ## @param startupProbe.failureThreshold Failure threshold for startupProbe
+  failureThreshold: 60
+  ## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
   initialDelaySeconds: 0
+  ## @param startupProbe.periodSeconds Period seconds for startupProbe
   periodSeconds: 30
+  ## @param startupProbe.successThreshold Success threshold for startupProbe
   successThreshold: 1
+  ## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
   timeoutSeconds: 10
 
 livenessProbe:
-
+  ## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
   failureThreshold: 3
+  ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
   initialDelaySeconds: 30
+  ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
   periodSeconds: 30
+  ## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
   timeoutSeconds: 10
 
 readinessProbe:
-
+  ## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
   failureThreshold: 1
+  ## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   initialDelaySeconds: 10
+  ## @param readinessProbe.periodSeconds Period seconds for readinessProbe
   periodSeconds: 10
+  ## @param readinessProbe.successThreshold Set threshold for success on readiness probe
   successThreshold: 1
+  ## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
   timeoutSeconds: 10
 
 ########################################################################################################################
@@ -412,10 +598,14 @@ readinessProbe:
 resources:
 
   limits:
+    ## @param resources.limits.cpu Set CPU limit on resources
     cpu: 1000m
+    ## @param resources.limits.memory Set memory limit on resources
     memory: 4Gi
   requests:
+    ## @param resources.requests.cpu Set CPU for requests on resources
     cpu: 1000m
+    ## @param resources.requests.memory Set memory for requests on resources
     memory: 4Gi
 
 ########################################################################################################################
@@ -425,20 +615,36 @@ init:
   permission:
 
     image:
+      ## @param init.permission.image.name Set init container image name
       name: ${docker.edu_sharing.community.common.minideb.name}
+      ## @param init.permission.image.tag Set init container image tag
       tag: "${docker.edu_sharing.community.common.minideb.tag}"
+
+    ## @param init.permission.startupProbe Optional specs for startupProbe
+    startupProbe:
+
+    ## @param init.permission.livenessProbe Optional specs for livenessProbe
+    livenessProbe:
+
+    ## @param init.permission.readinessProbe Optional specs for readinessProbe
+    readinessProbe:
 
     resources:
 
       limits:
+        ## @param init.permission.resources.limits.cpu Set init container CPU limit on resources
         cpu: 125m
+        ## @param init.permission.resources.limits.memory Set init container memory limit on resources
         memory: 512Mi
       requests:
+        ## @param init.permission.resources.requests.cpu Set init container CPU for requests on resources
         cpu: 125m
+        ## @param init.permission.resources.requests.memory Set init container memory for requests on resources
         memory: 512Mi
 
     securityContext:
 
+      ## @param init.permission.securityContext.runAsUser Set user to run init container under
       runAsUser: 0
 
 ########################################################################################################################
@@ -448,118 +654,177 @@ sidecar:
   proxyCache:
 
     image:
+      ## @param sidecar.proxyCache.image.name Set proxyCache sidecar image name
       name: ${docker.edu_sharing.community.common.varnish.name}
+      ## @param sidecar.proxyCache.image.tag Set proxyCache sidecar image tag
       tag: "${docker.edu_sharing.community.common.varnish.tag}"
 
     startupProbe:
-
+      ## @param sidecar.proxyCache.startupProbe.failureThreshold Failure threshold for startupProbe
       failureThreshold: 30
+      ## @param sidecar.proxyCache.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
       initialDelaySeconds: 0
+      ## @param sidecar.proxyCache.startupProbe.periodSeconds Period seconds for startupProbe
       periodSeconds: 20
+      ## @param sidecar.proxyCache.startupProbe.successThreshold Success threshold for startupProbe
       successThreshold: 1
+      ## @param sidecar.proxyCache.startupProbe.timeoutSeconds Timeout seconds for startupProbe
       timeoutSeconds: 10
 
     livenessProbe:
-
+      ## @param sidecar.proxyCache.livenessProbe.failureThreshold Failure threshold for livenessProbe
       failureThreshold: 3
+      ## @param sidecar.proxyCache.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
       initialDelaySeconds: 30
+      ## @param sidecar.proxyCache.livenessProbe.periodSeconds Period seconds for livenessProbe
       periodSeconds: 30
+      ## @param sidecar.proxyCache.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
       timeoutSeconds: 10
 
     readinessProbe:
-
+      ## @param sidecar.proxyCache.readinessProbe.failureThreshold Failure threshold for readinessProbe
       failureThreshold: 1
+      ## @param sidecar.proxyCache.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
       initialDelaySeconds: 10
+      ## @param sidecar.proxyCache.readinessProbe.periodSeconds Period seconds for readinessProbe
       periodSeconds: 10
+      ## @param sidecar.proxyCache.readinessProbe.successThreshold Set threshold for success on readiness probe
       successThreshold: 1
+      ## @param sidecar.proxyCache.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
       timeoutSeconds: 10
 
     resources:
 
       limits:
+        ## @param sidecar.proxyCache.resources.limits.cpu Set CPU limit on resources
         cpu: 500m
+        ## @param sidecar.proxyCache.resources.limits.memory Set memory limit on resources
         memory: 2Gi
       requests:
+        ## @param sidecar.proxyCache.resources.requests.cpu Set CPU for requests on resources
         cpu: 500m
+        ## @param sidecar.proxyCache.resources.requests.memory Set memory for requests on resources
         memory: 2Gi
 
     securityContext:
 
+      ## @param sidecar.proxyCache.securityContext.allowPrivilegeEscalation Allow privilege escalation
       allowPrivilegeEscalation: false
       capabilities:
+        ## @param sidecar.proxyCache.securityContext.capabilities.drop Set drop capabilities
         drop:
           - ALL
+      ## @param sidecar.proxyCache.securityContext.runAsUser Define user to run under
       runAsUser: 101
 
   proxyMetrics:
 
     image:
+      ## @param sidecar.proxyMetrics.image.name Set proxyMetrics sidecar image name
       name: ${docker.edu_sharing.community.common.varnish.exporter.name}
+      ## @param sidecar.proxyMetrics.image.tag Set proxyMetrics sidecar image tag
       tag: "${docker.edu_sharing.community.common.varnish.exporter.tag}"
 
+    ## @param sidecar.proxyMetrics.relabelings Set proxyMetrics sidecar relabelings
     relabelings: []
+
+    ## @param sidecar.proxyMetrics.startupProbe Optional specs for startupProbe
+    startupProbe:
+
+    ## @param sidecar.proxyMetrics.livenessProbe Optional specs for livenessProbe
+    livenessProbe:
+
+    ## @param sidecar.proxyMetrics.readinessProbe Optional specs for readinessProbe
+    readinessProbe:
 
     resources:
 
       limits:
+        ## @param sidecar.proxyMetrics.resources.limits.cpu Set CPU limit on resources
         cpu: 250m
+        ## @param sidecar.proxyMetrics.resources.limits.memory Set memory limit on resources
         memory: 1Gi
       requests:
+        ## @param sidecar.proxyMetrics.resources.requests.cpu Set CPU for requests on resources
         cpu: 250m
+        ## @param sidecar.proxyMetrics.resources.requests.memory Set memory for requests on resources
         memory: 1Gi
 
     securityContext:
 
+      ## @param sidecar.proxyMetrics.securityContext.allowPrivilegeEscalation Allow privilege escalation
       allowPrivilegeEscalation: false
       capabilities:
+        ## @param sidecar.proxyMetrics.securityContext.capabilities.drop Set drop capabilities
         drop:
           - ALL
+      ## @param sidecar.proxyMetrics.securityContext.runAsUser Define user to run under
       runAsUser: 101
 
   transform:
 
     image:
+      ## @param sidecar.transform.image.name Set transform sidecar image name
       name: ${docker.edu_sharing.community.common.alfresco.transform.name}
+      ## @param sidecar.transform.image.tag Set transform sidecar image tag
       tag: "${docker.edu_sharing.community.common.alfresco.transform.tag}"
 
     startupProbe:
-
+      ## @param sidecar.transform.startupProbe.failureThreshold Failure threshold for startupProbe
       failureThreshold: 30
+      ## @param sidecar.transform.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
       initialDelaySeconds: 0
+      ## @param sidecar.transform.startupProbe.periodSeconds Period seconds for startupProbe
       periodSeconds: 20
+      ## @param sidecar.transform.startupProbe.successThreshold Success threshold for startupProbe
       successThreshold: 1
+      ## @param sidecar.transform.startupProbe.timeoutSeconds Timeout seconds for startupProbe
       timeoutSeconds: 10
 
     livenessProbe:
-
+      ## @param sidecar.transform.livenessProbe.failureThreshold Failure threshold for livenessProbe
       failureThreshold: 3
+      ## @param sidecar.transform.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
       initialDelaySeconds: 30
+      ## @param sidecar.transform.livenessProbe.periodSeconds Period seconds for livenessProbe
       periodSeconds: 30
+      ## @param sidecar.transform.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
       timeoutSeconds: 10
 
     readinessProbe:
-
+      ## @param sidecar.transform.readinessProbe.failureThreshold Failure threshold for readinessProbe
       failureThreshold: 1
+      ## @param sidecar.transform.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
       initialDelaySeconds: 10
+      ## @param sidecar.transform.readinessProbe.periodSeconds Period seconds for readinessProbe
       periodSeconds: 10
+      ## @param sidecar.transform.readinessProbe.successThreshold Set threshold for success on readiness probe
       successThreshold: 1
+      ## @param sidecar.transform.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
       timeoutSeconds: 10
 
     resources:
 
       limits:
+        ## @param sidecar.transform.resources.limits.cpu Set CPU limit on resources
         cpu: 500m
+        ## @param sidecar.transform.resources.limits.memory Set memory limit on resources
         memory: 2Gi
       requests:
+        ## @param sidecar.transform.resources.requests.cpu Set CPU for requests on resources
         cpu: 500m
+        ## @param sidecar.transform.resources.requests.memory Set memory for requests on resources
         memory: 2Gi
 
     securityContext:
 
+      ## @param sidecar.transform.securityContext.allowPrivilegeEscalation Allow privilege escalation
       allowPrivilegeEscalation: false
       capabilities:
+        ## @param sidecar.transform.securityContext.capabilities.drop Set drop capabilities
         drop:
           - ALL
+      ## @param sidecar.transform.securityContext.runAsUser Define user to run under
       runAsUser: 1000
 
 ########################################################################################################################

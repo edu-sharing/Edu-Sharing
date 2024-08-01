@@ -638,5 +638,66 @@
         "CREATED": "Plate-forme enregistrée"
       }
     }
+  },
+  "Key": "ANGLAIS",
+  "Konto": "Compte",
+  "LTITOOL": {
+    "REGISTER": "Début de l'enregistrement",
+    "DYNAMIC_URL": "Outil d'enregistrement dynamique url",
+    "DATA": {
+      "redirectionUrls": "Urls de redirection",
+      "targetLinkUri": "Lien cible Url",
+      "clientName": "Nom de l'outil",
+      "keysetUrl": "Url du jeu de clés",
+      "loginInitiationUrl": "Url d'ouverture de session (oidc)"
+    },
+    "MANUAL_INFO": "Si votre outil compatible LTI ne prend pas en charge l'enregistrement dynamique ou s'il ne fonctionne pas, vous pouvez utiliser l'enregistrement manuel.\n\nAprès avoir cliqué sur \"Enregistrer\", une connexion sera préparée avec les données fournies.",
+    "HEADER": "Enregistrement de l'outil LTI",
+    "DYNAMIC_INFO": "Grâce à l'enregistrement dynamique des LTI, les outils LTI peuvent être facilement connectés à l'edu-sharing.\n Déterminez l'URL pour l'enregistrement dynamique de l'outil et entrez-la dans le champ \"URL de l'outil pour l'enregistrement dynamique\". En cliquant sur \"Démarrer l'enregistrement\", l'outil externe est automatiquement connecté à l'edu-sharing."
+  },
+  "GLOBAL_CONFIG": {
+    "SERVER_CONFIG_HINT": "Vous pouvez écraser les valeurs de configuration ici. Ces modifications s'appliquent au serveur actuel et ne sont pas écrasées par les mises à jour. Elles ont la priorité la plus élevée. ATTENTION ! En mode cluster, ces paramètres ne s'appliquent qu'au serveur cluster actuel !",
+    "SERVER_CONFIG_TITLE": "Fichier de configuration du serveur (écrasement)",
+    "DEPLOYMENT_CONFIG_TITLE": "Fichier de configuration du déploiement",
+    "DEPLOYMENT_CONFIG_HINT": "Ce fichier a été défini par le déploiement et peut modifier les données qui s'écartent du modèle. Ce fichier ne peut être modifié que par le déploiement."
+  },
+  "PLUGINS": {
+    "PLUGIN_DETAILS": {
+      "Alfresco Share Services AMP": {
+        "DESCRIPTION": "Ce module Alfresco fournit les interfaces Alfresco Share"
+      },
+      "edu_sharing-community-repository-backend-alfresco-module": {
+        "DESCRIPTION": "Le module principal d'edu-sharing. Il étend le système de base avec les API et les interfaces d'edu-sharing ainsi que d'autres fonctionnalités."
+      },
+      "edu_sharing-enterprise-repository-plugin-transform-backend-alfresco-module": {
+        "DESCRIPTION": "Ce plugin sépare les fonctions de transformation (capture d'écran et génération de documents en texte intégral via LibreOffice) du serveur de dépôt et permet une répartition plus efficace et plus stable de la charge de travail."
+      },
+      "alfresco-trashcan-cleaner project": {
+        "DESCRIPTION": "Le nettoyeur de corbeille supprime régulièrement les anciens contenus de la corbeille de tous les utilisateurs."
+      },
+      "edu_sharing-community-repository-plugin-elastic-backend-alfresco-module": {
+        "DESCRIPTION": "Le module Elasticsearch transforme les objets, y compris les statistiques et les métadonnées, en une structure d'index Elasticsearch spéciale et permet des recherches efficaces et très détaillées."
+      },
+      "edu_sharing-projects-community-repository-backend-alfresco-module": {
+        "DESCRIPTION": "Ce module peut inclure des ajustements spécifiques au projet"
+      }
+    }
+  },
+  "JOBS": {
+    "PARAMETERS": "Paramètre de l'emploi",
+    "APPLY_TEMPLATE": "Insérer comme modèle"
+  },
+  "APPLICATIONS": {
+    "HOMEAPP": {
+      "import_metadataset": "Jeu de métadonnées utilisé pour les objets importés de cette source"
+    }
+  },
+  "FRONTPAGE": {
+    "TOTAL_COUNT_LARGER_HINT": "Si le nombre total d'éléments est supérieur au nombre d'éléments affichés, le nombre d'éléments à afficher est toujours sélectionné de manière aléatoire dans cette réserve."
+  },
+  "BROWSER": {
+    "LUCENE_TEMPLATE_MEMORY": {
+      "DEFAULT_TEMPLATE_OVERRIDE": "Les modèles standard ne doivent pas être écrasés"
+    }
   }
 }

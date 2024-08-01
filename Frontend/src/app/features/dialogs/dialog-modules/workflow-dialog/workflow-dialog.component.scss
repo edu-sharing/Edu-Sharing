@@ -3,6 +3,10 @@
 .row {
     margin-bottom: 20px;
 }
+es-info-message {
+    display: flex;
+    padding-bottom: 20px;
+}
 
 .inputs {
     display: flex;
@@ -28,6 +32,7 @@
     &::before {
         content: '';
         border-radius: 50%;
+        min-width: 12px;
         width: 12px;
         height: 12px;
         background-color: var(--status-color);

@@ -94,7 +94,7 @@
     <mat-checkbox
       #shareModeCopyRef
       [(ngModel)]="shareModeCopy"
-      (ngModelChange)="$event ? (doiActive = true) : null; updateShareMode('copy')"
+      (ngModelChange)="$event ? setHandlesActive() : null; updateShareMode('copy')"
       [disabled]="!copyAllowed() || isCopy || isLicenseMissing() || isAuthorMissing()"
     >
       <es-multi-line-label>
@@ -114,7 +114,7 @@
             [disabled]="!copyAllowed()"
             (ngModelChange)="setRepublish()"
           >
-            <mat-radio-button [disabled]="!isCopy" [value]="false">
+            <mat-radio-button [disabled]="!isCopy" [value]="'disabled'">
               <es-multi-line-label>
                 <ng-container slot="label">
                   {{ 'WORKSPACE.SHARE.PUBLISH.NO_REPUBLISH' | translate }}
@@ -160,14 +160,33 @@
   </div>
 </div>
 <div
-  class="doi"
+  class="handle"
   *ngIf="
-    doiPermission && publishCopyPermission && !inherited && shareModeCopy && republish === 'new'
+    handlePermission &&
+    publishCopyPermission &&
+    !inherited &&
+    shareModeCopy &&
+    republish === 'new' &&
+    (hasFeature('handleService') || hasFeature('doiService'))
   "
 >
   <mat-checkbox
-    [disabled]="doiDisabled"
-    [(ngModel)]="doiActive"
+    *ngIf="hasFeature('handleService')"
+    [disabled]="handleInitialState.handleService"
+    [(ngModel)]="handleActive.handleService"
+    (ngModelChange)="updatePublishedVersions()"
+    id="handle"
+  >
+    <div class="strong label">
+      {{ 'WORKSPACE.SHARE.HANDLE' | translate }}
+      <i esIcon="vpn_key"></i>
+    </div>
+    <div class="label-secondary">{{ 'WORKSPACE.SHARE.HANDLE_INFO' | translate }}</div>
+  </mat-checkbox>
+  <mat-checkbox
+    *ngIf="hasFeature('doiService')"
+    [disabled]="handleInitialState.doiService"
+    [(ngModel)]="handleActive.doiService"
     (ngModelChange)="updatePublishedVersions()"
     id="doi"
   >
@@ -177,7 +196,7 @@
     </div>
     <div class="label-secondary">{{ 'WORKSPACE.SHARE.DOI_INFO' | translate }}</div>
   </mat-checkbox>
-  <div *ngIf="doiActive" class="handle-mode">
+  <div *ngIf="handleActive" class="handle-mode">
     <mat-radio-group [(ngModel)]="handleMode">
       <mat-radio-button value="distinct">
         <es-multi-line-label>
@@ -244,8 +263,13 @@
       <div class="version-handle">
         <i
           esIcon="vpn_key"
-          matTooltip="{{ 'WORKSPACE.SHARE.DOI' | translate }}"
+          matTooltip="{{ 'WORKSPACE.SHARE.HANDLE' | translate }}"
           *ngIf="v.properties['ccm:published_handle_id']"
+        ></i>
+        <i
+          esIcon="vpn_key"
+          matTooltip="{{ 'WORKSPACE.SHARE.DOI' | translate }}"
+          *ngIf="v.properties['ccm:published_doi_id']"
         ></i>
       </div>
       <div class="version-actions">

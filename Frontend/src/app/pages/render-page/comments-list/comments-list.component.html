@@ -25,8 +25,12 @@
   <div class="new-no-permission" *ngIf="!canComment()">
     <div class="no-permission">
       {{
-        'NODE_COMMENTS.' + (this.isFromHomeRepo ? 'NO_PERMISSION' : 'NOT_SUPPORTED_REMOTELY')
-          | translate
+        'NODE_COMMENTS.' +
+          (isFromHomeRepo
+            ? isGuest
+              ? 'NO_GUEST_COMMENTING'
+              : 'NO_PERMISSION'
+            : 'NOT_SUPPORTED_REMOTELY') | translate
       }}
     </div>
   </div>

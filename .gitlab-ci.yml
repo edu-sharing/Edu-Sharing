@@ -19,6 +19,7 @@ default:
       command: [ "dockerd-entrypoint.sh" ]
 
 stages:
+  - lint
   - test
   - deploy
 
@@ -199,3 +200,23 @@ e2e:
   only:
     variables:
       - $E2E_TEST == "true"
+
+check-helmreadme:
+  stage: lint
+  image: node:lts-alpine3.20
+  before_script:
+    - ln -s $CI_PROJECT_DIR/deploy/docker/helm/search-solr/src/main/chart /tmp/search-solr && cp /tmp/search-solr/README.md /tmp/README_search-solr.md
+    - ln -s $CI_PROJECT_DIR/deploy/docker/helm/service/src/main/chart /tmp/service && cp /tmp/service/README.md /tmp/README_service.md
+    - ln -s $CI_PROJECT_DIR/deploy/docker/helm/transform-aio/src/main/chart /tmp/transform-aio && cp /tmp/transform-aio/README.md /tmp/README_transform-aio.md
+    - ln -s $CI_PROJECT_DIR/deploy/docker/helm/transform-es/src/main/chart /tmp/transform-es && cp /tmp/transform-es/README.md /tmp/README_transform-es.md
+  script:
+    - wget -qO- https://github.com/bitnami/readme-generator-for-helm/archive/refs/tags/2.6.1.tar.gz | tar -xz -C /tmp
+    - cd /tmp; npm install ./readme-generator-for-helm-2.6.1; cd readme-generator-for-helm-2.6.1
+    - ./bin/index.js -v /tmp/search-solr/values.yaml -r /tmp/README_search-solr.md
+    - ./bin/index.js -v /tmp/service/values.yaml -r /tmp/README_service.md
+    - ./bin/index.js -v /tmp/transform-aio/values.yaml -r /tmp/README_transform-aio.md
+    - ./bin/index.js -v /tmp/transform-es/values.yaml -r /tmp/README_transform-es.md
+    - diff /tmp/README_search-solr.md /tmp/search-solr/README.md     || (echo "README was not generated before committing." && exit 1)
+    - diff /tmp/README_service.md /tmp/service/README.md             || (echo "README was not generated before committing." && exit 1)
+    - diff /tmp/README_transform-aio.md /tmp/transform-aio/README.md || (echo "README was not generated before committing." && exit 1)
+    - diff /tmp/README_transform-es.md /tmp/transform-es/README.md   || (echo "README was not generated before committing." && exit 1)

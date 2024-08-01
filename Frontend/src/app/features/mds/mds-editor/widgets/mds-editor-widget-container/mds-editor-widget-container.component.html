@@ -86,7 +86,9 @@
       <!-- We use our own required marker to show it even on disabled controls for bulk editing.
     -->
       <span
-        *ngIf="widget.definition.isRequired === 'mandatory'"
+        *ngIf="
+          widget.definition.isRequired === 'mandatory' && mdsEditorInstance.editorMode !== 'search'
+        "
         class="required-marker"
         aria-hidden="true"
         >*</span

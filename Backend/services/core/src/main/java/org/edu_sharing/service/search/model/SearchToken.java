@@ -150,7 +150,7 @@ public class SearchToken implements Serializable {
 		if(this.query != null && facets != null) {
 			List<String> combined = new ArrayList<>();
 			this.facets.forEach((facet) -> {
-				List<String> sublist = this.query.findParameterByName(facet).getFacets();
+				List<String> sublist = this.query.findParameterByName(facet).getFacets().stream().map(MetadataQueryParameter.MetadataQueryFacet::getValue).collect(Collectors.toList());
 				if(sublist != null) {
 					combined.addAll(sublist);
 				} else {

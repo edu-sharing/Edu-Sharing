@@ -13,6 +13,7 @@ import {
 } from '../models';
 import { NodeStats } from '../api/models/node-stats';
 import { NodeEntry } from '../api/models/node-entry';
+import { HandleParam } from '../api/models/handle-param';
 
 export class NodeConstants {
     public static SPACES_STORE_REF = 'workspace://SpacesStore/';
@@ -148,6 +149,14 @@ export class NodeService {
         return this.nodeV1.getPublishedCopies({
             repository,
             node: id,
+        });
+    }
+
+    publishCopy(id: string, handle?: HandleParam, { repository = HOME_REPOSITORY } = {}) {
+        return this.nodeV1.publishCopy({
+            repository,
+            node: id,
+            body: handle,
         });
     }
 

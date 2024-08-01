@@ -15,7 +15,7 @@ public class SharingDao {
 	public static SharingInfo getInfo(RepositoryDao repositoryDao, String node, String token,String password) throws DAOException{
 		try {
 			Share share = getShare(repositoryDao, node, token);
-			return new SharingInfo(share, NodeDao.getNode(repositoryDao, node).asNode(),password);
+			return new SharingInfo(share, NodeDao.getNode(repositoryDao, node),password);
 		}catch(Throwable t){
 			throw DAOException.mapping(t);
 

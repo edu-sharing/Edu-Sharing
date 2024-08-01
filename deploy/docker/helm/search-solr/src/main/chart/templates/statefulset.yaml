@@ -34,8 +34,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      initContainers:
       {{- if (default .Values.global.cluster.storage.data.permission .Values.persistence.data.permission) }}
+      initContainers:
       - name: {{ include "edusharing_common_lib.names.name" . }}-init-permission
         image: {{ include "edusharing_common_lib.images.common" . }}{{ .Values.init.permission.image.name }}:{{ .Values.init.permission.image.tag }}
         imagePullPolicy: {{ .Values.global.image.pullPolicy }}
@@ -49,6 +49,44 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /opt/alfresco/alf_data
+        {{- with .Values.init.permission.startupProbe }}
+        startupProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo startupProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with .Values.init.permission.livenessProbe }}
+        livenessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo livenessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with .Values.init.permission.readinessProbe }}
+        readinessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo readinessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
         {{- with .Values.init.permission.resources }}
         resources: {{ toYaml . | nindent 10 }}
         {{- end }}
@@ -219,8 +257,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      initContainers:
       {{- if (default $.Values.global.cluster.storage.data.permission $.Values.persistence.data.permission) }}
+      initContainers:
       - name: {{ include "edusharing_common_lib.names.name" $ }}-init-permission
         image: {{ include "edusharing_common_lib.images.common" $ }}{{ .Values.init.permission.image.name }}:{{ .Values.init.permission.image.tag }}
         imagePullPolicy: {{ $.Values.global.image.pullPolicy }}
@@ -234,6 +272,44 @@ spec:
         volumeMounts:
           - name: data
             mountPath: /opt/alfresco/alf_data
+        {{- with $.Values.init.permission.startupProbe }}
+        startupProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo startupProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with $.Values.init.permission.livenessProbe }}
+        livenessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo livenessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with $.Values.init.permission.readinessProbe }}
+        readinessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo readinessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
         {{- with $.Values.init.permission.resources }}
         resources: {{ toYaml . | nindent 10 }}
         {{- end }}

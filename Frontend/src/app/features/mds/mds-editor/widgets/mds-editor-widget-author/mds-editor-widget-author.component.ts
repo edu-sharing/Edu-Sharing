@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 import { BehaviorSubject } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
+import { filter, first, tap } from 'rxjs/operators';
 import { Node } from '../../../../../core-module/rest/data-object';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
 import { RestIamService } from '../../../../../core-module/rest/services/rest-iam.service';
@@ -120,6 +120,9 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
         return values;
     }
     private async updateValues(nodes: Node[]) {
+        if (this.hasChanges.value) {
+            return;
+        }
         this._nodes = nodes;
         this.refreshTabs();
     }

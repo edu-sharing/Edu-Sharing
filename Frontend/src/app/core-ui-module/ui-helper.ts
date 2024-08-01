@@ -739,7 +739,9 @@ export class UIHelper {
      */
     static errorContains(error: any, data: string) {
         try {
-            return error.error.message.indexOf(data) != -1;
+            return (
+                error.error?.details?.cause?.includes(data) || error.error?.message?.includes(data)
+            );
         } catch (e) {}
         return false;
     }

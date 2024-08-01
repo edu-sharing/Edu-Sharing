@@ -1,16 +1,18 @@
-package org.edu_sharing.alfresco.service.handleservice;
+package org.edu_sharing.service.handleservice;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.PrivateKey;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
@@ -27,8 +29,12 @@ import net.handle.hdllib.HandleValue;
 import net.handle.hdllib.PublicKeyAuthenticationInfo;
 import net.handle.hdllib.Resolver;
 import net.handle.hdllib.Util;
+import org.edu_sharing.repository.client.tools.CCConstants;
+import org.springframework.stereotype.Service;
 
-public class HandleService {
+@Service
+@Slf4j
+public class HandleServiceImpl implements HandleService{
 
 	private final Config config;
 	String privkeyPath = null;
@@ -42,24 +48,61 @@ public class HandleService {
 	
 	
 	Resolver resolver = new Resolver();
-	
-	
-	public HandleService() throws HandleServiceNotConfiguredException{
+
+	@Override
+	public boolean available() {
+		try{
+			handleServiceAvailable();
+			return true;
+		}catch (Exception e){
+			return false;
+		}
+	}
+
+	@Override
+	public String generateId() throws Exception {
+		return this.generateHandle();
+	}
+
+	@Override
+	public String create(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception {
+		return createHandle(handleId, getDefautValues(getContentLink(properties)));
+	}
+
+	@Override
+	public String update(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception {
+		return updateHandle(handleId, getDefautValues(getContentLink(properties)));
+	}
+
+	@Override
+	public String delete(String handleId, String nodeId) throws Exception {
+		//not implemented
+		return "";
+	}
+
+	@Override
+	public String getHandleIdProperty() {
+		return CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID;
+	}
+
+	public HandleServiceImpl() throws HandleServiceNotConfiguredException{
 		config = LightbendConfigLoader.get().getConfig("repository.handleservice");
-		if(this.handleServerAvailable()) {
-			handleServerPrefix = config.getString("prefix");
-			handleServerRepoId = config.getString("repoid");
-			privkeyPath = config.getString("privkey");
-			/**
-			 * config dir: must be writeable
-			 */
-			String configDir = config.getString("configDir");
-			if(configDir != null){
-				System.setProperty("net.handle.configDir", configDir);
+		if(config.hasPath("repoid")) {
+			try {
+				handleServerPrefix = config.getString("prefix");
+				handleServerRepoId = config.getString("repoid");
+				privkeyPath = config.getString("privkey");
+				/**
+				 * config dir: must be writeable
+				 */
+				String configDir = config.getString("configDir");
+				if (configDir != null) {
+					System.setProperty("net.handle.configDir", configDir);
+				}
+				id = "0.NA/" + handleServerPrefix;
+			} catch (Throwable t) {
+				log.error("Could not initialize handle service properly cause of error in config, please check config for \"repository.handleservice\"", t);
 			}
-			id = "0.NA/"+handleServerPrefix;
-		}else {
-			throw new HandleServiceNotConfiguredException();
 		}
 	}
 	
@@ -146,9 +189,9 @@ public class HandleService {
 		String handleId = RandomStringUtils.randomAlphabetic(HANDLE_ID_LENGTH);
 		System.out.println(handleId);
 		if(true) return;
-		HandleService main;
+		HandleServiceImpl main;
 		try {
-			main = new HandleService();
+			main = new HandleServiceImpl();
 		
 		HandleValue[] hvs =  main.getHandleValues(handleServerPrefix + "/901-LEO-ORG",
 				new String[] {new String(Common.STD_TYPE_EMAIL), new String(Common.STD_TYPE_URL)});
@@ -170,14 +213,15 @@ public class HandleService {
 		}
 		
 	}
-	
-	public boolean handleServerAvailable() {
+
+	@Override
+	public boolean enabled() {
 		return config.getBoolean("enabled");
 	}
 	
 	public String generateHandle() throws SQLException  {
 		
-		String id = HandleService.generateUniqueHandleId();
+		String id = HandleServiceImpl.generateUniqueHandleId();
 		return handleServerPrefix +"/" + handleServerRepoId + id;
 	}
 	

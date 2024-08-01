@@ -12,8 +12,9 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
-import org.edu_sharing.service.permission.HandleMode;
+import org.edu_sharing.service.permission.HandleParam;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.extensions.surf.util.URLEncoder;
@@ -361,7 +362,7 @@ public class NodeServiceAdapter implements NodeService {
 	@Override
 	public GetPreviewResult getPreview(String storeProtocol, String storeIdentifier, String nodeId, Map<String, Object> nodeProps, String version) {
 	    try {
-			String previewURL = URLTool.getBaseUrl(true);
+			String previewURL = URLHelper.getBaseUrl(true);
 			previewURL += "/preview?nodeId="+URLEncoder.encodeUriComponent(nodeId)+"&repository="+
 					URLEncoder.encodeUriComponent(appId)+
 					"&storeProtocol="+storeProtocol+"&storeId="+storeIdentifier+"&dontcache="+System.currentTimeMillis();
@@ -391,7 +392,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public String publishCopy(String nodeId, HandleMode handleMode) throws Throwable {
+	public String publishCopy(String nodeId, HandleParam handleParam) throws Throwable {
 		throw new NotImplementedException("publishCopy");
 	}
 

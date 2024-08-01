@@ -2,54 +2,77 @@
 # GLOBAL
 ########################################################################################################################
 
+## @section Global parameters
 global:
 
+  ## @param global.annotations Define global annotations
   annotations: {}
 
   cluster:
 
     istio:
+      ## @param global.cluster.istio.enabled Enable Istio Service mesh
       enabled: false
 
     pdb:
+      ## @param global.cluster.pdb.enabled Enable PDF
       enabled: false
 
+  ## @param global.debug Enable global debugging
   debug: false
 
   image:
+    ## @param global.image.pullPolicy Set global image pullPolicy
     pullPolicy: Always
+    ## @param global.image.pullSecrets Set global image pullSecrets
     pullSecrets: []
+    ## @param global.image.registry Set global image container registry
     registry: ${docker.registry}
+    ## @param global.image.repository Set global image container repository
     repository: ${docker.repository}
+    ## @param global.image.common Set global image container common
     common: ${docker.common}
 
   metrics:
     scrape:
+      ## @param global.metrics.scrape.interval Set prometheus scrape interval
       interval: 60s
+      ## @param global.metrics.scrape.timeout Set prometheus scrape timeout
       timeout: 60s
     servicemonitor:
+      ## @param global.metrics.servicemonitor.enabled Enable metrics service monitor
       enabled: false
 
+  ## @param global.security Set global security parameters
   security: {}
 
 ########################################################################################################################
 # LOCAL
 ########################################################################################################################
 
+## @section Local parameters
+## @param nameOverride Override name
 nameOverride: edusharing-repository-transform-es
 
 image:
+  ## @param image.name Set image name
   name: ${docker.prefix}-deploy-docker-build-transform-edu-sharing
+  ## @param image.tag Set image tag
   tag: ${docker.tag}
 
 ########################################################################################################################
 
+## @param replicaCount Define amount of parallel replicas to run
 replicaCount: 1
 
 autoscaling:
+  ## @param autoscaling.enabled Enable autoscaling
   enabled: false
+  ## @param autoscaling.minReplicas Define minimum number of replicas to have running
   minReplicas: 3
+  ## @param autoscaling.maxReplicas Define maximum number of replicas to have running
   maxReplicas: 5
+  ## @param autoscaling.targetCPU Set CPU limit when to scale
   targetCPU: 80
 
 ########################################################################################################################
@@ -57,74 +80,102 @@ autoscaling:
 service:
 
   port:
+    ## @param service.port.api Set port for service API
     api: 8091
+    ## @param service.port.management Set port for service management
     management: 8092
 
 config:
 
   jvm:
     ram:
+      ## @param config.jvm.ram.minPercentage Set minimum memory in percentages
       minPercentage: "90.0"
+      ## @param config.jvm.ram.maxPercentage Set maximum memory in percentages
       maxPercentage: "90.0"
 
   metrics:
+    ## @param config.metrics.enabled Enable metrics
     enabled: true
+    ## @param config.metrics.relabelings Relable metrics
     relabelings: []
 
+  ## @param config.override Set custom overrides
   override: ""
 
 ########################################################################################################################
 
+## @param debug Enable debugging
 debug: false
 
 ########################################################################################################################
 
+## @param nodeAffinity Set node affinity
 nodeAffinity: {}
 
+## @param tolerations Set tolerations
 tolerations: []
 
 ########################################################################################################################
 
+## @param podAnnotations Set custom pod annotations
 podAnnotations: {}
 
 podSecurityContext:
 
+  ## @param podSecurityContext.fsGroup Set fs group for access
   fsGroup: 1000
+  ## @param podSecurityContext.fsGroupChangePolicy Set change policy for fs group
   fsGroupChangePolicy: OnRootMismatch
 
 securityContext:
 
+  ## @param securityContext.allowPrivilegeEscalation Allow privilege escalation
   allowPrivilegeEscalation: false
   capabilities:
+    ## @param securityContext.capabilities.drop Set drop capabilities
     drop:
-    - ALL
+      - ALL
+  ## @param securityContext.runAsUser Define user to run under
   runAsUser: 1000
 
 ########################################################################################################################
 
+## @param terminationGracePeriod Define grace period for termination
 terminationGracePeriod: 120
 
 startupProbe:
-
+  ## @param startupProbe.failureThreshold Failure threshold for startupProbe
   failureThreshold: 30
+  ## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
   initialDelaySeconds: 0
+  ## @param startupProbe.periodSeconds Period seconds for startupProbe
   periodSeconds: 20
+  ## @param startupProbe.successThreshold Success threshold for startupProbe
   successThreshold: 1
+  ## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
   timeoutSeconds: 10
 
 livenessProbe:
-
+  ## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
   failureThreshold: 3
+  ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
   initialDelaySeconds: 30
+  ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
   periodSeconds: 30
+  ## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
   timeoutSeconds: 10
 
 readinessProbe:
-
+  ## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
   failureThreshold: 1
+  ## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   initialDelaySeconds: 10
+  ## @param readinessProbe.periodSeconds Period seconds for readinessProbe
   periodSeconds: 10
+  ## @param readinessProbe.successThreshold Set threshold for success on readiness probe
   successThreshold: 1
+  ## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
   timeoutSeconds: 10
 
 ########################################################################################################################
@@ -132,10 +183,14 @@ readinessProbe:
 resources:
 
   limits:
+    ## @param resources.limits.cpu Set CPU limit on resources
     cpu: 500m
+    ## @param resources.limits.memory Set memory limit on resources
     memory: 2Gi
   requests:
+    ## @param resources.requests.cpu Set CPU for requests on resources
     cpu: 500m
+    ## @param resources.requests.memory Set memory for requests on resources
     memory: 2Gi
 
 ########################################################################################################################

@@ -27,18 +27,10 @@
  */
 package org.edu_sharing.repository.server.authentication;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import org.springframework.extensions.surf.util.URLDecoder;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -52,16 +44,22 @@ import org.edu_sharing.repository.server.tools.security.ShibbolethSessions.Sessi
 import org.edu_sharing.service.authentication.AuthenticationExceptionMessages;
 import org.edu_sharing.service.authentication.EduAuthentication;
 import org.edu_sharing.service.authentication.SSOAuthorityMapper;
+import org.edu_sharing.service.authority.AuthorityServiceFactory;
+import org.edu_sharing.service.toolpermission.ToolPermissionService;
+import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ShibbolethServlet extends HttpServlet {
 
@@ -128,7 +126,9 @@ public class ShibbolethServlet extends HttpServlet {
 				redirect(resp, req);
 				return;
 
-			} else {
+				// do not trigger as guest
+				// otherwise, the session will be invalidated but still holding the OIDC token from the user
+			} else if(!AuthorityServiceFactory.getLocalService().isGuest()) {
 
 				logger.info("end session for user:" + validAuthInfo.get(CCConstants.AUTH_USERNAME));
 				authTool.logout(validAuthInfo.get(CCConstants.AUTH_TICKET));
@@ -141,7 +141,7 @@ public class ShibbolethServlet extends HttpServlet {
 		}
 
 		try {
-
+			Objects.requireNonNull(ToolPermissionServiceFactory.getInstance()).invalidateSessionCache();
 			logger.info("no valid authinfo found in session. doing the repository shib auth");
 
 			logger.info("req.getCharacterEncoding():"+req.getCharacterEncoding());

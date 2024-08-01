@@ -32,8 +32,12 @@ public class BulkEditPermissionsJob extends AbstractJobMapAnnotationParams{
 
 	@JobFieldDescription(description = "Mode to use")
 	private Mode mode;
-	@JobFieldDescription(description = "Authority name, only if mode == RemoveAuthority or mode == AddCCPublish")
+
+	@JobFieldDescription(description = "Authority name, only if mode == RemoveAuthority or mode == AddAuthority or mode == AddCCPublish")
 	private String authorityName;
+
+	@JobFieldDescription(description = "Authority name to replace with, only if mode == ReplaceAuthority")
+	private String newAuthorityName;
 
 	@JobFieldDescription(description = "Element types to process, e.g. ccm:map,ccm:io")
 	private List<String> types;
@@ -73,9 +77,19 @@ public class BulkEditPermissionsJob extends AbstractJobMapAnnotationParams{
 						logger.info("Node " + ref.getId() + " has authority invited:" + StringUtils.join(result.stream().filter(p -> AccessStatus.ALLOWED.equals(p.getAccessStatus())).collect(Collectors.toList()), ", "));
 						permissionService.clearPermission(ref, authorityName);
 					}
+				} else if(mode.equals(Mode.ReplaceAuthority)) {
+					Set<AccessPermission> permissions = permissionService.getAllSetPermissions(ref);
+					List<AccessPermission> result = permissions.stream().filter(p -> p.getAuthority().equals(authorityName)).collect(Collectors.toList());
+					if(!result.isEmpty()) {
+						logger.info("Node " + ref.getId() + " has authority invited:" + StringUtils.join(result.stream().filter(p -> AccessStatus.ALLOWED.equals(p.getAccessStatus())).collect(Collectors.toList()), ", "));
+						permissionService.clearPermission(ref, authorityName);
+						result.forEach(x->permissionService.setPermission(ref, newAuthorityName, x.getPermission(), x.getAccessStatus() == AccessStatus.ALLOWED));
+					}
+
 				} else if(mode.equals(Mode.Remove)) {
 					logger.info("Node " + ref.getId() + ": all local permissions will be removed");
 					permissionService.deletePermissions(ref);
+
 				} else if(mode.equals(Mode.AddCCPublish)) {
 					Set<AccessPermission> permissions = permissionService.getAllSetPermissions(ref);
 					permissions.stream().filter(p ->
@@ -120,6 +134,8 @@ public class BulkEditPermissionsJob extends AbstractJobMapAnnotationParams{
 		@JobFieldDescription(description = "remove a given authority from the list (will do nothing if this authority was not invited on the node)")
 		RemoveAuthority,
 		@JobFieldDescription(description = "Add the CCPublish permission for all users that already have at least Consumer/Read permissions")
-		AddCCPublish
+		AddCCPublish,
+		@JobFieldDescription(description = "add a given authority from the list (will do nothing if this authority is already invited on the node)")
+		ReplaceAuthority,
 	}
 }

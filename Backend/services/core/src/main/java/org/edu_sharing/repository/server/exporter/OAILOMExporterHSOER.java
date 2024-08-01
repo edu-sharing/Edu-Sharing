@@ -17,13 +17,12 @@ import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.forms.VCardTool;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.repository.server.tools.VCardConverter;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.license.LicenseService;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
@@ -296,7 +295,7 @@ public class OAILOMExporterHSOER extends OAILOMExporter {
         // size
         createAndAppendElement("size", category, QName.createQName(CCConstants.LOM_PROP_TECHNICAL_SIZE));
         // location as URI (attribute "type" can be "URI" or "TEXT")
-        Element locationEle = createAndAppendElement("location", category, URLTool.getNgRenderNodeUrl(nodeRef.getId(), null));
+        Element locationEle = createAndAppendElement("location", category, URLHelper.getNgRenderNodeUrl(nodeRef.getId(), null));
         locationEle.setAttribute("type", "URI");
         // otherplatformrequirements
         createAndAppendElement("otherplatformrequirements", category, QName.createQName(CCConstants.LOM_PROP_TECHNICAL_OTHERPLATFORMREQUIREMENTS));

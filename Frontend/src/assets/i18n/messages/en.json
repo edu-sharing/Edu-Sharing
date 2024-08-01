@@ -12,6 +12,7 @@
     "usage_missing": "Share removed",
     "LTI_ERROR": "LTI process failed",
     "LTI_REG_ERROR": "Connection to LTI platform failed",
+    "SHARING_ERROR": "Sharing failed",
     "DETAILS": {
       "share_expired": "The shared link has expired or has been terminated by the owner of the material.",
       "share_file_deleted": "The shared link points to an object which has been deleted. Please contact the author.",
@@ -23,7 +24,8 @@
       "INVALID": "Wenn dieser Fehler erneut auftritt, kontaktieren Sie bitte den Betreiber des Systems",
       "403": "The access to the given resource is restricted.",
       "404": "Error 404",
-      "500": "Error 500"
+      "500": "Error 500",
+      "SHARING_ERROR": "Unfortunately, edu-sharing can currently only share files of a limited size. Please try with a different file"
     }
   }
 }

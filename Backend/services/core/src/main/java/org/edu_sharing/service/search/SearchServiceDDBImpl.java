@@ -6,6 +6,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.metadataset.v2.MetadataQuery;
+import org.edu_sharing.metadataset.v2.MetadataQueryParameter;
 import org.edu_sharing.metadataset.v2.MetadataReader;
 import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
@@ -148,7 +149,7 @@ public class SearchServiceDDBImpl extends SearchServiceAdapter {
     public List<? extends Suggestion> getSuggestions(MetadataSet mds, String queryId, String parameterId, String value, List<MdsQueryCriteria> criterias) {
         List<Suggestion> result = new ArrayList<>();
 
-        List<String> facets = mds.findQuery(queryId, MetadataReader.QUERY_SYNTAX_LUCENE).findParameterByName(parameterId).getFacets();
+		List<String> facets = mds.findQuery(queryId, MetadataReader.QUERY_SYNTAX_LUCENE).findParameterByName(parameterId).getFacets().stream().map(MetadataQueryParameter.MetadataQueryFacet::getValue).collect(Collectors.toList());
         //String url = getUrl("/search",parameterId +":("+value+")",facets, 0, 0);
         String url = getUrl("/search", "*", facets, 0, 0);
         System.out.println("url:" + url);

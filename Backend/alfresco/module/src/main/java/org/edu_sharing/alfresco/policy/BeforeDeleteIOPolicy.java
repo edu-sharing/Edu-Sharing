@@ -7,19 +7,13 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.version.Version;
-import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.service.handleservice.HandleService;
-import org.edu_sharing.alfresco.service.handleservice.HandleServiceNotConfiguredException;
 import org.edu_sharing.alfresco.service.search.CMISSearchHelper;
 import org.edu_sharing.alfresco.tools.UsageTool;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-
-import net.handle.hdllib.HandleException;
 
 import java.util.HashMap;
 import java.util.List;

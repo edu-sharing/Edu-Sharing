@@ -50,7 +50,7 @@
     "NO_SUB_NODES": "Plus d'éléments",
     "NO_NODES_IN_FOLDER": "Ce dossier est vide.",
     "UPLOAD_TITLE": "Télécharger",
-    "UPLOAD_SUBTITLE": "{{progress}}/{total}} traité",
+    "UPLOAD_SUBTITLE": "{{progress}}/{{total}} traité",
     "UPLOAD_REMAINING": "{{time}} gauche",
     "UPLOAD_FINISHING": "Presque terminé...",
     "UPLOAD_ERROR": {
@@ -60,11 +60,12 @@
       "VIRUS": "Virus détecté. Le fichier a été supprimé.",
       "VIRUS_SCAN_FAILED": "Erreur de vérification du fichier. Veuillez réessayer.",
       "MIMETYPE_VERIFICATION": "Le contenu du fichier n'était pas autorisé ou n'a pas pu être vérifié. Le fichier a été supprimé.",
-      "FILETYPE_VERIFICATION": "L'extension du fichier n'a pas pu être vérifiée. Le fichier a été supprimé."
+      "FILETYPE_VERIFICATION": "L'extension du fichier n'a pas pu être vérifiée. Le fichier a été supprimé.",
+      "FILE_SIZE_EXCEEDED": "Dépassement de la taille maximale autorisée (taille du fichier : {{actualSize}}, maximum autorisé : {{maxSize}})"
     },
     "ADD_FOLDER_TITLE": "Ajouter un nouveau dossier",
     "ADD_FOLDER_METADATASET": "Métadonnées du dossier",
-    "FOLDER_PLACEHOLDER": "Nom de famille",
+    "FOLDER_PLACEHOLDER": "Nom du dossier",
     "DELETE_TITLE_SINGLE": "Supprimer un élément ?",
     "DELETE_TITLE_PUBLISHED_COPY": "Dépublier ?",
     "DELETE_TITLE_COLLECTION": "Supprimer la collection ?",
@@ -143,6 +144,8 @@
       "NO_FUZZY": "Saisir l'adresse e-mail complète pour ajouter des utilisateurs",
       "DOI": "Fournir le DOI",
       "DOI_INFO": "Le DOI (Digital Object Identifier) est un identifiant standardisé pour l'identification unique et globale du matériel récupéré.",
+      "HANDLE": "Fournir le handle",
+      "HANDLE_INFO": "Le handle est un identifiant standardisé pour l'identification unique et globale du matériel récupéré.",
       "PUBLISHING_WARNING_TITLE": "Publier un élément ?",
       "PUBLISHING_WARNING_MESSAGE": "Si vous continuez, l'élément actuel sera partagé avec tous les utilisateurs du système et sera accessible à tous.\n\nÊtes-vous sûr de vouloir publier cet élément ?",
       "ERROR_INVALID_TYPE_COMBINATION": "les éléments de types différents ne peuvent pas être partagés en masse",
@@ -226,7 +229,9 @@
         "EXTEND_DESCRIPTION": "Les autorisations sélectionnées seront ajoutées aux autorisations existantes de l'utilisateur/du groupe.",
         "REPLACE": "Remplacer les autorisations existantes",
         "REPLACE_DESCRIPTION": "Les autorisations sélectionnées remplaceront les autorisations existantes de l'utilisateur/du groupe."
-      }
+      },
+      "DOI_MISSING_ATTRIBUTE": "Afin de publier ce matériel en tant que DOI, le champ suivant est requis : {{key}}",
+      "DOI_METADATA": "Métadonnées ouvertes"
     },
     "INHERIT_DISABLED": "L'héritage est actuellement désactivé",
     "INHERIT_ACCESS_DENIED": "Les droits hérités ne peuvent pas être affichés puisque vous n'avez pas accès à l'élément parent.",
@@ -299,7 +304,8 @@
       "REPLACE_MATERIAL": "Remplacer le matériel",
       "REPLACE_PREVIEW": "Remplacer l'aperçu",
       "DELETE_PREVIEW": "Supprimer l'aperçu",
-      "UPDATED": "Informations mises à jour"
+      "UPDATED": "Informations mises à jour",
+      "PREVIEW_DELETED": "La vignette est supprimée"
     },
     "REVERTED_VERSION": "La version a été inversée avec succès",
     "NODE_TEMPLATE": {
@@ -343,7 +349,9 @@
       "USER_NO_PERMISSION": "Permissions manquantes",
       "USER_NO_PERMISSION_INFO": "L'utilisateur/groupe responsable '{{user}}' n'a actuellement pas le droit d'accéder à ce document / ces documents. Souhaitez-vous lui accorder des autorisations de coordinateur ?\n\nLes coordinateurs peuvent modifier le matériel et accorder l'accès à d'autres utilisateurs.",
       "PROCEED": "Oui, accorder les autorisations",
-      "BULK_WORKFLOWS_EXIST": "Certains des documents sélectionnés ont déjà un flux de travail actif. Veuillez éditer ces documents séparément."
+      "BULK_WORKFLOWS_EXIST": "Certains des documents sélectionnés ont déjà un flux de travail actif. Veuillez éditer ces documents séparément.",
+      "INFO_MESSAGE": "Veuillez noter que la personne ou le groupe choisi devra obtenir un accès complet à ce matériel dans le processus afin de modifier et de mettre à jour le matériel et le flux de travail.",
+      "SAVE": "Économiser"
     },
     "CONTRIBUTOR": {
       "TITLE": "Contributeurs au jeu",
@@ -488,6 +496,23 @@
       "LTI_FIELDS_REQUIRED_LINK": "Créer un lien régulier",
       "TO_ME_SHARED_PERSONAL": "Le contenu partagé avec moi est affiché",
       "TO_ME_SHARED_ALL": "Le contenu partagé avec moi ou mes groupes est affiché"
+    },
+    "LTI_TOOLS": {
+      "TITLE": "Outils LTI",
+      "TITLE_TOOL": "Informations sur l'outil {{ tool }}",
+      "TITLE_CONFIG": "Configurations pour l'outil {{ tool }}",
+      "TITLE_CREATE_LTI": "Créer un nouvel objet {{ tool }}",
+      "NEW_TOOL": "Nouvel outil",
+      "EDIT_TOOL": "Modifier les informations sur l'outil",
+      "CREATE_LOCATION": "Emplacement du fichier :",
+      "MANAGE_CONFIGS": "Gérer les configurations",
+      "CREATE_NAME_PLACEHOLDER": "Saisir le nom...",
+      "NEW_CONFIG": "Créer une configuration",
+      "EDIT_CONFIG": "Modifier la configuration",
+      "USE_TOOL": "Postuler",
+      "DELETE_CONFIG": "Supprimer la configuration",
+      "DELETE_CONFIG_TITLE": "Supprimer la configuration ?",
+      "DELETE_CONFIG_MESSAGE": "Êtes-vous sûr de vouloir supprimer la configuration d'outil sélectionnée ?\nTous les objets déjà créés à l'aide de cette configuration deviendront invalides."
     }
   }
 }

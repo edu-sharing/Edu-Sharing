@@ -29,9 +29,9 @@ import org.edu_sharing.repository.server.authentication.ContextManagementFilter;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.HttpException;
-import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.repository.server.tools.security.Encryption;
 import org.edu_sharing.repository.server.tools.security.SignatureVerifier;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.authentication.SSOAuthorityMapper;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
@@ -459,7 +459,7 @@ public class RenderingProxy extends HttpServlet {
 		}
 
 		String version=getVersion(req);
-		String urlWindow = URLTool.getNgRenderNodeUrl(nodeId,version,false,(repoInfo != null) ? repoInfo.getAppId() : null);
+		String urlWindow = URLHelper.getNgRenderNodeUrl(nodeId,version,false,(repoInfo != null) ? repoInfo.getAppId() : null);
 
 
 		Map parameterMap = req.getParameterMap();

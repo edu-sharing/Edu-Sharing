@@ -632,7 +632,9 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                         try {
                             await this.publishComponent.save().toPromise();
                         } catch (error) {
-                            this.toast.error(error);
+                            if (!error.defaultPrevented) {
+                                this.toast.error(error);
+                            }
                             this.dialogRef.patchState({ isLoading: false });
                             return;
                         }

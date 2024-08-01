@@ -75,7 +75,9 @@ export interface ConfigOptionItem extends ConfigEntry {
     multiple: boolean;
     changeStrategy: string;
 }
-
+export type HandleState = {
+    [key in 'handleService' | 'doiService']?: boolean;
+};
 @Injectable({ providedIn: 'root' })
 export class NodeHelperService extends NodeHelperServiceBase {
     private viewContainerRef: ViewContainerRef;
@@ -595,17 +597,27 @@ export class NodeHelperService extends NodeHelperServiceBase {
      * @param {Permissions} permissions
      * @returns {boolean}
      */
-    isDOIActive(node: Node, permissions: Permission[]) {
+    getHandleStates(node: Node, permissions: Permission[]) {
+        const states: HandleState = {};
         if (
             node.aspects.indexOf(RestConstants.CCM_ASPECT_PUBLISHED) != -1 &&
             node.properties[RestConstants.CCM_PROP_PUBLISHED_HANDLE_ID]
         ) {
             for (const permission of permissions) {
                 if (permission.authority.authorityName === RestConstants.AUTHORITY_EVERYONE)
-                    return true;
+                    states.handleService = true;
             }
         }
-        return false;
+        if (
+            node.aspects.indexOf(RestConstants.CCM_ASPECT_PUBLISHED) != -1 &&
+            node.properties[RestConstants.CCM_PROP_PUBLISHED_DOI_ID]
+        ) {
+            for (const permission of permissions) {
+                if (permission.authority.authorityName === RestConstants.AUTHORITY_EVERYONE)
+                    states.doiService = true;
+            }
+        }
+        return states;
     }
 
     propertiesFromConnector(event: any) {

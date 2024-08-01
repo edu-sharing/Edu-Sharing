@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -28,6 +27,7 @@ import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.server.rendering.RenderingErrorServlet;
 import org.edu_sharing.repository.server.rendering.RenderingException;
 import org.edu_sharing.repository.server.tools.*;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.restservices.*;
 import org.edu_sharing.restservices.shared.Filter;
 import org.edu_sharing.restservices.shared.Node;
@@ -41,7 +41,6 @@ import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.annotation.NodeManipulation;
 import org.edu_sharing.service.nodeservice.annotation.NodeOriginal;
 import org.edu_sharing.service.permission.PermissionService;
-import org.edu_sharing.service.permission.PermissionServiceFactory;
 import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +111,7 @@ public class RenderingServiceImpl implements RenderingService{
 			}
 			renderingServiceUrl = new RenderingTool().getRenderServiceUrl(appInfo,nodeId,parameters,displayMode);
 			// base url for dynamic context routing of domains
-			renderingServiceUrl = UrlTool.setParam(renderingServiceUrl, "baseUrl",URLEncoder.encode(URLTool.getBaseUrl(true)));
+			renderingServiceUrl = UrlTool.setParam(renderingServiceUrl, "baseUrl",URLEncoder.encode(URLHelper.getBaseUrl(true)));
 			logger.debug(renderingServiceUrl);
 			RenderingServiceOptions options = new RenderingServiceOptions();
 			options.displayMode = displayMode;

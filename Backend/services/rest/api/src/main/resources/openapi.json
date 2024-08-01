@@ -48,6 +48,12 @@
       },
       "About": {
         "properties": {
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureInfo"
+            },
+            "type": "array"
+          },
           "lastCacheUpdate": {
             "format": "int64",
             "type": "integer"
@@ -939,6 +945,23 @@
       "ConfigRemoteRocketchat": {
         "type": "object"
       },
+      "ConfigReportProblem": {
+        "properties": {
+          "toolPermissions": {
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "toolPermission"
+              }
+            },
+            "type": "array",
+            "xml": {
+              "name": "toolPermission"
+            }
+          }
+        },
+        "type": "object"
+      },
       "ConfigThemeColor": {
         "properties": {
           "value": {
@@ -966,6 +989,14 @@
               "$ref": "#/components/schemas/ConfigThemeColor"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ConfigTutorial": {
+        "properties": {
+          "enabled": {
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -1413,6 +1444,18 @@
         ],
         "type": "object"
       },
+      "FeatureInfo": {
+        "properties": {
+          "id": {
+            "enum": [
+              "handleService",
+              "doiService"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "FeedbackData": {
         "properties": {
           "authority": {
@@ -1691,6 +1734,25 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "HandleParam": {
+        "properties": {
+          "doiService": {
+            "enum": [
+              "distinct",
+              "update"
+            ],
+            "type": "string"
+          },
+          "handleService": {
+            "enum": [
+              "distinct",
+              "update"
+            ],
+            "type": "string"
           }
         },
         "type": "object"
@@ -6586,6 +6648,9 @@
           "rendering": {
             "$ref": "#/components/schemas/Rendering"
           },
+          "reportProblem": {
+            "$ref": "#/components/schemas/ConfigReportProblem"
+          },
           "searchGroupResults": {
             "type": "boolean"
           },
@@ -6619,6 +6684,9 @@
           },
           "themeColors": {
             "$ref": "#/components/schemas/ConfigThemeColors"
+          },
+          "tutorial": {
+            "$ref": "#/components/schemas/ConfigTutorial"
           },
           "upload": {
             "$ref": "#/components/schemas/ConfigUpload"
@@ -28201,6 +28269,16 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandleParam"
+              }
+            }
+          },
+          "description": "handle parameter, if a handle and/or doi should be created. Skip this parameter if you don't want a handle or doi,"
+        },
         "responses": {
           "200": {
             "content": {

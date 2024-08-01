@@ -64,6 +64,7 @@ import { UIHelper } from '../../../core-ui-module/ui-helper';
 import { DELETE_OR_CANCEL } from '../../../features/dialogs/dialog-modules/generic-dialog/generic-dialog-data';
 import { DialogsService } from '../../../features/dialogs/dialogs.service';
 import { BreadcrumbsService } from '../../../shared/components/breadcrumbs/breadcrumbs.service';
+import { InputPasswordComponent } from '../../../shared/components/input-password/input-password.component';
 
 @Component({
     selector: 'es-permissions-authorities',
@@ -87,6 +88,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
         columns: [],
     };
     @ViewChild('actionbar') actionbar: ActionbarComponent;
+    @ViewChild('passwordRef') passwordRef: InputPasswordComponent;
     @ViewChild('actionbarMember') actionbarMember: ActionbarComponent;
     @ViewChild('actionbarSignup') actionbarSignup: ActionbarComponent;
     @ViewChild('mainList') nodeEntries: NodeEntriesWrapperComponent<GenericAuthority>;
@@ -137,8 +139,11 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
     signupButtons: DialogButton[];
     signupListButtons: DialogButton[];
     editStatus: User;
+    resetPassword: User;
+    newPassword = '';
     editStatusNotify = true;
     editStatusButtons: DialogButton[];
+    resetPasswordButtons: DialogButton[];
     groupSignup: Organization;
     groupSignupListNode: Organization;
     groupSignupListShown = false;
@@ -574,6 +579,15 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
             personStatus.elementType = [ElementType.Person];
             personStatus.group = DefaultGroups.Edit;
             options.push(personStatus);
+            const personPassword = new OptionItem(
+                'PERMISSIONS.MENU_RESET_PASSWORD',
+                'lock',
+                (data: any) => this.resetPersonPassword(this.getList(data)[0]),
+            );
+            personPassword.constrains = [Constrain.NoBulk, Constrain.Admin];
+            personPassword.elementType = [ElementType.Person];
+            personPassword.group = DefaultGroups.Edit;
+            options.push(personPassword);
             if (this.org) {
                 const excludePerson = new OptionItem(
                     'PERMISSIONS.MENU_EXCLUDE',
@@ -1310,6 +1324,12 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
             }),
             new DialogButton('SAVE', { color: 'primary' }, () => this.savePersonStatus()),
         ];
+        this.resetPasswordButtons = [
+            new DialogButton('CANCEL', { color: 'standard' }, () => {
+                this.editStatus = null;
+            }),
+            new DialogButton('SAVE', { color: 'primary' }, () => this.savePersonPassword()),
+        ];
         this.signupButtons = DialogButton.getSaveCancel(
             () => (this.groupSignupDetails = null),
             () => this.saveGroupSignup(),
@@ -1324,6 +1344,11 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
     }
     private setPersonStatus(data: User) {
         this.editStatus = data;
+        this.updateButtons();
+    }
+    private resetPersonPassword(data: User) {
+        this.resetPassword = data;
+        this.newPassword = '';
         this.updateButtons();
     }
 
@@ -1346,7 +1371,35 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                 },
             );
     }
-
+    private savePersonPassword() {
+        if (!this.newPassword || this.passwordRef.passwordStrength === 'weak') {
+            this.toast.error(null, 'PERMISSIONS.ERROR_PASSWORD_TO_WEAK');
+            return;
+        }
+        this.toast.showProgressSpinner();
+        this.iam
+            .setCredentials(
+                {
+                    newPassword: this.newPassword,
+                },
+                this.resetPassword.authorityName,
+            )
+            .subscribe(
+                () => {
+                    this.toast.closeProgressSpinner();
+                    this.resetPassword = null;
+                    this.toast.show({
+                        message: 'PERMISSIONS.TOAST_PASSWORD_RESET',
+                        type: 'info',
+                        subtype: ToastType.InfoAction,
+                    });
+                },
+                (error) => {
+                    this.toast.closeProgressSpinner();
+                    this.toast.error(error);
+                },
+            );
+    }
     saveGroupSignup() {
         this.toast.showProgressSpinner();
         if (this.groupSignupDetails.signupMethod === 'disabled') {

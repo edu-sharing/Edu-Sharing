@@ -41,6 +41,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.servlet.support.RequestContextUtils;
+import org.edu_sharing.repository.tools.URLHelper;
 
 import java.io.*;
 import java.util.*;
@@ -75,7 +76,7 @@ public class DownloadServlet extends HttpServlet {
 		try {
 			downloadNodeInternal(nodeId, repositoryId, req,resp, fileName,mode);
 		} catch (InsufficientPermissionException e) {
-			resp.sendRedirect(URLTool.getBaseUrl(true) + "/" + NgServlet.COMPONENTS_ERROR + "/" + HttpServletResponse.SC_FORBIDDEN);
+			resp.sendRedirect(URLHelper.getBaseUrl(true) + "/" + NgServlet.COMPONENTS_ERROR + "/" + HttpServletResponse.SC_FORBIDDEN);
 		}
 
 	}

@@ -27,11 +27,14 @@ public class MetadataHelper {
 		return MetadataReader.getMetadataset(appId, mdsSet,getLocale());
 	}
 	public static MetadataSet getMetadataset(NodeRef node) throws Exception{
+		return getMetadataset(node, getLocale());
+	}
+	public static MetadataSet getMetadataset(NodeRef node, String locale) throws Exception{
 		String mdsSet = NodeServiceHelper.getProperty(node, CCConstants.CM_PROP_METADATASET_EDU_METADATASET);
 		if(mdsSet==null || mdsSet.isEmpty())
 			mdsSet=CCConstants.metadatasetdefault_id;
 
-		return MetadataReader.getMetadataset(ApplicationInfoList.getHomeRepository(), mdsSet,getLocale());
+		return MetadataReader.getMetadataset(ApplicationInfoList.getHomeRepository(), mdsSet, locale);
 	}
 	public static MetadataSet getMetadataset(org.edu_sharing.restservices.shared.NodeRef node) throws Exception{
 		if(node.isHomeRepo()) {

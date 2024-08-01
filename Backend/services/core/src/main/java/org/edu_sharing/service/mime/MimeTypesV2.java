@@ -5,7 +5,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.Theme;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -134,7 +134,7 @@ public class MimeTypesV2 {
 		}
 		if(appInfo.ishomeNode()){
 			// @TODO 5.1 This can be set to dynamic!
-			return URLTool.getBaseUrl(false);
+			return URLHelper.getBaseUrl(false);
 		}
 		String basePath=appInfo.getClientBaseUrl();
 		if(basePath.endsWith("/")){

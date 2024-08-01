@@ -29,7 +29,7 @@ import { first } from 'rxjs/operators';
 })
 export class CommentsListComponent {
     public _node: Node;
-    private isGuest: boolean;
+    isGuest: boolean;
     user: User;
     comments: Comment[];
     private edit: Comment[];

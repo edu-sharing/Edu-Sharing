@@ -40,7 +40,12 @@ class NodeCustomizationPoliciesTest {
                     filename,
                     allowList,
                     false);
-            Map<String, List<String>> allowListWrongMimetype = new HashMap<>() {{
+            NodeCustomizationPolicies.verifyMimetype(
+                    contentReader,
+                    null,
+                    allowList,
+                    false);
+            Map<String, List<String>> allowListWrongMimetype = new HashMap<String, List<String>>() {{
                 put("test/sample", Collections.singletonList(mimetype.split("/")[1]));
             }};
             Mockito.when(contentReader.getContentInputStream()).thenReturn(

@@ -6,13 +6,14 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.Mail;
 import org.edu_sharing.repository.server.tools.PropertiesHelper;
-import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.mime.MimeTypesV2;
@@ -33,9 +34,12 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.edu_sharing.repository.tools.URLHelper;
 
 public class MailTemplate {
 	static XPathFactory pfactory = XPathFactory.newInstance();
@@ -74,13 +78,20 @@ public class MailTemplate {
 		} catch(Throwable t) {
 			context = Context.getGlobalContext();
 		}
-		String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
+		String currentLocale = mapLocale(new AuthenticationToolAPI().getCurrentLocale());
 		mail.sendMailHtml(
 				context,
 				receiver,
 				MailTemplate.getSubject(templateId,currentLocale),
 				MailTemplate.getContent(templateId,currentLocale, true),
 				replace);
+	}
+
+	private static String mapLocale(String locale) {
+		if(LightbendConfigLoader.get().hasPath("repository.mail.locale")) {
+			return LightbendConfigLoader.get().getString("repository.mail.locale");
+		}
+		return locale;
 	}
 
 	public static void sendMail(String senderName, String sendMail, String receiver, String templateId, Map<String, String> replace) throws Exception {
@@ -110,16 +121,16 @@ public class MailTemplate {
 		);
 		if(MimeTypesV2.MIME_DIRECTORY.equals(mime)){
 			if(nodeService.hasAspect(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId,CCConstants.CCM_ASPECT_COLLECTION)){
-				target.put(keyName, URLTool.getNgComponentsUrl() + "collections/?id="+nodeId);
-				target.put(keyName + ".static", URLTool.getNgComponentsUrl(false) + "collections/?id="+nodeId);
+				target.put(keyName, URLHelper.getNgComponentsUrl() + "collections/?id="+nodeId);
+				target.put(keyName + ".static", URLHelper.getNgComponentsUrl(false) + "collections/?id="+nodeId);
 				return;
 			}
-			target.put(keyName, URLTool.getNgComponentsUrl() +  "workspace/?id="+nodeId);
-			target.put(keyName + ".static", URLTool.getNgComponentsUrl(false) +  "workspace/?id="+nodeId);
+			target.put(keyName, URLHelper.getNgComponentsUrl() +  "workspace/?id="+nodeId);
+			target.put(keyName + ".static", URLHelper.getNgComponentsUrl(false) +  "workspace/?id="+nodeId);
 			return;
 		}
-		target.put(keyName, URLTool.getNgComponentsUrl() + "render/"+nodeId+"?closeOnBack=true");
-		target.put(keyName + ".static", URLTool.getNgComponentsUrl(false) + "render/"+nodeId+"?closeOnBack=true");
+		target.put(keyName, URLHelper.getNgComponentsUrl() + "render/"+nodeId+"?closeOnBack=true");
+		target.put(keyName + ".static", URLHelper.getNgComponentsUrl(false) + "render/"+nodeId+"?closeOnBack=true");
 	}
 	public static UserMail getUserMailData(String authorityName) {
 
@@ -146,6 +157,7 @@ public class MailTemplate {
 	}
 
 	private static Map<TemplateDescription, Node> getTemplates(String locale) throws Exception {
+		locale = mapLocale(locale);
 		Document base=getXML(locale,false);
 		NodeList templatesBase = (NodeList) xpath.evaluate("/templates/template", base, XPathConstants.NODESET);
 		Map<TemplateDescription,Node> result = new HashMap<>();
@@ -213,7 +225,9 @@ public class MailTemplate {
 
 	public static void applyNodePropertiesToMap(String prefix, Map<String, Object> properties, Map<String, String> map) {
 		properties.forEach((key, value) -> map.put(prefix + CCConstants.getValidLocalName(key), value instanceof Collection ?
-				StringUtils.join((Collection)value, ", ") : value == null ? "" : value.toString()));
+				StringUtils.join((Collection)value, ", ") : value == null ? "" :
+						StringUtils.join(ValueTool.getMultivalue(value.toString()), ", ")
+				));
 	}
 
 	public static class UserMail {

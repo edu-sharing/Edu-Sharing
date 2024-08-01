@@ -1,4 +1,5 @@
 package org.edu_sharing.alfresco.service.config.model;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import jakarta.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
 
@@ -64,7 +65,12 @@ public class Values implements Serializable {
 	@XmlElement	public ConfigUpload upload;
 	@XmlElement	public ConfigPublish publish;
 	@XmlElement	public ConfigRemote remote;
+	@XmlElement public ConfigReportProblem reportProblem;
 	@XmlElement	public String customCSS;
 	@XmlElement	public ConfigThemeColors themeColors;
 	@XmlElement	public ConfigPrivacy privacy;
+
+	@JsonPropertyDescription("Config for frontend tutorial (darkened area with highlighted element)")
+	@XmlElement	public ConfigTutorial tutorial;
+
 }

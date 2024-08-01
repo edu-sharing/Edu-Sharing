@@ -1,0 +1,20 @@
+repos:
+  - repo: https://github.com/bitnami/readme-generator-for-helm
+    rev: "2.6.1"
+    hooks:
+    - id: helm-readme-generator
+      pass_filenames: false
+      always_run: true
+      args: [--readme=deploy/docker/helm/search-solr/src/main/chart/README.md, --values=deploy/docker/helm/search-solr/src/main/chart/values.yaml]
+    - id: helm-readme-generator
+      pass_filenames: false
+      always_run: true
+      args: [--readme=deploy/docker/helm/service/src/main/chart/README.md, --values=deploy/docker/helm/service/src/main/chart/values.yaml]
+    - id: helm-readme-generator
+      pass_filenames: false
+      always_run: true
+      args: [--readme=deploy/docker/helm/transform-aio/src/main/chart/README.md, --values=deploy/docker/helm/transform-aio/src/main/chart/values.yaml]
+    - id: helm-readme-generator
+      pass_filenames: false
+      always_run: true
+      args: [--readme=deploy/docker/helm/transform-es/src/main/chart/README.md, --values=deploy/docker/helm/transform-es/src/main/chart/values.yaml]

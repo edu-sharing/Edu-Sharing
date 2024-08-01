@@ -1,4 +1,4 @@
-package org.edu_sharing.alfresco.service.handleservice;
+package org.edu_sharing.service.handleservice;
 
 public class HandleServiceNotConfiguredException extends Exception {
 

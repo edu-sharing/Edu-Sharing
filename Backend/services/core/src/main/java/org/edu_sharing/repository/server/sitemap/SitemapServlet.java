@@ -24,6 +24,7 @@ import org.edu_sharing.repository.server.sitemap.xml.Sitemapindex;
 import org.edu_sharing.repository.server.sitemap.xml.Urlset;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.mime.MimeTypesV2;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
@@ -126,7 +127,7 @@ public class SitemapServlet extends HttpServlet{
                 url.loc=URLTool.getNgCollectionUrl(ref.getNodeId());
             }
             else {
-                url.loc = URLTool.getNgRenderNodeUrl(ref.getNodeId(), null);
+                url.loc = URLHelper.getNgRenderNodeUrl(ref.getNodeId(), null);
             }
             String mimetype=nodeService.getContentMimetype(ref.getStoreProtocol(),ref.getStoreId(),ref.getNodeId());
             if(MimeTypesV2.getTypeFromMimetype(mimetype).equals("file-video")){

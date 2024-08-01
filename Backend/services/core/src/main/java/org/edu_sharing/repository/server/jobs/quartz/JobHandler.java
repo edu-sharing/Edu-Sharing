@@ -3,6 +3,24 @@
  */
 package org.edu_sharing.repository.server.jobs.quartz;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
+import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
+import org.alfresco.service.ServiceRegistry;
+import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
+import org.edu_sharing.spring.scope.refresh.RefreshScopeRefreshedEvent;
+import org.jetbrains.annotations.NotNull;
+import org.quartz.*;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.stereotype.Component;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.ParseException;
@@ -10,30 +28,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigValue;
-import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
-
-import org.alfresco.service.ServiceRegistry;
-import org.apache.log4j.Logger;
-import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.spring.scope.refresh.RefreshScopeRefreshedEvent;
-import org.jetbrains.annotations.NotNull;
-import org.quartz.*;
-import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.stereotype.Component;
-
-import org.springframework.context.ApplicationContext;
-
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.CronScheduleBuilder.dailyAtHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.CronScheduleBuilder.*;
 
 /**
  * @author rudi start jobs, start scheduling of an job, stop scheduling of a job
@@ -432,7 +431,7 @@ public class JobHandler implements ApplicationListener<RefreshScopeRefreshedEven
             }
             logger.info("primary repository, will register and handle quartz jobs");
 
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            ClassLoader classLoader = this.getClass().getClassLoader();
             List<? extends Config> list = LightbendConfigLoader.get().getConfigList("jobs.entries");
             jobConfigList.clear();
             for (String groupName : quartzScheduler.getJobGroupNames()) {

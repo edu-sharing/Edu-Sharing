@@ -121,9 +121,10 @@ public class SearchServicePixabayImpl extends SearchServiceAdapter{
 		searchResultNodeRef.setData(data);
 		for(int i=0;i<array.length();i++){
 			JSONObject json=array.getJSONObject(i);
-			
+
+			Object id = json.get("id");
 			Map<String,Object> properties=new HashMap<>();
-			properties.put(CCConstants.SYS_PROP_NODE_UID,json.getString("id"));
+			properties.put(CCConstants.SYS_PROP_NODE_UID,id.toString());
 			properties.put(CCConstants.CM_PROP_C_MODIFIED,System.currentTimeMillis());
 			properties.put(CCConstants.LOM_PROP_GENERAL_TITLE,json.getString("tags"));
 			properties.put(CCConstants.LOM_PROP_GENERAL_KEYWORD,json.getString("tags").replace(", ",CCConstants.MULTIVALUE_SEPARATOR));
@@ -144,13 +145,13 @@ public class SearchServicePixabayImpl extends SearchServiceAdapter{
 			String author=VCardTool.nameToVCard(json.getString("user"));
 			properties.put(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR,author);
 			properties.put(CCConstants.VIRT_PROP_USAGECOUNT,json.getInt("downloads"));
-			properties.put(CCConstants.CCM_PROP_IO_WIDTH,json.getString("imageWidth"));
-			properties.put(CCConstants.CCM_PROP_IO_HEIGHT,json.getString("imageHeight"));
+			properties.put(CCConstants.CCM_PROP_IO_WIDTH,json.get("imageWidth"));
+			properties.put(CCConstants.CCM_PROP_IO_HEIGHT,json.get("imageHeight"));
 			properties.put(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE,"pixabay");
 			//properties.put(CCConstants.CONTENTURL,json.getString("pageURL"));
 			properties.put(CCConstants.LOM_PROP_TECHNICAL_LOCATION,json.getString("pageURL"));
 			properties.put(CCConstants.CCM_PROP_IO_WWWURL,json.getString("pageURL"));
-			properties.put(CCConstants.CONTENTURL,URLTool.getRedirectServletLink(repositoryId, json.getString("id")));
+			properties.put(CCConstants.CONTENTURL,URLTool.getRedirectServletLink(repositoryId, id.toString()));
 			properties.put(CCConstants.VIRT_PROP_PERMALINK,json.getString("pageURL"));
 			Pattern p = Pattern.compile(".*\\/\\/.*\\/.*_(.*)\\..*");
 			String thumb = json.getString("previewURL");
@@ -173,7 +174,7 @@ public class SearchServicePixabayImpl extends SearchServiceAdapter{
 				properties.put(CCConstants.CCM_PROP_IO_THUMBNAILURL,thumb);
 			}
 			//properties.put(CCConstants.CCM_PROP_IO_THUMBNAILURL,json.getString("webformatURL"));//.replace("_640", "_960"));
-			properties.put(CCConstants.DOWNLOADURL,URLTool.getDownloadServletUrl(json.getString("id"),null,true, repositoryId));
+			properties.put(CCConstants.DOWNLOADURL,URLTool.getDownloadServletUrl(id.toString(),null,true, repositoryId));
 			org.edu_sharing.service.model.NodeRef ref = new org.edu_sharing.service.model.NodeRefImpl(repositoryId, 
 					StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(),
 					StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),properties);

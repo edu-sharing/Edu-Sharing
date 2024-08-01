@@ -12,6 +12,7 @@
       ></es-authority-search-input>
       <mat-form-field class="status-select">
         <mat-select
+          #statusSelect
           [value]="status"
           (valueChange)="setStatus($event)"
           [style.--status-color]="status.color"
@@ -45,6 +46,7 @@
       </mat-chip-listbox>
     </div>
   </div>
+  <es-info-message>{{ 'WORKSPACE.WORKFLOW.INFO_MESSAGE' | translate }}</es-info-message>
   <mat-form-field class="comment">
     <mat-label>{{ 'WORKSPACE.WORKFLOW.COMMENT' | translate }}</mat-label>
     <input matInput [(ngModel)]="comment" />

@@ -18,6 +18,7 @@ import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.repository.server.tools.VCardConverter;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.license.LicenseService;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.permission.PermissionServiceHelper;
@@ -304,7 +305,7 @@ public class OAILOMExporter {
 		// second is text/html for rendering
 		technical = createAndAppendElement("technical", lom);
 		createAndAppendElement("format",technical,"text/html");
-		createAndAppendElement("location",technical,URLTool.getNgRenderNodeUrl(nodeRef.getId(),null));
+		createAndAppendElement("location",technical, URLHelper.getNgRenderNodeUrl(nodeRef.getId(),null));
 	}
 
 	public void createMetadata(Element lom) {

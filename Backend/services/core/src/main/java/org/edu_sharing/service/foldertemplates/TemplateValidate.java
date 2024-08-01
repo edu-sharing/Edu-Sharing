@@ -18,13 +18,13 @@ import org.xml.sax.SAXParseException;
 
 public class TemplateValidate {
 
-	public static void validateXML(InputStream xmlFile, File schemaFile, boolean nameSpaceAware, 
+	public static void validateXML(InputStream xmlFile, InputStream schemaStream, boolean nameSpaceAware,
 			LoggingErrorHandler errHandler) throws Exception
 	{
 		try {
 			// create a SchemaFactory and a Schema
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Source schemaSource = new StreamSource(schemaFile);
+			Source schemaSource = new StreamSource(schemaStream);
 			Schema schema = schemaFactory.newSchema(schemaSource);
 			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

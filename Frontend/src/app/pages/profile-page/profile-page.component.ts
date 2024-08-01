@@ -1,4 +1,4 @@
-import { forkJoin as observableForkJoin, Subject } from 'rxjs';
+import { forkJoin as observableForkJoin, Subject, timer } from 'rxjs';
 
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
@@ -24,6 +24,8 @@ import { trigger } from '@angular/animations';
 import { Helper } from '../../core-module/rest/helper';
 import { LoadingScreenService } from '../../main/loading-screen/loading-screen.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
+import { take, takeUntil } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'es-profile-page',
@@ -34,6 +36,8 @@ import { MainNavService } from '../../main/navigation/main-nav.service';
 export class ProfilePageComponent implements OnInit, OnDestroy {
     private destroyed = new Subject<void>();
     private loadingTask = this.loadingScreen.addLoadingTask({ until: this.destroyed });
+    // dummy parameter to refetch the avatar
+    avatarCache = '';
     constructor(
         private toast: Toast,
         private route: ActivatedRoute,
@@ -251,6 +255,13 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
                     this.editAbout = false;
                     this.toast.toast('PROFILE_UPDATED');
                     this.loadUser(this.userEdit.authorityName);
+                    // the backend is running an async refresh task
+                    // so we wait here and try to refetch the icon
+                    timer(0, 1000)
+                        .pipe(take(10), takeUntil(this.destroyed))
+                        .subscribe(() => {
+                            this.avatarCache = '&dontcache = ' + Math.random();
+                        });
                 },
                 (error) => {
                     this.toast.error(error);

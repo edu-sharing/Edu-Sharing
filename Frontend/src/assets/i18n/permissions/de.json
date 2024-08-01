@@ -12,6 +12,7 @@
     "MENU_CREATE_GROUP": "Gruppe erstellen",
     "MENU_EDIT_GROUP": "Bearbeiten",
     "MENU_EDIT_PERSON": "Bearbeiten",
+    "MENU_RESET_PASSWORD": "Passwort zurücksetzen",
     "MENU_DELETE": "Löschen",
     "MENU_TOOLPERMISSIONS": "Berechtigungen",
     "MENU_TOOLPERMISSIONS_GLOBAL": "Globale Berecht.",
@@ -86,6 +87,9 @@
     "STATUS_LABEL": "Nutzer{{GENDER_SEPARATOR}}innen Status",
     "STATUS_NOTIFY": "Nutzer per E-Mail über Statusänderung informieren",
     "STATUS_LAST_CHANGE": "Letzte Änderung des Status",
+    "NEW_PASSWORD": "Neues Passwort",
+    "ERROR_PASSWORD_TO_WEAK": "Das gewählte Passwort ist nicht sicher genug",
+    "TOAST_PASSWORD_RESET": "Passwort wurde zurückgesetzt",
     "GROUP_TYPE": {
       "null": "Kein / Normale Gruppe",
       "EDITORIAL": "Redaktionsgruppe",

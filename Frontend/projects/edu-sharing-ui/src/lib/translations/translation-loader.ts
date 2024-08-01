@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Optional } from '@angular/core';
 import { TranslateLoader } from '@ngx-translate/core';
-import { ConfigService, LANGUAGES } from 'ngx-edu-sharing-api';
+import { ConfigService, LANGUAGES, TranslationsDict } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
 import { concat, Observable, of } from 'rxjs';
-import { catchError, first, map, reduce } from 'rxjs/operators';
+import { catchError, filter, first, map, reduce, switchMap, tap } from 'rxjs/operators';
 import { EduSharingUiConfiguration } from '../edu-sharing-ui-configuration';
 import { ASSETS_BASE_PATH } from '../types/injection-tokens';
 import { TranslationSource } from './translation-source';
@@ -62,6 +62,7 @@ export class TranslationLoader implements TranslateLoader {
         if (!LANGUAGES[lang]) {
             console.error('unknown locale for language ' + lang);
         }
+        console.log('lang', lang);
         this.configService.setLocale(LANGUAGES[lang]);
         return rxjs
             .forkJoin({
@@ -74,10 +75,10 @@ export class TranslationLoader implements TranslateLoader {
                     .pipe(first()),
             })
             .pipe(
-                map(({ originalTranslations, translationOverrides }) =>
+                map(({ originalTranslations, translationOverrides }) => {
                     // FIXME: This will alter the object returned by `getOriginalTranslations`.
-                    this.applyOverrides(originalTranslations, translationOverrides),
-                ),
+                    return this.applyOverrides(originalTranslations, translationOverrides);
+                }),
                 map((translations) => this.replaceGenderCharacter(translations)),
                 catchError((error, obs) => {
                     console.error(error);
@@ -89,7 +90,11 @@ export class TranslationLoader implements TranslateLoader {
     private getOriginalTranslations(lang: string): Observable<Dictionary> {
         switch (this.getSource()) {
             case 'repository':
-                return this.configService.observeDefaultTranslations().pipe(first());
+                return this.configService.observeDefaultTranslations().pipe(
+                    filter((arg) => !arg || arg.locale === LANGUAGES[lang]),
+                    switchMap((arg) => arg?.dict?.pipe(first()) || of(null)),
+                    first(),
+                );
             case 'local':
                 return this.mergeTranslations(this.fetchTranslations(lang));
         }

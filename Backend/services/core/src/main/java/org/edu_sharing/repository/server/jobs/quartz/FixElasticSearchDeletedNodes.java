@@ -31,13 +31,17 @@ import java.util.List;
 import java.util.Map;
 
 @JobDescription(description = "checks for nodes removed in repository but still exist in elasticsearch. please check that tracker is 100% finished and tracker is disabled before running ths job.")
-public class FixElasticSearchDeletedNodes extends AbstractJob{
+public class FixElasticSearchDeletedNodes extends AbstractJobMapAnnotationParams{
 
     @JobFieldDescription(description = "if false (default) no changes will be done.")
     boolean execute;
 
     @JobFieldDescription(description = "query that delivers a result of nodes that have to be checked. optional. if not set all nodes will be searched.",sampleValue = "{\"query\":\"{\\\"term\\\":{\\\"type\\\":\\\"ccm:io\\\"}}\"}")
     String query;
+
+
+    @JobFieldDescription(description = "Try to check the nested arrays like children or collections and clean them up as well",sampleValue = "true")
+    boolean cleanupChildren = true;
 
     SearchServiceElastic searchServiceElastic = new SearchServiceElastic(ApplicationInfoList.getHomeRepository().getAppId());
 
@@ -49,9 +53,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
     ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
     NodeService nodeService = serviceRegistry.getNodeService();
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        execute = Boolean.parseBoolean( (String) jobExecutionContext.getJobDetail().getJobDataMap().get("execute"));
-        query =  (String)jobExecutionContext.getJobDetail().getJobDataMap().get("query");
+    public void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
             AuthenticationUtil.runAsSystem(()->{
                 try {
@@ -96,7 +98,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
         return searchServiceElastic.searchNative(SearchRequest.of(req->req
                 .index(index)
                 .size(pageSize)
-                .source(src->src.filter(filter->filter.excludes("preview")))
+                .source(src->src.filter(filter->filter.excludes("preview", "content")))
                 .scroll(scroll)));
     }
 
@@ -139,7 +141,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
                 //so we can safely remove it here without checking for archive store
 
                 //cleanup replicated collections on ios
-                if(type.equals("ccm:map") && aspects.contains("ccm:collection") ){
+                if(cleanupChildren && type.equals("ccm:map") && aspects.contains("ccm:collection") ){
                     syncNestedCollections(dbid);
                 }
 
@@ -189,6 +191,9 @@ public class FixElasticSearchDeletedNodes extends AbstractJob{
     }
 
     private void cleanupSubArray(String dbid, Hit<Map> searchHit, List<Map<String, Object>> nestedObjectsArray, String subArrayName) throws IOException {
+        if(nestedObjectsArray == null) {
+            return;
+        }
         if(nestedObjectsArray.size() == 1) {
             /**
              * remove all collections so that there is no empty collection object left over

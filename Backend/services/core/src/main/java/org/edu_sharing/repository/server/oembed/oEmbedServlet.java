@@ -4,9 +4,8 @@ import com.google.gson.Gson;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.rendering.RenderingErrorServlet;
-import org.edu_sharing.repository.server.rendering.RenderingException;
 import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.restservices.DAOException;
 import org.edu_sharing.restservices.DAOSecurityException;
 import org.edu_sharing.restservices.NodeDao;
@@ -24,7 +23,6 @@ import jakarta.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,7 +64,7 @@ public class oEmbedServlet extends HttpServlet {
                 base=new oEmbedBase();
                 base.setType("rich");
                 int[] size=getSize(oEmbedBase.DEFAULT_SIZE,oEmbedBase.DEFAULT_SIZE,maxWidth,maxHeight);
-                base.setHtml(getIFrameHTML(URLTool.getBaseUrl(true)+"/rendering-error?i18n=usage_missing&exception="+e.getClass().getName(),size[0],size[1]));
+                base.setHtml(getIFrameHTML(URLHelper.getBaseUrl(true)+"/rendering-error?i18n=usage_missing&exception="+e.getClass().getName(),size[0],size[1]));
             }catch(Throwable t){
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,t.getMessage());
                 return;

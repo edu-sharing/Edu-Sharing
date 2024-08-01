@@ -1,4 +1,6 @@
 {
+  "Key": "ENGLISH",
+  "Konto": "Account",
   "ADMIN": {
     "TITLE": "Admin-Tools",
     "UNDERSTAND": "Understood, proceed",
@@ -639,6 +641,65 @@
         "auth_token_url": "Auth Token Url",
         "CREATED": "Platform registered"
       }
+    }
+  },
+  "LTITOOL": {
+    "REGISTER": "Start registration",
+    "DYNAMIC_URL": "Dynamic registration tool url",
+    "DATA": {
+      "redirectionUrls": "Redirection Urls",
+      "targetLinkUri": "Target link Url",
+      "clientName": "Tool name",
+      "keysetUrl": "Keyset Url",
+      "loginInitiationUrl": "Login Initiation (oidc) Url"
+    },
+    "MANUAL_INFO": "If your LTI-compatible tool does not support dynamic registration or if it does not work, you can use manual registration.\n\nAfter clicking on \"Save\", a connection will be prepared with the given data.",
+    "HEADER": "LTI tool registration",
+    "DYNAMIC_INFO": "With the help of the dynamic LTI registration, LTI tools can be easily connected to edu-sharing. \n Determine the URL for the dynamic registration of the tool and enter it in the field \"URL of the tool for dynamic registration\". By clicking on \"Start registration\" the external tool is automatically connected to edu-sharing."
+  },
+  "GLOBAL_CONFIG": {
+    "SERVER_CONFIG_HINT": "You can overwrite configuration values ​​here. These changes apply to the current server and are not overwritten by updates. They have the highest priority. ATTENTION! In cluster operation, these parameters only apply to the current cluster server!",
+    "SERVER_CONFIG_TITLE": "Server configuration file (overwrite)",
+    "DEPLOYMENT_CONFIG_TITLE": "Deployment configuration file",
+    "DEPLOYMENT_CONFIG_HINT": "This file was defined by the deployment and may change data that deviates from the template. This file can only be changed by the deployment."
+  },
+  "PLUGINS": {
+    "PLUGIN_DETAILS": {
+      "Alfresco Share Services AMP": {
+        "DESCRIPTION": "This Alfresco module provides the Alfresco Share interfaces"
+      },
+      "edu_sharing-community-repository-backend-alfresco-module": {
+        "DESCRIPTION": "The core module of edu-sharing. It extends the basic system with edu-sharing APIs and interfaces as well as other functionalities"
+      },
+      "edu_sharing-enterprise-repository-plugin-transform-backend-alfresco-module": {
+        "DESCRIPTION": "This plugin separates the transformation functions (screenshot & full-text generation of documents via LibreOffice) from the repository server and allows a better, more stable distribution of the workload"
+      },
+      "alfresco-trashcan-cleaner project": {
+        "DESCRIPTION": "The Trashcan Cleaner regularly deletes old content from all users’ trash"
+      },
+      "edu_sharing-community-repository-plugin-elastic-backend-alfresco-module": {
+        "DESCRIPTION": "The Elasticsearch module transforms the objects including statistics and metadata into a special Elasticsearch index structure and allows efficient and very detailed search queries"
+      },
+      "edu_sharing-projects-community-repository-backend-alfresco-module": {
+        "DESCRIPTION": "This module may include project-specific adjustments"
+      }
+    }
+  },
+  "JOBS": {
+    "PARAMETERS": "Job parameter",
+    "APPLY_TEMPLATE": "Insert as template"
+  },
+  "APPLICATIONS": {
+    "HOMEAPP": {
+      "import_metadataset": "Metadata set used for imported objects from this source"
+    }
+  },
+  "FRONTPAGE": {
+    "TOTAL_COUNT_LARGER_HINT": "If the total number of elements is greater than the displayed elements, the selected number of elements to be displayed is always randomly selected from this pool"
+  },
+  "BROWSER": {
+    "LUCENE_TEMPLATE_MEMORY": {
+      "DEFAULT_TEMPLATE_OVERRIDE": "Standard templates must not be overwritten"
     }
   }
 }

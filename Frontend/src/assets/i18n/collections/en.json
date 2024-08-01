@@ -92,8 +92,11 @@
     "EXTENDED_PERMISSIONS_BUTTON": "Invite",
     "TOAST": {
       "DUPLICATE_NAME": "A collection with the same name already exists",
+      "ERROR_IMAGE_APPLY": "Unfortunately, the selected image could not be read. Please try another element.",
       "CREATED": "Collection has been created",
-      "INVALID_NAME": "The given name is invalid. Please don't use special characters"
+      "INVALID_NAME": "The given name is invalid. Please don't use special characters",
+      "SORT_SAVED_TYPE": "The selected sorting by \"{{type}}\" will apply to all viewers of the collection in the future",
+      "SORT_SAVED_CUSTOM": "The order established will apply to all viewers of the collection in the future"
     },
     "NEW": {
       "AUTHOR_FREETEXT": "Name of author",
@@ -119,6 +122,8 @@
   "collections_description": "Description:",
 
   "collections_content": "Content",
+  "collections_noCollections": "No public collections are available.",
+  "collections_noOrgaCollections": "You have not been invited to any collection yet.",
   "collections_noContentAvailable": "No content available",
   "collections_howToAddContent": "Just click on the \"Add Material\" button and use the search engine to find contents for your collection.",
 

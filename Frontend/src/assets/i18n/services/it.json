@@ -1,5 +1,31 @@
 {
   "SERVICES": {
-    "TITLE": "Servizi"
+    "TITLE": "Servizi",
+    "REGISTER": "Registrazione di un nuovo servizio",
+    "REGISTERED_SERVICES": "Servizi già registrati",
+    "URL": "URL",
+    "LOGO": "Logo",
+    "NAME": "Nome",
+    "ID": "ID",
+    "INTERFACE_TYPES": {
+      "Generic_Api": "API",
+      "Statistics": "Statistiche",
+      "Sitemap": "Mappa del sito",
+      "Search": "Ricerca",
+      "OAI": "OAI"
+    },
+    "TAB": {
+      "LICENSES": "Licenza",
+      "MATERIALS": "Tipo di materiale"
+    },
+    "TYPE": "Tipo",
+    "MATERIALS": "I materiali",
+    "REGISTERED": "Il servizio è stato registrato con successo",
+    "ERROR": {
+      "LOADJSON": "Non è stato possibile aprire l'URL del servizio",
+      "REGISTERED": "Non è stato possibile registrare il servizio (errore di formato JSON o simile).",
+      "DUPLICATE": "Questo URL di servizio è già stato registrato",
+      "ENTERURL": "Immettere un URL"
+    }
   }
 }

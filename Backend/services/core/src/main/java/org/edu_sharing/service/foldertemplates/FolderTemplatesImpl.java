@@ -93,13 +93,12 @@ public class FolderTemplatesImpl implements FolderTemplates {
 	public boolean validateTemplate(InputStream is) throws Throwable {
 
 		boolean nameSpaceAware = false;
-		File schemaFile; 
+		InputStream schemaStream;
 		
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		URL url = classLoader.getResource("template.xsd");
 
 		try {
-			schemaFile = new File(url.toURI());
+			schemaStream =  classLoader.getResourceAsStream("template.xsd");
 		} catch (Exception e) {
 			loggingErrorHandler.getMessage().add(e.getMessage());
 			//e.printStackTrace();
@@ -107,7 +106,7 @@ public class FolderTemplatesImpl implements FolderTemplates {
 		}
 
 		try {
-			TemplateValidate.validateXML(is, schemaFile, nameSpaceAware, loggingErrorHandler);
+			TemplateValidate.validateXML(is, schemaStream, nameSpaceAware, loggingErrorHandler);
 		} catch (Exception e) {
 			loggingErrorHandler.getMessage().add(e.getMessage());
 			//e.printStackTrace();

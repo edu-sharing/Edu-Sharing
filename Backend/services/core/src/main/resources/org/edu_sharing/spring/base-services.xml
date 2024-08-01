@@ -31,7 +31,9 @@
   </bean>
 
   <bean id="archiveService" class="org.edu_sharing.service.archive.ArchiveServiceImpl" lazy-init="true"/>
-  <bean id="nodeServiceImpl" class="org.edu_sharing.service.nodeservice.NodeServiceImpl"/>
+	<bean id="nodeServiceImpl" class="org.edu_sharing.service.nodeservice.NodeServiceImpl">
+		<property name="handleServiceFactory" ref="handleServiceFactory"/>
+	</bean>
   <bean id="nodeServiceInterceptor" class="org.edu_sharing.service.nodeservice.NodeServiceInterceptor"
         init-method="init"/>
 
@@ -50,6 +52,11 @@
       </list>
     </property>
   </bean>
+	<bean id="trackingServiceImpl" class="org.edu_sharing.service.tracking.TrackingServiceImpl">
+		<property name="nodeService">
+			<ref bean="nodeServiceImpl" />
+		</property>
+	</bean>
   <bean id="trackingServiceInterceptor" class="org.edu_sharing.service.tracking.TrackingServiceInterceptor"
         init-method="init"/>
 

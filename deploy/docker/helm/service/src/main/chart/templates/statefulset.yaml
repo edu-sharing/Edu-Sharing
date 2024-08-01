@@ -16,6 +16,7 @@ spec:
         checksum/configmap-env: {{ include (print .Template.BasePath "/configmap-env.yaml") . | sha256sum | trunc 63 }}
         checksum/configmap-file: {{ include (print .Template.BasePath "/configmap-file.yaml") . | sha256sum | trunc 63 }}
         checksum/secret-env: {{ include (print .Template.BasePath "/secret-env.yaml") . | sha256sum | trunc 63 }}
+        checksum/secret-file: {{ include (print .Template.BasePath "/secret-file.yaml") . | sha256sum | trunc 63 }}
         {{- if not .Values.global.metrics.servicemonitor.enabled }}
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9090"
@@ -26,8 +27,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      initContainers:
       {{- if (default .Values.global.cluster.storage.share.permission .Values.persistence.share.permission) }}
+      initContainers:
       - name: {{ include "edusharing_common_lib.names.name" . }}-init-permission
         image: {{ include "edusharing_common_lib.images.common" . }}{{ .Values.init.permission.image.name }}:{{ .Values.init.permission.image.tag }}
         imagePullPolicy: {{ .Values.global.image.pullPolicy }}
@@ -59,6 +60,44 @@ spec:
         {{- if .Values.persistence.share.safe.enabled }}
         - name: share-safe
           mountPath: /opt/alfresco/alf_safe
+        {{- end }}
+        {{- with .Values.init.permission.startupProbe }}
+        startupProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo startupProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with .Values.init.permission.livenessProbe }}
+        livenessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo livenessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with .Values.init.permission.readinessProbe }}
+        readinessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo readinessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
         {{- end }}
         {{- with .Values.init.permission.resources }}
         resources: {{ toYaml . | nindent 10 }}
@@ -116,12 +155,12 @@ spec:
         {{- end }}
         {{- with .Values.config.override.config.application.mds }}
         - name: file
-          mountPath: /opt/bitnami/tomcat/shared/classes/config/default/metadatasets/xml/mds_override.xml
+          mountPath: /opt/bitnami/tomcat/shared/classes/config/defaults/metadatasets/xml/mds_override.xml
           subPath: config-application-mds
         {{- end }}
         {{- with .Values.config.override.config.application.settings }}
         - name: file-sec
-          mountPath: /opt/bitnami/tomcat/shared/classes/config/default/edu-sharing.override.conf
+          mountPath: /opt/bitnami/tomcat/shared/classes/config/defaults/edu-sharing.override.conf
           subPath: config-application-settings
         {{- end }}
         {{- with .Values.config.override.logging.application }}
@@ -310,6 +349,44 @@ spec:
             subPath: proxy-config
           - name: temp-proxy
             mountPath: /var/lib/varnish
+        {{- with .Values.sidecar.proxyMetrics.startupProbe }}
+        startupProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo startupProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with .Values.sidecar.proxyMetrics.livenessProbe }}
+        livenessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo livenessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
+        {{- with .Values.sidecar.proxyMetrics.readinessProbe }}
+        readinessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "echo readinessProbe > /dev/null"
+          failureThreshold: {{ .failureThreshold }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          successThreshold: {{ .successThreshold }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+        {{- end }}
         {{- with .Values.sidecar.proxyMetrics.resources }}
         resources: {{ toYaml . | nindent 10 }}
         {{- end }}

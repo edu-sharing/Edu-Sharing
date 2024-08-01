@@ -58,11 +58,12 @@ data:
   REPOSITORY_SEARCH_SOLR_PORT: {{ .Values.config.search.solr.port | quote }}
   REPOSITORY_SERVICE_HAZELCAST_HEARTBEAT_FAILUREDETECTOR_TYPE: {{ .Values.config.hazelcast.heartbeat.failuredetector.type | quote }}
   REPOSITORY_SERVICE_HAZELCAST_HEARTBEAT_INTERVAL_SECONDS: {{ .Values.config.hazelcast.heartbeat.interval.seconds | quote }}
-  REPOSITORY_SERVICE_HAZELCAST_MAX_NO_HEARTBEAT_SECONDS: {{ .Values.config.hazelcast.max.no.heartbeat.seconds | quote }}
+  REPOSITORY_SERVICE_HAZELCAST_MAX_NO_HEARTBEAT_SECONDS: {{ .Values.config.hazelcast.max.heartbeat.seconds | quote }}
   REPOSITORY_SERVICE_HAZELCAST_PHIACCRUAL_FAILUREDETECTOR_THRESHOLD: {{ .Values.config.hazelcast.phiaccrual.failuredetector.threshold | quote }}
   REPOSITORY_SERVICE_HAZELCAST_PHIACCRUAL_FAILUREDETECTOR_SAMPLE_SIZE: {{ .Values.config.hazelcast.phiaccrual.failuredetector.sample.size | quote }}
   REPOSITORY_SERVICE_HAZELCAST_PHIACCRUAL_FAILUREDETECTOR_MIN_STD_DEV_MILLIS: {{ .Values.config.hazelcast.phiaccrual.failuredetector.min.std.dev.millis | quote }}
   REPOSITORY_SERVICE_HOME_APPID: {{ .Values.config.home.appid | quote }}
+  REPOSITORY_SERVICE_HOME_URL_DYNAMIC: {{ .Values.config.home.urlDynamic | quote }}
   REPOSITORY_SERVICE_HOME_AUTH: {{ if or .Values.config.oidc.enabled .Values.config.saml.enabled }}"shibboleth"{{ else }}""{{ end }}
   REPOSITORY_SERVICE_HOME_COOKIE_ATTRIBUTES: {{ .Values.config.home.cookieAttributes | quote }}
   REPOSITORY_SERVICE_ALLOW_ORIGIN: "{{- join "," .Values.config.http.server.allowOrigin}}"

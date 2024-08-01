@@ -638,5 +638,66 @@
         "CREATED": "Piattaforma registrata"
       }
     }
+  },
+  "Key": "INGLESE",
+  "Konto": "Conto",
+  "LTITOOL": {
+    "REGISTER": "Avviare la registrazione",
+    "DYNAMIC_URL": "Strumento di registrazione dinamica url",
+    "DATA": {
+      "redirectionUrls": "Url di reindirizzamento",
+      "targetLinkUri": "Link di destinazione Url",
+      "clientName": "Nome dello strumento",
+      "keysetUrl": "URL della tastiera",
+      "loginInitiationUrl": "Url di avvio del login (oidc)"
+    },
+    "MANUAL_INFO": "Se lo strumento compatibile con LTI non supporta la registrazione dinamica o se non funziona, è possibile utilizzare la registrazione manuale.\n\nDopo aver fatto clic su \"Salva\", verrà preparata una connessione con i dati forniti.",
+    "HEADER": "Registrazione dello strumento LTI",
+    "DYNAMIC_INFO": "Con l'aiuto della registrazione dinamica LTI, gli strumenti LTI possono essere facilmente collegati a edu-sharing.\n Determinare l'URL per la registrazione dinamica dello strumento e inserirlo nel campo \"URL dello strumento per la registrazione dinamica\". Facendo clic su \"Avvia registrazione\", lo strumento esterno viene automaticamente collegato a edu-sharing."
+  },
+  "GLOBAL_CONFIG": {
+    "SERVER_CONFIG_HINT": "Qui è possibile sovrascrivere i valori di configurazione. Queste modifiche si applicano al server corrente e non vengono sovrascritte dagli aggiornamenti. Hanno la massima priorità. ATTENZIONE! Nel funzionamento del cluster, questi parametri si applicano solo al server cluster corrente!",
+    "SERVER_CONFIG_TITLE": "File di configurazione del server (sovrascrittura)",
+    "DEPLOYMENT_CONFIG_TITLE": "File di configurazione della distribuzione",
+    "DEPLOYMENT_CONFIG_HINT": "Questo file è stato definito dall'installazione client e può modificare i dati che si discostano dal modello. Questo file può essere modificato solo dall'installazione client."
+  },
+  "PLUGINS": {
+    "PLUGIN_DETAILS": {
+      "Alfresco Share Services AMP": {
+        "DESCRIPTION": "Questo modulo Alfresco fornisce le interfacce di Alfresco Share"
+      },
+      "edu_sharing-community-repository-backend-alfresco-module": {
+        "DESCRIPTION": "Il modulo principale di edu-sharing. Estende il sistema di base con le API e le interfacce di edu-sharing e con altre funzionalità."
+      },
+      "edu_sharing-enterprise-repository-plugin-transform-backend-alfresco-module": {
+        "DESCRIPTION": "Questo plugin separa le funzioni di trasformazione (generazione di screenshot e full-text di documenti tramite LibreOffice) dal server del repository e consente una distribuzione migliore e più stabile del carico di lavoro."
+      },
+      "alfresco-trashcan-cleaner project": {
+        "DESCRIPTION": "Il Trashcan Cleaner cancella regolarmente i vecchi contenuti dal cestino di tutti gli utenti."
+      },
+      "edu_sharing-community-repository-plugin-elastic-backend-alfresco-module": {
+        "DESCRIPTION": "Il modulo Elasticsearch trasforma gli oggetti, comprese le statistiche e i metadati, in una speciale struttura di indice Elasticsearch e consente di effettuare query di ricerca efficienti e molto dettagliate."
+      },
+      "edu_sharing-projects-community-repository-backend-alfresco-module": {
+        "DESCRIPTION": "Questo modulo può includere adeguamenti specifici per il progetto"
+      }
+    }
+  },
+  "JOBS": {
+    "PARAMETERS": "Parametro di lavoro",
+    "APPLY_TEMPLATE": "Inserire come modello"
+  },
+  "APPLICATIONS": {
+    "HOMEAPP": {
+      "import_metadataset": "Set di metadati utilizzato per gli oggetti importati da questa sorgente"
+    }
+  },
+  "FRONTPAGE": {
+    "TOTAL_COUNT_LARGER_HINT": "Se il numero totale di elementi è maggiore degli elementi visualizzati, il numero selezionato di elementi da visualizzare viene sempre scelto in modo casuale da questo pool."
+  },
+  "BROWSER": {
+    "LUCENE_TEMPLATE_MEMORY": {
+      "DEFAULT_TEMPLATE_OVERRIDE": "I modelli standard non devono essere sovrascritti"
+    }
   }
 }

@@ -536,7 +536,7 @@
     <dependency>
       <groupId>net.sourceforge.cardme</groupId>
       <artifactId>cardme</artifactId>
-      <scope>runtime</scope>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>

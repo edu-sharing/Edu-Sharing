@@ -93,7 +93,10 @@
     "TOAST": {
       "DUPLICATE_NAME": "Esiste già una raccolta con lo stesso nome",
       "CREATED": "La collezione è stata creata",
-      "INVALID_NAME": "Il nome indicato non è valido. Non utilizzare caratteri speciali"
+      "INVALID_NAME": "Il nome indicato non è valido. Non utilizzare caratteri speciali",
+      "ERROR_IMAGE_APPLY": "Purtroppo non è stato possibile leggere l'immagine selezionata. Provare con un altro elemento.",
+      "SORT_SAVED_TYPE": "L'ordinamento selezionato per \"{{type}}\" sarà applicato a tutti i visualizzatori della collezione in futuro.",
+      "SORT_SAVED_CUSTOM": "L'ordine stabilito si applicherà a tutti gli spettatori della collezione in futuro"
     },
     "NEW": {
       "AUTHOR_FREETEXT": "Nome dell'autore",
@@ -125,5 +128,7 @@
   "collectionNew_createCollection": "creare",
   "collectionNew_storeChanges": "salvare le modifiche",
   "collectionNew_placeholderTitle": "titolo della collezione",
-  "collectionNew_placeholderDescription": "Di cosa parla la tua collezione?"
+  "collectionNew_placeholderDescription": "Di cosa parla la tua collezione?",
+  "collections_noCollections": "Non sono disponibili collezioni pubbliche.",
+  "collections_noOrgaCollections": "Non sei ancora stato invitato a nessuna collezione."
 }

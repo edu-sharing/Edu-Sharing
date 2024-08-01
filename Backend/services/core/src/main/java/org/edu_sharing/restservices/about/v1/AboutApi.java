@@ -53,7 +53,10 @@ public class AboutApi  {
 	    	About about = new About();
 			AboutPlugins plugins = ApplicationContextFactory.getApplicationContext().getBean(AboutPlugins.class);
 			about.setPlugins(plugins.getPlugins());
-	    	ServiceVersion version = new ServiceVersion();
+
+			AboutFeatures features = ApplicationContextFactory.getApplicationContext().getBean(AboutFeatures.class);
+			about.setFeatures(features.getFeatureInfoList());
+			ServiceVersion version = new ServiceVersion();
 	    	
 	    	version.setMajor(ApiApplication.MAJOR);
 	    	version.setMinor(ApiApplication.MINOR);

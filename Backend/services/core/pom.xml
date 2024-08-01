@@ -67,6 +67,12 @@
       <artifactId>edu_sharing-community-repository-backend-services-xoai</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>edu_sharing-community-repository-backend-alfresco-module</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- provided -->
 
     <dependency>

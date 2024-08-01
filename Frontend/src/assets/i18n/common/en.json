@@ -63,6 +63,8 @@
   "TODAY": "today",
   "YESTERDAY": "yesterday",
   "DAYS_AGO": "{{ days }} days ago",
+  "MONTHS_AGO": "{{ months }} month(s) ago",
+  "YEARS_AGO": "{{ years }} year(s) ago",
   "HOURS_AGO": "{{ hours }} hours ago",
   "MINUTES_AGO": "{{ minutes }} minutes ago",
   "JUST_NOW": "Just now",
@@ -158,7 +160,12 @@
     "TOOLPERMISSION_CONNECTOR_SAFE": "Editor \"{{connector}}\" can be used in safe",
     "TOOLPERMISSION_REPOSITORY": "Repository \"{{repository}}\" can be viewed & browsed and media can be retrieved from it",
     "TOOLPERMISSION_CREATE_MAP_LINK": "Create folders that link to other folders",
-    "TOOLPERMISSION_SIGNUP_GROUP": "Signup to an organisation/group (only applies to organisation/groups which are configured for signup)"
+    "TOOLPERMISSION_SIGNUP_GROUP": "Signup to an organisation/group (only applies to organisation/groups which are configured for signup)",
+    "TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_FUZZY": "Search and find users outside the organization without entering the entire user ID",
+    "TOOLPERMISSION_MANAGE_RELATIONS": "Manage and create relationships between elements",
+    "TOOLPERMISSION_RATE_WRITE": "The permission to rate materials (requires TOOLPERMISSION_RATE_READ)",
+    "TOOLPERMISSION_COLLECTION_PROPOSAL": "Suggesting materials for collections for which the user does not have write permissions",
+    "TOOLPERMISSION_RATE_READ": "The right to view reviews of materials"
   },
   "NO_WRITE_PERMISSIONS": "No permissions",
   "NODE_SEARCH": "Search elements...",
@@ -167,11 +174,14 @@
   "REPLACE": "Replace",
   "CHANGE_STORAGE_LOCATION": "Select",
   "STORAGE_LOCATION_UNSET": "Not set",
+  "STORAGE_LOCATION_SAVE": "Use this location as default in the future",
   "SUGGESTION": "Suggestion",
   "CLICKTOREMOVE": "Click to remove",
   "NO_PERMISSIONS_FOR_SCOPE": "No permissions to access this environment",
   "DATE_SELECT_YEAR": "Choose year",
   "DATE_CLEAR": "Clear",
+  "SEARCH_CLEAR": "Clear",
+  "TOGGLE_SEARCH_FILTERS": "Show or hide search filters",
   "USER_TUTORIAL_HEADING": "Your Profile",
   "USER_TUTORIAL_DESCRIPTION": "Here you can add a profile picture and show who you are and what you do. You decide what others can see.",
   "PROFILE_UPDATED": "Account details updated",
@@ -221,10 +231,19 @@
   },
   "LIST_TABLE": {
     "DUMMY_ICON_LABEL": "File type",
-    "TOGGLE_ALL": "Select all/none"
+    "TOGGLE_ALL": "Select all/none",
+    "CONFIGURE_COLUMNS": "Configure columns"
+  },
+  "PAGINATOR": {
+    "getRangeLabel": "Page {{page}} of {{pageCount}}",
+    "itemsPerPageLabel": "Entries per page:",
+    "nextPageLabel": "Next page",
+    "previousPageLabel": "Previous page"
   },
   "NODE": {
     "cm:name": "filename",
+    "cm:title": "title",
+    "ccm:replicationsource": "source",
     "score": "relevance",
     "description": "description",
     "mimetype": "file type",
@@ -258,8 +277,17 @@
       "VIEW_MATERIAL": "Access",
       "VIEW_MATERIAL_EMBEDDED": "Embeddings",
       "DOWNLOAD_MATERIAL": "Downloads",
-      "VIEW_MATERIAL_PLAY_MEDIA": "Wiedergaben"
-    }
+      "VIEW_MATERIAL_PLAY_MEDIA": "Playbacks",
+      "VIEW_COLLECTION": "Collection views",
+      "OPEN_EXTERNAL_LINK": "External link views"
+    },
+    "ccm:replicationsourcetimestamp": "last changed",
+    "ccm:eaf_subtitle": "subtitle",
+    "ccm:replicationmodified": "last changed",
+    "ccm:taxonid": "Area of ​​Expertise",
+    "ccm:educationalintendedenduserrole": "Target group",
+    "ccm:eaf_sequence_title": "Title of sequence",
+    "ccm:collection_ordered_position": "Manual sorting"
   },
   "COOKIE_INFO": {
     "ACCEPT": " Accept",
@@ -325,11 +353,13 @@
   },
   "COMMENTS_SINGLE": "Comment",
   "COMMENTS_MULTIPLE": "Comments",
+  "PUBLISHED_COPY_TOOLTIP": "Published copy",
   "NODE_COMMENTS": {
     "TITLE": "Comments",
     "NEW_COMMENT_PLACEHOLDER": "New comment...",
     "COMMENT_EMPTY": "Please enter a comment",
     "NO_COMMENTS": "No comments yet",
+    "NO_GUEST_COMMENTING": "Please login to comment elements",
     "NO_PERMISSION": "Commenting is disabled for this element",
     "NOT_SUPPORTED_REMOTELY": "Commenting is not supported for external elements",
     "OPTION_EDIT": "edit",
@@ -379,7 +409,11 @@
     "folder": "Folder",
     "file": "Unknown",
     "collection": "Collection",
-    "saved_search": "Search"
+    "saved_search": "Search",
+    "tool_object": "LTI tool",
+    "file-csv": "CSV file",
+    "file-serlo": "Serlo file",
+    "file-geogebra": "Geogebra file"
   },
   "PERMISSION_TYPE": {
     "Consumer": "Viewer",
@@ -405,10 +439,23 @@
     "TOAST_DURATION_INFINITE_INFO": "Status messages are not automatically hidden and must be closed manually.",
     "TOAST_DURATION_TITLE": "display time",
     "TOAST_DURATION_MESSAGE": "Status messages disappear automatically after a specified time or can be closed manually by clicking.",
-    "DISMISS_TOAST": "Hide"
+    "DISMISS_TOAST": "Hide",
+    "INDICATOR_ICONS_TITLE": "Meaningful symbols",
+    "INDICATOR_ICONS_MESSAGE": "Communicate content using symbols. The meaning of a symbol is displayed when the mouse pointer is moved over the symbol. However, this is not possible when using the keyboard alone.",
+    "INDICATOR_ICONS_OPTION": {
+      "ICONS": "Show symbols",
+      "TEXT_ONLY": "Show text only"
+    },
+    "CONTRAST_MODE_TITLE": "Contrast Mode",
+    "CONTRAST_MODE_MESSAGE": "In contrast mode, elements on the page are more distinctive from each other.",
+    "CONTRAST_MODE_OPTION": {
+      "CONTRAST": "Improved contrast",
+      "STANDARD": "Standard contrast"
+    }
   },
   "AUTHORITY_TYPE_GROUP": "Group",
   "AUTHORITY_TYPE_ORG": "Organisation",
+  "CHILDOBJECT_COUNT": "{{count}} items (sequence)",
   "GROUP": {
     "displayName": "group name",
     "authorityName": "system name",
@@ -427,9 +474,10 @@
     "firstName": "first name",
     "lastName": "last name",
     "email": "e-mail",
-    "primaryAffiliation": "Primary role",
+    "status": "status",
+    "primaryAffiliation": "primary role",
     "password": "password",
-    "sizeQuota": "Quota size in MB",
+    "sizeQuota": "quota size in MB",
     "PRIMARY_AFFILIATION": {
       "teacher": "teacher",
       "student": "student",
@@ -441,6 +489,7 @@
   },
   "PROFILE_SETTINGS": {
     "SHOW_EMAIL_LABEL": "E-Mail public",
+    "SHOW_EMAIL_TOOLTIP": "Controls whether other users can see the email address, e.g. in the invitation dialog or when accessing the profile",
     "SHOW_EMAIL": "Email is displayed",
     "HIDE_EMAIL": "E-mail is hidden"
   },
@@ -462,6 +511,18 @@
       "TITLE": "New html document",
       "PLACEHOLDER": "document title",
       "FILENAME": "the following file is being created"
+    },
+    "H5P": {
+      "TITLE": "new H5P content",
+      "FILENAME": "the following file is being created",
+      "NAME": "H5P",
+      "PLACEHOLDER": "Name of content"
+    },
+    "MOODLE": {
+      "TITLE": "new Moodle content",
+      "FILENAME": "the following file is being created",
+      "NAME": "MOODLE",
+      "PLACEHOLDER": "Name of content"
     },
     "MIMETYPE": {
       "imsqti_xmlv2p1_questionnaire": "Questionnaire",
@@ -486,7 +547,7 @@
       "COPYRIGHT_FREE": "Copyright, free access",
       "COPYRIGHT_LICENSE": "Copyright, subject to licensing",
       "SCHULFUNK": "German educational radio/television license (§47 UrhG)",
-      "UNTERRICHTS_UND_LEHRMEDIEN": "§60b Unterrichts- und Lehrmedien",
+      "UNTERRICHTS_UND_LEHRMEDIEN": "§60b Media collections for teaching",
       "CC_0": "CC-0",
       "PDM": "PDM",
       "CC_BY": "CC-BY",
@@ -507,7 +568,8 @@
       "CC_0": "This work is dedicated to the public domain.<br /> You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.",
       "COPYRIGHT_FREE": "The work is accessible free of charge.<br />Use and attribution according to the generally applicable legal regulations.",
       "COPYRIGHT_LICENSE": "The work may only be used by the licensed user group according to the conditions stipulated in the license agreement.<br />Passing on to third parties is prohibited.<br />Attribution according to the generally applicable practices.",
-      "SCHULFUNK": "Access-restricted and time-limited offering for school radio according to §47 UrhG (German Act on Copyright and Related Rights).<br />Passing on to third parties is prohibited.<br />Attribution according to the generally applicable practices."
+      "SCHULFUNK": "Access-restricted and time-limited offering for school radio according to §47 UrhG (German Act on Copyright and Related Rights).<br />Passing on to third parties is prohibited.<br />Attribution according to the generally applicable practices.",
+      "UNTERRICHTS_UND_LEHRMEDIEN": "(1) Producers of media collections for teaching may reproduce, distribute or make available to the public up to 10 per cent of a published work for such collections.<br />(2) Section 60a (2) and (3) sentence 1 applies accordingly.<br />(3) For the purposes of this Act, ʻmedia collections for teachingʼ means collections which bring together a significant number of authors and which are suitable, intended and labelled accordingly for the exclusive purpose of non-commercial illustration in teaching in educational establishments (section 60a).<br />source: https://www.gesetze-im-internet.de/englisch_urhg/englisch_urhg.html#p0475"
     },
     "GROUPS": {
       "NONE": "No license chosen",
@@ -518,7 +580,19 @@
       "CC_0": "CC 0 / Public Domain",
       "SCHULFUNK": "German educational radio/television license (§47 UrhG)",
       "EDU": "edu-sharing Licenses",
-      "CUSTOM": "define custom license"
+      "CUSTOM": "define custom license",
+      "UNTERRICHTS_UND_LEHRMEDIEN": "§60b Media collections for teaching"
+    },
+    "URLS": {
+      "CC_BY_ABOUT": "https://creativecommons.org/licenses/list.de",
+      "CC_BY": "https://creativecommons.org/licenses/by/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_ND": "https://creativecommons.org/licenses/by-nd/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_SA": "https://creativecommons.org/licenses/by-sa/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_NC": "https://creativecommons.org/licenses/by-nc/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_NC_ND": "https://creativecommons.org/licenses/by-nc-nd/{{version}}/{{locale}}legalcode.de",
+      "CC_BY_NC_SA": "https://creativecommons.org/licenses/by-nc-sa/{{version}}/{{locale}}legalcode.de",
+      "CC_0": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.de",
+      "PDM": "https://creativecommons.org/public-domain/pdm/"
     }
   },
   "LIST": {
@@ -527,9 +601,18 @@
     "TOTAL_COUNT_TOOLTIP": "{{selected}} items selected from a total of {{total}}"
   },
   "DIALOG": {
+    "SAVING": "Save...",
+    "SAVED": "Changes saved",
+    "SAVING_ERROR": "Error while saving changes",
+    "CONFIRM_DISCARD_TITLE": "Discard changes?",
+    "CONFIRM_DISCARD_MESSAGE": "Close dialogue without saving changes?",
     "COLLECTION_SHARE_PUBLIC": "Add material to collection?",
-    "COLLECTION_SHARE_PUBLIC_INFO": "By adding this material into collection \"{{collection}}\" everyone who has access to this collection may access it."
+    "COLLECTION_SHARE_PUBLIC_INFO": "By adding this material into collection \"{{collection}}\" everyone who has access to this collection may access it.",
+    "COLLECTION_PROPSE": "Submit a proposal?",
+    "COLLECTION_PROPSE_INFO": "You do not have sufficient rights to the collection \"{{collection}}\". However, you can submit the material as a proposal. Would you like to continue?"
   },
+  "OPTIONS_FOR": "Aktions for {{element}}",
+  "NO_AVAILABLE_OPTIONS": "No actions are available for the selected items",
   "OPTIONS": {
     "SHOW_ALL_OPTIONS": "More actions",
     "APPLY": "Apply",
@@ -578,7 +661,15 @@
     "SWITCH_TO_LIST_VIEW": "Switch to list view",
     "SWITCH_TO_CARDS_VIEW": "Switch to cards view",
     "LIST_SETTINGS": "Configure List",
-    "METADATA_SIDEBAR": "Material details"
+    "METADATA_SIDEBAR": "Material details",
+    "DOWNLOAD_SAFE": "Archive",
+    "ACCESSIBILITY": "Accessibility",
+    "COLLECTION_PROPOSAL_ACCEPT": "Accept proposal",
+    "LTI": "Adopt in LTI platform",
+    "EMBED": "Embed",
+    "OPEN_ORIGINAL_NODE": "Open original",
+    "COLLECTION_PROPOSAL_DECLINE": "Decline proposal",
+    "RELATIONS": "Manage relations"
   },
   "NO_SIZE": "-",
   "VERSION_COMMENT": "Version comment",
@@ -616,9 +707,20 @@
     "INDETERMINATE_NOTICE": "Click on the chip in order to add the value \"{{ value }}\" to all elements, or remove it in order to delete it from all elements.",
     "SHOW_OPTIONS_BUTTON": "Show options",
     "FILTER_FOR": "Filter for \"{{value}}\" ({{count}} matching element(s))",
-    "FILTER_TREE": "Filter..."
+    "FILTER_TREE": "Filter...",
+    "OPEN_CLOSE_EXTENDED": "Open/close view",
+    "FILTER_FACET": "Filter...",
+    "SHOW_EXTENDED_TRUE": "Display additional information",
+    "NO_ARBITRARY_VALUES_NOTICE": "You cannot freely select values ​​for this field. Please select values ​​from the list.",
+    "DELETE_KEY_NOTICE": "Delete with Delete key",
+    "SHOW_EXTENDED_FALSE": "hide additional information",
+    "SUGGEST_VALUE_SEND": "suggest",
+    "SUGGESTION_TOOLTIP": "Value \"{{ value }}\" suggested by \"{{ creator }}\"",
+    "NO_MATCHING_VALUES": "No matching values",
+    "ERROR_PREVIEW": "Preview image could not be replaced. Please try another image file",
+    "SUGGEST_VALUE_SENT": "The suggestion has been submitted and is being reviewed by the editorial team. The suggestion will only appear once it has been activated by the editorial team. Thank you!",
+    "SUGGEST_VALUE_LABEL": "Suggest new value"
   },
-
   "SIMPLE_EDIT": {
     "TITLE": "Quick Edit",
     "SAVED": "Element {{name}} was changed",
@@ -706,7 +808,15 @@
     "RENDER_NOT_FOUND": "The requested element is deleted or does not exist",
     "FIELD_REQUIRED": "The field {{ name }} is required",
     "API_FORBIDDEN": "No permissions to access this content",
-    "API_FORBIDDEN_LOGIN": "Please login to access this section"
+    "API_FORBIDDEN_LOGIN": "Please login to access this section",
+    "NO_CONNECTION": "Unstable internet connection, content could not be loaded. Please try again later",
+    "DOWNLOAD_STARTED": "Download of \"{{name}}\" has started",
+    "DOWNLOAD_FINISHED_ANDROID": "Download of \"{{name}}\" completed.\nYou can find the item in the device's download folder",
+    "DOWNLOAD_FINISHED_IOS": "Download of \"{{name}}\" completed.\nYou can find the item in the files app",
+    "DOWNLOAD_FAILED": "Download of \"{{name}}\" failed.\nCheck your Internet connection and try again",
+    "DOWNLOAD_TRY_AGAIN": "Try again",
+    "STORAGE_LOCATION_SAVED": "The folder \"{{name}}\" will be used by default for uploads in the future",
+    "STORAGE_LOCATION_RESET": "The default folder for uploads has been reset"
   },
   "NODE_SEARCH_SELECTOR": {
     "MORE_FILTERS": "Extended search filters",
@@ -726,7 +836,11 @@
     "Zip": "ZIP Code",
     "City": "City",
     "Region": "State/Region",
-    "Country": "Country"
+    "Country": "Country",
+    "X-GND-URI": "GND-URI",
+    "X-Wikidata": "Wikidata entry",
+    "X-ORCID": "ORCID",
+    "X-ROR": "ROR (Research Organization Registry)"
   },
   "ICON_LABELS": {
     "more_vert": "Options",
@@ -744,9 +858,10 @@
     "redo": "Apply"
   },
   "FILL_STATUS": {
-    "REQUIRED": "required fields",
-    "REQUIREDPUBLISH": "for publishing required fields",
-    "SHOW": "show"
+    "REQUIRED": "mandatory fields",
+    "REQUIREDPUBLISH": "mandatory fields for publishing",
+    "SHOW": "show",
+    "MESSAGE": "fields filled"
   },
   "SIGNUP_GROUP": {
     "TITLE": "Enroll in group",
@@ -781,6 +896,8 @@
   },
   "LANGUAGE": {
     "INTERNATIONAL": "international",
+    "ancient_greek": "Ancient Green",
+    "ancient_indian": "Ancient Indian",
     "ar": "Arabic",
     "ar_AE": "Arabic (United Arab Emirates)",
     "ar_BH": "Arabic (Bahrain)",
@@ -881,6 +998,7 @@
     "ja_JP_JP": "Japanese (Japan,JP)",
     "ko": "Korean",
     "ko_KR": "Korean (South Korea)",
+    "latin": "Latin",
     "lt": "Lithuanian",
     "lt_LT": "Lithuanian (Lithuania)",
     "lv": "Latvian",
@@ -1038,11 +1156,215 @@
     "COLLECTIONS": "collections"
   },
   "SKIP_LINKS": {
-    "MAIN_CONTENT": "Skip to main content"
+    "MAIN_CONTENT": "Skip to main content",
+    "ACCESSIBILITY_SETTINGS": "Accessibility settings"
   },
-  "REPOSITORIES": {},
+  "REPOSITORIES": {
+    "de_fwu": "FWU",
+    "ddb": "German National Library",
+    "geogebra": "GeoGebra",
+    "memucho": "Memucho",
+    "omega": "Omega",
+    "pixabay": "Pixabay",
+    "tutory": "Tutory",
+    "youtube": "YouTube",
+    "zum": "ZUM Wiki"
+  },
   "BREADCRUMBS": {
     "YOU_ARE_HOME": "You are in the root directory",
     "IN_HOME": "Root directory"
+  },
+  "API_ERROR": {
+    "RELOAD_NOTICE_TITLE": "Page needs to be reloaded",
+    "RELOAD_NOTICE": "Something went wrong while loading important information. Please reload the page.",
+    "RELOAD_BUTTON_LABEL": "Reload page"
+  },
+  "PROPOSAL_STATUS": {
+    "DECLINED": "declined",
+    "ACCEPTED": "accepted",
+    "PENDING": "pending"
+  },
+  "NODE_PROPOSAL": {
+    "cm:created": "Time of proposal",
+    "ccm:collection_proposal_status": "Status of proposal",
+    "cm:creator": "proposed by"
+  },
+  "RATING": {
+    "TOAST": {
+      "LIKE_REMOVED": "Recommendation for material \"{{name}}\" removed",
+      "RATING_REMOVED": "Rating for material \"{{name}}\" removed",
+      "RATED": "Material \"{{name}}\" was rated {{rating}}. Thank you!",
+      "LIKED": "Material \"{{name}}\" recommended. Thank you!"
+    },
+    "COUNT_RATINGS": "Number of reviews",
+    "STARS_RATE": "Rate with {{rating}}",
+    "LIKES": "Recommend",
+    "COUNT_LIKES": "Number of recommendations",
+    "DELETE_RATING": "Remove review"
+  },
+  "NOTIFICATION_LIST": {
+    "UNREAD_COUNT": "{{count}} unread notifications",
+    "TITLE": "Notifications",
+    "SETTINGS": "Notification settings",
+    "RELOAD": "refresh",
+    "MARK_ALL_READ": "Mark all as read",
+    "SHOW_READ": "Show read notifications",
+    "EMPTY_UNREAD": "There're no unread notifications",
+    "EMPTY_ALL": "No notifications",
+    "DESCRIPTIONS": {
+      "AddToCollectionEvent": "{{creator}} added the material \"{{title}}\" to the collection {{collection}}.",
+      "ProposeForCollectionEvent": "{{creator}} has proposed the material \"{{title}}\" for the collection {{collection}}.",
+      "CommentEvent": "{{creator}} has written a comment on the material \"{{title}}\".",
+      "InviteEvent": "{{creator}} has released the object \"{{title}}\" to you.",
+      "NodeIssueEvent": "{{creator}} reported problem \"{{reason}}\" on material \"{{title}}\".",
+      "RatingEvent": "A rating has been given for the material \"{{title}}\".",
+      "WorkflowEvent": "{{creator}} changed the workflow status of material \"{{title}}\" to \"{{workflowStatus}}\".",
+      "MetadataSuggestionEvent": ""
+    }
+  },
+  "ADD_TO_STREAM": {
+    "TITLE": "Add to stream",
+    "AUDIENCE_TYPE": "At stream of...",
+    "AUDIENCE_EVERYONE": "All",
+    "AUDIENCE_EVERYONE_INFO": "The entry will appear on the stream for all users",
+    "AUDIENCE_CUSTOM": "Users or groups",
+    "SUCCESSFUL": "Item(s) were added to the stream",
+    "ERROR": {
+      "NO_PERSON_INVITED": "No users selected"
+    }
+  },
+  "FEEDBACK": {
+    "TITLE": "Give feedback on the material",
+    "VIEW_TITLE": "Feedback given on the material",
+    "VIEW_EMPTY": "No feedback has been given on the material yet",
+    "CREATOR": "Author {{creator}}",
+    "SAVE": "Send",
+    "TOAST": "Feedback sent. Thank you!"
+  },
+  "VCARD_HINT": {
+    "X-ORCID": "Reference to a persistent ORCID identifier. <a target='blank' href='https://orcid.org/'>Registration & Info</a>",
+    "X-GND-URI": "Reference to a persistent GND URI of the German National Library. <a target='blank' href='https://portal.dnb.de/opac.htm'>Search for people</a>",
+    "X-ROR": "Reference to an entry in the Research Organization Registry. <a target='blank' href='https://ror.org/'>Info</a>",
+    "X-Wikidata": "Reference to an entry on Wikidata. <a target='_blank' href='https://www.wikidata.org/wiki/Wikidata:Main_Page'>Info</a>"
+  },
+  "EMBED": {
+    "SIZE_CONSTRAINTS_ERROR_NOTICE": "Please choose a value between {{ min }} and {{ max }}",
+    "VERSION_OPTION": {
+      "FIXED": "this version",
+      "NEWEST": "always the newest version"
+    },
+    "NOT_PUBLIC_WARNING": "This material is not publicly available.",
+    "VERSION": "Version",
+    "WIDTH": "Width",
+    "CODE_LABEL": "Embed code",
+    "HEIGHT": "Height",
+    "COPIED_TO_CLIPBOARD_NOTICE": "The embed code has been copied to the clipboard."
+  },
+  "NODE_INFO": {
+    "TITLE": "Node \"{{name}}\"",
+    "LOCATION": "Path to item",
+    "NODE_ASPECTS": "Aspects",
+    "NODE_PROPERTIES": "Properties",
+    "NODE_TYPE": "Objekt type",
+    "JSON": "Entire Objekt",
+    "PERMISSIONS": "Permissions",
+    "PERMISSIONS_INHERITED": "Inherited permissions",
+    "PERMISSIONS_INHERIT_DISABLED": "Inheritance disabled",
+    "PERMISSIONS_INHERIT_EMPTY": "No permissions inherited from parent",
+    "PERMISSIONS_LOCAL": "Explicit permissions",
+    "PERMISSIONS_LOCAL_EMPTY": "No permissions set on the object",
+    "CHILDREN": "Children",
+    "CHILDREN_NONE": "This element has no child objects",
+    "CUSTOM_PROPERTY_NAME": "Enter name for custom property",
+    "CUSTOM_PROPERTY_VALUE": "Enter value for custom property"
+  },
+  "NOTIFICATION": {
+    "MENU": "Notifications",
+    "TITLE": "Notification settings",
+    "SUBTITLE": "Settings for notifications and updates",
+    "CONFIG": {
+      "uniformly": "for all types of notifications",
+      "uniformly_DESCRIPTION": "The notification interval is set globally, regardless of the type of message",
+      "individual": "per type of notifications",
+      "individual_DESCRIPTION": "The notification interval can be set individually for each notification type"
+    },
+    "PERMISSION": {
+      "consumer": "You have read permissions to the object.",
+      "collaborator": "You have change permissions to the object.",
+      "read": "read",
+      "write": "write",
+      "delete": "delete",
+      "deletechildren": "delete subordinate elements",
+      "deletenode": "delete node",
+      "addchildren": "add subordinate elements",
+      "editor": "editor",
+      "contributer": "contributor",
+      "coordinator": "You have all permissions to the object.",
+      "ccpublish": "You are permitted to use the object in a connected system (e.g. a learning management system).",
+      "readpermissions": "read permissions",
+      "changepermissions": "change permissions",
+      "all": "all"
+    },
+    "SAVED": "Notification settings have been saved",
+    "INTERVAL_LABEL": "Interval of notification",
+    "INTERVAL": {
+      "immediately": "immediately",
+      "daily": "daily",
+      "weekly": "weekly",
+      "disabled": "disable notifications entirely"
+    },
+    "GROUP": {
+      "addToCollectionEvent": "Content added to collection",
+      "commentEvent": "Comments on content",
+      "inviteEvent": "Invitations to materials",
+      "nodeIssueEvent": "Problem reports on materials",
+      "ratingEvent": "Assessments of materials",
+      "workflowEvent": "Assigned as workflow owner",
+      "metadataSuggestionEvent": "Metadata proposal",
+      "proposeForCollectionEvent": "Suggestions for collections"
+    }
+  },
+  "LTI": {
+    "REGISTERED": {
+      "TITLE": "LTI platform registered",
+      "DESCRIPTION": "edu-sharing is now connected to your system and content can be integrated via LTI."
+    }
+  },
+  "NODE_RELATIONS": {
+    "TITLE": "Manage relations",
+    "CREATE_RELATION": "Create new relation",
+    "RELATION_TYPE_LABEL": "Type of relation",
+    "RELATION_SEARCH_LABEL": "Search for target item",
+    "EXISTING_RELATIONS": "Existing relations",
+    "NO_RELATIONS": "There are no relations for this item.",
+    "SWAP": "Swap",
+    "RESELECT": "Reset",
+    "CREATE_CONFIRM": "Create relation",
+    "NO_PERMISSIONS": "You cannot relate this item due to insufficient rights",
+    "RELATION_CREATED": "created",
+    "RELATION_CREATOR": "creator",
+    "VARIANT_CREATED": "created",
+    "VARIANT_CREATOR": "creator",
+    "OPEN_NODE": "Show item",
+    "REMOVE_RELATION": "Remove relation",
+    "RESTORE_RELATION": "Restore relation",
+    "CURRENT_VERSION": "Current version",
+    "RELATION_EXISTS": "This relation already exists.",
+    "RELATION_COPY_HINT": "Relationships of a published copy are managed. Note that these relationships apply to all published versions as well as the original item.",
+    "RELATION_TYPE": {
+      "VERSIONS": "Versions",
+      "FORKED_CHILDS": "Has variants",
+      "FORKED_ORIGIN": "Is variant of",
+      "isPartOf": "is part of",
+      "isBasedOn": "is based on",
+      "references": "refers to",
+      "hasPart": "has part of",
+      "isBasisFor": "is base of"
+    },
+    "RELATION_TYPE_FULLY": {
+      "isPartOf": "is part of (isPartOf)",
+      "isBasedOn": "is based on (isBasedOn)",
+      "references": "refers to (references)"
+    }
   }
 }

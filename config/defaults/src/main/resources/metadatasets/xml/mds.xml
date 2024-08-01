@@ -20,6 +20,8 @@
       <bottomCaption>cm_title_bottom</bottomCaption>
       <type>text</type>
       <hideIfEmpty>true</hideIfEmpty>
+
+      <required>mandatoryForPublish</required>
       <condition type="PROPERTY" negate="true">ccm:wwwurl</condition>
     </widget>
     <widget>
@@ -28,6 +30,7 @@
       <caption>cm_title_wwwurl</caption>
       <placeholder>cm_title_placeholder</placeholder>
       <type>text</type>
+      <required>mandatoryForPublish</required>
       <condition type="PROPERTY">ccm:wwwurl</condition>
     </widget>
     <widget>
@@ -71,6 +74,23 @@
       <placeholder>lom_prop_general_keyword_placeholder</placeholder>
       <hideIfEmpty>true</hideIfEmpty>
       <searchable>true</searchable>
+    </widget>
+    <widget>
+      <id>ccm:published_handle_id</id>
+      <caption>ccm_published_handle_id</caption>
+      <type>text</type>
+      <link>_BLANK</link>
+      <format>http://hdl.handle.net/${value}</format>
+      <hideIfEmpty>true</hideIfEmpty>
+    </widget>
+    <widget>
+      <id>ccm:published_doi_id</id>
+      <caption>ccm_published_doi_id</caption>
+      <type>text</type>
+      <link>_BLANK</link>
+      <!-- or https://api.test.datacite.org -->
+      <format>https://api.datacite.org/${value}</format>
+      <hideIfEmpty>true</hideIfEmpty>
     </widget>
     <widget>
       <id>cclom:general_keyword</id>
@@ -642,6 +662,8 @@
 			  <ccm:educationallearningresourcetype>
               <cclom:general_description>
               <cclom:general_keyword>
+              <ccm:published_handle_id>
+              <ccm:published_doi_id>
               <cclom:size>
               <cm:created>
               <cm:modified>

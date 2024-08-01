@@ -15,8 +15,8 @@ import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.Mail;
-import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.repository.server.tools.mailtemplates.MailTemplate;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.rest.notification.data.StatusDTO;
 import org.edu_sharing.rest.notification.event.NotificationEventDTO;
 import org.edu_sharing.restservices.mds.v1.model.MdsValue;
@@ -57,8 +57,8 @@ public class NotificationServiceImpl implements NotificationService {
         replace.put("reason", reason);
         replace.put("name", (String) properties.get(CCConstants.CM_NAME));
         replace.put("id", nodeId);
-        replace.put("link", URLTool.getNgRenderNodeUrl(nodeId, null, true));
-        replace.put("link.static", URLTool.getNgRenderNodeUrl(nodeId, null, false));
+        replace.put("link", URLHelper.getNgRenderNodeUrl(nodeId, null, true));
+        replace.put("link.static", URLHelper.getNgRenderNodeUrl(nodeId, null, false));
         MailTemplate.applyNodePropertiesToMap("node.", properties, replace);
 
 		if(Context.getCurrentInstance() != null && Context.getCurrentInstance().getRequest() != null) {
@@ -124,7 +124,7 @@ public class NotificationServiceImpl implements NotificationService {
                 MailTemplate.addContentLinks(ApplicationInfoList.getHomeRepository(), nodeId, replace, "link");
                 replace.put("status", I18nAngular.getTranslationAngular("common", "WORKFLOW." + status));
                 receiverMail.applyToMap("", replace);
-                MailTemplate.applyNodePropertiesToMap("nodeId.", nodeProperties, replace);
+                MailTemplate.applyNodePropertiesToMap("node.", nodeProperties, replace);
 
                 String template = "invited_workflow";
                 MailTemplate.sendMail(sender.getFullName(), sender.getEmail(), receiverMail.getEmail(), template, replace);

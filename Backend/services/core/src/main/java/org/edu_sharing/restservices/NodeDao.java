@@ -87,6 +87,8 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.edu_sharing.service.permission.HandleParam;
+
 public class NodeDao {
     private static Logger logger = Logger.getLogger(NodeDao.class);
     private static final StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
@@ -702,7 +704,8 @@ public class NodeDao {
 
     private int getCommentCount() {
         if (nodeProps.containsKey(CCConstants.VIRT_PROP_COMMENTCOUNT)) {
-            return (int) nodeProps.get(CCConstants.VIRT_PROP_COMMENTCOUNT);
+            Object count = nodeProps.get(CCConstants.VIRT_PROP_COMMENTCOUNT);
+            return (count instanceof Integer) ? (int) count : Integer.parseInt((String) count);
         }
         return 0;
     }
@@ -734,7 +737,7 @@ public class NodeDao {
             /**
              * call getProperties on demand
              */
-            if (nodeRef.getProperties() == null || nodeRef.getProperties().size() == 0) {
+            if (nodeRef.getProperties() == null || nodeRef.getProperties().isEmpty()) {
                 this.nodeProps = this.nodeService.getProperties(this.storeProtocol, this.storeId, this.nodeId);
 
             } else {
@@ -812,8 +815,10 @@ public class NodeDao {
                         Map<String, Object> nodePropsReplace = nodeServiceRemote.getPropertiesDynamic(
                                 null, null, (String) this.nodeProps.get(CCConstants.CCM_PROP_REMOTEOBJECT_NODEID));
                         nodePropsReplace.remove(CCConstants.SYS_PROP_NODE_UID);
+                        nodePropsReplace.remove(CCConstants.SYS_PROP_NODE_DBID);
                         nodePropsReplace.remove(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORYID);
                         nodePropsReplace.remove(CCConstants.CCM_PROP_REMOTEOBJECT_NODEID);
+                        nodePropsReplace.remove(CCConstants.CCM_PROP_IO_ORIGINAL);
                         this.nodeProps.putAll(nodePropsReplace);
                     } catch (Throwable t) {
                         logger.warn("Error while fetching properties for node id " + getId() + ": Node is a remote node and calling remote " + (String) this.nodeProps.get(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORYID) + " failed", t);
@@ -865,13 +870,17 @@ public class NodeDao {
             this.isPublic = nodeRef.getPublic();
         } else {
             if(!StringUtils.isBlank(ApplicationInfoList.getHomeRepository().getGuest_username())) {
-                this.isPublic = usedPermissionService.hasPermission(
-                        storeProtocol,
-                        storeId,
-                        nodeId,
-                        ApplicationInfoList.getHomeRepository().getGuest_username(),
-                        CCConstants.PERMISSION_READ_ALL
-                );
+                try {
+                    this.isPublic = usedPermissionService.hasPermission(
+                            storeProtocol,
+                            storeId,
+                            nodeId,
+                            ApplicationInfoList.getHomeRepository().getGuest_username(),
+                            CCConstants.PERMISSION_READ_ALL
+                    );
+                }catch(Throwable t) {
+                    logger.info("Unexpected error while resolving isPublic for node " + nodeId, t);
+                }
             }
         }
         if (nodeRef != null && nodeRef.getPermissions() != null && nodeRef.getPermissions().size() > 0) {
@@ -1875,7 +1884,7 @@ public class NodeDao {
      * @param (String) userName  of Person,
      * @return true || false
      */
-    private boolean checkUserHasPermissionToSeeMail(String userName) {
+    public boolean checkUserHasPermissionToSeeMail(String userName) {
         try {
             if (LightbendConfigCache.getBoolean("repository.privacy.filterMetadataEmail") &&
                     (access == null || !access.contains(CCConstants.PERMISSION_WRITE))) {
@@ -2755,9 +2764,9 @@ public class NodeDao {
         }
     }
 
-    public NodeDao publishCopy(HandleMode handleMode) throws DAOException {
+    public NodeDao publishCopy(HandleParam handleParam) throws DAOException {
         try {
-            return NodeDao.getNode(repoDao, nodeService.publishCopy(nodeId, handleMode), Filter.createShowAllFilter());
+            return NodeDao.getNode(repoDao, nodeService.publishCopy(nodeId, handleParam), Filter.createShowAllFilter());
         } catch (Throwable t) {
             throw DAOException.mapping(t);
         }

@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NodeService } from 'ngx-edu-sharing-api';
+import { About, AboutService, HandleParam, NodeService, FeatureInfo } from 'ngx-edu-sharing-api';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { BridgeService } from '../../../../../services/bridge.service';
@@ -26,10 +26,9 @@ import { RestConstants } from '../../../../../core-module/rest/rest-constants';
 import { RestHelper } from '../../../../../core-module/rest/rest-helper';
 import { RestConnectorService } from '../../../../../core-module/rest/services/rest-connector.service';
 import { RestNodeService } from '../../../../../core-module/rest/services/rest-node.service';
-import { NodeHelperService } from '../../../../../services/node-helper.service';
-import { Toast } from '../../../../../services/toast';
+import { HandleState, NodeHelperService } from '../../../../../services/node-helper.service';
+import { Toast, ToastType } from '../../../../../services/toast';
 import { UIHelper } from '../../../../../core-ui-module/ui-helper';
-import { MainNavService } from '../../../../../main/navigation/main-nav.service';
 import {
     CompletionStatusEntry,
     MdsEditorInstanceService,
@@ -58,7 +57,7 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
     @Output() onInitCompleted = new EventEmitter<void>();
     @ViewChild('shareModeCopyRef') shareModeCopyRef: any;
     @ViewChild('shareModeDirectRef') shareModeDirectRef: any;
-    doiPermission: boolean;
+    handlePermission: boolean;
     initialState: {
         copy: boolean;
         direct: boolean;
@@ -66,16 +65,17 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
     shareModeCopy: boolean;
     shareModeDirect: boolean;
     publishCopyPermission: boolean;
-    doiActive: boolean;
-    doiDisabled: boolean;
+    handleActive: HandleState = {};
+    handleInitialState: HandleState = {};
     isCopy: boolean;
     handleMode: 'distinct' | 'update' = 'distinct';
-    republish: 'update' | 'new' | false = false;
+    republish: 'update' | 'new' | 'disabled' = 'disabled';
     private publishedVersions: Node[] = [];
     allPublishedVersions: PublishedNode[];
     mdsCompletion: CompletionStatusEntry;
     private initHasStarted = false;
     private destroyed = new Subject<void>();
+    private about: About;
 
     constructor(
         private bridge: BridgeService,
@@ -86,16 +86,18 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
         private mdsService: MdsEditorInstanceService,
         private nodeHelper: NodeHelperService,
         private nodeService: NodeService,
+        private aboutService: AboutService,
         private router: Router,
         private toast: Toast,
         private translate: TranslateService,
     ) {
-        this.doiPermission = this.connector.hasToolPermissionInstant(
+        this.handlePermission = this.connector.hasToolPermissionInstant(
             RestConstants.TOOLPERMISSION_HANDLESERVICE,
         );
         this.publishCopyPermission = this.connector.hasToolPermissionInstant(
             RestConstants.TOOLPERMISSION_PUBLISH_COPY,
         );
+        this.aboutService.getAbout().subscribe((about) => (this.about = about));
     }
 
     ngOnInit(): void {
@@ -184,8 +186,9 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
     }
 
     private refresh() {
-        this.doiActive = this.nodeHelper.isDOIActive(this.node, this.permissions);
-        this.doiDisabled = this.doiActive;
+        this.handleActive = this.nodeHelper.getHandleStates(this.node, this.permissions);
+        this.handleInitialState = Helper.deepCopy(this.handleActive);
+
         const prop = this.node?.properties?.[RestConstants.CCM_PROP_PUBLISHED_MODE]?.[0];
         if (prop === ShareMode.Copy) {
             this.shareModeCopy = true;
@@ -234,8 +237,8 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                 return;
             }
         }
-        if (this.shareModeCopy && this.doiPermission && type === 'copy') {
-            this.doiActive = true;
+        if (this.shareModeCopy && this.handlePermission && type === 'copy') {
+            this.setHandlesActive();
         }
         this.updatePublishedVersions();
     }
@@ -262,23 +265,17 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                 // republish and not yet published, or wasn't published before at all
                 ((this.republish === 'new' && !this.currentVersionPublished()) || !this.isCopy)
             ) {
-                this.legacyNodeService
-                    .publishCopy(
-                        this.node.ref.id,
-                        this.doiPermission && !this.doiDisabled && this.doiActive
-                            ? this.handleMode
-                            : null,
-                    )
-                    .subscribe(
-                        ({ node }) => {
-                            observer.next(node);
-                            observer.complete();
-                        },
-                        (error) => {
-                            observer.error(error);
-                            observer.complete();
-                        },
-                    );
+                this.nodeService.publishCopy(this.node.ref.id, this.getHandleConfig()).subscribe(
+                    ({ node }) => {
+                        observer.next(node);
+                        observer.complete();
+                    },
+                    (error) => {
+                        this.handleError(error);
+                        observer.error(error);
+                        observer.complete();
+                    },
+                );
             } else if (
                 this.shareModeCopy &&
                 // update most recent version
@@ -292,6 +289,7 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                             observer.complete();
                         },
                         (error) => {
+                            this.handleError(error);
                             observer.error(error);
                             observer.complete();
                         },
@@ -329,8 +327,19 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                 virtual.properties[RestConstants.CCM_PROP_PUBLISHED_DATE + '_LONG'] = [
                     new Date().getTime(),
                 ];
-                if (this.doiActive && !this.doiDisabled && this.doiPermission) {
+                if (
+                    this.handleActive.handleService &&
+                    !this.handleInitialState.handleService &&
+                    this.handlePermission
+                ) {
                     virtual.properties[RestConstants.CCM_PROP_PUBLISHED_HANDLE_ID] = [true];
+                }
+                if (
+                    this.handleActive.doiService &&
+                    !this.handleInitialState.doiService &&
+                    this.handlePermission
+                ) {
+                    virtual.properties[RestConstants.CCM_PROP_PUBLISHED_DOI_ID] = [true];
                 }
                 virtual.status = 'new';
                 this.allPublishedVersions = [virtual].concat(this.publishedVersions);
@@ -357,7 +366,16 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
     }
 
     setRepublish() {
-        this.doiActive = this.republish !== false && this.doiPermission;
+        this.handleActive = {
+            handleService:
+                this.republish !== 'disabled' &&
+                this.handlePermission &&
+                this.hasFeature('handleService'),
+            doiService:
+                this.republish !== 'disabled' &&
+                this.handlePermission &&
+                this.hasFeature('doiService'),
+        };
         this.updatePublishedVersions();
     }
 
@@ -370,6 +388,13 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                             !v.status && v.properties[RestConstants.CCM_PROP_PUBLISHED_HANDLE_ID],
                     )
                     .map((v) => v.properties[RestConstants.CCM_PROP_PUBLISHED_HANDLE_ID][0]),
+            ).size === 1 ||
+            new Set(
+                this.allPublishedVersions
+                    .filter(
+                        (v) => !v.status && v.properties[RestConstants.CCM_PROP_PUBLISHED_DOI_ID],
+                    )
+                    .map((v) => v.properties[RestConstants.CCM_PROP_PUBLISHED_DOI_ID][0]),
             ).size === 1
         );
     }
@@ -387,6 +412,58 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
             this.initialState.copy ||
             this.initialState.direct
         );
+    }
+
+    hasFeature(id: 'handleService' | 'doiService') {
+        return this.about.features?.filter((f) => f.id === id).length > 0;
+    }
+
+    private getHandleConfig(): HandleParam {
+        return {
+            handleService:
+                this.handlePermission &&
+                !this.handleInitialState.handleService &&
+                this.handleActive.handleService
+                    ? this.handleMode
+                    : null,
+            doiService:
+                this.handlePermission &&
+                !this.handleInitialState.doiService &&
+                this.handleActive.doiService
+                    ? this.handleMode
+                    : null,
+        };
+    }
+
+    setHandlesActive() {
+        this.handleActive = {
+            doiService: this.hasFeature('doiService'),
+            handleService: this.hasFeature('handleService'),
+        };
+    }
+
+    private handleError(error: any) {
+        if (UIHelper.errorContains(error, 'DOIServiceMissingAttributeException')) {
+            // do not trigger global error
+            error.preventDefault();
+            const id = error.error.details.property;
+            const widget = this.mdsService.getPrimaryWidget(id);
+            this.toast.show({
+                type: 'error',
+                subtype: ToastType.ErrorSpecific,
+                message: this.translate.instant('WORKSPACE.SHARE.DOI_MISSING_ATTRIBUTE', {
+                    key: widget?.definition?.caption || id,
+                }),
+                action: {
+                    label: this.translate.instant('WORKSPACE.SHARE.DOI_METADATA'),
+                    callback: () => {
+                        this.openMetadata();
+                    },
+                },
+            });
+            return true;
+        }
+        return false;
     }
 }
 export enum ShareMode {

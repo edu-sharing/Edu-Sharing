@@ -38,8 +38,10 @@ public class MetadataSearchHelper {
 
 	public static Map<String, String[]> convertCriterias(List<MdsQueryCriteria> criterias){
 		Map<String,String[]> criteriasMap=new HashMap<>();
-		for(MdsQueryCriteria criteria : criterias){
-			criteriasMap.put(criteria.getProperty(),criteria.getValues().toArray(new String[0]));
+		if(criterias != null) {
+			for (MdsQueryCriteria criteria : criterias) {
+				criteriasMap.put(criteria.getProperty(), criteria.getValues().toArray(new String[0]));
+			}
 		}
 		return criteriasMap;
 	}

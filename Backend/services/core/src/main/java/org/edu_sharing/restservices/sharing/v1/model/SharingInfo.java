@@ -2,6 +2,8 @@ package org.edu_sharing.restservices.sharing.v1.model;
 
 import org.edu_sharing.repository.client.rpc.Share;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.restservices.DAOException;
+import org.edu_sharing.restservices.NodeDao;
 import org.edu_sharing.restservices.shared.Node;
 import org.edu_sharing.restservices.shared.Person;
 import org.edu_sharing.service.share.ShareService;
@@ -15,24 +17,26 @@ public class SharingInfo {
     private boolean expired;
     private Person invitedBy = null;
     private Node node;
-    public SharingInfo(Share share, Node node, String passwordCheck) {
+    public SharingInfo(Share share, NodeDao nodeDao, String passwordCheck) throws DAOException {
         this.password=share.getPassword()!=null;
-        setInvitedBy(convertToPerson(share));
+        setInvitedBy(convertToPerson(share, nodeDao));
         if(passwordCheck!=null && !passwordCheck.isEmpty()){
             this.passwordMatches=ShareServiceImpl.encryptPassword(passwordCheck).equals(share.getPassword());
         }
         this.expired=share.getExpiryDate() != ShareService.EXPIRY_DATE_UNLIMITED && new Date(System.currentTimeMillis()).after(new Date(share.getExpiryDate()));
         if(!this.expired)
-            this.node=node;
+            this.node=nodeDao.asNode();
     }
 
-    private Person convertToPerson(Share share) {
+    private Person convertToPerson(Share share, NodeDao nodeDao) {
         Person ref = new Person();
         ref.setFirstName((String) share.getProperties()
                 .get(CCConstants.NODECREATOR_FIRSTNAME));
         ref.setLastName((String) share.getProperties()
                 .get(CCConstants.NODECREATOR_LASTNAME));
-        ref.setMailbox((String) share.getProperties().get(CCConstants.NODECREATOR_EMAIL));
+        if(nodeDao.checkUserHasPermissionToSeeMail((String) share.getProperties().get(CCConstants.CM_PROP_C_CREATOR))) {
+            ref.setMailbox((String) share.getProperties().get(CCConstants.NODECREATOR_EMAIL));
+        }
         return ref;
     }
 

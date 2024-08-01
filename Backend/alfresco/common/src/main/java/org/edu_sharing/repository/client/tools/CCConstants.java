@@ -845,6 +845,8 @@ public class CCConstants {
 
 	public final static String CCM_PROP_PUBLISHED_HANDLE_ID = "{http://www.campuscontent.de/model/1.0}published_handle_id";
 
+	public final static String CCM_PROP_PUBLISHED_DOI_ID = "{http://www.campuscontent.de/model/1.0}published_doi_id";
+
 	/**
 	 * share props
 	 */

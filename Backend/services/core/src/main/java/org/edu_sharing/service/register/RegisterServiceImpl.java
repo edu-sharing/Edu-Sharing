@@ -19,7 +19,6 @@ import org.edu_sharing.repository.server.AuthenticationTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.server.tools.Mail;
-import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.repository.server.tools.mailtemplates.MailTemplate;
 import org.edu_sharing.restservices.register.v1.model.RegisterInformation;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
@@ -31,6 +30,8 @@ import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.edu_sharing.repository.tools.URLHelper;
 
 public class RegisterServiceImpl implements RegisterService {
     static Logger logger = Logger.getLogger(RegisterServiceImpl.class);
@@ -57,7 +58,7 @@ public class RegisterServiceImpl implements RegisterService {
         String subject=MailTemplate.getSubject("userRegister", currentLocale);
         String content=MailTemplate.getContent("userRegister", currentLocale,true);
         Map<String,String> replace=new HashMap<>();
-        replace.put("link",URLTool.getNgComponentsUrl()+"register/done/"+URLEncoder.encode(key)+"/"+ URLEncoder.encode(info.getEmail()));
+        replace.put("link", URLHelper.getNgComponentsUrl()+"register/done/"+URLEncoder.encode(key)+"/"+ URLEncoder.encode(info.getEmail()));
         replace.put("key",key);
         addMailRegisterInfo(info, replace);
         Mail mail=new Mail();
@@ -114,8 +115,8 @@ public class RegisterServiceImpl implements RegisterService {
                 String subject = MailTemplate.getSubject("userRecoverPassword", currentLocale);
                 String content = MailTemplate.getContent("userRecoverPassword", currentLocale, true);
                 Map<String, String> replace = new HashMap<>();
-                replace.put("link", URLTool.getNgComponentsUrl() + "register/reset-password/" + URLEncoder.encode(key));
-                replace.put("link.static", URLTool.getNgComponentsUrl(false) + "register/reset-password/" + URLEncoder.encode(key));
+                replace.put("link", URLHelper.getNgComponentsUrl() + "register/reset-password/" + URLEncoder.encode(key));
+                replace.put("link.static", URLHelper.getNgComponentsUrl(false) + "register/reset-password/" + URLEncoder.encode(key));
                 replace.put("key", key);
                 addMailRegisterInfo(info, replace);
                 Mail mail = new Mail();
@@ -157,7 +158,7 @@ public class RegisterServiceImpl implements RegisterService {
 
         try{
             Map<String, String> replace = new HashMap<>();
-            replace.put("link",URLTool.getNgComponentsUrl()+"permissions");
+            replace.put("link", URLHelper.getNgComponentsUrl()+"permissions");
             addMailRegisterInfo(info, replace);
             Mail mail = new Mail();
             ServletContext context = Context.getCurrentInstance().getRequest().getSession().getServletContext();
