@@ -156,7 +156,6 @@
         "ADDITIONAL_PERMISSIONS_INFO": "Définir les autorisations qui seront encore accordées indirectement, le cas échéant.",
         "PERMISSION": {
           "ReadAll": "Visualiser (prévisualisation de l'image, visualisation des métadonnées et du contenu)",
-          "Print": "Imprimer (uniquement pour les fichiers pdf)",
           "DownloadContent": "Télécharger"
         }
       },

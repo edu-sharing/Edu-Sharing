@@ -307,6 +307,7 @@ config:
     appid: local
     ## @param config.home.cookieAttributes Set home cookie attributes
     cookieAttributes: ""
+    ## @param config.home.urlDynamic Set url_dynamic attribute
     urlDynamic: false
 
   jvm:

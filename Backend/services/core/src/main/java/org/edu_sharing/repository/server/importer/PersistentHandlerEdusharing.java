@@ -231,6 +231,10 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 		return importFolderId;
 	}
 
+	public void setImportFolderId(String importFolderId) {
+		this.importFolderId = importFolderId;
+	}
+
 	private Map<String,String> importFolderCursorIds=new HashMap<>();
 	private synchronized String createFolderStructure(String cursor, String set) throws Throwable {
 		if (set == null || set.trim().equals("")) {

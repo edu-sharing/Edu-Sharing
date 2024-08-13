@@ -43,7 +43,7 @@ public class CSVTool {
 	public static CSVResult readCSV(BufferedReader in, char delimiter) {
 		try {
 
-			CSVParser parser = CSVParser.parse(in,CSVFormat.newFormat(delimiter));
+			CSVParser parser = CSVParser.parse(in,CSVFormat.newFormat(delimiter).withHeader());
 			CSVResult result = new CSVResult();
 			result.setHeaders(parser.getHeaderNames());
 			ArrayList<Map<String, String>> lines = new ArrayList<>();

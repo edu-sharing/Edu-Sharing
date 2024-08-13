@@ -156,7 +156,6 @@
         "ADDITIONAL_PERMISSIONS_INFO": "Definire le autorizzazioni che verranno concesse indirettamente, se presenti.",
         "PERMISSION": {
           "ReadAll": "Visualizza (Anteprima dell'immagine, visualizzazione dei metadati e dei contenuti)",
-          "Print": "Stampa (solo per i file pdf)",
           "DownloadContent": "Scaricare"
         }
       },

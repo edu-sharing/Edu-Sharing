@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class CallSourceHelper {
+    public static final String WEBAPP_BASE_PATH = "/edu-sharing";
+
     public enum CallSource {
         Search,
         Render,
@@ -60,7 +62,7 @@ public class CallSourceHelper {
     }
 
     private static boolean isRatingApi(String requestPath) {
-        return requestPath.startsWith("/edu-sharing/rest/rating");
+        return requestPath.startsWith(WEBAPP_BASE_PATH + "/rest/rating");
     }
 
     private static boolean isToolConnector() {
@@ -69,31 +71,31 @@ public class CallSourceHelper {
     }
 
     private static boolean isSearch(String path){
-        if(path.startsWith("/edu-sharing/rest/search")){
+        if(path.startsWith(WEBAPP_BASE_PATH + "/rest/search")){
             return true;
         }
         return false;
     }
 
     private static boolean isRender(String path){
-        if(path.startsWith("/edu-sharing/components/render")
-                || path.startsWith("/edu-sharing/rest/rendering")
-                || path.startsWith("/edu-sharing/eduservlet/render")
-                || path.startsWith("/edu-sharing/content")){
+        if(path.startsWith(WEBAPP_BASE_PATH + "/components/render")
+                || path.startsWith(WEBAPP_BASE_PATH + "/rest/rendering")
+                || path.startsWith(WEBAPP_BASE_PATH + "/eduservlet/render")
+                || path.startsWith(WEBAPP_BASE_PATH + "/content")){
             return true;
         }
         return false;
     }
 
     private static boolean isPreview(String path){
-        if(path.startsWith("/edu-sharing/preview")){
+        if(path.startsWith(WEBAPP_BASE_PATH + "/preview")){
             return true;
         }
         return false;
     }
 
     private static boolean isSitemap(String path){
-        if(path.startsWith("/edu-sharing/eduservlet/sitemap")){
+        if(path.startsWith(WEBAPP_BASE_PATH + "/eduservlet/sitemap")){
             return true;
         }
         return false;

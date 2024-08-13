@@ -29,7 +29,6 @@ public class PermissionServiceHelper {
 			 CCConstants.PERMISSION_FEEDBACK,
 			 CCConstants.PERMISSION_RATE_READ,
 			 CCConstants.PERMISSION_DOWNLOAD_CONTENT,
-			 CCConstants.PERMISSION_PRINT,
 			 org.alfresco.service.cmr.security.PermissionService.ADD_CHILDREN,
 			 org.alfresco.service.cmr.security.PermissionService.READ_PERMISSIONS,
 			 org.alfresco.service.cmr.security.PermissionService.CHANGE_PERMISSIONS,

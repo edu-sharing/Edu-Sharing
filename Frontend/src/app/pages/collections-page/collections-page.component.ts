@@ -46,6 +46,10 @@ import { Toast } from '../../services/toast';
 import { BreadcrumbsService } from '../../shared/components/breadcrumbs/breadcrumbs.service';
 import { CollectionContentComponent } from './collection-content/collection-content.component';
 import { CollectionInfoBarComponent } from './collection-info-bar/collection-info-bar.component';
+import {
+    GlobalCollectionsPageService,
+    GlobalCollectionsPageServiceInternal,
+} from './global-collections-page.service';
 
 // component class
 @Component({
@@ -142,6 +146,7 @@ export class CollectionsPageComponent implements OnDestroy {
     private _collectionShare: Node;
     private params: Params;
     private destroyed = new Subject<void>();
+    readonly customTemplates = this.globalCollectionsPageServiceInternal.customTemplates;
 
     // inject services
     constructor(
@@ -156,6 +161,7 @@ export class CollectionsPageComponent implements OnDestroy {
         private nodeService: RestNodeService,
         private route: ActivatedRoute,
         private router: Router,
+        private globalCollectionsPageServiceInternal: GlobalCollectionsPageServiceInternal,
         private tempStorage: TemporaryStorageService,
         private optionsService: OptionsHelperDataService,
         private networkService: RestNetworkService,

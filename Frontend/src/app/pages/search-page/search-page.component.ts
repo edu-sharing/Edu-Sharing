@@ -152,7 +152,7 @@ export class SearchPageComponent implements OnInit, OnDestroy {
             minWidth: 350,
             customHeaderBarContent: this.filtersDialogResetButton,
         });
-        this.searchPage.results.totalResults
+        this.searchPage.results?.totalResults
             .pipe(
                 switchMap((results) => this.translate.get('SEARCH.NUMBER_RESULTS', { results })),
                 takeUntil(dialogRef.afterClosed()),

@@ -1,7 +1,6 @@
 package org.edu_sharing.repository.server.authentication;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.servlet.FilterChain;
@@ -17,9 +16,11 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.AuthenticationTool;
 import org.edu_sharing.repository.server.RepoFactory;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.alfresco.service.config.model.Config;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
+import org.edu_sharing.spring.security.openid.SilentLoginModeRedirect;
 
 public class GuestFilter implements jakarta.servlet.Filter {
 
@@ -64,6 +65,9 @@ public class GuestFilter implements jakarta.servlet.Filter {
 						logger.debug("guest filter disabled for context "+ConfigServiceFactory.getCurrentDomain());
 					}
 					else {
+						if(SilentLoginModeRedirect.process(httpRequest, httpresponse)){
+							return;
+						}
 						Map<String, String> authInfoGuest = authTool.createNewSession(guestLogin, guestPW);
 						authTool.storeAuthInfoInSession(authInfoGuest.get(CCConstants.AUTH_USERNAME), authInfoGuest.get(CCConstants.AUTH_TICKET),CCConstants.AUTH_TYPE_DEFAULT, session);
 
@@ -72,6 +76,12 @@ public class GuestFilter implements jakarta.servlet.Filter {
 					}
 				}else{
 					logger.debug("no guest defined");
+				}
+			}else if(authentication != null){
+				if(AuthorityServiceFactory.getLocalService().isGuest()){
+					if(SilentLoginModeRedirect.process(httpRequest, httpresponse)){
+						return;
+					}
 				}
 			}
 		} catch (Throwable e) {

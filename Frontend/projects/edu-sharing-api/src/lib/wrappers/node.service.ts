@@ -109,6 +109,20 @@ export class NodeService {
             .pipe(tap(() => this._nodesChanged.next()));
     }
 
+    getParents(
+        node: string,
+        {
+            repository = HOME_REPOSITORY,
+            ...params
+        }: Partial<Omit<Parameters<NodeV1Service['getParents']>[0], 'node'>> = {},
+    ) {
+        return this.nodeV1.getParents({
+            repository,
+            node,
+            propertyFilter: ['-all-'],
+            ...params,
+        });
+    }
     getChildren(
         parent: string,
         {

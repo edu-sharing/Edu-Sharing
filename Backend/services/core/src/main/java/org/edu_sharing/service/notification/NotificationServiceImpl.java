@@ -1,5 +1,8 @@
 package org.edu_sharing.service.notification;
 
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +15,6 @@ import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.I18nAngular;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
-import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.Mail;
 import org.edu_sharing.repository.server.tools.mailtemplates.MailTemplate;
@@ -30,25 +32,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import jakarta.servlet.ServletContext;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
+@Slf4j
+@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-
-    private final Logger logger = Logger.getLogger(NotificationServiceImpl.class);
-
-    private final ApplicationInfo appInfo;
-
-
-    public NotificationServiceImpl(String appId) {
-        appInfo = (appId == null) ? ApplicationInfoList.getHomeRepository() : ApplicationInfoList.getRepositoryInfoById(appId);
-    }
+    private final Optional<NotificationService.NodeIssueMapping> customNodeIssueMapping;
 
     @Override
     public void notifyNodeIssue(String nodeId, String reason, String nodeType, List<String> aspects, Map<String, Object> properties, String userEmail, String userComment) throws Throwable {
-        logger.info(String.format("send notifyNodeIssue: nodeId: %s, reason: %s, userComment: %s", nodeId, reason, userComment));
+        log.info(String.format("send notifyNodeIssue: nodeId: %s, reason: %s, userComment: %s", nodeId, reason, userComment));
         String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
+        NodeContext nodeContext = new NodeContext(nodeId, aspects, properties);
+        String templateId = (customNodeIssueMapping.isPresent()) ? customNodeIssueMapping.get().getTemplateId(nodeContext) : "nodeIssue";
         String subject=MailTemplate.getSubject("nodeIssue", currentLocale);
         String content=MailTemplate.getContent("nodeIssue", currentLocale, true);
         Map<String, String> replace = new HashMap<>();
@@ -89,11 +90,16 @@ public class NotificationServiceImpl implements NotificationService {
         }
         Mail mail=new Mail();
         List<String> receivers = null;
-        if(mail.getConfig().hasPath("report.receivers")) {
+        if(customNodeIssueMapping.isPresent()) {
+            receivers = customNodeIssueMapping.get().getReceivers(nodeContext);
+        }
+        if(receivers != null && !receivers.isEmpty()) {
+            // receivers were provided by custom mapping
+        } else if (mail.getConfig().hasPath("report.receivers")) {
             receivers = mail.getConfig().getStringList("report.receivers");
         } else if (mail.getConfig().getString("report.receiver") != null){
             receivers = Collections.singletonList(mail.getConfig().getString("report.receiver"));
-            logger.info("report.receiver is deprecated. Prefer using the report.receivers field instead");
+            log.info("report.receiver is deprecated. Prefer using the report.receivers field instead");
         }
         if(receivers==null || receivers.isEmpty()) {
             throw new IllegalArgumentException("no mail.report.receivers registered in ccmail.properties");
@@ -111,7 +117,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void notifyWorkflowChanged(String nodeId, String nodeType, List<String> aspects, Map<String, Object> nodeProperties, String receiver, String comment, String status) {
-        logger.info(String.format("send notifyWorkflowChanged: nodeId: %s, nodePropertiesList: %s, comment: %s, status: %s", nodeId, nodeProperties, comment, status));
+        log.info(String.format("send notifyWorkflowChanged: nodeId: %s, nodePropertiesList: %s, comment: %s, status: %s", nodeId, nodeProperties, comment, status));
 
         MailTemplate.UserMail receiverMail = MailTemplate.getUserMailData(receiver);
         EmailValidator mailValidator = EmailValidator.getInstance(true, true);
@@ -129,7 +135,7 @@ public class NotificationServiceImpl implements NotificationService {
                 String template = "invited_workflow";
                 MailTemplate.sendMail(sender.getFullName(), sender.getEmail(), receiverMail.getEmail(), template, replace);
             } catch (Throwable t) {
-                logger.warn("Mail send failed", t);
+                log.warn("Mail send failed", t);
             }
         }
     }
@@ -145,7 +151,7 @@ public class NotificationServiceImpl implements NotificationService {
             String template = "userStatusChanged";
             MailTemplate.sendMail(receiver, template, replace);
         } catch (Exception e) {
-            logger.warn("Can not send status notify mail to user: " + e.getMessage(), e);
+            log.warn("Can not send status notify mail to user: " + e.getMessage(), e);
         }
     }
 
@@ -156,7 +162,7 @@ public class NotificationServiceImpl implements NotificationService {
         EmailValidator mailValidator = EmailValidator.getInstance(true, true);
 
         if (!mailValidator.isValid(receiver.getEmail())) {
-            logger.info("username/receiverAuthority: " + receiverAuthority + " has no valid emailaddress:" + receiver.getEmail());
+            log.info("username/receiverAuthority: " + receiverAuthority + " has no valid emailaddress:" + receiver.getEmail());
             return;
         }
 
@@ -190,7 +196,7 @@ public class NotificationServiceImpl implements NotificationService {
         replace.put("name", name.trim());
         replace.put("message", mailText.replace("\n", "<br />").trim());
         replace.put("permissions", permText.trim());
-        MailTemplate.addContentLinks(appInfo, nodeId, replace, "link");
+        MailTemplate.addContentLinks(ApplicationInfoList.getHomeRepository(), nodeId, replace, "link");
 
         String template = "invited";
         if (CCConstants.CCM_VALUE_SCOPE_SAFE.equals(NodeServiceInterceptor.getEduSharingScope())) {

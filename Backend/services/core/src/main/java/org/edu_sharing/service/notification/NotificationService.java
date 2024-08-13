@@ -1,6 +1,9 @@
 package org.edu_sharing.service.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.edu_sharing.metadataset.v2.MetadataWidget;
@@ -16,12 +19,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public interface NotificationService {
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    class NodeContext {
+        private String nodeId;
+        private List<String> aspects;
+        private Map<String, Object> properties;
+    }
+    interface NodeIssueMapping {
+        String getTemplateId(NodeContext context);
+        List<String> getReceivers(NodeContext context);
+    }
+
     void notifyNodeIssue(String nodeId, String reason, String nodeType, List<String> aspects, Map<String, Object> properties, String userEmail, String userComment) throws Throwable;
 
     void notifyWorkflowChanged(String nodeId, String nodeType, List<String> aspects, Map<String, Object> nodeProperties, String receiver, String comment, String status);

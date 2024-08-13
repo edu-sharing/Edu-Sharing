@@ -233,6 +233,10 @@
         <filter-name>Edu Context Management Filter</filter-name>
         <url-pattern>/oauth2/*</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>Edu Context Management Filter</filter-name>
+        <url-pattern>/sso/*</url-pattern>
+    </filter-mapping>
    <filter-mapping>
 	      <filter-name>Edu Context Management Filter</filter-name>
 	      <url-pattern>/index.html</url-pattern>
@@ -538,10 +542,6 @@
         </servlet-class> 
     </servlet>
     <servlet>
-        <servlet-name>Login</servlet-name>
-        <servlet-class>org.edu_sharing.repository.server.authentication.LoginServlet</servlet-class> 
-    </servlet>
-    <servlet>
         <servlet-name>Logout</servlet-name>
         <servlet-class>org.edu_sharing.repository.server.authentication.LogoutServlet</servlet-class> 
     </servlet>
@@ -552,6 +552,11 @@
                 <param-name>useHeaders</param-name>
                 <param-value>false</param-value>
         </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>SSORegistrationsDispatcherServlet</servlet-name>
+        <servlet-class>org.edu_sharing.spring.security.openid.SSORegistrationsDispatcherServlet</servlet-class>
     </servlet>
      <servlet>
         <servlet-name>CAS</servlet-name>
@@ -608,14 +613,6 @@
      <servlet>
     	<servlet-name>ExcelImport</servlet-name>
     	<servlet-class>org.edu_sharing.repository.server.ExcelImportServlet</servlet-class>   
-    </servlet>
-    <servlet>
-    	<servlet-name>DispatchToIndexServlet</servlet-name>
-    	<servlet-class>org.edu_sharing.repository.server.DispatcherServlet</servlet-class>
-    	<init-param>
-    		<param-name>mapTo</param-name>
-    		<param-value>/index.html</param-value>
-    	</init-param>
     </servlet>
     
     <servlet>
@@ -676,6 +673,10 @@
     </servlet-mapping>
 
     <!-- servlet mapping -->
+    <servlet-mapping>
+        <servlet-name>SSORegistrationsDispatcherServlet</servlet-name>
+        <url-pattern>/sso</url-pattern>
+    </servlet-mapping>
  <servlet-mapping> 
         <servlet-name>FolderTemplateServlet</servlet-name>
         <url-pattern>/eduservlet/foldertemplate</url-pattern>
@@ -694,10 +695,6 @@
     <servlet-mapping> 
         <servlet-name>Logout</servlet-name>
         <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-     <servlet-mapping> 
-        <servlet-name>Login</servlet-name>
-        <url-pattern>/login</url-pattern>
     </servlet-mapping>
 	 <servlet-mapping>
     	<servlet-name>Shibboleth</servlet-name>
@@ -796,15 +793,6 @@
     <servlet-mapping>
     	<servlet-name>RenderingProxy</servlet-name>
     	<url-pattern>/renderingproxy</url-pattern>
-    </servlet-mapping>
-     <servlet-mapping>
-    	<servlet-name>DispatchToIndexServlet</servlet-name>
-    	<url-pattern>/node/*</url-pattern>
-    </servlet-mapping>
-    
-    <servlet-mapping>
-    	<servlet-name>DispatchToIndexServlet</servlet-name>
-    	<url-pattern>/search</url-pattern>
     </servlet-mapping>
 
     <servlet>

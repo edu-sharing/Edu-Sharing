@@ -168,7 +168,6 @@
         "ADDITIONAL_PERMISSIONS_INFO": "Legen Sie fest, ob und falls ja, welche Berechtigungen für dieses Material indirekt über Sammlungen weitergegeben werden dürfen",
         "PERMISSION": {
           "ReadAll": "Betrachten (Vorschaubild, Metadaten & Inhaltsanzeige)",
-          "Print": "Drucken (nur für PDF-Dateien)",
           "DownloadContent": "Herunterladen"
         }
       },

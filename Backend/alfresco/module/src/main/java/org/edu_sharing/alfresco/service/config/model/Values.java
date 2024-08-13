@@ -10,6 +10,8 @@ public class Values implements Serializable {
 	@XmlElement public Boolean loginAllowLocal;
 	@XmlElement public String loginProvidersUrl;
 	@XmlElement public String loginProviderTargetUrl;
+	//none,iframe,redirect
+	@XmlElement public LoginSilentMode loginSilentMode;
 	@XmlElement public Register register;
 	@XmlElement public String recoverPasswordUrl;
 	@XmlElement	public String imprintUrl;
@@ -47,6 +49,7 @@ public class Values implements Serializable {
 	@XmlElement	public Integer itemsPerRequest;
 	@XmlElement	public Rendering rendering;
 	@XmlElement	public SessionExpiredDialog sessionExpiredDialog;
+	@XmlElement	public String defaultLocation;
 	@XmlElement	public String loginDefaultLocation;
 	@XmlElement	public Boolean searchGroupResults;
 	@XmlElement	public Mainnav mainnav;

@@ -43,6 +43,7 @@
     </ng-template>
   </mat-tab>
 </mat-tab-group>
+<ng-container *ngTemplateOutlet="customTemplates.value.belowTabs"></ng-container>
 <div class="collections-header-group">
   <es-actionbar
     *ngIf="collectionContentTemplateRef && !isRootLevelCollection()"

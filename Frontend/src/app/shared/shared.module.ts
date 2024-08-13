@@ -74,6 +74,7 @@ import { SplitNewLinesPipe } from './pipes/split-new-lines.pipe';
 import { VersionLabelPipe } from './pipes/version-label.pipe';
 import { SmallCollectionComponent } from './components/small-collection/small-collection.component';
 import { ImprintPrivacyComponent } from './components/imprint-privacy-footer/imprint-privacy.component';
+import { extensionSchemas } from '../extension/extension-schemas';
 
 @NgModule({
     declarations: [
@@ -220,5 +221,6 @@ import { ImprintPrivacyComponent } from './components/imprint-privacy-footer/imp
         UserQuotaComponent,
         VersionLabelPipe,
     ],
+    schemas: [].concat(extensionSchemas),
 })
 export class SharedModule {}

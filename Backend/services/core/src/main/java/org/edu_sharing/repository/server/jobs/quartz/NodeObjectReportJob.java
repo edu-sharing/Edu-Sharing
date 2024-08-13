@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang3.StringUtils;
@@ -206,8 +207,13 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
             }
 
             if(!aspectFilters.isEmpty()) {
-                String[] apsects = nodeService.getAspects(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), entry.getNode());
-                if (Arrays.stream(apsects).noneMatch(x -> aspectFilters.contains(x))) {
+                try {
+                    String[] apsects = nodeService.getAspects(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), entry.getNode());
+                    if (Arrays.stream(apsects).map(CCConstants::getValidLocalName).noneMatch(x -> aspectFilters.contains(x))) {
+                        continue;
+                    }
+                }catch (InvalidNodeRefException e){
+                    log.warn("Node {} does not exist", entry.getNode());
                     continue;
                 }
             }

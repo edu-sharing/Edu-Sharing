@@ -203,6 +203,48 @@ export class AppComponent implements OnInit, DoCheck, AfterViewInit {
                 )
             ) {
                 RestHelper.goToLogin(this.injector.get(Router), this.configuration);
+            } else if (loginInfo.isGuest) {
+                this.configuration.get('loginSilentMode').subscribe((mode: string) => {
+                    if ('iframe' === mode) {
+                        const iframe_id: string = 'sso_check';
+                        console.log('guest is active');
+                        if (!document.getElementById(iframe_id)) {
+                            let iframe = document.createElement('iframe');
+                            iframe.style.display = 'none';
+                            iframe.src =
+                                window.location.origin +
+                                '/edu-sharing/rest/authentication/v1/validateSSOSession';
+                            iframe.id = iframe_id;
+                            iframe.onload = (ev) => {
+                                try {
+                                    var y = iframe.contentDocument;
+                                    var pre_info = y.getElementsByTagName('pre')[0].innerHTML;
+                                    console.log('object', pre_info);
+                                    var o = JSON.parse(pre_info);
+                                    if (o.error && o.error === 'login_required') {
+                                        console.log('login_required');
+                                    } else {
+                                        console.log('login exists');
+                                        RestHelper.goToLogin(
+                                            this.injector.get(Router),
+                                            this.configuration,
+                                        );
+                                    }
+                                } catch (error) {
+                                    console.error('check session iframe fails:' + error);
+                                }
+                            };
+                            document.body.appendChild(iframe);
+                        }
+                    }
+                });
+
+                /*this.authentication.validateSSOSession().subscribe(async (loginInfo) => {
+                    console.log("got a login will reload page");
+                    window.location.reload();
+                }, error => {
+                    console.error(error);
+                })*/
             }
         });
     }

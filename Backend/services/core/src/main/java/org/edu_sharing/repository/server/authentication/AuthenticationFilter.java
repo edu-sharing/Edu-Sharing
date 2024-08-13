@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
@@ -15,10 +16,13 @@ import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.LocaleValidator;
 import org.edu_sharing.service.authentication.oauth2.TokenService;
 import org.edu_sharing.service.authentication.oauth2.TokenService.Token;
+import org.edu_sharing.service.config.ConfigServiceFactory;
+import org.edu_sharing.service.nodeservice.CallSourceHelper;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +73,8 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
 	    }
 
 		AuthenticationFilter.handleLocale(false, httpReq.getParameter("locale"), httpReq, httpRes);
-
+		// when on root entry point
+		if (redirectToDefaultLocation(httpReq, httpRes)) return;
 		//find out if we have to do the guest login
 	  	String user = httpReq.getParameter("user");
 	  	if(user != null && user.equals("guest")){
@@ -197,7 +202,7 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
 		if(loginSuccessRedirectUrl.contains(CCConstants.REQUEST_PARAM_DISABLE_GUESTFILTER)){
 			loginSuccessRedirectUrl = UrlTool.removeParam(loginSuccessRedirectUrl, CCConstants.REQUEST_PARAM_DISABLE_GUESTFILTER);
 		}
-		URL url = new URL(req.getRequestURL().toString()+"?"+req.getQueryString());
+		URL url = new URL(req.getRequestURL().toString()+(StringUtils.isBlank(req.getQueryString()) ? "" : "?"+req.getQueryString()));
 		if(!url.getPath().contains(NgServlet.COMPONENTS_ERROR)) {
 			log.info(LOGIN_SUCCESS_REDIRECT_URL + ":" + loginSuccessRedirectUrl);
 			req.getSession().setAttribute(LOGIN_SUCCESS_REDIRECT_URL, loginSuccessRedirectUrl);
@@ -250,6 +255,32 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
         }
 
     }
+
+	public static boolean redirectToDefaultLocation(HttpServletRequest req, HttpServletResponse resp) throws MalformedURLException {
+		URL url = new URL(req.getRequestURL().toString());
+		if(url.getPath().equals(CallSourceHelper.WEBAPP_BASE_PATH + "/")) {
+			// navigate to default location
+            try {
+				String defaultLocation = ConfigServiceFactory.getCurrentConfig(req).getValue("defaultLocation", "login");
+				if (defaultLocation.contains("://")) {
+					resp.sendRedirect(defaultLocation);
+				} else {
+					resp.sendRedirect(CallSourceHelper.WEBAPP_BASE_PATH + "/components/" + defaultLocation);
+				}
+				return true;
+            } catch (Exception e) {
+                Logger.getLogger(AuthenticationFilter.class).error(e);
+                try {
+                    resp.sendRedirect(CallSourceHelper.WEBAPP_BASE_PATH + "/components/login");
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            }
+
+		}
+		return false;
+	}
 
 	private void addErrorCode(HttpServletResponse resp, URL url) {
 		String error=url.getPath().substring(url.getPath().indexOf(NgServlet.COMPONENTS_ERROR) + NgServlet.COMPONENTS_ERROR.length() + 1);

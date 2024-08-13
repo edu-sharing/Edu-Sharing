@@ -169,7 +169,6 @@
         "ADDITIONAL_PERMISSIONS_INFO": "Define the permissions that will still be granted indirectly, if any.",
         "PERMISSION": {
           "ReadAll": "View (Preview image, metadata & content viewing)",
-          "Print": "Print (only for pdf files)",
           "DownloadContent": "Download"
         }
       },

@@ -13,6 +13,7 @@ import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.edu_sharing.spring.security.basic.EduAuthSuccsessHandler;
 import org.edu_sharing.spring.security.basic.EduWebSecurityCustomizer;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -68,6 +69,9 @@ public class SecurityConfigurationSaml {
         return EduWebSecurityCustomizer.webSecurityCustomizer();
     }
 
+    @Autowired
+    EduAuthSuccsessHandler eduAuthSuccsessHandler;
+
     @Bean
     SecurityFilterChain app(HttpSecurity http) throws Exception {
 
@@ -82,7 +86,7 @@ public class SecurityConfigurationSaml {
                             if(StringUtils.hasText(loginPath)){
                                 login.loginPage(loginPath);
                             }
-                            login.successHandler(new EduAuthSuccsessHandler());
+                            login.successHandler(eduAuthSuccsessHandler);
                         }
                         //don't use this cause it uses SavedRequestAwareAuthenticationSuccessHandler
                         //.defaultSuccessUrl("/shibboleth")

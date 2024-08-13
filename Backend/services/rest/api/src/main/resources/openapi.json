@@ -6530,6 +6530,9 @@
             },
             "type": "array"
           },
+          "defaultLocation": {
+            "type": "string"
+          },
           "defaultPassword": {
             "type": "string"
           },
@@ -6601,6 +6604,14 @@
             "type": "string"
           },
           "loginProvidersUrl": {
+            "type": "string"
+          },
+          "loginSilentMode": {
+            "enum": [
+              "none",
+              "iframe",
+              "redirect"
+            ],
             "type": "string"
           },
           "loginUrl": {
@@ -12622,6 +12633,28 @@
           }
         },
         "summary": "Validates the Basic Auth Credentials and check if the session is a logged in user",
+        "tags": [
+          "AUTHENTICATION v1"
+        ]
+      }
+    },
+    "/authentication/v1/validateSSOSession": {
+      "get": {
+        "description": "If no provider session exists an 401 with 'login required' message is delivered. If true the current Login Object is shown.",
+        "operationId": "validateSSOSession",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Login"
+                }
+              }
+            },
+            "description": "OK."
+          }
+        },
+        "summary": "Validates if an provider (idp) session exists.",
         "tags": [
           "AUTHENTICATION v1"
         ]
