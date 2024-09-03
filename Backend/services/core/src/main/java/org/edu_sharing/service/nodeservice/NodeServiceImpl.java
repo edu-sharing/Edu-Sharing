@@ -708,7 +708,9 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 					logger.warn("Error while calling interceptor " + i.getClass().getName() + ": " + e.toString());
 				}
 			}
-			Map<QName, Serializable> propsStore = propsFinal.entrySet().stream().collect(
+			Map<QName, Serializable> propsStore = propsFinal.entrySet().stream().
+					filter(e -> e.getValue() != null).
+					collect(
 					HashMap::new,
 					(m,entry)-> m.put(QName.createQName(entry.getKey()), (Serializable) entry.getValue()),
 					HashMap::putAll
