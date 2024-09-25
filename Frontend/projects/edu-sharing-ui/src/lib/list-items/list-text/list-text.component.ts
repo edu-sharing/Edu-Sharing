@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, SimpleChanges, OnChanges } from '@angular/core';
 import { MdsService, Node, Organization, RestConstants, ProposalNode } from 'ngx-edu-sharing-api';
 import { BehaviorSubject, merge } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { MdsHelperService } from '../../mds/mds-helper.service';
     templateUrl: './list-text.component.html',
     styleUrls: ['./list-text.component.scss'],
 })
-export class ListTextComponent extends ListWidget implements OnInit {
+export class ListTextComponent extends ListWidget implements OnInit, OnChanges {
     static supportedItems = [
         new ListItem('NODE', '*'),
         new ListItem('NODE_PROPOSAL', '*'),

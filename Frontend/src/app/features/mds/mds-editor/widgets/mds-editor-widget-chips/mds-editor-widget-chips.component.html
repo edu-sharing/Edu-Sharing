@@ -113,7 +113,7 @@
       [matTooltip]="text.hasTextOverflow() ? value.label : null"
       [esRegisterCustomProperty]="{ key: 'tooltip', value: tooltip, object: option }"
     >
-      <span [innerHTML]="value.label | escapeHtml | highlight: inputControl.value"></span>
+      <span [innerHTML]="value.label | escapeHtml | highlight : inputControl.value"></span>
     </mat-option>
     <mat-option disabled *ngIf="shouldShowNoMatchingValuesNotice | async" aria-live="polite">
       {{ 'MDS.NO_MATCHING_VALUES' | translate }}

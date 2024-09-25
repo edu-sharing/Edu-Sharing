@@ -10,10 +10,7 @@ import { BridgeService } from 'src/app/services/bridge.service';
 export class ImprintPrivacyService {
     imprintUrl: string;
     privacyInformationUrl: string;
-    constructor(
-        private configService: ConfigService,
-        private bridge: BridgeService,
-    ) {
+    constructor(private configService: ConfigService, private bridge: BridgeService) {
         this.configService.observeConfig().subscribe((data: any) => {
             this.imprintUrl = data.imprintUrl;
             this.privacyInformationUrl = data.privacyInformationUrl;

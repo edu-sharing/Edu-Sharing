@@ -584,13 +584,10 @@ export class SearchService {
             return rxjs.of({});
         }
         return rxjs.forkJoin(
-            results.reduce(
-                (acc, facet) => {
-                    acc[facet.property] = this.mapFacet(facet);
-                    return acc;
-                },
-                {} as { [property: string]: Observable<FacetAggregation> },
-            ),
+            results.reduce((acc, facet) => {
+                acc[facet.property] = this.mapFacet(facet);
+                return acc;
+            }, {} as { [property: string]: Observable<FacetAggregation> }),
         );
     }
 
@@ -659,12 +656,9 @@ function pickProperties<T extends {}, K extends keyof T>(
     if (obj === null) {
         return null;
     } else {
-        return properties.reduce(
-            (acc, prop) => {
-                acc[prop] = obj[prop];
-                return acc;
-            },
-            {} as Pick<T, K>,
-        );
+        return properties.reduce((acc, prop) => {
+            acc[prop] = obj[prop];
+            return acc;
+        }, {} as Pick<T, K>);
     }
 }

@@ -458,31 +458,28 @@ export class AuthenticationService {
     private createUserChanges(): Observable<void> {
         return this.loginActionResponseSubject.pipe(
             filter((response): response is LoginActionResponse => response !== null),
-            scan(
-                (acc, response) => {
-                    if (acc === null && response.loginAction.kind === 'initial') {
-                        // We had no information about the logged-in user so far and just refreshed the
-                        // login information. We learned about the logged-in user, but they really were
-                        // already logged-in before.
-                        return {
-                            changed: false,
-                            authorityName: response.loginInfo.authorityName,
-                        };
-                    } else if (acc?.authorityName !== response.loginInfo.authorityName) {
-                        // The logged-in user changed.
-                        return {
-                            changed: true,
-                            authorityName: response.loginInfo.authorityName,
-                        };
-                    } else {
-                        return {
-                            changed: false,
-                            authorityName: response.loginInfo.authorityName,
-                        };
-                    }
-                },
-                null as { changed: boolean; authorityName?: string } | null,
-            ),
+            scan((acc, response) => {
+                if (acc === null && response.loginAction.kind === 'initial') {
+                    // We had no information about the logged-in user so far and just refreshed the
+                    // login information. We learned about the logged-in user, but they really were
+                    // already logged-in before.
+                    return {
+                        changed: false,
+                        authorityName: response.loginInfo.authorityName,
+                    };
+                } else if (acc?.authorityName !== response.loginInfo.authorityName) {
+                    // The logged-in user changed.
+                    return {
+                        changed: true,
+                        authorityName: response.loginInfo.authorityName,
+                    };
+                } else {
+                    return {
+                        changed: false,
+                        authorityName: response.loginInfo.authorityName,
+                    };
+                }
+            }, null as { changed: boolean; authorityName?: string } | null),
             filter((acc) => acc?.changed ?? false),
             mapTo(void 0),
             share(),

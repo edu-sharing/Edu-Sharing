@@ -85,7 +85,7 @@
     <span *ngIf="provideLabel" class="cdk-visually-hidden"
       >{{ 'NODE.ccm:replicationsource' | translate }}:</span
     >
-    {{ $any(getNode()).properties['ccm:replicationsource'] | appNodeSource: { mode: 'text' } }}
+    {{ $any(getNode()).properties['ccm:replicationsource'] | appNodeSource : { mode: 'text' } }}
   </span>
   <span
     *ngSwitchCase="'ccm:commonlicense_key'"
@@ -99,7 +99,7 @@
         license[0] === 'CUSTOM'
           ? $any(getNode()).properties['cclom:rights_description']
           : ('LICENSE.NAMES.' + $any(getNode()).properties['ccm:commonlicense_key']
-            | translate: { fallback: $any(getNode()).properties['ccm:commonlicense_key'] })
+            | translate : { fallback: $any(getNode()).properties['ccm:commonlicense_key'] })
       }}
     </ng-container>
     <ng-container *ngIf="!$any(getNode()).properties['ccm:commonlicense_key']">

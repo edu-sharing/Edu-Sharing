@@ -21,7 +21,7 @@
             #text="esCheckTextOverflow"
             (mouseenter)="text.hasTextOverflow()"
             [matTooltip]="text.hasTextOverflow() ? getFacet(i).label : null"
-            [innerHTML]="getFacet(i).label | escapeHtml | highlight: filter.value"
+            [innerHTML]="getFacet(i).label | escapeHtml | highlight : filter.value"
           ></span>
           <span class="count">{{ getFacet(i).count }}</span>
         </span>

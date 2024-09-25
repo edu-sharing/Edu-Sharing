@@ -28,10 +28,7 @@ export class CollectionInfoBarComponent implements OnChanges {
     @Output() edit = new EventEmitter<void>();
     stats: NodeStats;
 
-    constructor(
-        private nodeHelper: NodeHelperService,
-        private nodeService: NodeService,
-    ) {}
+    constructor(private nodeHelper: NodeHelperService, private nodeService: NodeService) {}
 
     async ngOnChanges(changes: SimpleChanges) {
         if (changes.collection?.currentValue) {

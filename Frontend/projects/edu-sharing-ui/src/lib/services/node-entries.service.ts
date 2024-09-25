@@ -140,10 +140,7 @@ export class NodeEntriesService<T extends NodeEntriesDataType> {
     disableInfiniteScroll: boolean;
     scrollGradientColor: WritableSignal<string> = signal('fff');
 
-    constructor(
-        private uiService: UIService,
-        private entriesGlobal: NodeEntriesGlobalService,
-    ) {}
+    constructor(private uiService: UIService, private entriesGlobal: NodeEntriesGlobalService) {}
 
     onClicked({ event, ...data }: NodeClickEvent<T> & { event: MouseEvent }) {
         if (event.ctrlKey || event.metaKey) {
