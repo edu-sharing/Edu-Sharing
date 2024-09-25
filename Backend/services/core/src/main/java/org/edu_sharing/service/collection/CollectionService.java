@@ -1,14 +1,15 @@
 package org.edu_sharing.service.collection;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang3.NotImplementedException;
 import org.edu_sharing.repository.client.rpc.ACE;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.search.model.SortDefinition;
 
@@ -61,11 +62,14 @@ public interface CollectionService {
 	
 	public void move(String toCollection, String nodeId);
 	
-	public List<NodeRef> getChildren(String parentId, String scope);
-	
-	public List<NodeRef> getChildren(String parentId, String scope, SortDefinition sortDefinition,List<String> filter);
 
-	public Collection get(org.edu_sharing.service.model.NodeRef collection, boolean fetchCounts);
+	public List<org.edu_sharing.service.model.NodeRef> getChildren(String parentId, String scope, SortDefinition sortDefinition, List<String> filter);
+
+	List<org.edu_sharing.service.model.NodeRef> getRecentForCurrentUser() throws Throwable;
+
+	public SearchResultNodeRef getRoot(String scope, SortDefinition sortDefinition, int skipCount, int maxItems) throws Throwable;
+
+	public Collection get(org.edu_sharing.service.model.NodeRef collection, boolean fetchCounts, boolean resolveUsernames, BoolQuery readPermissionsQuery);
 
 	void removePreviewImage(String collectionId) throws Exception;
 

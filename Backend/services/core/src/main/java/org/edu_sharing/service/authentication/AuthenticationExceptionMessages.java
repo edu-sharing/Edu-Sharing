@@ -44,6 +44,8 @@ public interface AuthenticationExceptionMessages {
 	final public static String INVALID_AUTHENTICATION_METHOD = "INVALID_AUTHENTICATION_METHOD";
 	final public static String NOT_IN_WHITELIST = "NOT_IN_WHITELIST";
 	final public static String USER_BLOCKED = "USER_BLOCKED";
+	final public static String SSO_REQ_ATT_PATTERN_SYNTAX = "SSO_REQ_ATT_PATTERN_SYNTAX";
+	final public static String SSO_REQ_ATT_NOT_MATCHES = "SSO_REQ_ATT_NOT_MATCHES";
 
 
 }

@@ -23,7 +23,17 @@ mat-form-field {
     // spacing for drop-down button
     padding-right: 35px;
 }
-
+mat-chip {
+    &.indeterminate {
+        background: repeating-linear-gradient(
+            -45deg,
+            var(--palette-primary-50),
+            var(--palette-primary-50) 5px,
+            var(--palette-primary-100) 5px,
+            var(--palette-primary-100) 10px
+        );
+    }
+}
 .mat-select-arrow {
     // Use the button color which respects disabled state.
     color: unset;

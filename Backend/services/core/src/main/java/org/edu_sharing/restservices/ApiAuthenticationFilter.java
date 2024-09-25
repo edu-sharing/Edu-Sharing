@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import com.typesafe.config.Config;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.authentication.subsystems.SubsystemChainingAuthenticationService;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
@@ -25,6 +27,7 @@ import org.edu_sharing.service.authentication.EduAuthentication;
 import org.edu_sharing.service.authentication.oauth2.TokenService;
 import org.edu_sharing.service.authentication.oauth2.TokenService.Token;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
+import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
@@ -115,7 +118,7 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
             }
 
         }
-
+        Config accessConfig = LightbendConfigLoader.get().getConfig("security.access");
         List<String> AUTHLESS_ENDPOINTS = Arrays.asList(new String[]{"/authentication", "/_about", "/config", "/register", "/sharing",
                 "/lti/v13/oidc/login_initiations",
                 "/lti/v13/lti13",
@@ -142,8 +145,8 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
         }
 
         boolean noAuthenticationNeeded = false;
+        String pathInfo = httpReq.getPathInfo();
         for (String endpoint : AUTHLESS_ENDPOINTS) {
-            String pathInfo = httpReq.getPathInfo();
             if (pathInfo == null) {
                 continue;
             }
@@ -155,7 +158,6 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
         }
         boolean adminRequired = false;
         for (String endpoint : ADMIN_ENDPOINTS) {
-            String pathInfo = httpReq.getPathInfo();
             if (pathInfo == null) {
                 continue;
             }
@@ -167,15 +169,29 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
         }
 
         for (String endpoint : DISABLED_ENDPOINTS) {
-            String pathInfo = httpReq.getPathInfo();
             if (pathInfo == null) {
                 continue;
             }
 
             if (pathInfo.startsWith(endpoint)) {
-                httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 httpResp.flushBuffer();
                 httpResp.getWriter().print("This endpoint is disabled via config");
+                return;
+            }
+        }
+
+        for (Map.Entry<String, Object> endpoint : accessConfig.getObject("endpoints").unwrapped().entrySet()) {
+            if (pathInfo == null) {
+                continue;
+            }
+            if (pathInfo.startsWith(endpoint.getKey()) && (
+                    endpoint.getValue().toString().equalsIgnoreCase("admin") && !AuthorityServiceHelper.isAdmin()
+                    || endpoint.getValue().toString().equalsIgnoreCase("disabled")
+            )) {
+                httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                httpResp.getWriter().print("This endpoint is disabled via config");
+                httpResp.flushBuffer();
                 return;
             }
         }
@@ -197,14 +213,22 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
 
         // ignore the auth for the login
         if (validatedAuth == null && (!noAuthenticationNeeded && !trustedAuth)) {
-            String pathInfo = httpReq.getPathInfo();
-            if (pathInfo != null && pathInfo.equals("/openapi.json"))
+            if (pathInfo != null && pathInfo.equals("/openapi.json")) {
                 httpResp.setHeader("WWW-Authenticate", "BASIC realm=\"" + "Edu-Sharing Rest API" + "\"");
+            }
             httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResp.flushBuffer();
             return;
         }
-
+        if (pathInfo != null && pathInfo.equals("/openapi.json")) {
+            String openApiAccess = accessConfig.getString("openapi");
+            if (openApiAccess.equalsIgnoreCase("admin") && !AuthorityServiceHelper.isAdmin() || openApiAccess.equalsIgnoreCase("disabled")) {
+                httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResp.flushBuffer();
+                httpResp.getWriter().print("This endpoint is disabled via config");
+                return;
+            }
+        }
         // Chain other filters
         chain.doFilter(req, resp);
     }

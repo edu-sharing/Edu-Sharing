@@ -12,6 +12,7 @@
     "SEARCH_ACTION": "Search",
     "SAFE_SEARCH": "Search the safe…",
     "MY_FILES": "My content",
+    "COLLECTION_HOME": "root level",
     "SEARCH_GLOBAL": "Search everywhere",
     "ALL_FILES": "Alle Dateien",
     "ADD": "New",
@@ -171,6 +172,16 @@
           "ReadAll": "View (Preview image, metadata & content viewing)",
           "DownloadContent": "Download"
         }
+      },
+      "TIMEBASED": {
+        "TOOLTIP": "Configure time-based permission",
+        "INVALID_STATE": "This time-based permission if overriden by an equal or higher permission without a time restriction",
+        "INVALID_STATE_TITLE": "Invalid configuration detected",
+        "INVALID_STATE_DETAILS": "There are time-based permissions which are overriden by persistend permissions. Change the time-based permissions to a higher permission level or remove them.",
+        "FROM_CHECKBOX": "Set start date",
+        "TO_CHECKBOX": "Set end date",
+        "DATE_LABEL": "Date",
+        "TIME_LABEL": "Time"
       },
       "PUBLISH": {
         "OPEN_VERSION": "Show version",
@@ -350,7 +361,8 @@
       "PASSWORD": "Password Protect",
       "PASSWORD_INFO": "Activate to enter password for link.",
       "PASSWORD_PLACEHOLDER": "Set password...",
-      "PASSWORD_PLACEHOLDER_EDIT": "Password is already set",
+      "PASSWORD_PLACEHOLDER_EDIT": "Password already set",
+      "PASSWORD_EDIT_HINT": "By entering a new password the old password will be replaced",
       "LINK": "Link to object",
       "ACTIVATE": "Activate sharing",
       "COPY_CLIPBOARD": "Copy",

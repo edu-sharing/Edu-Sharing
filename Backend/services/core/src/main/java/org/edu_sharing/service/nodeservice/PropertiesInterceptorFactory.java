@@ -1,5 +1,6 @@
 package org.edu_sharing.service.nodeservice;
 
+import com.typesafe.config.ConfigObject;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
@@ -16,11 +17,11 @@ public class PropertiesInterceptorFactory {
 
     static List<PropertiesGetInterceptor> propertiesGetInterceptors = null;
     static List<PropertiesSetInterceptor> propertiesSetInterceptors = null;
+    static List<NodeServiceInterceptorPermissions> nodeServiceInterceptorPermissions = null;
 
-    public static List<?> getInterceptors(String key) {
+    public static List<?> getInterceptors(List<String> className) {
         synchronized (PropertiesInterceptorFactory.class) {
             try {
-                List<String> className = new ArrayList<>(LightbendConfigLoader.get().getStringList(key));
                 ArrayList<Class<?>> clazz = (ArrayList<Class<?>>)className.stream().map((String className1) -> {
                     try {
                         return Class.forName(className1);
@@ -44,8 +45,9 @@ public class PropertiesInterceptorFactory {
         if(propertiesSetInterceptors == null){
             synchronized (PropertiesInterceptorFactory.class){
                 try{
+                    List<String> className = new ArrayList<>(LightbendConfigLoader.get().getStringList("repository.interceptors.properties.set"));
                     List<PropertiesSetInterceptor> clazz =
-                            (List<PropertiesSetInterceptor>) getInterceptors("repository.interceptors.properties.set");
+                            (List<PropertiesSetInterceptor>) getInterceptors(className);
                     if(clazz.size() == 0) {
                         logger.info("No interceptors for set properties defined, will use default handling");
                     }
@@ -61,8 +63,9 @@ public class PropertiesInterceptorFactory {
         if(propertiesGetInterceptors == null){
             synchronized (PropertiesInterceptorFactory.class){
                 try{
+                    List<String> className = new ArrayList<>(LightbendConfigLoader.get().getStringList("repository.interceptors.properties.get"));
                     List<PropertiesGetInterceptor> clazz =
-                            (List<PropertiesGetInterceptor>) getInterceptors("repository.interceptors.properties.get");
+                            (List<PropertiesGetInterceptor>) getInterceptors(className);
                     if(clazz.size() == 0) {
                         logger.info("No interceptors for get properties defined, will use default handling");
                     }
@@ -77,9 +80,34 @@ public class PropertiesInterceptorFactory {
         return propertiesGetInterceptors;
     }
 
+    public static List<? extends NodeServiceInterceptorPermissions> getNodeServiceInterceptorPermissions(){
+        if(nodeServiceInterceptorPermissions == null){
+            synchronized (PropertiesInterceptorFactory.class){
+                try{
+                    List<String> classes = LightbendConfigLoader.get().getObjectList("repository.interceptors.permissions")
+                            .stream()
+                            .map(co -> co.toConfig())
+                            .map(c -> c.getString("clazz"))
+                            .collect(Collectors.toList());
+                    List<NodeServiceInterceptorPermissions> clazz =
+                            (List<NodeServiceInterceptorPermissions>) getInterceptors(classes);
+                    if(clazz.size() == 0) {
+                        logger.info("No interceptors for get properties defined, will use default handling");
+                    }
+
+                    nodeServiceInterceptorPermissions = clazz;
+                }catch(Throwable t) {
+                    throw new RuntimeException(t);
+                }
+            }
+        }
+        return nodeServiceInterceptorPermissions;
+    }
+
     public static void refresh(){
         propertiesGetInterceptors = null;
         propertiesSetInterceptors = null;
+        nodeServiceInterceptorPermissions = null;
     }
 
     public static PropertiesGetInterceptor.PropertiesContext getPropertiesContext(NodeRef nodeRef, Map<String,Object> properties, List<String> aspects, Map<String, Boolean> permissions, Map<String, Object> elasticsearchSource){

@@ -14,14 +14,10 @@ export class FormatSizePipe implements PipeTransform {
             value /= 1024;
             i++;
         }
-        //return value+" "+names[i];
-        return (
-            value.toLocaleString(
-                this.translate.currentLang === 'none' ? 'en' : this.translate.currentLang,
-                { maximumFractionDigits: 1 },
-            ) +
-            ' ' +
-            names[i]
-        );
+        let options: Intl.NumberFormatOptions = {
+            maximumFractionDigits: i > 1 ? 1 : 0,
+        };
+        let numberFormat = new Intl.NumberFormat([], options);
+        return numberFormat.format(value) + ' ' + names[i];
     }
 }

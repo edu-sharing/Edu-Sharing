@@ -6,4 +6,12 @@
     //
     // An alternative would be to use `overflow-x: clip` when it is supported by Safari.
     padding: 0 var(--mds-editor-horizontal-padding, 0);
+    ::ng-deep {
+        // fix multi-line bottom hints
+        .mat-mdc-form-field-hint-wrapper,
+        .mat-mdc-form-field-error-wrapper {
+            position: relative;
+            margin-top: -20px;
+        }
+    }
 }

@@ -14,7 +14,7 @@ public class RenderingServiceNotSupported implements RenderingService{
 	}
 	
 	@Override
-	public String getDetails(String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
+	public RenderingDetails getDetails(String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
 		throw new NotImplementedException();
 	}
 

@@ -3,7 +3,15 @@
  */
 
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Directive, ElementRef, Input, OnDestroy, OnInit, Optional } from '@angular/core';
+import {
+    Directive,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    Optional,
+    Renderer2,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from 'ngx-edu-sharing-api';
@@ -34,6 +42,7 @@ export class IconDirective implements OnInit, OnDestroy {
     private _aria: boolean;
     private altTextSpan: HTMLElement;
     private isReady = false;
+    private svg: HTMLImageElement;
 
     /**
      * An alt text to show to screen readers.
@@ -64,6 +73,7 @@ export class IconDirective implements OnInit, OnDestroy {
     constructor(
         private element: ElementRef<HTMLElement>,
         private translate: TranslateService,
+        private renderer: Renderer2,
         @Optional() private config: ConfigService,
     ) {
         combineLatest([this.originalId$.pipe(filter(notNull)), this.config.get('icons', null)])
@@ -93,6 +103,19 @@ export class IconDirective implements OnInit, OnDestroy {
                 'custom-icons',
                 'material-icons',
             );
+            if (this.svg) {
+                this.renderer.removeChild(this.element.nativeElement, this.svg);
+            }
+        }
+        if (id.startsWith('svg-')) {
+            this.svg = document.createElement('img');
+            this.svg.classList.add('svg-icons');
+            this.svg.src = 'assets/images/icons/' + id.substring(4);
+            this.renderer.appendChild(this.element.nativeElement, this.svg);
+            if (this._aria) {
+                this.updateAria();
+            }
+            return;
         }
         let customClass: string = null;
         const mapping = iconsConfig?.filter((i) => i.original === id);
@@ -107,10 +130,10 @@ export class IconDirective implements OnInit, OnDestroy {
         let cssClass: string;
         if (id?.startsWith('edu-') && !customClass) {
             cssClass = 'edu-icons';
-            id = id.substr(4);
+            id = id.substring(4);
         } else if (id?.startsWith('custom-') || customClass) {
             cssClass = 'custom-icons';
-            id = id.substr(7);
+            id = id.substring(7);
         } else {
             cssClass = 'material-icons';
         }
@@ -134,6 +157,9 @@ export class IconDirective implements OnInit, OnDestroy {
     }
 
     private setAltText(altText: string): void {
+        if (this.svg) {
+            this.svg.alt = altText;
+        }
         if (altText && !this.altTextSpan) {
             this.insertAltTextSpan();
         }

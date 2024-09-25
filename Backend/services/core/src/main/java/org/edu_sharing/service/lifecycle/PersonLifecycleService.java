@@ -23,12 +23,15 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.tools.VCardConverter;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
+import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authentication.ScopeUserHomeService;
 import org.edu_sharing.service.authentication.ScopeUserHomeServiceFactory;
 import org.edu_sharing.service.feedback.FeedbackServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.nodeservice.RecurseMode;
+import org.edu_sharing.service.permission.PermissionServiceFactory;
+import org.edu_sharing.service.permission.PermissionServiceHelper;
 import org.edu_sharing.service.rating.RatingServiceFactory;
 import org.edu_sharing.service.stream.StreamServiceFactory;
 import org.edu_sharing.service.tracking.TrackingServiceFactory;
@@ -269,31 +272,31 @@ public class PersonLifecycleService {
 	}
 
 	private void handleStatistics(NodeRef personNodeRef, String deletedUsername, PersonDeleteOptions options) {
-			String username = (String)nodeService.getProperty(personNodeRef,
-					QName.createQName(CCConstants.CM_PROP_PERSON_USERNAME));
-			try {
-				if(options.statistics.delete) {
-					TrackingServiceFactory.getTrackingService().deleteUserData(username);
-					logger.info("removed tracking/statistics data");
-				}else{
-					TrackingServiceFactory.getTrackingService().reassignUserData(username,deletedUsername);
-					logger.info("removed tracking/statistics data");
-				}
-			}catch(Throwable t){
-				throw new RuntimeException(t);
+		String username = (String)nodeService.getProperty(personNodeRef,
+				QName.createQName(CCConstants.CM_PROP_PERSON_USERNAME));
+		try {
+			if(options.statistics.delete) {
+				TrackingServiceFactory.getTrackingService().deleteUserData(username);
+				logger.info("removed tracking/statistics data");
+			}else{
+				TrackingServiceFactory.getTrackingService().reassignUserData(username,deletedUsername);
+				logger.info("removed tracking/statistics data");
 			}
+		}catch(Throwable t){
+			throw new RuntimeException(t);
+		}
 	}
 
 	/**
 	 * Deletes all nodes from the given person + type in the repository
 	 */
 	private List<NodeRef> deleteAllOfType(NodeRef personNodeRef,String type,String scope) {
-			String username = (String)nodeService.getProperty(personNodeRef,
-					QName.createQName(CCConstants.CM_PROP_PERSON_USERNAME));
-			List<NodeRef> refs = getAllNodeRefs(username,type, scope);
-			logger.info("Deleting all files of type "+type);
-			deleteAllRefs(refs);
-			return refs;
+		String username = (String)nodeService.getProperty(personNodeRef,
+				QName.createQName(CCConstants.CM_PROP_PERSON_USERNAME));
+		List<NodeRef> refs = getAllNodeRefs(username,type, scope);
+		logger.info("Deleting all files of type "+type);
+		deleteAllRefs(refs);
+		return refs;
 	}
 
 	/**
@@ -394,8 +397,59 @@ public class PersonLifecycleService {
 				collectionsIos.forEach((ref)->setOwner(ref,userName,options.receiver, options));
 			}
 			return counts;
+		} else {
+			List<NodeRef> collectionsIosPublic = filterPublic(collectionsIos);
+			collectionsIos.removeAll(collectionsIosPublic);
+
+			List<NodeRef> collectionsMapsPublic = filterPublic(collectionsMaps);
+			collectionsMaps.removeAll(collectionsMapsPublic);
+
+			// remove private/shared collections + ios
+			if(options.collections.privateCollections.equals(PersonDeleteOptions.DeleteMode.delete)) {
+				// the maps may be not enough if the user contributed to foreign collections
+				deleteAllRefs(collectionsIos);
+				deleteAllRefs(collectionsMaps);
+			}
+			else if(options.collections.privateCollections.equals(PersonDeleteOptions.DeleteMode.assign)) {
+				setOwnerAndPermissions(collectionsMaps, userName, options);
+				//setOwnerAndPermissions(collectionsIos, userName, options);
+				// io references should not support additional permissions (always inherit)
+				collectionsIos.forEach((ref)->setOwner(ref,userName,options.receiver, options));
+			}
+
+			// remove public collections + ios
+			if(options.collections.publicCollections.equals(PersonDeleteOptions.DeleteMode.delete)) {
+				// the maps may be not enough if the user contributed to foreign collections
+				deleteAllRefs(collectionsIosPublic);
+				deleteAllRefs(collectionsMapsPublic);
+			}
+			else if(options.collections.publicCollections.equals(PersonDeleteOptions.DeleteMode.assign)) {
+				setOwnerAndPermissions(collectionsMapsPublic, userName, options);
+				//setOwnerAndPermissions(collectionsIos, userName, options);
+				// io references should not support additional permissions (always inherit)
+				collectionsIosPublic.forEach((ref)->setOwner(ref,userName,options.receiver, options));
+			}
+			return counts;
 		}
-		throw new IllegalArgumentException("Currently collection deletion does only support the same modes for private and public");
+	}
+
+	/**
+	 * return only elements were GROUP_EVERYONE has Permission.Read
+	 */
+	private List<NodeRef> filterPublic(List<NodeRef> refs) {
+		return refs.stream().filter(ref -> {
+			try {
+				return Arrays.stream(PermissionServiceFactory.getLocalService().getPermissions(ref.getId()).getAces()).anyMatch(
+						ace -> ace.getAuthorityType().equals(CCConstants.PERM_AUTHORITY_TYPE_EVERYONE) &&
+								ace.getAuthority().equals(CCConstants.AUTHORITY_GROUP_EVERYONE) && (
+								ace.getPermission().equals(CCConstants.PERMISSION_READ) || ace.getPermission().equals(CCConstants.PERMISSION_CONSUMER
+								)
+						)
+				);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}).collect(Collectors.toList());
 	}
 
 	/**
@@ -453,9 +507,9 @@ public class PersonLifecycleService {
 		List<PersonDeleteResult.Element> result=new ArrayList<>();
 		for (Collection<NodeRef> ref : refs) {
 			result.addAll(ref.stream().map((r)->
-				new PersonDeleteResult.Element(r.getId(),
-						(String) nodeService.getProperty(r, QName.createQName(CCConstants.CM_NAME)),
-						nodeService.getType(r).toString())
+					new PersonDeleteResult.Element(r.getId(),
+							(String) nodeService.getProperty(r, QName.createQName(CCConstants.CM_NAME)),
+							nodeService.getType(r).toString())
 			).collect(Collectors.toList()));
 		}
 		return result;
@@ -704,8 +758,8 @@ public class PersonLifecycleService {
 		if(orgRef == null) {
 			if(scope!=null) {
 				orgRef = authorityService.getAuthorityNodeRef(
-							ScopeUserHomeServiceFactory.getScopeUserHomeService().getOrCreateScopedEduGroup(orgName, scope).getGroupId()
-  						 );
+						ScopeUserHomeServiceFactory.getScopeUserHomeService().getOrCreateScopedEduGroup(orgName, scope).getGroupId()
+				);
 			}
 			if(orgRef == null) {
 				throw new IllegalArgumentException("Given org " + orgName + " (" + scope + ") could not be found");

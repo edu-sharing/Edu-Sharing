@@ -13,6 +13,12 @@
     "SHARING_ERROR": "Freigeben fehlgeschlagen",
     "LTI_ERROR": "LTI Prozess fehlgeschlagen",
     "LTI_REG_ERROR": "Anbindung der LTI Plattform fehlgeschlagen",
+    "USER_BLOCKED": "Login nicht möglich",
+    "SSO_INSUFFICIENT_REQUIREMENTS": "Login nicht möglich",
+    "SSO_UNKNOWN_ERROR": "Login nicht möglich",
+    "MISSING_PARAM": "Login nicht möglich",
+    "SSO_REQ_ATT_NOT_MATCHES": "Login nicht möglich",
+    "INVALID_AUTHENTICATION_METHOD": "SSO Authentifizierung ist nicht konfiguriert",
     "DETAILS": {
       "403": "Der Zugriff auf den gewünschten Bereich bzw. die gewünschte Ressource ist leider nicht möglich",
       "404": "Fehler 404",
@@ -25,7 +31,13 @@
       "SHARING_ERROR": "edu-sharing kann aktuell leider nur Dateien begrenzter Größe teilen. Bitte versuchen Sie es mit einer anderen Datei",
       "LTI_ERROR": "Fehlermeldung: {{text}}",
       "LTI_REG_ERROR": "Fehlermeldung: {{text}}",
-      "INVALID": "Wenn dieser Fehler weiterhin auftritt, wenden Sie sich an den Betreiber des Systems"
+      "INVALID": "Wenn dieser Fehler weiterhin auftritt, wenden Sie sich an den Betreiber des Systems",
+      "USER_BLOCKED": "Benutzer gesperrt",
+      "SSO_INSUFFICIENT_REQUIREMENTS": "Vorraussetzungen nicht gegeben",
+      "SSO_UNKNOWN_ERROR": "unbekannter Fehler",
+      "MISSING_PARAM": "unvollständige Benutzerinformationen",
+      "SSO_REQ_ATT_NOT_MATCHES": "falsche Nutzerinformationen",
+      "INVALID_AUTHENTICATION_METHOD": "Bitte wenden Sie sich an einen Administrator"
     }
   }
 }

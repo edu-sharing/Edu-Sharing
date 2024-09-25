@@ -6,6 +6,7 @@
   [ngModelOptions]="{ standalone: true }"
 ></ngx-monaco-editor>
 <textarea
+  [readOnly]="options?.readOnly === true"
   *ngIf="editorType === 'Textarea'"
   [ngModel]="ngModel"
   (ngModelChange)="ngModelChange.emit($event)"

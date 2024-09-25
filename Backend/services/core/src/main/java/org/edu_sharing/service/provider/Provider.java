@@ -55,7 +55,7 @@ public abstract class Provider {
     }
     public RenderingService getRenderingService(){
         RenderingService service = (RenderingService) ApplicationContextFactory.getApplicationContext().getBean("renderingService");
-        service.setAppId(ApplicationInfoList.getHomeRepository().getAppId());
+        service.setAppId(appId);
         return service;
     }
     public CollectionService getCollectionService(){

@@ -14,8 +14,8 @@
   [style.background-color]="isCollection ? node.collection.color : null"
   [class.dynamic-single-click]="entriesService.singleClickHint === 'dynamic'"
   [class.selected]="entriesService.selection.isSelected(node)"
-  (contextmenu)="openContextmenu($event)"
-  (keydown.ContextMenu)="openContextmenu($event)"
+  (contextmenu)="openContextmenu($event, node)"
+  (keydown.ContextMenu)="openContextmenu($event, node)"
 >
   <div
     *ngIf="templatesService.overlay"
@@ -55,7 +55,7 @@
         [checked]="entriesService.selection.isSelected(node)"
         (change)="entriesService.onCheckboxChanged(node, $event.checked)"
         color="primary"
-        aria-label="{{ 'SELECT' | translate: { element: (node | nodeTitle) } }}"
+        aria-label="{{ 'SELECT' | translate : { element: (node | nodeTitle) } }}"
       ></mat-checkbox>
     </div>
   </div>
@@ -119,7 +119,7 @@
         color="primary"
         (click)="openMenu(node)"
         [matMenuTriggerFor]="dropdown.menu"
-        [attr.aria-label]="'OPTIONS_FOR' | translate: { element: (node | nodeTitle) }"
+        [attr.aria-label]="'OPTIONS_FOR' | translate : { element: (node | nodeTitle) }"
         data-test="card-options-button"
       >
         <i esIcon="more_vert"></i>

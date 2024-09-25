@@ -29,15 +29,17 @@ public class RefreshScopeRefreshedEvent extends ApplicationEvent {
      */
     public static final String DEFAULT_NAME = "__refreshAll__";
 
-    private String name;
+    private final String name;
+    private final boolean isCaller;
 
-    public RefreshScopeRefreshedEvent() {
-        this(DEFAULT_NAME);
+    public RefreshScopeRefreshedEvent(boolean isCaller) {
+        this(DEFAULT_NAME, isCaller);
     }
 
-    public RefreshScopeRefreshedEvent(String name) {
+    public RefreshScopeRefreshedEvent(String name, boolean isCaller) {
         super(name);
         this.name = name;
+        this.isCaller = isCaller;
     }
 
 }

@@ -174,7 +174,7 @@ export class SimpleEditLicenseComponent implements OnInit {
                 this.initalAuthorFreetext = this.authorFreetext;
                 setTimeout(async () => {
                     if (updateInvalid) {
-                        this.invalid = !this.fromUpload && !isValid;
+                        this.invalid = !isValid;
                         this.wasInvalid = this.invalid;
                     }
                     if (this.tpLicense && this.modeGroup) {

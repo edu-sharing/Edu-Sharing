@@ -2,17 +2,16 @@ package org.edu_sharing.restservices;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.AssociationRef;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
+import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.restservices.collection.v1.model.*;
 import org.edu_sharing.restservices.collection.v1.model.Collection;
 import org.edu_sharing.restservices.node.v1.model.AbstractEntries;
@@ -22,6 +21,9 @@ import org.edu_sharing.service.collection.CollectionProposalInfo;
 import org.edu_sharing.service.collection.CollectionService;
 import org.edu_sharing.service.collection.CollectionServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
+import org.edu_sharing.service.search.SearchService;
+import org.edu_sharing.service.search.SearchServiceElastic;
+import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 
@@ -134,53 +136,75 @@ public class CollectionDao {
 	}
 	private static CollectionBaseEntries getCollectionsChildren(RepositoryDao repoDao, String parentId, SearchScope scope, boolean fetchCounts, Filter propFilter, List<String> filter, SortDefinition sortDefinition, int skipCount, int maxItems) throws DAOException {
 		try {
-			List<Node> result = new ArrayList<>();
-			NodeDao parentNode = null;
+			NodeDao parentNode;
 			if(!ROOT.equals(parentId)) {
 				parentNode = NodeDao.getNode(repoDao, parentId);
 				parentNode.fetchCounts = false;
 			}
-			List<org.alfresco.service.cmr.repository.NodeRef> children =
-					repoDao.getCollectionClient().getChildren(
-							ROOT.equals(parentId) ? null : parentId,
-							scope != null ? scope.toString() : null, sortDefinition, filter);
-
-
-			//NodeDao.convertAlfrescoNodeRef(repoDao,children)
-			NodeEntries sorted = NodeDao.convertToRest(repoDao,
-					Filter.createShowAllFilter(),
-					NodeDao.convertAlfrescoNodeRef(repoDao, children),
-					skipCount,
-					maxItems,
-					(dao) -> {
-						dao.fetchCounts = fetchCounts;
-						return dao;
-					});
-			Pagination pagination = sorted.getPagination();
-			for (Node child : sorted.getNodes()) {
-
-				String nodeType = child.getType();
-
-				if (CCConstants.getValidLocalName(CCConstants.CCM_TYPE_MAP).equals(nodeType)) {
-
-					// it's a collection
-					result.add(child);
-
-				} else if (CCConstants.getValidLocalName(CCConstants.CCM_TYPE_IO).equals(nodeType)) {
-
-					// it's a reference
-					try {
-						result.add((CollectionReference) child);
-					}catch(ClassCastException e) {
-						logger.error("Collection "+parentId+" contains a non-ref object: "+child.getRef().getId()+". Please clean up the collection", e);
+			if(!ROOT.equals(parentId) || SearchScope.RECENT.equals(scope)) {
+					List<Node> result = new ArrayList<>();
+					List<org.edu_sharing.service.model.NodeRef> children;
+					if(SearchScope.RECENT.equals(scope)) {
+						children = repoDao.getCollectionClient().getRecentForCurrentUser();
+					} else {
+						children =
+								repoDao.getCollectionClient().getChildren(
+										ROOT.equals(parentId) ? null : parentId,
+										scope != null ? scope.toString() : null, sortDefinition, filter);
 					}
+
+					//NodeDao.convertAlfrescoNodeRef(repoDao,children)
+					NodeEntries sorted = NodeDao.convertToRest(repoDao,
+							Filter.createShowAllFilter(),
+							NodeDao.convertEduNodeRef(repoDao, children),
+							skipCount,
+							maxItems,
+							(dao) -> {
+								dao.fetchCounts = fetchCounts;
+								return dao;
+							});
+					Pagination pagination = sorted.getPagination();
+					for (Node child : sorted.getNodes()) {
+
+						String nodeType = child.getType();
+
+						if (CCConstants.getValidLocalName(CCConstants.CCM_TYPE_MAP).equals(nodeType)) {
+
+							// it's a collection
+							result.add(child);
+
+						} else if (CCConstants.getValidLocalName(CCConstants.CCM_TYPE_IO).equals(nodeType)) {
+
+							// it's a reference
+							try {
+								result.add((CollectionReference) child);
+							} catch (ClassCastException e) {
+								logger.error("Collection " + parentId + " contains a non-ref object: " + child.getRef().getId() + ". Please clean up the collection", e);
+							}
+						}
+					}
+					CollectionBaseEntries obj = new CollectionBaseEntries();
+					obj.setEntries(result);
+					obj.setPagination(pagination);
+					return obj;
+
+			} else {
+				SearchResultNodeRef searchResult = repoDao.getCollectionClient().getRoot(
+						scope != null ? scope.toString() : null, sortDefinition, skipCount, maxItems
+				);
+				BoolQuery readPermissionsQuery = null;
+				SearchService searchService = SearchServiceFactory.getSearchService(repoDao.getId());
+				if(searchService instanceof SearchServiceElastic) {
+					// improve performance by caching the relatively expensive query
+					readPermissionsQuery = ((SearchServiceElastic)searchService).getReadPermissionsQuery(new BoolQuery.Builder()).build();
 				}
+				NodeSearch transformed = NodeDao.transform(repoDao, searchResult, propFilter, null, readPermissionsQuery);
+				CollectionBaseEntries obj = new CollectionBaseEntries();
+				obj.setEntries(transformed.getNodes());
+				obj.setPagination(new Pagination(searchResult));
+				return obj;
 			}
-			CollectionBaseEntries obj = new CollectionBaseEntries();
-			obj.setEntries(result);
-			obj.setPagination(pagination);
-			return obj;
-		}catch(Exception e){
+		}catch(Throwable e){
 			throw DAOException.mapping(e);
 		}
 	}
@@ -199,7 +223,7 @@ public class CollectionDao {
 			this.collectionId = collectionId;
 			this.nodeDao=NodeDao.getNode(repoDao, collectionId);
 
-			this.collection = unmarshalling(repoDao.getId(), collectionClient.get(nodeDao.getNodeRef(), nodeDao.fetchCounts));
+			this.collection = unmarshalling(repoDao.getId(), collectionClient.get(nodeDao.getNodeRef(), nodeDao.fetchCounts, nodeDao.resolveUsernames, nodeDao.readPermissionsQuery));
 			this.baseClient = repoDao.getBaseClient();
 
 		} catch (Exception e) {
@@ -216,7 +240,7 @@ public class CollectionDao {
 			this.repoDao = repoDao;
 			this.collectionId = collectionId;
 			this.nodeDao=nodeDao;
-			this.collection = unmarshalling(repoDao.getId(), collectionClient.get(nodeDao.getNodeRef(), nodeDao.fetchCounts));
+			this.collection = unmarshalling(repoDao.getId(), collectionClient.get(nodeDao.getNodeRef(), nodeDao.fetchCounts, nodeDao.resolveUsernames, nodeDao.readPermissionsQuery));
 			this.baseClient = repoDao.getBaseClient();
 			this.access = node.getAccess();//baseClient.hasAllPermissions(collectionId, PERMISSIONS);
 			this.preview= node.getPreview();

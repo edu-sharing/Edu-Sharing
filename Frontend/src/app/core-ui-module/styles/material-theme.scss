@@ -340,10 +340,21 @@ body {
 .mat-mdc-checkbox {
     .mdc-checkbox__background {
         border-color: $primary !important;
+
         background-color: #fff !important;
 
         .mdc-checkbox__checkmark {
             color: #fff !important;
+        }
+    }
+    &.mdc-checkbox--disabled {
+        .mdc-checkbox__background {
+            border-color: $primaryLight !important;
+        }
+        &.mat-mdc-checkbox-checked {
+            .mdc-checkbox__background {
+                background-color: $primaryLight !important;
+            }
         }
     }
     &.mat-mdc-checkbox-checked {
@@ -412,6 +423,10 @@ body {
 i.mat-icon {
     height: 1em;
     width: 1em;
+    > .svg-icons {
+        width: 20px;
+        height: 20px;
+    }
 }
 button {
     &.mat-mdc-button,

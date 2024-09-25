@@ -9,6 +9,7 @@ import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.edu_sharing.alfresco.authentication.HttpContext;
+import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
@@ -23,6 +24,7 @@ import org.edu_sharing.service.organization.OrganizationService;
 import org.edu_sharing.service.organization.OrganizationServiceFactory;
 import org.edu_sharing.service.organization.GroupSignupMethod;
 import org.edu_sharing.service.search.SearchServiceFactory;
+import org.edu_sharing.spring.ApplicationContextFactory;
 
 
 public class OrganizationDao {
@@ -196,9 +198,10 @@ public class OrganizationDao {
 								
 				throw new AccessDeniedException(currentUser);
 			}
-				
-			((MCAlfrescoAPIClient)repoDao.getBaseClient()).unbindEduGroupFolder(groupName, eduGroup.getFolderId());
-			
+
+			OrganisationService organisationService = (OrganisationService) ApplicationContextFactory.getApplicationContext().getBean("organisationService");
+			organisationService.unbindEduGroupFolder(groupName,eduGroup.getFolderId());
+
 		} catch (Exception e) {
 
 			throw DAOException.mapping(e);

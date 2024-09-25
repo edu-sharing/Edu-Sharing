@@ -9,7 +9,8 @@ import { ApiConfiguration } from './api/api-configuration';
 @Injectable()
 export class ApiRequestConfiguration {
     private authForNextRequest: string | null = null;
-    private locale: string | null = null;
+    private _locale: string | null = null;
+    private _language: string | null = null;
 
     /** Emits each time, an API request is performed. */
     readonly apiRequest = new EventEmitter<void>();
@@ -17,7 +18,22 @@ export class ApiRequestConfiguration {
     constructor(private apiConfiguration: ApiConfiguration) {}
 
     setLocale(locale: string): void {
-        this.locale = locale;
+        this._locale = locale;
+    }
+
+    /**
+     * internal edu sharing language code, might be "de", "en" or something like "de-formal"
+     */
+    setLanguage(language: string): void {
+        this._language = language;
+    }
+
+    public getLocale(): string | null {
+        return this._locale;
+    }
+
+    public getLanguage(): string | null {
+        return this._language;
     }
 
     setBasicAuthForNextRequest(auth: { username: string; password: string }): void {
@@ -47,8 +63,11 @@ export class ApiRequestConfiguration {
         }
         this.apiRequest.emit();
         headers['X-Client-Trace-Id'] = this.generateTraceId();
-        if (this.locale) {
-            headers.locale = this.locale;
+        if (this._locale) {
+            headers.locale = this._locale;
+        }
+        if (this._language) {
+            headers['X-Edu-Sharing-Language'] = this._language;
         }
         if (this.authForNextRequest) {
             headers.Authorization = this.authForNextRequest;

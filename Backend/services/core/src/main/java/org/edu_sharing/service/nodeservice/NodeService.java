@@ -4,8 +4,8 @@ import lombok.NonNull;
 import org.alfresco.service.cmr.repository.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
-import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.repository.client.rpc.User;
+import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
 import org.edu_sharing.service.permission.HandleMode;
 import org.edu_sharing.service.permission.HandleParam;
@@ -13,7 +13,10 @@ import org.edu_sharing.service.search.model.SortDefinition;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public interface NodeService {
 
@@ -39,7 +42,9 @@ public interface NodeService {
 
 	public Map<String, String[]> getNameProperty(String name);
 
-    List<NodeRef> getChildrenRecursive(StoreRef store, String nodeId, List<String> types,RecurseMode recurseMode);
+	Map<String, Map<String, Object>> getChildrenPropsByType(StoreRef store, String nodeId, String type);
+
+	List<NodeRef> getChildrenRecursive(StoreRef store, String nodeId, List<String> types, RecurseMode recurseMode);
 
     public NodeRef getChild(StoreRef store, String parentId, String type, String property, Serializable value);
 
@@ -142,6 +147,14 @@ public interface NodeService {
 
 	public boolean exists(String protocol, String store, String nodeId);
 
+	default boolean exists(StoreRef storeRef, String id){
+		return exists(storeRef.getProtocol(), storeRef.getIdentifier(), id);
+	}
+
+	default boolean exists(String id){
+		return exists(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, id);
+	}
+
 	default String getProperty(String storeProtocol, String storeId, String nodeId, String property) {
 	    try {
             return (String)getProperties(storeProtocol, storeId, nodeId).get(property);
@@ -179,6 +192,12 @@ public interface NodeService {
 	List<AssociationRef> getNodesByAssoc(String nodeId, AssocInfo assoc);
 
 	void setProperty(String protocol, String storeId, String nodeId, String property, Serializable value, boolean skipDefinitionChecks);
+	default void setProperty(StoreRef storeRef, String nodeId, String property, Serializable value, boolean skipDefinitionChecks) {
+		setProperty(storeRef.getProtocol(), storeRef.getIdentifier(), nodeId, property, value, skipDefinitionChecks);
+	}
+	default void setProperty(String nodeId, String property, Serializable value, boolean skipDefinitionChecks) {
+		setProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId, property, value, skipDefinitionChecks);
+	}
 
     GetPreviewResult getPreview(String storeProtocol, String storeIdentifier, String nodeId, Map<String, Object> nodeProps, String version);
 

@@ -438,12 +438,18 @@
             resize: vertical;
             overflow: auto;
         }
+        es-code-editor {
+            height: 200px;
+        }
     }
     .elastic-response {
         padding-top: 20px;
         ngx-monaco-editor {
             resize: vertical;
             overflow: auto;
+        }
+        es-code-editor {
+            height: 200px;
         }
     }
     .lucenePaging {

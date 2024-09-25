@@ -24,20 +24,22 @@
     "STATUS_LABEL": "Nutzenden-Status Status",
     "ORG_SIGNUP_ADD_CONFIRM": "Nutzende Person(en) wurde(n) der Gruppe hinzugefügt",
     "ORG_SIGNUP_REJECT_CONFIRM": "Nutzende Person(en) wurde(n) von der Warteliste entfernt und nicht in die Gruppe hinzugefügt",
+    "STATUS_NOTIFY": "Nutzende per E-Mail über Statusänderung informieren",
+    "GROUP_TYPE": {
+      "TEACHER": "Lehrerende"
+    },
     "TAB": {
       "USER": "Nutzende Person"
     },
-    "DELETE": {
-      "MAIN_HEADING": "Nutzende Person & Daten löschen",
-      "RECEIVER": "Nutzende Person suchen..."
-    },
-
     "TOOLPERMISSIONS": {
       "EVERYONE_ALLOWED": "Ausgangswert für alle Nutzenden",
       "USER_ALLOWED": "Gilt für gewählten Nutzenden"
     },
 
     "DELETE": {
+      "MAIN_HEADING": "Nutzende Person & Daten löschen",
+      "USER_LIST": "Vorgang für folgende Nutzende & deren Daten durchführen",
+      "RECEIVER": "Nutzende Person suchen...",
       "CONFIRM": {
         "USERS": "Die Aktion wird für alle folgenden Nutzenden und deren gespeicherte Daten angewandt:",
         "RECEIVER_CAPTION": "Die gewählte Person wird als erstellende Person in der Daten & Sammlungen angezeigt"
@@ -72,7 +74,7 @@
       },
 
       "STATE": {
-        "NO_USERS": "Bislang sind keine Konten für eine Löschung freigegeben. Nutzende können freigegeben werden, indem der Nutzers{{GENDER_SEPARATOR}}in-Status auf den entsprechenden Wert gesetzt wird",
+        "NO_USERS": "Bislang sind keine Konten für eine Löschung freigegeben. Nutzende können freigegeben werden, indem der Nutzenden-Status auf den entsprechenden Wert gesetzt wird",
         "NO_RECEIVER": "Es wurde festgelegt, dass ein oder mehrere Elemente anderer Nutzenden zugewiesen werden sollen, jedoch wurde kein(e) Ziel-Nutzer{{GENDER_SEPARATOR}}in bzw. eine Ziel-Organisation ausgewählt. Bitte legen Sie eine(n) Zielnutzer{{GENDER_SEPARATOR}}in sowie die verantwortliche Organisation fest",
         "DELETE_COLLECTIONS": "Es wurde festgelegt, dass erstellte Sammlungen dieser nutzenden Person entfernt werden soll. Sollten sich unterhalb dieser Sammlung Sammlungen oder Materialien anderer Nutzender Personen befinden, werden diese ebenfalls entfernt"
       }

@@ -1,10 +1,12 @@
 package org.edu_sharing.alfresco.service;
 
+import com.hazelcast.shaded.nonapi.io.github.classgraph.utils.StringUtils;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.node.db.DbNodeServiceImpl;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AuthorityType;
@@ -16,7 +18,6 @@ import org.edu_sharing.alfresco.tools.EduSharingNodeHelper;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.cache.Cache;
-import org.edu_sharing.repository.server.tools.cache.EduGroupCache;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
 
 import java.io.Serializable;
@@ -32,6 +33,8 @@ public class OrganisationService {
 
 	org.alfresco.service.cmr.security.AuthorityService authorityService;
 
+	org.alfresco.service.cmr.security.AuthorityService authorityServiceInsecure;
+
 	Repository repositoryHelper;
 
 	PermissionService permissionService;
@@ -40,11 +43,17 @@ public class OrganisationService {
 
 	TransactionService transactionService;
 
-	public static String ORGANIZATION_GROUP_FOLDER = "EDU_SHARED";
+	public static final String ORGANIZATION_GROUP_FOLDER = "EDU_SHARED";
 
 	public static final String CCM_PROP_EDUGROUP_EDU_HOMEDIR = "{http://www.campuscontent.de/model/1.0}edu_homedir";
 	public static final String CCM_PROP_EDUGROUP_EDU_UNIQUENAME = "{http://www.campuscontent.de/model/1.0}edu_uniquename";
-	public static final QName QNAME_EDUGROUP = QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP);
+
+	public static final QName ASPECT_EDUGROUP = QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP);
+	public static final QName PROP_EDUGROUP_EDU_HOMEDIR = QName.createQName(CCConstants.CCM_PROP_EDUGROUP_EDU_HOMEDIR);
+
+
+	public static final QName ASPECT_EDUGROUP_FOLDER = QName.createQName(CCConstants.CCM_ASPECT_EDUGROUP_FOLDER);
+	public static final QName PROP_EDUGROUP_FOLDER_ORGANISATION = QName.createQName(CCConstants.CCM_PROP_EDUGROUP_FOLDER_ORGANISATION);
 
 	Logger logger = Logger.getLogger(OrganisationService.class);
 
@@ -63,7 +72,7 @@ public class OrganisationService {
 
 		NodeRef shared = getOrganisationFolderRoot();
 
-		String orgFolderName = (groupDisplayName != null && !groupDisplayName.trim().isEmpty()) ? groupDisplayName : orgName;
+		String orgFolderName = !groupDisplayName.trim().isEmpty() ? groupDisplayName : orgName;
 		orgFolderName = EduSharingNodeHelper.cleanupCmName(orgFolderName);
 		
 		NodeRef orgFolder = createNode(shared, CCConstants.CCM_TYPE_MAP, orgFolderName);
@@ -146,19 +155,53 @@ public class OrganisationService {
 	
 	/**
 	 * 
-	 * @param orgName without GROUP_ AND ORG_ PREFIX
+	 * @param orgName with or without GROUP_ORG PREFIX
+	 *
+	 *  for performance reason it uses insecure authorityServiceInsecure and dbNodeService (30%)
 	 */
 	public Map<QName, Serializable> getOrganisation(String orgName) {
-		for(NodeRef nodeRef : EduGroupCache.getKeys()) {
-			Map<QName, Serializable> props = EduGroupCache.get(nodeRef);
-			String tmpOrgName = getCleanName((String)props.get(ContentModel.PROP_AUTHORITY_NAME));
-			if(orgName.equals(tmpOrgName)) {
-				return props;
+
+		//prevent a normal group gets switched to an organisation
+		if(orgName.startsWith(AuthorityType.GROUP.getPrefixString()) && !hasOrganisationPrefix(orgName)){
+			logger.error("orgName " + orgName + " is not an Organisation");
+			return null;
+		}
+
+		String authorityName = getCleanName(orgName);
+		authorityName = AuthorityType.GROUP.getPrefixString() + AuthorityService.ORG_GROUP_PREFIX + authorityName;
+
+		NodeRef authorityNodeRef = authorityServiceInsecure.getAuthorityNodeRef(authorityName);
+		if(authorityNodeRef == null) return null;
+
+		if(!dbNodeService.hasAspect(authorityNodeRef, ASPECT_EDUGROUP)){
+			logger.error("authority: " +authorityName + " missing edugroup aspect");
+			return null;
+		}
+
+		return dbNodeService.getProperties(authorityNodeRef);
+	}
+
+	public List<Map<QName, Serializable>> getOrganisations() {
+		List<Map<QName, Serializable>> organisations = new ArrayList<>();
+
+		logger.info("collecting authorities");
+		Set<String> authorities = authorityServiceInsecure.getAllAuthorities(AuthorityType.GROUP);
+		logger.info("finished collecting authorities: " + authorities.size());
+
+		logger.info("collecting organisations");
+		for(String authorityName : authorities){
+			if(hasOrganisationPrefix(authorityName)){
+				Map<QName, Serializable> organisation = getOrganisation(authorityName);
+				if(organisation != null) organisations.add(organisation);
 			}
 		}
-		
-		return null;
+		logger.info("finished collecting organisations: " + organisations.size());
+		return organisations;
 	}
+
+	private boolean hasOrganisationPrefix(String authorityName) {
+        return authorityName.startsWith(AuthorityType.GROUP.getPrefixString() + AuthorityService.ORG_GROUP_PREFIX);
+    }
 
 	public String getCleanName(String fullOrgName) {
 		String tmpOrgName = new String(fullOrgName);
@@ -169,13 +212,14 @@ public class OrganisationService {
 
 
 	public void syncOrganisationFolderName(boolean execute){
-		for(NodeRef eduGroupFolder : EduGroupCache.getKeysEduGroupFolder()){
-			Map<QName, Serializable> eduGroupProps = EduGroupCache.getByEduGroupfolder(eduGroupFolder);
+
+		for(Map<QName,Serializable> eduGroupProps : getOrganisations()){
+			NodeRef eduGroupFolder = (NodeRef)eduGroupProps.get(QName.createQName(CCM_PROP_EDUGROUP_EDU_HOMEDIR));
 			NodeRef organisationNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,(String)eduGroupProps.get(ContentModel.PROP_NODE_UUID));
 			String authorityName = (String)eduGroupProps.get(ContentModel.PROP_AUTHORITY_NAME);
 			String displayName = (String)nodeService.getProperty(organisationNodeRef, ContentModel.PROP_AUTHORITY_DISPLAY_NAME);
 			String folderName = (String)nodeService.getProperty(eduGroupFolder, ContentModel.PROP_NAME);
-			if (displayName == null || displayName.trim().equals("")) {
+			if (displayName == null || displayName.trim().isEmpty()) {
 				logger.error("display name of authority is null or empty "+ authorityName);
 				continue;
 			}
@@ -226,7 +270,37 @@ public class OrganisationService {
 		params.put(QName.createQName(CCM_PROP_EDUGROUP_EDU_HOMEDIR), folder);
 		params.put(QName.createQName(CCM_PROP_EDUGROUP_EDU_UNIQUENAME), groupName);
 
-		nodeService.addAspect(authorityNodeRef, QNAME_EDUGROUP, params);
+		nodeService.addAspect(authorityNodeRef, ASPECT_EDUGROUP, params);
+
+		bindEduGroupToFolder(PermissionService.GROUP_PREFIX + groupName, folder);
+	}
+
+	public void bindEduGroupToFolder(String authorityName, NodeRef folder) throws Exception{
+		if(!hasOrganisationPrefix(authorityName)){
+			throw new Exception("authorityName " +authorityName +" is no organisation");
+		}
+
+		if(folder == null){
+			logger.error("no homefolder provided");
+			return;
+		}
+
+		if(!nodeService.exists(folder)){
+			logger.error("folder does not exist");
+			return;
+		}
+
+		if(!nodeService.hasAspect(folder,ASPECT_EDUGROUP_FOLDER)){
+			NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(authorityName);
+			if(authorityNodeRef != null){
+				logger.info("adding aspect " + OrganisationService.ASPECT_EDUGROUP_FOLDER +" to the organisation folder of organisation "+ authorityName);
+				Map<QName, Serializable> aspectProps = new HashMap<>();
+				aspectProps.put(OrganisationService.PROP_EDUGROUP_FOLDER_ORGANISATION, authorityNodeRef);
+				nodeService.addAspect(folder,OrganisationService.ASPECT_EDUGROUP_FOLDER,aspectProps);
+			}
+		}else{
+			logger.warn("folder "+ folder + " already has aspect " +ASPECT_EDUGROUP_FOLDER);
+		}
 	}
 
 	private NodeRef createNode(NodeRef parent, String type, String name) {
@@ -365,13 +439,10 @@ public class OrganisationService {
 				
 				String eduGroupScope = (String)nodeService.getProperty(nodeRefAuthority, QName.createQName(CCConstants.CCM_PROP_EDUSCOPE_NAME));
 				
-				boolean add = false;
-				if(authorities.contains(CCConstants.AUTHORITY_GROUP_ALFRESCO_ADMINISTRATORS) 
-						|| authorities.contains(authority)) {
-					add = true;
-				}
-				
-				if(scoped) {
+				boolean add = authorities.contains(CCConstants.AUTHORITY_GROUP_ALFRESCO_ADMINISTRATORS)
+                        || authorities.contains(authority);
+
+                if(scoped) {
 					String currentScope = NodeServiceInterceptor.getEduSharingScope();
 					if(eduGroupScope == null && currentScope != null) {
 						add=false;
@@ -388,6 +459,41 @@ public class OrganisationService {
 			}	
 		}
 		return organisations;
+	}
+
+	public void unbindEduGroupFolder(String groupName, String folderId) throws Exception {
+
+		transactionService.getRetryingTransactionHelper().doInTransaction(
+
+                (RetryingTransactionHelper.RetryingTransactionCallback<Void>) () -> {
+                    if (authorityService.isAdminAuthority(AuthenticationUtil.getRunAsUser())) {
+
+                        NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(PermissionService.GROUP_PREFIX + groupName);
+
+                        if (authorityNodeRef == null) {
+                            return null;
+                        }
+
+                        NodeRef folderNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, folderId);
+
+                        if (!nodeService.exists(folderNodeRef)) {
+                            return null;
+                        }
+
+                        if(!nodeService.getType(authorityNodeRef).equals(QName.createQName(CCConstants.CM_TYPE_AUTHORITY_CONTAINER))){
+                            throw new Exception(authorityNodeRef + " is no Group");
+                        }
+
+                        // remove aspect from group
+                        nodeService.removeAspect(authorityNodeRef, OrganisationService.ASPECT_EDUGROUP);
+
+						//remove Aspect from folder
+                        nodeService.removeAspect(folderNodeRef,OrganisationService.ASPECT_EDUGROUP_FOLDER);
+                    }
+
+                    return null;
+                }, false);
+
 	}
 
 	public void setEduAuthorityService(AuthorityService eduAuthorityService) {
@@ -428,5 +534,9 @@ public class OrganisationService {
 
 	public void setDbNodeService(DbNodeServiceImpl dbNodeService) {
 		this.dbNodeService = dbNodeService;
+	}
+
+	public void setAuthorityServiceInsecure(org.alfresco.service.cmr.security.AuthorityService authorityServiceInsecure) {
+		this.authorityServiceInsecure = authorityServiceInsecure;
 	}
 }

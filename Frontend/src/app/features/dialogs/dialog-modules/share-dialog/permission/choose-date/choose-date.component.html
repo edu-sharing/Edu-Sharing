@@ -1,0 +1,23 @@
+<mat-form-field>
+  <mat-label>{{ 'WORKSPACE.SHARE.TIMEBASED.DATE_LABEL' | translate }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="picker"
+    [min]="toDate(from)"
+    [max]="toDate(to)"
+    [value]="toDate(dateTime)"
+    (dateChange)="updateDate($event)"
+  />
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+<mat-form-field class="time">
+  <mat-label>{{ 'WORKSPACE.SHARE.TIMEBASED.TIME_LABEL' | translate }}</mat-label>
+  <input
+    matInput
+    pattern="\d\d:\d\d"
+    [formControl]="timeControl"
+    name="timeControl"
+    ngDefaultControl
+  />
+</mat-form-field>

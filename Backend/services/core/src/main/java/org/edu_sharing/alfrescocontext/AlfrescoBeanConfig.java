@@ -26,8 +26,8 @@ import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteService;
@@ -36,7 +36,11 @@ import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.transaction.TransactionService;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfresco.policy.HomeFolderTool;
+import org.edu_sharing.alfresco.service.OrganisationService;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -67,8 +71,8 @@ public class AlfrescoBeanConfig {
 
     @Primary
     @Bean
-  public SearchTrackingComponent solrTrackingComponent() {
-    return applicationContext.getBean(SearchTrackingComponent.class);
+    public SearchTrackingComponent solrTrackingComponent() {
+        return applicationContext.getBean(SearchTrackingComponent.class);
     }
 
     @Primary
@@ -109,7 +113,7 @@ public class AlfrescoBeanConfig {
 
     @Primary
     @Bean(name = "AuthenticationService")
-    public AuthenticationService authenticationService() {
+    public MutableAuthenticationService authenticationService() {
         return serviceRegistry.getAuthenticationService();
     }
 
@@ -269,9 +273,11 @@ public class AlfrescoBeanConfig {
         return serviceRegistry.getWorkflowService();
     }
 
-  @Bean(name="WebDavAuthenticationFilter")
-  @ConditionalOnMissingBean(name = "WebDavAuthenticationFilter")
-  public DependencyInjectedFilter webDavAuthenticationFilter(){ return applicationContext.getBean("WebDavAuthenticationFilter", DependencyInjectedFilter.class); }
+    @Bean(name = "WebDavAuthenticationFilter")
+    @ConditionalOnMissingBean(name = "WebDavAuthenticationFilter")
+    public DependencyInjectedFilter webDavAuthenticationFilter() {
+        return applicationContext.getBean("WebDavAuthenticationFilter", DependencyInjectedFilter.class);
+    }
 
     @Bean
     public NodeService alfrescoDefaultDbNodeService() {
@@ -295,12 +301,12 @@ public class AlfrescoBeanConfig {
 
     @Bean
     @Scope("prototype")
-    public HomeFolderTool homeFolderTool(){
+    public HomeFolderTool homeFolderTool() {
         return new HomeFolderTool(serviceRegistry);
     }
 
     @Bean
-    public AuthenticationComponent authenticationComponent()  {
+    public AuthenticationComponent authenticationComponent() {
         return applicationContext.getBean("authenticationComponent", AuthenticationComponent.class);
     }
 
@@ -309,4 +315,22 @@ public class AlfrescoBeanConfig {
         return serviceRegistry.getModuleService();
     }
 
+    @Bean(name = "organisationService")
+    public OrganisationService organisationService() {
+        return (OrganisationService) applicationContext.getBean("eduOrganisationService");
+    }
+
+    @Bean
+    public GuestService guestService() {
+        return applicationContext.getBean(GuestService.class);
+    }
+
+    @Bean
+    public LightbendConfigLoader lightbendConfigLoader() {
+        return applicationContext.getBean(LightbendConfigLoader.class);
+    }
+    @Bean
+    public SqlSessionFactory sqlSessionFactoryBean(){
+        return applicationContext.getBean("repoSqlSessionFactory", SqlSessionFactory.class);
+    }
 }

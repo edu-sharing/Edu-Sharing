@@ -260,7 +260,7 @@ spec:
       {{- if (default $.Values.global.cluster.storage.data.permission $.Values.persistence.data.permission) }}
       initContainers:
       - name: {{ include "edusharing_common_lib.names.name" $ }}-init-permission
-        image: {{ include "edusharing_common_lib.images.common" $ }}{{ .Values.init.permission.image.name }}:{{ .Values.init.permission.image.tag }}
+        image: {{ include "edusharing_common_lib.images.common" $ }}{{ $.Values.init.permission.image.name }}:{{ $.Values.init.permission.image.tag }}
         imagePullPolicy: {{ $.Values.global.image.pullPolicy }}
         command:
           - "/bin/bash"
@@ -319,8 +319,25 @@ spec:
       {{- end }}
       containers:
       - name: {{ include "edusharing_common_lib.names.name" $ }}
-        image: {{ include "edusharing_common_lib.images.common" $ }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        image: {{ include "edusharing_common_lib.images.common" $ }}{{ $.Values.image.name }}:{{ $.Values.image.tag }}
         imagePullPolicy: {{ $.Values.global.image.pullPolicy }}
+        args:
+          - solr/solr/bin/solr
+          - start
+          - '-f'
+          - '-p'
+          - '8080'
+          {{- if or $.Values.config.metrics.enabled (default $.Values.global.debug $.Values.debug) }}
+          - '-a'
+          - >-
+            {{- if $.Values.config.metrics.enabled }}
+            -javaagent:/opt/alfresco/solr/agent/jmx_prometheus_javaagent.jar=9090:/opt/alfresco/solr/agent/jmx-exporter-config.yaml
+            {{- end }}
+            {{- if default $.Values.global.debug $.Values.debug }}
+            -agentlib:jdwp=transport=dt_socket,address=0.0.0.0:5005,server=y,suspend=n
+            {{- end }}
+          {{- end }}
+          - '-Dcreate.alfresco.defaults=alfresco,archive'
         env:
         - name: REPOSITORY_SEARCH_SOLR_CONFIG
           value: | {{ .spec.config.override.application.common | nindent 12 }}

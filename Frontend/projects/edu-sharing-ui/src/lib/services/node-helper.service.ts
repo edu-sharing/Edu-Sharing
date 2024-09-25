@@ -2,6 +2,7 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import {
     ApiHelpersService,
     ConfigService,
+    User,
     NetworkService,
     Node,
     ProposalNode,
@@ -102,7 +103,7 @@ export class NodeHelperService {
         if (icon == 'none' && !useNoneAsFallback) return null;
         const result =
             this.apiHelpersService.getServerUrl() + '/../ccimages/licenses/' + icon + '.svg';
-        return this.repoUrlService.withCurrentOrigin(result);
+        return result;
     }
     /**
      * Return a translated name of a license name for a node
@@ -201,10 +202,13 @@ export class NodeHelperService {
             Workflow.WORKFLOW_STATUS_CHECKED,
         ]);
     }
-    copyDataToNode<T extends Node>(target: T, source: T) {
+    copyDataToNode<T extends Node | User>(target: T, source: T) {
         target.properties = source.properties;
-        target.name = source.name;
-        target.title = source.title;
+        (target as Node).name = (source as Node).name;
+        (target as Node).title = (source as Node).title;
+        (target as User).authorityName = (source as User).authorityName;
+        (target as User).profile = (source as User).profile;
+        (target as User).status = (source as User).status;
     }
     isNodeCollection(node: Node): boolean {
         return node.aspects?.includes(RestConstants.CCM_ASPECT_COLLECTION) || !!node.collection;

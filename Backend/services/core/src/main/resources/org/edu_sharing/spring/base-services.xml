@@ -74,10 +74,6 @@
       </list>
     </property>
   </bean>
-  <bean id="permissionServiceImpl" class="org.edu_sharing.service.permission.PermissionServiceImpl">
-    <constructor-arg name="toolPermission" ref="toolPermissionService"/>
-    <constructor-arg name="eduNodeService" ref="nodeService"/>
-  </bean>
   <bean id="permissionServiceInterceptor" class="org.edu_sharing.service.permission.PermissionServiceInterceptor"
         init-method="init"/>
 

@@ -16,9 +16,11 @@
       (keydown.enter)="add(value)"
       [matTooltip]="'MDS.FILTER_FOR' | translate : { value: value.label, count: value.count }"
     >
-      <mat-icon>add</mat-icon>
-      <span class="caption">{{ value.label }}</span>
-      <span class="count">({{ value.count }})</span>
+      <div class="wrapper">
+        <mat-icon>add</mat-icon>
+        <span class="caption">{{ value.label }}</span>
+        <span class="count">({{ value.count }})</span>
+      </div>
     </mat-chip-row>
   </mat-chip-grid>
 </es-mds-editor-widget-container>

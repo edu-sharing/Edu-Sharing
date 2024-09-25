@@ -31,9 +31,13 @@ public abstract class AbstractJobMapAnnotationParams extends AbstractJob {
                     if (field.getAnnotation(JobFieldDescription.class).file()) {
                         field.set(this, jobExecutionContext.getJobDetail().getJobDataMap().get(JobHandler.FILE_DATA));
                     } else if (field.getType().isEnum()) {
-                        field.set(this, mapEnum(field.getType(), jobExecutionContext.getJobDetail().getJobDataMap().getString(field.getName())));
+                        if(value != null) {
+                            field.set(this, mapEnum(field.getType(), jobExecutionContext.getJobDetail().getJobDataMap().getString(field.getName())));
+                        }
                     } else if (field.getType().isPrimitive()) {
-                        field.set(this, value);
+                        if(value != null) {
+                            field.set(this, value);
+                        }
                     } else if (field.getType().isAssignableFrom(Collection.class) || field.getType().equals(List.class)) {
                         if (value != null) {
                             Type abstractType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];

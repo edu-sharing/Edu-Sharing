@@ -9,6 +9,9 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.service.guest.GuestConfig;
+import org.edu_sharing.alfresco.service.guest.GuestService;
+import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.metadataset.v2.MetadataKey;
 import org.edu_sharing.metadataset.v2.MetadataReader;
 import org.edu_sharing.metadataset.v2.MetadataSet;
@@ -37,6 +40,7 @@ public class OAILOMExporterHSOER extends OAILOMExporter {
     final String nsLRT = "https://w3id.org/kim/hcrt/scheme";
     final String nsLOM = "LOMv1.0";
 
+    final GuestService guestService = AlfAppContextGate.getApplicationContext().getBean(GuestService.class);
     public OAILOMExporterHSOER() throws ParserConfigurationException {
        super();
        this.xmlLanguageAttribute = "xml:lang";
@@ -235,9 +239,17 @@ public class OAILOMExporterHSOER extends OAILOMExporter {
         // status - for now is always "Final" (allowed is "Draft", "Revised", Unavailable" too)
         String status = "Draft";
 
-        String unGuest = ApplicationInfoList.getHomeRepository().getGuest_username();
-        if(unGuest == null) unGuest = PermissionService.GUEST_AUTHORITY;
-        AccessStatus sharedForEveryOne = AuthenticationUtil.runAs(()->{return serviceRegistry.getPermissionService().hasPermission(nodeRef, PermissionService.CONSUMER);}, unGuest);
+//        String unGuest = ApplicationInfoList.getHomeRepository().getGuest_username();
+//        if(unGuest == null) unGuest = PermissionService.GUEST_AUTHORITY;
+        GuestConfig guestConfig = guestService.getCurrentGuestConfig();
+        String unGuest = null;
+        if(guestConfig != null && guestConfig.isEnabled()) {
+            unGuest = guestConfig.getUsername();
+        }
+        if (unGuest == null) {
+            unGuest = PermissionService.GUEST_AUTHORITY;
+        }
+        AccessStatus sharedForEveryOne = AuthenticationUtil.runAs(()-> serviceRegistry.getPermissionService().hasPermission(nodeRef, PermissionService.CONSUMER), unGuest);
         if(sharedForEveryOne.equals(AccessStatus.ALLOWED)){
             status = "Final";
         }

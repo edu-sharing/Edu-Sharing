@@ -23,8 +23,8 @@ public abstract class MetadataQueryBase implements Serializable{
         return conditions;
     }
 
-    public Map<String, String> getBasequery() {
-        return this.basequery;
+    public String getPrimaryBasequery() {
+        return QueryUtils.replaceCommonQueryParams(this.basequery.get(null), QueryUtils.replacerFromSyntax(syntax, true));
     }
 
     public void setBasequery(Map<String, String> basequery) {

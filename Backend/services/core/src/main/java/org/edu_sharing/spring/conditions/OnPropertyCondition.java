@@ -17,6 +17,9 @@ public class OnPropertyCondition implements Condition {
                 .stream(ConditionalOnProperty.class.getName())
                 .filter(MergedAnnotationPredicates.unique(MergedAnnotation::getMetaTypes))
                 .map(MergedAnnotation::asAnnotationAttributes).collect(Collectors.toList());
+        if(allAnnotationAttributes.isEmpty()){
+            return false;
+        }
         AnnotationAttributes annotationAttributes = allAnnotationAttributes.get(0);
         String name = annotationAttributes.getString("name");
         String hasValue = annotationAttributes.getString("havingValue");

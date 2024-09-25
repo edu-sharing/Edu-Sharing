@@ -470,7 +470,8 @@
       "employee": "employé-e",
       "extern": "utilisateur-trice externe",
       "system": "compte système",
-      "function": "compte de fonction"
+      "function": "compte de fonction",
+      "guest": "Invité"
     },
     "status": "statut"
   },

@@ -151,6 +151,8 @@ export class NodeEntriesTableComponent<T extends NodeEntriesDataType>
         }
         // Wait for the menu to reflect changed options.
         setTimeout(() => {
+            this.dropdown.callbackObject = node;
+            this.dropdown.ngOnChanges();
             if (this.dropdown.canShowDropdown()) {
                 this.menuTrigger.openMenu();
             } else {

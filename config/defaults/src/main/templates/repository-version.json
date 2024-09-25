@@ -1,4 +1,5 @@
 {
+  "repository": "repository",
   "git": {
     "branch": "${git.branch}",
     "closest": {

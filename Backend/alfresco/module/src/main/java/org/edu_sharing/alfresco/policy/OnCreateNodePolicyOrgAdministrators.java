@@ -15,13 +15,11 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
+import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.cache.EduGroupCache;
 
 public class OnCreateNodePolicyOrgAdministrators implements OnCreateNodePolicy, OnMoveNodePolicy {
 
@@ -79,7 +77,7 @@ public class OnCreateNodePolicyOrgAdministrators implements OnCreateNodePolicy, 
 		NodeRef organisationNode = null;
 		while(!companyHome.equals(currentNode) && organisationNode == null && currentNode != null){
 			
-			if(EduGroupCache.isAnOrganisationFolder(currentNode)){
+			if(nodeService.hasAspect(currentNode, OrganisationService.ASPECT_EDUGROUP_FOLDER)){
 				organisationNode = currentNode;
 				break;
 			}
@@ -88,8 +86,8 @@ public class OnCreateNodePolicyOrgAdministrators implements OnCreateNodePolicy, 
 		}
 		
 		if(organisationNode != null){
-			
-			Map<QName, Serializable> eduGroupProps = EduGroupCache.getByEduGroupfolder(organisationNode);
+			NodeRef orgNodeRef = (NodeRef)nodeService.getProperty(organisationNode,OrganisationService.PROP_EDUGROUP_FOLDER_ORGANISATION);
+			Map<QName, Serializable> eduGroupProps = nodeService.getProperties(orgNodeRef);
 			NodeRef eduGroupNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, (String)eduGroupProps.get(ContentModel.PROP_NODE_UUID));
 			List<ChildAssociationRef> childGroups = nodeService.getChildAssocs(eduGroupNodeRef);
 			for(ChildAssociationRef childGroup : childGroups){

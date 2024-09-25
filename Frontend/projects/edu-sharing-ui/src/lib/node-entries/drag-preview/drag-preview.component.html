@@ -1,6 +1,6 @@
 <div class="drag-preview" [matBadge]="selected.length > 1 ? selected.length : null">
   <div class="drag-preview-icon">
-    <img *ngIf="node.iconURL" [src]="node | esNodeIcon" />
+    <img *ngIf="node.iconURL" [src]="node | esNodeIcon | async" />
   </div>
   <es-list-text class="drag-preview-text" [node]="node" [item]="item"></es-list-text>
 </div>

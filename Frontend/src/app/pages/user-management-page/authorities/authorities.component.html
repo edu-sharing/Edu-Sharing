@@ -299,8 +299,10 @@
         </div>
         <div *ngIf="!editId">
           <es-input-password
+            #passwordRef
             label="{{ 'USER.password' | translate }}"
             [(value)]="editDetails.password"
+            [displayStrength]="true"
           ></es-input-password>
         </div>
         <div class="quota">

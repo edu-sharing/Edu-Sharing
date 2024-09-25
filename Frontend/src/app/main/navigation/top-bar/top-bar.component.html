@@ -160,7 +160,7 @@
       data-test="main-nav-user-menu-button"
     >
       <es-user-avatar [user]="currentUser" [size]="'xsmall'"></es-user-avatar>
-      <span *ngIf="!connector.getCurrentLogin()?.isGuest">{{ currentUser | authorityName }}</span>
+      <span *ngIf="!connector.getCurrentLogin()?.isGuest">{{ currentUser | nodePersonName }}</span>
       <span *ngIf="connector.getCurrentLogin()?.isGuest">{{ 'USER_GUEST' | translate }}</span>
       <i esIcon="keyboard_arrow_down" [aria]="false" class="iconArrow"></i>
       <!-- <i class="material-icons barIcon iconPerson">account_circle</i>-->

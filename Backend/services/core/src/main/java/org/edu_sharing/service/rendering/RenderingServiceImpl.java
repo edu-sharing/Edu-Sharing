@@ -1,14 +1,9 @@
 package org.edu_sharing.service.rendering;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -17,18 +12,25 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.metadataset.v2.tools.MetadataTemplateRenderer;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
 import org.edu_sharing.repository.server.AuthenticationTool;
 import org.edu_sharing.repository.server.RepoFactory;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.server.rendering.RenderingErrorServlet;
 import org.edu_sharing.repository.server.rendering.RenderingException;
-import org.edu_sharing.repository.server.tools.*;
+import org.edu_sharing.repository.server.tools.ApplicationInfo;
+import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.edu_sharing.repository.server.tools.HttpException;
+import org.edu_sharing.repository.server.tools.HttpQueryTool;
 import org.edu_sharing.repository.tools.URLHelper;
-import org.edu_sharing.restservices.*;
+import org.edu_sharing.restservices.DAOException;
+import org.edu_sharing.restservices.NodeDao;
+import org.edu_sharing.restservices.PersonDao;
+import org.edu_sharing.restservices.RepositoryDao;
 import org.edu_sharing.restservices.shared.Filter;
 import org.edu_sharing.restservices.shared.Node;
 import org.edu_sharing.restservices.shared.NodeUrls;
@@ -45,7 +47,11 @@ import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class RenderingServiceImpl implements RenderingService{
@@ -53,6 +59,7 @@ public class RenderingServiceImpl implements RenderingService{
 
 	private final NodeService nodeService;
 	private final PermissionService permissionService;
+	private final GuestService guestService;
 	ApplicationInfo appInfo;
 	
 	Map<String,String> authInfo;
@@ -69,14 +76,11 @@ public class RenderingServiceImpl implements RenderingService{
 			this.appInfo = ApplicationInfoList.getRepositoryInfoById(appId);
 			this.authTool = RepoFactory.getAuthenticationToolInstance(appId);
 
-			String guestUn = ApplicationInfoList.getHomeRepository().getGuest_username();
-
 			//fix for running in runas user mode
 			if((AuthenticationUtil.isRunAsUserTheSystemUser()
 					|| "admin".equals(AuthenticationUtil.getRunAsUser()))
 					|| Context.getCurrentInstance().getCurrentInstance() == null
-					|| (guestUn != null
-					&& guestUn.equals(AuthenticationUtil.getFullyAuthenticatedUser()) )) {
+					|| guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser())) {
 				logger.debug("starting in runas user mode");
 				this.authInfo = new HashMap<>();
 				this.authInfo.put(CCConstants.AUTH_USERNAME, AuthenticationUtil.getRunAsUser());
@@ -97,8 +101,8 @@ public class RenderingServiceImpl implements RenderingService{
 	}
 
 	@Override
-	public String getDetails(String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
-		
+	public RenderingDetails getDetails(String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
+
 		if(!this.permissionService.hasPermission(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId,CCConstants.PERMISSION_READ)){
 			throw new InsufficientPermissionException("no read permission");
 		}
@@ -117,11 +121,13 @@ public class RenderingServiceImpl implements RenderingService{
 			options.displayMode = displayMode;
 			options.parameters = parameters;
 			RenderingServiceData data = getData(appInfo, nodeId, nodeVersion, AuthenticationUtil.getFullyAuthenticatedUser(), options);
-			return getDetails(renderingServiceUrl, data);
+            return new RenderingDetails(getDetails(renderingServiceUrl, data), data);
 		}catch(Throwable t) {
 			logger.warn(t.getMessage(),t);
-			return RenderingErrorServlet.errorToHTML(null,
-					new RenderingException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,t.getMessage(),RenderingException.I18N.unknown,t));
+			RenderingException exception = new RenderingException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), RenderingException.I18N.unknown, t);
+			RenderingDetails details = new RenderingDetails(RenderingErrorServlet.errorToHTML(null, exception), null);
+			details.setException(exception);
+			return details;
 			/*
 			String repository=VersionService.getVersionNoException(VersionService.Type.REPOSITORY);
 			String rs=VersionService.getVersionNoException(VersionService.Type.RENDERSERVICE);
@@ -138,7 +144,7 @@ public class RenderingServiceImpl implements RenderingService{
 			}
 			*/
 		}
-	
+
 	}
 
 	@Override
@@ -175,7 +181,9 @@ public class RenderingServiceImpl implements RenderingService{
 		long time=System.currentTimeMillis();
 		NodeService nodeService = NodeServiceFactory.getNodeService(appInfo.getAppId());
 		RenderingServiceData data=new RenderingServiceData();
-		data.setEditors(getAvailableEditors(nodeId, nodeVersion, user));
+		if(appInfo.ishomeNode()) {
+			data.setEditors(getAvailableEditors(nodeId, nodeVersion, user));
+		}
 		RepositoryDao repoDao = RepositoryDao.getRepository(this.appInfo.getAppId());
 		NodeDao nodeDao = NodeDao.getNodeWithVersion(repoDao, nodeId, nodeVersion);
 

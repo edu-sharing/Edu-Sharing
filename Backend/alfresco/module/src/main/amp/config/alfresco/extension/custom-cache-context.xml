@@ -13,13 +13,6 @@
    <bean name="eduSharingPersonCache" factory-bean="cacheFactory" factory-method="createCache">
       <constructor-arg value="cache.eduSharingPersonCache"/>      
    </bean>
-   <bean name="eduSharingEduGroupCache" factory-bean="cacheFactory" factory-method="createCache">
-   		<constructor-arg value="cache.eduSharingEduGroupCache"/> 
-   </bean>
-
-    <bean name="eduSharingEduGroupFolderCache" factory-bean="cacheFactory" factory-method="createCache">
-        <constructor-arg value="cache.eduSharingEduGroupFolderCache"/>
-    </bean>
 
    <bean name="eduSharingRatingCache" factory-bean="cacheFactory" factory-method="createCache">
         <constructor-arg value="cache.eduSharingRatingCache"/>
@@ -60,6 +53,10 @@
     <bean name="eduSharingConfigCache" factory-bean="cacheFactory" factory-method="createCache">
         <constructor-arg value="cache.eduSharingConfigCache"/>
     </bean>
+
+  <bean name="eduSharingContextCache" factory-bean="cacheFactory" factory-method="createCache">
+    <constructor-arg value="cache.eduSharingContextCache"/>
+  </bean>
 
     <bean name="eduSharingVersionCache" factory-bean="cacheFactory" factory-method="createCache">
         <constructor-arg value="cache.eduSharingVersionCache"/>

@@ -100,6 +100,7 @@
       <permissionGroup name="WriteProperties" expose="true" allowFullControl="false" />  
       <permissionGroup name="ReadContent" expose="false" allowFullControl="false" />  
       <permissionGroup name="DownloadContent" expose="true" allowFullControl="false" />
+      <permissionGroup name="Embed" expose="true" allowFullControl="false" />
       <permissionGroup name="WriteContent" expose="false" allowFullControl="false" />
       <permissionGroup name="ExecuteContent" expose="false" allowFullControl="false" />  
       <permissionGroup name="DeleteNode" expose="true" allowFullControl="false" />  
@@ -225,6 +226,10 @@
 
        <permission name="_DownloadContent" expose="false">
            <grantedToGroup permissionGroup="DownloadContent"/>
+       </permission>
+
+       <permission name="_Embed" expose="false">
+           <grantedToGroup permissionGroup="Embed"/>
        </permission>
 
       <!-- The permission to write content.                                              -->
@@ -388,6 +393,7 @@
           <includePermissionGroup type="sys:base" permissionGroup="Feedback"/>
           <includePermissionGroup type="sys:base" permissionGroup="RateRead"/>
           <includePermissionGroup type="sys:base" permissionGroup="Rate"/>
+          <includePermissionGroup type="sys:base" permissionGroup="Embed"/>
       </permissionGroup>
       <!-- edu-sharing a restricted Consumer which can only read metadata of the node -->
       <permissionGroup name="ConsumerMetadata" allowFullControl="false" expose="true" >

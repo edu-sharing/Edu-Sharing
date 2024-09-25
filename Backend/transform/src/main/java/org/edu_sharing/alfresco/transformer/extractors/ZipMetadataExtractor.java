@@ -4,6 +4,7 @@ import org.alfresco.transform.base.TransformManager;
 import org.alfresco.transform.base.metadata.AbstractMetadataExtractorEmbedder;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.tika.utils.StringUtils;
 import org.edu_sharing.alfresco.transformer.executors.tools.ZipTool;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -58,7 +59,9 @@ public class ZipMetadataExtractor extends AbstractMetadataExtractorEmbedder {
                     Reader reader = new InputStreamReader(zip);
                     JSONObject jo = (JSONObject)new JSONParser().parse(reader);
                     String title = (String)jo.get("title");
-                    result.put(TITLE,title);
+                    if(!StringUtils.isBlank(title)) {
+                        result.put(TITLE, title);
+                    }
                 }
 
             }

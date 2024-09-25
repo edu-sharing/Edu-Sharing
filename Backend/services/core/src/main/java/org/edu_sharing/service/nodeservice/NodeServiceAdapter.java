@@ -1,10 +1,5 @@
 package org.edu_sharing.service.nodeservice;
 
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.*;
-import java.util.Map.Entry;
-
 import org.alfresco.service.cmr.repository.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.edu_sharing.repository.client.rpc.User;
@@ -18,6 +13,11 @@ import org.edu_sharing.service.permission.HandleParam;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.extensions.surf.util.URLEncoder;
+
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class NodeServiceAdapter implements NodeService {
 	
@@ -63,6 +63,11 @@ public class NodeServiceAdapter implements NodeService {
 
 	@Override
 	public Map<String, String[]> getNameProperty(String name) {
+		return null;
+	}
+
+	@Override
+	public Map<String, Map<String, Object>> getChildrenPropsByType(StoreRef store, String nodeId, String type) {
 		return null;
 	}
 

@@ -18,7 +18,7 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfresco.policy.GuestCagePolicy;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.rpc.EduGroup;
@@ -51,7 +51,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 	OwnableService ownableService = serviceRegistry.getOwnableService();
 	PermissionService permissionService = serviceRegistry.getPermissionService();
     org.edu_sharing.alfresco.service.AuthorityService eduAuthorityService = (org.edu_sharing.alfresco.service.AuthorityService)alfApplicationContext.getBean("eduAuthorityService");
-
+	GuestService guestService = alfApplicationContext.getBean(GuestService.class);
 
 
     /**
@@ -146,8 +146,8 @@ public class AuthorityServiceImpl implements AuthorityService {
 	@Override
 	public boolean isGuest() {
 		try {
-			return GuestCagePolicy.getGuestUsers().contains(AuthenticationUtil.getFullyAuthenticatedUser());
-		} catch (Throwable e) {
+			return guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser());
+		} catch (Throwable ignored) {
 		}
 		return false;
 	}

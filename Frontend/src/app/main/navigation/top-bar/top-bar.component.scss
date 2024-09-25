@@ -47,6 +47,7 @@ es-imprint-privacy ::ng-deep {
     border: none;
     outline: none;
     background-color: unset;
+    font-family: $primaryFontFamily;
     color: $workspaceTopBarFontColor !important;
     & ::ng-deep .mat-ripple-element {
         background-color: #{color.change($workspaceTopBarFontColor, $alpha: 0.1)};
@@ -97,6 +98,7 @@ es-imprint-privacy ::ng-deep {
 .menuButton img {
     margin-left: 0;
     width: 35px;
+    margin-right: 5px;
 }
 
 span {

@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { LoginInfo } from 'ngx-edu-sharing-api';
+import { Ace, LoginInfo } from 'ngx-edu-sharing-api';
 import { ListItem, OPEN_URL_MODE, UIConstants } from 'ngx-edu-sharing-ui';
 import { Observable, Observer, forkJoin as observableForkJoin, of } from 'rxjs';
 import { catchError, first, take } from 'rxjs/operators';
@@ -45,6 +45,7 @@ import {
 import { NodeHelperService } from '../services/node-helper.service';
 import { RouterHelper } from '../util/router.helper';
 import { Toast } from '../services/toast';
+import { ExtendedAce } from '../features/dialogs/dialog-modules/share-dialog/share-dialog.component';
 
 export class UIHelper {
     // TODO: check, whether these parameters are still used and remove or include them in
@@ -784,7 +785,7 @@ export class UIHelper {
         document.body.removeChild(input);
     }
 
-    static mergePermissions(source: Permission[], add: Permission[]) {
+    static mergePermissions(source: (Ace | ExtendedAce)[], add: Ace[]) {
         const merge = source;
         for (const p2 of add) {
             // do only add new, unique permissions
@@ -802,7 +803,7 @@ export class UIHelper {
      * @param source
      * @param add
      */
-    static mergePermissionsWithHighestPermission(source: Permission[], add: Permission[]) {
+    static mergePermissionsWithHighestPermission(source: Ace[], add: Ace[]) {
         const result = Helper.deepCopyArray(source);
         for (const p2 of add) {
             const map = source.filter(
@@ -827,6 +828,12 @@ export class UIHelper {
             }
         }
         return result;
+    }
+    static permissionIsGreaterThanOrEqual(p1: string, p2: string) {
+        return (
+            RestConstants.BASIC_PERMISSIONS.indexOf(p1) >=
+            RestConstants.BASIC_PERMISSIONS.indexOf(p2)
+        );
     }
 
     static permissionIsGreaterThan(p1: string, p2: string) {

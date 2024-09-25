@@ -5,6 +5,8 @@ package org.edu_sharing.repository.server;
 
 import com.google.common.base.CharMatcher;
 import jakarta.transaction.UserTransaction;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -55,16 +57,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.alfresco.HasPermissionsWork;
 import org.edu_sharing.alfresco.fixes.VirtualEduGroupFolderTool;
-import org.edu_sharing.alfresco.policy.GuestCagePolicy;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.connector.ConnectorService;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.metadataset.v2.MetadataKey;
 import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.metadataset.v2.MetadataWidget;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
-import org.edu_sharing.repository.client.exception.CCException;
 import org.edu_sharing.repository.client.rpc.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.MimeTypes;
@@ -96,7 +97,7 @@ import org.springframework.extensions.surf.util.I18NUtil;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.rmi.RemoteException;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -111,21 +112,22 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     private static ApplicationContext applicationContext = null;
     private final UserCache userCache;
 
-    private ServiceRegistry serviceRegistry = null;
+    private final ServiceRegistry serviceRegistry;
 
-    private NodeService nodeService = null;
+    private final NodeService nodeService;
 
-    private ContentService contentService = null;
+    private final ContentService contentService;
 
-    private AuthorityService authorityService = null;
+    private final AuthorityService authorityService;
 
-    private SearchService searchService = null;
+    private final SearchService searchService;
 
-    private NamespaceService namespaceService = null;
+    private final NamespaceService namespaceService;
 
-    private PersonService personService;
+    private final PersonService personService;
 
-    private DictionaryService dictionaryService;
+    private final DictionaryService dictionaryService;
+    private final GuestService guestService;
 
     org.edu_sharing.alfresco.service.AuthorityService eduAuthorityService;
 
@@ -146,14 +148,24 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      * the referenced object will be returned by asking the remote Repository.
      * sometimes this behavior is not what we want for example getting the real
      * RemoteObject Properties so you can use this prop. see getPropertiesBridge
+     * -- GETTER --
+     *
+     *
+     * -- SETTER --
+     *
+     @return the resolveRemoteObjects
+      * @param resolveRemoteObjects the resolveRemoteObjects to set
+
      */
+    @Setter
+    @Getter
     boolean resolveRemoteObjects = true;
 
-    protected String repId = null;
+    protected String repId;
 
-    protected ApplicationInfo appInfo = null;
+    protected ApplicationInfo appInfo;
 
-    Repository repositoryHelper = null;
+    Repository repositoryHelper;
 
     private static String alfrescoSearchSubsystem = null;
 
@@ -163,7 +175,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     /**
      * this constructor can be used when the authentication at alfresco services
      * was already done The AuthenticationInfo is taken from the current thread.
-     *
+     * <p>
      * Pay attention when using it. Cause of the thread pool in tomcat this can
      * lead to the problem that the user becomes someone else when the thread
      * was used by another user before and no new authentication with alfresco
@@ -209,6 +221,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         personService = serviceRegistry.getPersonService();
 
         dictionaryService = serviceRegistry.getDictionaryService();
+        guestService = applicationContext.getBean(GuestService.class);
 
         eduAuthorityService = (org.edu_sharing.alfresco.service.AuthorityService) applicationContext.getBean("eduAuthorityService");
 
@@ -283,9 +296,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         Map<String, Map<String, Object>> returnVal = new LinkedHashMap<>();
         List<org.edu_sharing.service.model.NodeRef> resultNodeRefs = srnr.getData();
-        for (int i = 0; i < resultNodeRefs.size(); i++) {
+        for (org.edu_sharing.service.model.NodeRef nodeRefEdu : resultNodeRefs) {
 
-            org.edu_sharing.service.model.NodeRef nodeRefEdu = resultNodeRefs.get(i);
             NodeRef actNode = new NodeRef(new StoreRef(nodeRefEdu.getStoreProtocol(), nodeRefEdu.getStoreId()), nodeRefEdu.getNodeId());
 
             Map<String, Object> properties = getProperties(actNode);
@@ -310,7 +322,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         searchParameters.setSkipCount(startIdx);
         searchParameters.setMaxItems(nrOfresults);
 
-        if (facettes != null && facettes.size() > 0) {
+        if (facettes != null && !facettes.isEmpty()) {
             for (String facetteProp : facettes) {
                 String fieldFacette = "@" + facetteProp;
                 FieldFacet fieldFacet = new FieldFacet(fieldFacette);
@@ -337,7 +349,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         searchResult.setStartIDX(startIDX);
 
         // do the facette
-        if (facettes != null && facettes.size() > 0) {
+        if (facettes != null && !facettes.isEmpty()) {
             List<NodeSearch.Facet> facetsResult = new ArrayList<>();
 
             for (String facetteProp : facettes) {
@@ -366,7 +378,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                      * http://stackoverflow.com/questions/10069868/getting-facet-count-0-in-solr
                      * --> pair.getSecond() > 0
                      */
-                    if (first != null && !first.trim().equals("") && pair.getSecond() > 0) {
+                    if (StringUtils.isNotBlank(first) && pair.getSecond() > 0) {
                         NodeSearch.Facet.Value value = new NodeSearch.Facet.Value();
                         value.setValue(first);
                         value.setCount(pair.getSecond());
@@ -387,7 +399,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public Map<String, Map<String, Object>> search(String luceneString, String type) throws Exception {
 
         String queryString = "TYPE:\"" + type + "\"";
-        if (luceneString != null && !luceneString.trim().equals("")) {
+        if (StringUtils.isNotBlank(luceneString)) {
             queryString = queryString + " AND " + luceneString;
         }
 
@@ -474,7 +486,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         if (authorities != null) {
             essp = new ESSearchParameters();
-            ((ESSearchParameters) essp).setAuthorities(authorities.toArray(new String[authorities.size()]));
+            ((ESSearchParameters) essp).setAuthorities(authorities.toArray(new String[0]));
         }
         essp.setQuery(token.getQuery());
         for (SearchParameters.SortDefinition sort : token.getSortDefinitions()) {
@@ -507,7 +519,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         for (NodeRef nodeRef : resultSet.getNodeRefs()) {
             result.add(nodeRef.getId());
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     public String formatData(String type, String key, Object value, String metadataSetId) {
@@ -518,12 +530,11 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             // be formated with userInfo later
             if (value instanceof List) {
                 List<Object> list = (List<Object>) value;
-                if (list.size() > 0) {
+                if (!list.isEmpty()) {
                     if (list.get(0) instanceof Date) {
                         returnValue = ValueTool.toMultivalue(
                                 list.stream().
-                                        map((date) -> new Long(((Date) date).getTime()).toString()).
-                                        collect(Collectors.toList()).toArray(new String[0])
+                                        map((date) -> Long.toString(((Date) date).getTime())).toArray(String[]::new)
                         );
                         processed = true;
                     }
@@ -532,7 +543,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             if (value instanceof Date) {
 
                 Date date = (Date) value;
-                returnValue = new Long(date.getTime()).toString();
+                returnValue = Long.toString(date.getTime());
                 processed = true;
             }
             if (!processed) {
@@ -540,7 +551,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             }
             // !(value instanceof MLText || value instanceof List): prevent sth.
             // like de_DE=null in gui
-            if (returnValue == null && value != null && !(value instanceof MLText || value instanceof List)) {
+            if (returnValue == null && !(value instanceof MLText || value instanceof List)) {
                 returnValue = value.toString();
             }
         }
@@ -551,31 +562,31 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         //MetadataSetModelProperty mdsmProp = getMetadataSetModelProperty(metadataSetId, type, prop);
 
-        if (_value instanceof List && ((List) _value).size() > 0) {
-            String result = null;
+        if (_value instanceof List && !((List) _value).isEmpty()) {
+            StringBuilder result = null;
             for (Object value : (List) _value) {
                 if (result != null)
-                    result += CCConstants.MULTIVALUE_SEPARATOR;
+                    result.append(CCConstants.MULTIVALUE_SEPARATOR);
                 if (value != null) {
                     if (value instanceof MLText) {
                         String tmpStr = getMLTextString(value);
                         if (result != null)
-                            result += tmpStr;
+                            result.append(tmpStr);
                         else
-                            result = tmpStr;
+                            result = new StringBuilder(tmpStr);
                     } else {
                         if (result != null)
-                            result += value.toString();
+                            result.append(value);
                         else
-                            result = value.toString();
+                            result = new StringBuilder(value.toString());
                     }
                 }
             }
 
-            return result;
-        } else if (_value instanceof List && ((List) _value).size() == 0) {
+            return result == null ? null : result.toString();
+        } else if (_value instanceof List && ((List) _value).isEmpty()) {
             // cause empty list toString returns "[]"
-            return "";
+			return null;
         } else if (_value instanceof String) {
             return (String) _value;
         } else if (_value instanceof Number) {
@@ -625,7 +636,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 return mlText.getDefaultValue();
             }
 
-            String mlValueString = null;
+            StringBuilder mlValueString = null;
 
             for (Locale locale : mlText.getLocales()) {
                 String mlValue = mlText.getValue(locale);
@@ -636,19 +647,19 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     // for props that are declared multilang in alfresco model
                     // but not in cc metadataset then props are saved as default.
                     if (mlText.getLocales().size() == 1 && localeStr.equals(CCConstants.defaultLocale)) {
-                        mlValueString = mlValue;
+                        mlValueString = new StringBuilder(mlValue);
                     } else {
-                        mlValueString = localeStr + "=" + mlValue;
+                        mlValueString = new StringBuilder(localeStr + "=" + mlValue);
                     }
                 } else {
-                    mlValueString += "[,]" + localeStr + "=" + mlValue;
+                    mlValueString.append("[,]").append(localeStr).append("=").append(mlValue);
                 }
             }
-            if (mlValueString != null && !mlValueString.trim().equals("") && !mlValueString.contains(CCConstants.defaultLocale)) {
-                mlValueString += "[,]default=" + mlText.getDefaultValue();
+            if (StringUtils.isNotBlank(mlValueString.toString()) && !mlValueString.toString().contains(CCConstants.defaultLocale)) {
+                mlValueString.append("[,]default=").append(mlText.getDefaultValue());
             }
 
-            return mlValueString;
+            return mlValueString.toString();
         } else {
             return _mlText.toString();
         }
@@ -699,15 +710,14 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         if (parentID == null) {
 
             String startParentId = getRootNodeId();
-            if (startParentId == null || startParentId.trim().equals("")) {
+            if (StringUtils.isBlank(startParentId)) {
                 parentID = nodeService.getRootNode(storeRef).getId();
             } else {
                 parentID = startParentId;
             }
         }
         NodeRef parentNodeRef = new NodeRef(MCAlfrescoAPIClient.storeRef, parentID);
-        List<ChildAssociationRef> childAssocList = nodeService.getChildAssocs(parentNodeRef);
-        return childAssocList;
+        return nodeService.getChildAssocs(parentNodeRef);
     }
 
     public Map<String, Map<String, Object>> getChildren(String parentID, String type) throws Throwable {
@@ -716,7 +726,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         if (parentID == null) {
             String startParentId = getRootNodeId();
-            if (startParentId == null || startParentId.trim().equals("")) {
+            if (StringUtils.isBlank(startParentId)) {
                 parentID = nodeService.getRootNode(storeRef).getId();
             } else {
                 parentID = startParentId;
@@ -727,7 +737,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         List<ChildAssociationRef> childAssocList = nodeService.getChildAssocs(parentNodeRef);
         for (ChildAssociationRef child : childAssocList) {
 
-            /**
+            /*
              * Alfresco 4.0.e archiving on: - check if it's not the archive
              * store (when a object was deleted and it was linked somwhere the
              * link still exist and points to archive store)
@@ -788,9 +798,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         boolean downloadAllowed = downloadAllowed(nodeId);
         String redirectServletLink = this.getRedirectServletLink(repId, nodeId);
         if (props.get(CCConstants.ALFRESCO_MIMETYPE) != null && redirectServletLink != null && downloadAllowed) {
-            String params = URLEncoder.encode("display=download");
-            String downloadUrl = UrlTool.setParam(redirectServletLink, "params", params);
-            return downloadUrl;
+            String params = URLEncoder.encode("display=download", Charset.defaultCharset());
+            return UrlTool.setParam(redirectServletLink, "params", params);
         }
         return null;
     }
@@ -811,10 +820,10 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         boolean downloadAllowed;
         // Array value
         if (commonLicenseKey instanceof ArrayList)
-            downloadAllowed = (CCConstants.COMMON_LICENSE_EDU_P_NR_ND.equals(((ArrayList) commonLicenseKey).get(0))) ? false : true;
+            downloadAllowed = !CCConstants.COMMON_LICENSE_EDU_P_NR_ND.equals(((ArrayList) commonLicenseKey).get(0));
         else
             // string value
-            downloadAllowed = (CCConstants.COMMON_LICENSE_EDU_P_NR_ND.equals(commonLicenseKey)) ? false : true;
+            downloadAllowed = !CCConstants.COMMON_LICENSE_EDU_P_NR_ND.equals(commonLicenseKey);
 
         //allow download for owner, performance only check owner if download not allowed
 
@@ -823,7 +832,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         }
 
         // allow tinymce in safe but not in normal storage
-        if (editorType != null && editorType.toLowerCase().equals(ConnectorService.ID_TINYMCE.toLowerCase()) && (Context.getCurrentInstance() != null && !CCConstants.CCM_VALUE_SCOPE_SAFE.equals(Context.getCurrentInstance().getSessionAttribute(CCConstants.AUTH_SCOPE)))) {
+        if (editorType != null && editorType.equalsIgnoreCase(ConnectorService.ID_TINYMCE) && (Context.getCurrentInstance() != null && !CCConstants.CCM_VALUE_SCOPE_SAFE.equals(Context.getCurrentInstance().getSessionAttribute(CCConstants.AUTH_SCOPE)))) {
             downloadAllowed = false;
         }
 
@@ -858,7 +867,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         boolean isSubOfContent = serviceRegistry.getDictionaryService().isSubClass(QName.createQName(nodeType), QName.createQName(CCConstants.CM_TYPE_CONTENT));
 
         log.debug("setting external URL");
-        String contentUrl = URLHelper.getNgRenderNodeUrl(nodeRef.getId(),null);
+        String contentUrl = URLHelper.getNgRenderNodeUrl(nodeRef.getId(), null);
 
         contentUrl = URLTool.addOAuthAccessToken(contentUrl);
         propsCopy.put(CCConstants.CONTENTURL, contentUrl);
@@ -895,7 +904,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             }
         }
 
-        /** Add the image dimensions to the common CCM fields */
+        /* Add the image dimensions to the common CCM fields */
         if (nodeType.equals(CCConstants.CCM_TYPE_IO)) {
             if (propsCopy.containsKey(CCConstants.EXIF_PROP_PIXELXDIMENSION)) {
                 propsCopy.put(CCConstants.CCM_PROP_IO_WIDTH, propsCopy.get(CCConstants.EXIF_PROP_PIXELXDIMENSION));
@@ -916,7 +925,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         boolean hasMds = nodeType.equals(CCConstants.CCM_TYPE_IO) || nodeType.equals(CCConstants.CCM_TYPE_COMMENT) || nodeType.equals(CCConstants.CCM_TYPE_MATERIAL_FEEDBACK) || nodeType.equals(CCConstants.CCM_TYPE_MAP) || nodeType.equals(CCConstants.CM_TYPE_FOLDER);
         String mdsId = CCConstants.metadatasetdefault_id;
         MetadataSet mds = null;
-        /**
+        /*
          * run over all properties and format the date props with with current
          * user locale
          */
@@ -958,14 +967,12 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                         addAndOverwriteDateMap.put(entry.getKey() + CCConstants.DISPLAYNAME_SUFFIX, StringUtils.join(values, CCConstants.MULTIVALUE_SEPARATOR));
                     }
 
-                } catch (Throwable t) {
+                } catch (Throwable ignored) {
 
                 }
             }
 
-            for (Map.Entry<String, Object> entry : addAndOverwriteDateMap.entrySet()) {
-                propsCopy.put(entry.getKey(), entry.getValue());
-            }
+            propsCopy.putAll(addAndOverwriteDateMap);
         }
         // Preview this was done already in getPropertiesCached (the heavy
         // performance must be done in getPropertiesCached)
@@ -977,35 +984,31 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             if (renderServiceUrlPreview == null) {
                 // prefer alfresco thumbnail
                 String thumbnailUrl = (String) propsCopy.get(CCConstants.CM_ASSOC_THUMBNAILS);
-                if (thumbnailUrl != null && !thumbnailUrl.trim().equals("")) {
+                if (StringUtils.isNotBlank(thumbnailUrl)) {
 
                     // prevent Browser Caching:
-                    thumbnailUrl = UrlTool.setParam(thumbnailUrl, "dontcache", new Long(System.currentTimeMillis()).toString());
+                    thumbnailUrl = UrlTool.setParam(thumbnailUrl, "dontcache", Long.toString(System.currentTimeMillis()));
                     propsCopy.put(CCConstants.CM_ASSOC_THUMBNAILS, thumbnailUrl);
                 }
 
             }
 
-            /**
+            /*
              * for Collections Ref Objects return original nodeid
              * @TODO its a association so it could be multivalue
              */
             if (Arrays.asList(aspects).contains(CCConstants.CCM_ASPECT_COLLECTION_IO_REFERENCE)) {
-                AuthenticationUtil.runAsSystem(new RunAsWork<Void>() {
-
-                    @Override
-                    public Void doWork() throws Exception {
-                        try {
-                            List<NodeRef> assocNode = getAssociationNodeIds(nodeRef, CCConstants.CM_ASSOC_ORIGINAL);
-                            if (assocNode.size() > 0) {
-                                String originalNodeId = assocNode.get(0).getId();
-                                propsCopy.put(CCConstants.CM_ASSOC_ORIGINAL, originalNodeId);
-                            }
-                        } catch (Throwable t) {
-                            throw new Exception(t);
+                AuthenticationUtil.runAsSystem((RunAsWork<Void>) () -> {
+                    try {
+                        List<NodeRef> assocNode = getAssociationNodeIds(nodeRef, CCConstants.CM_ASSOC_ORIGINAL);
+                        if (!assocNode.isEmpty()) {
+                            String originalNodeId = assocNode.get(0).getId();
+                            propsCopy.put(CCConstants.CM_ASSOC_ORIGINAL, originalNodeId);
                         }
-                        return null;
+                    } catch (Throwable t) {
+                        throw new Exception(t);
                     }
+                    return null;
                 });
             }
 
@@ -1018,7 +1021,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 String paramToken = (iconUrl.contains("?")) ? "&" : "?";
                 iconUrl = iconUrl + paramToken + "ticket=" + authenticationInfo.get(CCConstants.AUTH_TICKET);
                 // prevent Browser Caching:
-                iconUrl = UrlTool.setParam(iconUrl, "dontcache", new Long(System.currentTimeMillis()).toString());
+                iconUrl = UrlTool.setParam(iconUrl, "dontcache", Long.toString(System.currentTimeMillis()));
 
                 propsCopy.put(CCConstants.CCM_PROP_MAP_ICON, iconUrl);
             }
@@ -1111,7 +1114,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             ));
         }
 
-        /**
+        /*
          * attach the display name suffix
          */
         if (hasMds) {
@@ -1129,10 +1132,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      * it will be cached so no (content url, icon url) will be set
      * here (cause it contains the ticket info) also no user depended permission
      * checks will be done
-     *
-     * @param nodeRef
-     * @return
-     * @throws Exception
      */
     public Map<String, Object> getPropertiesCached(NodeRef nodeRef, boolean getFromCache, boolean checkModified, boolean ifNotInCacheReturnNull) throws Exception {
         return getPropertiesCached(nodeRef, getFromCache, checkModified, ifNotInCacheReturnNull, nodeService);
@@ -1141,7 +1140,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public Map<String, Object> getPropertiesCached(NodeRef nodeRef, boolean getFromCache, boolean checkModified, boolean ifNotInCacheReturnNull, NodeService service)
             throws Exception {
 
-        Map<QName, Serializable> propMap = null;
         Cache repCache = new RepositoryCache();
         // only get object by cache for one storeRef cause we take only the
         // nodeId as key
@@ -1153,7 +1151,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
                 // check if thumbnail generation was processing if true
                 // occurs when i.e. when copying a node
-                boolean refreshThumbnail = new Boolean((String) propsFromCache.get(CCConstants.KEY_PREVIEW_GENERATION_RUNS));
+                boolean refreshThumbnail = Boolean.valueOf((String) propsFromCache.get(CCConstants.KEY_PREVIEW_GENERATION_RUNS));
 
                 if (checkModified) {
 
@@ -1167,8 +1165,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     String cacheModified = (String) propsFromCache.get(CCConstants.CC_CACHE_MILLISECONDS_KEY);
                     Long cachedModTime = null;
                     try {
-                        cachedModTime = new Long(cacheModified);
-                    } catch (Exception e) {
+                        cachedModTime = Long.valueOf(cacheModified);
+                    } catch (Exception ignored) {
 
                     }
 
@@ -1188,10 +1186,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             }
 
         }
-
-        if (propMap == null) {
-            propMap = service.getProperties(nodeRef);
-        }
+        Map<QName, Serializable> propMap = service.getProperties(nodeRef);
 
         Map<String, Object> properties = new HashMap<>();
         String nodeType = service.getType(nodeRef).toString();
@@ -1213,7 +1208,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 String value = formatData(nodeType, propName, object, metadataSetId);
 
                 // add formated replicationsourcetimestamp
-                if (propName.equals(CCConstants.CCM_PROP_IO_REPLICATIONSOURCETIMESTAMP) && !value.equals("") && !value.trim().equals("0000-00-00T00:00:00Z")) {
+                if (propName.equals(CCConstants.CCM_PROP_IO_REPLICATIONSOURCETIMESTAMP) && !value.isEmpty() && !value.trim().equals("0000-00-00T00:00:00Z")) {
 
                     try {
 
@@ -1238,7 +1233,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
                 // VCard
                 Map<String, Object> vcard = VCardConverter.getVCardMap(nodeType, propName, value);
-                if (vcard != null && vcard.size() > 0) properties.putAll(vcard);
+                if (vcard != null && !vcard.isEmpty()) properties.putAll(vcard);
 
             }
 
@@ -1257,7 +1252,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         if (nodeType.equals(CCConstants.CCM_TYPE_MAPRELATION)) {
             List<AssociationRef> relSrcList = nodeService.getTargetAssocs(nodeRef, QName.createQName(CCConstants.CCM_ASSOC_RELSOURCE));
             List<AssociationRef> relTargetList = nodeService.getTargetAssocs(nodeRef, QName.createQName(CCConstants.CCM_ASSOC_RELTARGET));
-            if ((relSrcList != null && relSrcList.size() > 0) && relTargetList != null && relTargetList.size() > 0) {
+            if ((relSrcList != null && !relSrcList.isEmpty()) && relTargetList != null && !relTargetList.isEmpty()) {
                 log.debug("relSrcList.get(0).getTargetRef().getId():" + relSrcList.get(0).getTargetRef().getId() + "  "
                         + nodeService.getType(relSrcList.get(0).getTargetRef()));
                 log.debug("relTargetList.get(0).getTargetRef().getId():" + relTargetList.get(0).getTargetRef().getId() + "  "
@@ -1330,7 +1325,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 version = (String) properties.get(CCConstants.CM_PROP_VERSIONABLELABEL);
 
             //String permaLink = URLTool.getBaseUrl() + "/node/" + nodeRef.getId();
-			String permaLink = URLHelper.getNgComponentsUrl()+"render/" + nodeRef.getId();
+            String permaLink = URLHelper.getNgComponentsUrl() + "render/" + nodeRef.getId();
             permaLink = (version != null) ? permaLink + "/" + version : permaLink;
             properties.put(CCConstants.VIRT_PROP_PERMALINK, permaLink);
         }
@@ -1390,14 +1385,14 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * @TODO Same handling with List and MLText properties like in getProperties
-     *       ->getValue
+     * ->getValue
      */
     public String getProperty(String storeProtocol, String storeIdentifier, String nodeId, String property) {
         Serializable val = nodeService.getProperty(new NodeRef(new StoreRef(storeProtocol, storeIdentifier), nodeId), QName.createQName(property));
         if (val != null) {
 
             String result = null;
-            if (val instanceof List && ((List) val).size() > 0) {
+            if (val instanceof List && !((List) val).isEmpty()) {
 
                 for (Object value : (List) val) {
                     if (result != null)
@@ -1425,15 +1420,15 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     private String getMultiLangCleaned(String value) {
 
-        String result = new String(value);
+        String result = value;
 
         // edu-sharing properties multilang = true {de_DE=Realschule}
-        if (result != null && result.matches("\\{[a-z][a-z]_[A-Z][A-Z]=.*\\}")) {
+        if (result.matches("\\{[a-z][a-z]_[A-Z][A-Z]=.*}")) {
             String[] splitted = result.split("=");
             result = splitted[1].replace("}", "");
         }
 
-        if (result != null && result.matches("\\{default=.*\\}")) {
+        if (result.matches("\\{default=.*}")) {
             String[] splitted = result.split("=");
             result = splitted[1].replace("}", "");
         }
@@ -1443,9 +1438,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * returns the simple alfresco properties without special handling
-     *
-     * @param nodeId
-     * @return
      */
     public Map<String, Object> getPropertiesSimple(StoreRef givenStoreRef, String nodeId) {
 
@@ -1482,9 +1474,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * returns the simple alfresco Properties without special handling
-     *
-     * @param nodeId
-     * @return
      */
     public Map<String, Object> getPropertiesSimple(String nodeId) {
         return getPropertiesSimple(storeRef, nodeId);
@@ -1506,7 +1495,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         String result = null;
         try {
-            result = null;
 
             // access from API Client always is the HomeRepository
             ApplicationInfo appInfo = ApplicationInfoList.getHomeRepository();
@@ -1531,7 +1519,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     }
 
     public List<ChildAssociationRef> getChildAssociationByType(String storeProtocol, String storeId, String nodeId, String type) {
-        Set<QName> set = new HashSet<QName>();
+        Set<QName> set = new HashSet<>();
         set.add(QName.createQName(type));
         return nodeService.getChildAssocs(new NodeRef(new StoreRef(storeProtocol, storeId), nodeId), set);
     }
@@ -1577,7 +1565,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     public Map<String, Map<String, Object>> getChildrenByAssociation(String store, String nodeId, String association) {
 
-        StoreRef storeRef = null;
+        StoreRef storeRef;
         if (store == null) {
             storeRef = this.storeRef;
         } else {
@@ -1618,7 +1606,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             // VCard
             String type = nodeService.getType(nodeRef).toString();
             Map<String, Object> vcard = VCardConverter.getVCardMap(type, qname.toString(), value);
-            if (vcard != null && vcard.size() > 0) resultProps.putAll(vcard);
+            if (vcard != null && !vcard.isEmpty()) resultProps.putAll(vcard);
 
         }
 
@@ -1636,13 +1624,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * this method returns the first child that matches the prop value pair it
-     *
-     * @param store
-     * @param parentId
-     * @param type
-     * @param property
-     * @param value
-     * @return
      */
     public Map<String, Object> getChild(StoreRef store, String parentId, String type, String property, String value) {
         Map<String, Map<String, Object>> children = this.getChildrenByType(store, parentId, type);
@@ -1656,10 +1637,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     }
 
     /**
-     * @param store
-     * @param parentId
-     * @param type
-     * @param props
      * @return all nodes that got the same properties like props
      */
     public Map<String, Map<String, Object>> getChilden(StoreRef store, String parentId, String type, Map<String, Object> props) {
@@ -1686,13 +1663,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         return result;
     }
 
-    /**
-     * @param store
-     * @param parentId
-     * @param type
-     * @param props
-     * @return
-     */
     public Map<String, Object> getChildRecursive(StoreRef store, String parentId, String type, Map<?, ?> props) throws Throwable {
 
         NodeRef parentNodeRef = new NodeRef(store, parentId);
@@ -1708,7 +1678,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     // getPropertiesWithoutChildren(child.getChildRef());
                     Map<String, Object> childProps = getProperties(child.getChildRef());
 
-                    if (childProps.size() == 0)
+                    if (childProps.isEmpty())
                         propertiesMatched = false;
 
                     for (Object key : props.keySet()) {
@@ -1745,17 +1715,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * uses the getPropertiesCached so no user information is in the result
-     *
-     * @param store
-     * @param parentId
-     * @param type
-     * @param result
-     * @param cached
-     * @return
-     * @throws Throwable
      */
     public Map<String, Map<String, Object>> getChildrenRecursive(StoreRef store, String parentId, String type,
-                                                                         Map<String, Map<String, Object>> result, boolean cached) throws Throwable {
+                                                                 Map<String, Map<String, Object>> result, boolean cached) throws Throwable {
 
         if (result == null)
             result = new HashMap<>();
@@ -1763,7 +1725,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         List<ChildAssociationRef> childAssocList = nodeService.getChildAssocs(parentNodeRef);
         for (ChildAssociationRef child : childAssocList) {
 
-            /**
+            /*
              * Alfresco 4.0.e archiving on: - check if it's not the archive
              * store (when a object was deleted and it was linked somewhere the
              * link still exists and points to archive store)
@@ -1797,7 +1759,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             }
         }
 
-        if (result.size() > 0)
+        if (!result.isEmpty())
             return result;
         else
             return null;
@@ -1808,9 +1770,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     }
 
     /**
-     * @param parentId
-     * @param type
-     * @param props
      * @return all nodes that got the same properties like props
      */
     public Map<String, Map<String, Object>> getChilden(String parentId, String type, Map<String, Object> props) {
@@ -1821,13 +1780,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         return this.createNode(storeRef, parentID, nodeTypeString, _props);
     }
 
-    /**
-     * @param store
-     * @param parentID
-     * @param nodeType
-     * @param properties
-     * @return
-     */
     public String createNode(StoreRef store, String parentID, String nodeType, Map<String, Object> properties) {
 
         return this.createNode(store, parentID, nodeType, CCConstants.CM_ASSOC_FOLDER_CONTAINS, properties);
@@ -1840,14 +1792,16 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     public String createNode(StoreRef store, String parentID, String nodeTypeString, String childAssociation, Map<String, Object> _props) {
 
-        String name = (String) _props.get(CCConstants.CM_NAME);
-        _props.put(CCConstants.CM_NAME, CharMatcher.javaIsoControl().removeFrom(name));
-        Map<QName, Serializable> properties = transformPropMap(_props);
+        Map<String, Object> props = new HashMap<>(_props);
+
+        String name = (String) props.get(CCConstants.CM_NAME);
+        props.put(CCConstants.CM_NAME, CharMatcher.javaIsoControl().removeFrom(name));
+        Map<QName, Serializable> properties = transformPropMap(props);
 
         NodeRef parentNodeRef = new NodeRef(store, parentID);
         QName nodeType = QName.createQName(nodeTypeString);
 
-        String assocName = (String) _props.get(CCConstants.CM_NAME);
+        String assocName = (String) props.get(CCConstants.CM_NAME);
         if (assocName == null) {
             assocName = "defaultAssociationName";
         } else {
@@ -1874,9 +1828,10 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public void updateNode(StoreRef store, String nodeId, Map<String, Object> _props) {
 
         try {
-            String name = (String) _props.get(CCConstants.CM_NAME);
-            _props.put(CCConstants.CM_NAME, CharMatcher.javaIsoControl().removeFrom(name));
-            Map<QName, Serializable> props = transformPropMap(_props);
+            Map<String, Object> props = new HashMap<>(_props);
+            String name = (String) props.get(CCConstants.CM_NAME);
+            props.put(CCConstants.CM_NAME, CharMatcher.javaIsoControl().removeFrom(name));
+            Map<QName, Serializable> properties = transformPropMap(_props);
             NodeRef nodeRef = new NodeRef(store, nodeId);
 
             // don't do this cause it's slow:
@@ -1887,15 +1842,11 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
              */
 
             // prevent overwriting of properties that don't come with param _props
-            Set<QName> changedProps = props.keySet();
             Map<QName, Serializable> currentProps = nodeService.getProperties(nodeRef);
-            for (Map.Entry<QName, Serializable> entry : currentProps.entrySet()) {
-                if (!changedProps.contains(entry.getKey())) {
-                    props.put(entry.getKey(), entry.getValue());
-                }
-            }
+            currentProps.keySet().removeAll(properties.keySet());
+            properties.putAll(currentProps);
 
-            nodeService.setProperties(nodeRef, props);
+            nodeService.setProperties(nodeRef, properties);
 
         } catch (Exception e) {
             // this occurs sometimes in workspace
@@ -1925,16 +1876,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     /**
      * thats the bad version cause there are OutOfMemory Problems when uploading
      * large files
-     *
      * so its better to use the method with InputStream or file as content
-     *
-     * @param store
-     * @param nodeID
-     * @param content
-     * @param mimetype
-     * @param _encoding
-     * @param property
-     * @throws Exception
      */
     public void writeContent(final StoreRef store, final String nodeID, final byte[] content, final String mimetype, String _encoding, final String property)
             throws Exception {
@@ -1942,15 +1884,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         this.writeContent(store, nodeID, is, mimetype, _encoding, property);
     }
 
-    /**
-     * @param store
-     * @param nodeID
-     * @param content
-     * @param mimetype
-     * @param _encoding
-     * @param property
-     * @throws Exception
-     */
     public void writeContent(final StoreRef store, final String nodeID, final File content, final String mimetype, String _encoding, final String property)
             throws Exception {
         FileInputStream fis = new FileInputStream(content);
@@ -1959,12 +1892,15 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * Runs a transaction
+     *
      * @param callback the callback to run
      */
-    public Object doInTransaction(RetryingTransactionCallback callback) {
+    public Object doInTransaction(RetryingTransactionCallback<?> callback) {
         TransactionService transactionService = serviceRegistry.getTransactionService();
         return transactionService.getRetryingTransactionHelper().doInTransaction(callback, false);
     }
+
+
     public void writeContent(final StoreRef store, final String nodeID, final InputStream content, final String mimetype, String _encoding,
                              final String property) throws Exception {
         writeContent(store,nodeID, content,mimetype, _encoding,property, null);
@@ -1975,39 +1911,31 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         final String encoding = (_encoding == null) ? "UTF-8" : _encoding;
         log.debug("called nodeID:" + nodeID + " store:" + store + " mimetype:" + mimetype + " property:" + property);
 
-        RetryingTransactionCallback callback = new RetryingTransactionCallback() {
-            @Override
-            public Object execute() throws Throwable {
+        RetryingTransactionCallback callback = () -> {
 
-                NodeRef nodeRef = new NodeRef(store, nodeID);
-                final ContentWriter contentWriter = contentService.getWriter(nodeRef, QName.createQName(property), true);
-                contentWriter.addListener(new ContentStreamListener() {
-                    @Override
-                    public void contentStreamClosed() throws ContentIOException {
-                        log.debug("Content Stream was closed");
-                        log.debug(" size:" + contentWriter.getContentData().getSize() +
-                                ", URL:" + contentWriter.getContentData().getContentUrl() +
-                                ", MimeType:" + contentWriter.getContentData().getMimetype() + "" +
-                                ", ContentData ToString:" + contentWriter.getContentData().toString());
+            NodeRef nodeRef = new NodeRef(store, nodeID);
+            final ContentWriter contentWriter = contentService.getWriter(nodeRef, QName.createQName(property), true);
+            contentWriter.addListener(() -> {
+                log.debug("Content Stream was closed");
+                log.debug(" size:" + contentWriter.getContentData().getSize() +
+                        ", URL:" + contentWriter.getContentData().getContentUrl() +
+                        ", MimeType:" + contentWriter.getContentData().getMimetype() + "" +
+                        ", ContentData ToString:" + contentWriter.getContentData().toString());
                         if(onComplete != null) {
                             onComplete.run();
                         }
-                    }
-                });
+            });
 
-                String finalMimeType = mimetype;
-                if (finalMimeType == null || finalMimeType.trim().equals("")) {
-                    finalMimeType = MCAlfrescoAPIClient.this.guessMimetype(MCAlfrescoAPIClient.this.getProperty(storeRef, nodeID, CCConstants.CM_NAME));
-                }
-
-                contentWriter.setMimetype(finalMimeType);
-                contentWriter.setEncoding(encoding);
-
-                InputStream is = content;
-                contentWriter.putContent(is);
-
-                return null;
+            String finalMimeType = mimetype;
+            if (StringUtils.isBlank(finalMimeType)) {
+                finalMimeType = MCAlfrescoAPIClient.this.guessMimetype(MCAlfrescoAPIClient.this.getProperty(storeRef, nodeID, CCConstants.CM_NAME));
             }
+
+            contentWriter.setMimetype(finalMimeType);
+            contentWriter.setEncoding(encoding);
+            contentWriter.putContent(content);
+
+            return null;
         };
         TransactionService transactionService = serviceRegistry.getTransactionService();
         transactionService.getRetryingTransactionHelper().doInTransaction(callback, false);
@@ -2025,7 +1953,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
             this.setUserDefinedPreview(nodeId, new File(filePath), fileName);
 
-            new File(filePath).delete();
+            boolean ignored = new File(filePath).delete();
 
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -2037,12 +1965,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      * NodeCustomizationPolicies.onContentUpdate would be excecuted, cause it's
      * not looking on which of the contentproperties is updated so we need to
      * disable the policy behavior here.
-     *
      * to disable/enable the policy behavior there must be an transaction active
-     *
-     * @param fileName
-     * @param file
-     * @param nodeId
      */
     public void setUserDefinedPreview(String nodeId, File file, String fileName) {
 
@@ -2104,10 +2027,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      * NodeCustomizationPolicies.onContentUpdate would be excecuted, cause it's
      * not looking on which of the contentproperties is updated so we need to
      * disable the policy behavior here.
-     *
+     * <p>
      * to disable/enable the policy behavior there must be an transaction active
-     *
-     * @param nodeId
      */
     public void removeUserDefinedPreview(String nodeId) {
 
@@ -2148,7 +2069,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 NodeRef personNodeRef = personService.getPerson(username);
                 Map<QName, Serializable> personProps = nodeService.getProperties(personNodeRef);
                 String repoId = (String) personProps.get(QName.createQName(CCConstants.PROP_USER_REPOSITORYID));
-                if (repoId != null && !repoId.trim().equals("") && !appInfo.getAppId().equals(repoId)) {
+                if (StringUtils.isNotBlank(repoId) && !appInfo.getAppId().equals(repoId)) {
                     authorityService.removeAuthority(authorityName, username);
                 }
             }
@@ -2171,11 +2092,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * transform to Alfresco Map
-     *
-     * @param map
-     * @return
      */
-    Map<QName, Serializable> transformPropMap(Map<String,?> map) {
+    Map<QName, Serializable> transformPropMap(Map<String, ?> map) {
         Map<QName, Serializable> result = new HashMap<>();
         for (Object key : map.keySet()) {
 
@@ -2222,8 +2140,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     @Override
     public String getHomeFolderID(String username) throws Exception {
 
-        if (NodeServiceInterceptor.getEduSharingScope() == null ||
-                NodeServiceInterceptor.getEduSharingScope().trim().equals("")) {
+        if (NodeServiceInterceptor.getEduSharingScope() == null || StringUtils.isBlank(NodeServiceInterceptor.getEduSharingScope())) {
             NodeRef person = serviceRegistry.getPersonService().getPerson(username, false);
             if (person != null) {
                 NodeRef homfolder = (NodeRef) nodeService.getProperty(person, QName.createQName(CCConstants.CM_PROP_PERSON_HOME_FOLDER));
@@ -2238,8 +2155,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     username,
                     NodeServiceInterceptor.getEduSharingScope(),
                     true);
-            String userHomeNodeId = (userHome != null) ? userHome.getId() : null;
-            return userHomeNodeId;
+            return (userHome != null) ? userHome.getId() : null;
         }
     }
 
@@ -2275,9 +2191,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     /**
      * returns target Assocs NodeIds
      *
-     * @param nodeRef
-     * @param association
-     * @return
      */
     public List<NodeRef> getAssociationNodeIds(NodeRef nodeRef, String association) {
 
@@ -2379,15 +2292,12 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         AuthorityService authorityService = serviceRegistry.getAuthorityService();
 
         return serviceRegistry.getTransactionService().getRetryingTransactionHelper().doInTransaction(
+                () -> {
+                    String key = groupName.startsWith(PermissionService.GROUP_PREFIX) ? groupName : PermissionService.GROUP_PREFIX + groupName;
 
-                new RetryingTransactionCallback<String>() {
-                    public String execute() throws Throwable {
-                        String key = groupName.startsWith(PermissionService.GROUP_PREFIX) ? groupName : PermissionService.GROUP_PREFIX + groupName;
-
-                        return authorityService.authorityExists(key)
-                                ? authorityService.getAuthorityNodeRef(key).getId()
-                                : null;
-                    }
+                    return authorityService.authorityExists(key)
+                            ? authorityService.getAuthorityNodeRef(key).getId()
+                            : null;
                 }, true);
 
     }
@@ -2598,19 +2508,19 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         String lastName = userInfo.get(CCConstants.CM_PROP_PERSON_LASTNAME);
         String email = userInfo.get(CCConstants.CM_PROP_PERSON_EMAIL);
 
-        if (userName == null || userName.trim().equals("")) {
+        if (StringUtils.isBlank(userName)) {
             throw new PropertyRequiredException(CCConstants.CM_PROP_PERSON_USERNAME);
         }
 
-        if (firstName == null || firstName.trim().equals("")) {
+        if (StringUtils.isBlank(firstName)) {
             throw new PropertyRequiredException(CCConstants.CM_PROP_PERSON_FIRSTNAME);
         }
 
-        if (lastName == null || lastName.trim().equals("")) {
+        if (StringUtils.isBlank(lastName)) {
             throw new PropertyRequiredException(CCConstants.CM_PROP_PERSON_LASTNAME);
         }
 
-        if (email == null || email.trim().equals("")) {
+        if (StringUtils.isBlank(email)) {
             throw new PropertyRequiredException(CCConstants.CM_PROP_PERSON_EMAIL);
         }
 
@@ -2710,13 +2620,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public void setUserPassword(String userName, String newPassword) {
 
         MutableAuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
-
         if (authenticationService.isAuthenticationMutable(userName)) {
-
             authenticationService.setAuthentication(userName, newPassword.toCharArray());
-
         } else {
-
             authenticationService.createAuthentication(userName, newPassword.toCharArray());
         }
     }
@@ -2724,11 +2630,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public void updateUserPassword(String userName, String oldPassword, String newPassword) {
 
         MutableAuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
-
         if (authenticationService.isAuthenticationMutable(userName)) {
-
             authenticationService.updateAuthentication(userName, oldPassword.toCharArray(), newPassword.toCharArray());
-
         }
     }
 
@@ -2779,11 +2682,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     public boolean hasContent(String nodeId, String contentProp) throws Exception {
         ContentReader reader = serviceRegistry.getContentService().getReader(new NodeRef(storeRef, nodeId), QName.createQName(contentProp));
-        if (reader != null && reader.getSize() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return reader != null && reader.getSize() > 0;
     }
 
     public void executeAction(String nodeId, String actionName, String actionId, Map<String, Object> parameters, boolean async) {
@@ -2856,7 +2755,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     eduGroup.setFolderPath(getPath((String) folderProps.get(CCConstants.SYS_PROP_NODE_UID)));
                     result.add(eduGroup);
                 }
-            } catch (AccessDeniedException e) {
+            } catch (AccessDeniedException ignored) {
             }
         }
         return result;
@@ -2924,11 +2823,11 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId, String[] permissions) {
         ApplicationInfo appInfo = ApplicationInfoList.getHomeRepository();
-        boolean guest = GuestCagePolicy.getGuestUsers().contains(AuthenticationUtil.getFullyAuthenticatedUser());
+        boolean guest = guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser());
         PermissionService permissionService = serviceRegistry.getPermissionService();
         Map<String, Boolean> result = new HashMap<>();
         NodeRef nodeRef = new NodeRef(new StoreRef(storeProtocol, storeId), nodeId);
-        if (permissions != null && permissions.length > 0) {
+        if (permissions != null) {
             for (String permission : permissions) {
                 AccessStatus accessStatus = permissionService.hasPermission(nodeRef, permission);
                 // Guest only has read permissions, no modify permissions
@@ -2936,9 +2835,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     accessStatus = AccessStatus.DENIED;
                 }
                 if (accessStatus.equals(AccessStatus.ALLOWED)) {
-                    result.put(permission, new Boolean(true));
+                    result.put(permission, Boolean.TRUE);
                 } else {
-                    result.put(permission, new Boolean(false));
+                    result.put(permission, Boolean.FALSE);
                 }
             }
         }
@@ -2952,7 +2851,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      */
     public Map<String, Boolean> hasAllPermissions(String nodeId, String authority, String[] permissions) throws Exception {
 
-        /**
+        /*
          * Strange behavior in alfresco: GROUP_EVERYONE is not a real group.
          * When calling PermissionService.hasPermissions alfresco checks if the authority exists
          * so alfresco-5.0.d raises an exception at AuthorityDAOImpl.listAuthorities(AuthorityDAOImpl.java:1086)
@@ -2984,7 +2883,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         Map<String, Boolean> hasAllPermResult = this.hasAllPermissions(nodeId, authority, permissions);
         for (String permission : permissions) {
             Boolean tmpBool = hasAllPermResult.get(permission);
-            if (tmpBool == null || tmpBool.booleanValue() == false) {
+            if (tmpBool == null || !tmpBool) {
                 return false;
             }
         }
@@ -2995,8 +2894,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         boolean result = true;
         Map<String, Boolean> hasAllPerm = hasAllPermissions(nodeId, permissions);
         for (Map.Entry<String, Boolean> entry : hasAllPerm.entrySet()) {
-            if (entry.getValue() == false) {
+            if (!entry.getValue()) {
                 result = false;
+                break;
             }
         }
         return result;
@@ -3011,21 +2911,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         return userCache.getUser(owner);
     }
 
-    /**
-     * @return the resolveRemoteObjects
-     */
-    public boolean isResolveRemoteObjects() {
-        return resolveRemoteObjects;
-    }
-
-    /**
-     * @param resolveRemoteObjects
-     *            the resolveRemoteObjects to set
-     */
-    public void setResolveRemoteObjects(boolean resolveRemoteObjects) {
-        this.resolveRemoteObjects = resolveRemoteObjects;
-    }
-
     public void setProperty(String nodeId, String property, Serializable value) {
         this.nodeService.setProperty(new NodeRef(storeRef, nodeId), QName.createQName(property), value);
     }
@@ -3036,7 +2921,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
             boolean isSystemUser = false;
 
-            String user = (String) AuthenticationUtil.getFullyAuthenticatedUser();
+            String user = AuthenticationUtil.getFullyAuthenticatedUser();
             if ("admin".equals(user)) {
                 isSystemUser = true;
             }
@@ -3076,14 +2961,10 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      * createChildAssociation so the favorite folder is not the primary parent
      * and the basket will just get removed from the favorite folder
      *
-     * @param basketID
-     * @return
-     * @throws org.apache.axis.AxisFault
-     * @throws RemoteException
      */
     public boolean removeBasket(String basketID) throws Throwable {
         String fromID = getFavoritesFolder();
-        /**
+        /*
          * just to remove node is not enough, because the children get deleted in cascade
          */
         removeNodeAndRelations(basketID, fromID);
@@ -3112,9 +2993,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         return true;
     }
 
-    public Map<String, Map<String,Object>> getParents(String nodeID, boolean primary) throws Throwable {
+    public Map<String, Map<String, Object>> getParents(String nodeID, boolean primary) throws Throwable {
         // nodeService.getP
-        Map<String, Map<String,Object>> result = new HashMap<>();
+        Map<String, Map<String, Object>> result = new HashMap<>();
         NodeRef nodeRef = new NodeRef(storeRef, nodeID);
         if (primary) {
             ChildAssociationRef cAR = nodeService.getPrimaryParent(nodeRef);
@@ -3129,7 +3010,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             try {
                 for (ChildAssociationRef parent : parents) {
                     String parentNodeId = parent.getParentRef().getId();
-                    Map<String,Object> parentProps = getProperties(parent.getParentRef());
+                    Map<String, Object> parentProps = getProperties(parent.getParentRef());
                     result.put(parentNodeId, parentProps);
                 }
             } catch (AccessDeniedException e) {
@@ -3207,7 +3088,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                                 );
 
                                 String repository = (String) personProps.get(QName.createQName(CCConstants.PROP_USER_REPOSITORYID));
-                                if (repository == null || repository.trim().equals(""))
+                                if (StringUtils.isBlank(repository))
                                     repository = appInfo.getAppId();
                                 user.setRepositoryId(repository);
                                 user.setUsername((String) personProps.get(ContentModel.PROP_USERNAME));
@@ -3245,11 +3126,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                                     if (CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
                                             && permission.equals(PermissionService.COORDINATOR)) {
 
-                                        if (isSharedNode(nodeId)) {
-                                            group.setEditable(false);
-                                        } else {
-                                            group.setEditable(true);
-                                        }
+                                        group.setEditable(!isSharedNode(nodeId));
 
                                     }
                                 }
@@ -3263,7 +3140,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                         aces.add(aceResult);
                     }
 
-                    result.setAces(aces.toArray(new ACE[aces.size()]));
+                    result.setAces(aces.toArray(new ACE[0]));
 
                     log.debug("permissionsService.getInheritParentPermissions(nodeRef):" + permissionsService.getInheritParentPermissions(nodeRef));
                     isInherited = permissionsService.getInheritParentPermissions(nodeRef);
@@ -3274,11 +3151,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 }, false);
     }
 
-    /** true if this node is in a shared context ("My shared files"), false if it's in users home
+    /**
+     * true if this node is in a shared context ("My shared files"), false if it's in users home
      *
-     * @param nodeId
-     * @return
-     * @throws Throwable
      */
     private boolean isSharedNode(String nodeId) {
         try {
@@ -3292,11 +3167,10 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                     sharedFolderIds.add(key.toString());
                 }
             }
-            if (sharedFolderIds.size() == 0) return false;
+            if (sharedFolderIds.isEmpty()) return false;
 
             NodeRef last = new NodeRef(storeRef, nodeId);
-            while (true) {
-                if (last == null) break;
+            while (last != null) {
                 if (sharedFolderIds.contains(last.getId())) return true;
                 last = getParent(last).getParentRef();
             }
@@ -3309,8 +3183,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * returns admin authority if context is an edugroup
-     * @param nodeRef
-     * @return
+     *
      */
     String getAdminAuthority(NodeRef nodeRef) {
         String authorityAdministrator = null;
@@ -3320,7 +3193,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(ap.getAuthority());
                 if (authorityNodeRef != null) {
                     String groupType = (String) nodeService.getProperty(authorityNodeRef, QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
-                    if (groupType != null && CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
+                    if (CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
                             && ap.getPermission().equals(PermissionService.COORDINATOR)) {
                         authorityAdministrator = ap.getAuthority();
                     }
@@ -3361,19 +3234,15 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     }
 
     /**
-     *
-     * @param parentID
-     * @param childID
      * @param association (is ignored)
-     *       removes all associations between two nodes
+     *                    removes all associations between two nodes
      */
     public void removeChild(String parentID, String childID, String association) {
         nodeService.removeChild(new NodeRef(storeRef, parentID), new NodeRef(storeRef, childID));
     }
 
     public String dropToBasketRemoteNode(String basketId, Map<String, String> params) throws Exception {
-        String result = createRemoteNode(basketId, params);
-        return result;
+        return createRemoteNode(basketId, params);
     }
 
     public String createRemoteNode(String parentId, Map<String, String> params) throws Exception {
@@ -3383,12 +3252,12 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         String remoteRepository = params.get(CCConstants.REPOSITORY_ID);
         String remoteRepositoryType = params.get(CCConstants.REPOSITORY_TYPE);
 
-        if (remoteNodeId != null && remoteNodeId.trim().length() > 0 && remoteRepository != null && remoteRepository.trim().length() > 0) {
-            Map<String,Object> properties = new HashMap<>();
+        if (StringUtils.isNotBlank(remoteNodeId) && StringUtils.isNotBlank(remoteRepository)) {
+            Map<String, Object> properties = new HashMap<>();
             properties.put(CCConstants.CCM_PROP_REMOTEOBJECT_NODEID, remoteNodeId);
             properties.put(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORYID, remoteRepository);
 
-            if (remoteRepositoryType == null || remoteRepositoryType.trim().equals("")) {
+            if (StringUtils.isBlank(remoteRepositoryType)) {
                 ApplicationInfo appInfo = ApplicationInfoList.getRepositoryInfoById(remoteRepository);
                 remoteRepositoryType = appInfo.getRepositoryType();
             }
@@ -3410,7 +3279,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                         QName.createQName(CCConstants.CM_NAME));
 		String extension = FilenameUtils.getExtension(originalName);
 		// keep the filename so that a possible mimetype verification is valid
-		nodeService.setProperty(new NodeRef(storeRef, nodeId), QName.createQName(CCConstants.CM_NAME), UUID.randomUUID().toString() + "." + extension);
+		nodeService.setProperty(new NodeRef(storeRef, nodeId), QName.createQName(CCConstants.CM_NAME), UUID.randomUUID().toString() +(StringUtils.isEmpty(extension) ? "" : ("." + extension)));
         try {
             nodeService.moveNode(
                     new NodeRef(storeRef, nodeId),
@@ -3440,9 +3309,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
 
     /**
-     * @param nodeId : the id of the node to copy
-     * @param toNodeId : the id of the target folder
-     * @param copyChildren
+     * @param nodeId       : the id of the node to copy
+     * @param toNodeId     : the id of the target folder
      */
     public String copyNode(String nodeId, String toNodeId, boolean copyChildren) throws Exception {
         NodeRef nodeRef = new NodeRef(MCAlfrescoAPIClient.storeRef, nodeId);
@@ -3467,74 +3335,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         return copyNodeRef.getId();
     }
 
-    /**
-     * walk through all parents until you find a folder that is used as
-     * edugrouphomedir of a edugroup return the Group
-     *
-     * @param nodeId
-     * @return
-     * @throws CCException
-     */
-    public Group getEduGroupContextOfNode(String nodeId) {
-
-        NodeRef result = null;
-
-        NodeRef nodeRef = new NodeRef(storeRef, nodeId);
-        QName nodeType = null;
-        QName mapType = QName.createQName(CCConstants.CCM_TYPE_MAP);
-
-        Collection<NodeRef> eduGroupNodeRefs = new VirtualEduGroupFolderTool(serviceRegistry, nodeService).getEduGroupNodeRefs();
-
-        // nodeRefEduGroupFolder , noderefEduGroup
-        Map<NodeRef, NodeRef> eduGroupEduGroupFolderMap = new HashMap<>();
-        for (NodeRef eduGroupNodeRef : eduGroupNodeRefs) {
-            eduGroupEduGroupFolderMap.put((NodeRef) nodeService.getProperty(eduGroupNodeRef, QName.createQName(CCConstants.CCM_PROP_EDUGROUP_EDU_HOMEDIR)),
-                    eduGroupNodeRef);
-        }
-
-        Group group = null;
-        try {
-            do {
-                ChildAssociationRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
-                nodeRef = (parentAssocRef == null) ? null : parentAssocRef.getParentRef();
-                if (nodeRef != null) {
-                    nodeType = nodeService.getType(nodeRef);
-                }
-
-                NodeRef groupNodeRef = eduGroupEduGroupFolderMap.get(nodeRef);
-                if ((groupNodeRef != null)) {
-                    result = groupNodeRef;
-
-                }
-
-            } while (nodeRef != null && mapType.equals(nodeType) && result == null);
-
-            if (result != null) {
-                group = new Group();
-                String authorityName = (String) nodeService.getProperty(result, ContentModel.PROP_AUTHORITY_NAME);
-                group.setName(authorityName);
-                group.setDisplayName((String) nodeService.getProperty(result, ContentModel.PROP_AUTHORITY_DISPLAY_NAME));
-                group.setRepositoryId(appInfo.getAppId());
-                group.setNodeId(result.getId());
-                group.setAuthorityType(AuthorityType.getAuthorityType(group.getName()).name());
-                group.setScope((String) nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_SCOPE_TYPE)));
-                NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(authorityName);
-                if (authorityNodeRef != null) {
-                    String groupType = (String) nodeService.getProperty(authorityNodeRef, QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
-                    if (groupType != null) {
-                        group.setGroupType(groupType);
-                    }
-                }
-            }
-        } catch (org.alfresco.repo.security.permissions.AccessDeniedException e) {
-            // maybe while doing nodeService.getPrimaryParent(nodeRef); and
-            // landing in an folder where i have no read permissions
-            log.debug(e.getMessage());
-        }
-
-        return group;
-    }
-
     public Map<String, String> checkAndCreateShadowUser(String username, String email, String repId) throws Exception {
         throw new Exception("checkAndCreateShadowUser is not implemented!");
     }
@@ -3543,7 +3343,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         VersionService versionService = serviceRegistry.getVersionService();
         VersionHistory versionHistory = versionService.getVersionHistory(new NodeRef(storeRef, nodeId));
         Map<String, Map<String, Object>> result = null;
-        if (versionHistory != null && versionHistory.getAllVersions() != null && versionHistory.getAllVersions().size() > 0) {
+        if (versionHistory != null && versionHistory.getAllVersions() != null && !versionHistory.getAllVersions().isEmpty()) {
             result = new HashMap<>();
             Collection<Version> versions = versionHistory.getAllVersions();
 
@@ -3556,7 +3356,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
                 props.put(CCConstants.ALFRESCO_MIMETYPE, getAlfrescoMimetype(version.getFrozenStateNodeRef()));
                 // contenturl
-				String contentUrl = URLHelper.getNgRenderNodeUrl(nodeId,version.getVersionLabel());
+                String contentUrl = URLHelper.getNgRenderNodeUrl(nodeId, version.getVersionLabel());
                 contentUrl = URLTool.addOAuthAccessToken(contentUrl);
 
                 props.put(CCConstants.CONTENTURL, contentUrl);
@@ -3568,9 +3368,9 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 // (thumbnail will be removed by versioning)
                 setPreviewUrlWithoutTicket(storeRef, nodeId, props);
                 String thumbnailUrl = (String) props.get(CCConstants.CM_ASSOC_THUMBNAILS);
-                if (thumbnailUrl != null && !thumbnailUrl.trim().equals("")) {
+                if (StringUtils.isNotBlank(thumbnailUrl)) {
                     // prevent Browser Caching
-                    thumbnailUrl = UrlTool.setParam(thumbnailUrl, "dontcache", new Long(System.currentTimeMillis()).toString());
+                    thumbnailUrl = UrlTool.setParam(thumbnailUrl, "dontcache", Long.toString(System.currentTimeMillis()));
                     props.put(CCConstants.CM_ASSOC_THUMBNAILS, thumbnailUrl);
                 }
 
@@ -3595,7 +3395,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public void revertVersion(String nodeId, String verLbl) throws Exception {
         VersionService versionService = serviceRegistry.getVersionService();
         VersionHistory versionHistory = versionService.getVersionHistory(new NodeRef(storeRef, nodeId));
-        if (versionHistory != null && versionHistory.getAllVersions() != null && versionHistory.getAllVersions().size() > 0) {
+        if (versionHistory != null && versionHistory.getAllVersions() != null && !versionHistory.getAllVersions().isEmpty()) {
             NodeRef ioNodeRef = new NodeRef(storeRef, nodeId);
             BehaviourFilter behaviourFilter = (BehaviourFilter) applicationContext.getBean("policyBehaviourFilter");
 
@@ -3647,8 +3447,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
      * runas = the fully authenticated user only when
      * AuthenticationUtil.RunAsWork<Result> it differs
      *
-     * @return
-     * @throws Exception
      */
     public boolean isAdmin() throws Exception {
 
@@ -3692,12 +3490,11 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         String systemFolderRootId = getCompanyHomeNodeId();
 
         Map<String, Object> systemFolderProps = getChild(systemFolderRootId, CCConstants.CM_TYPE_FOLDER, CCConstants.CM_NAME, foldername);
-        if (systemFolderProps == null || systemFolderProps.size() == 0) {
+        if (systemFolderProps == null || systemFolderProps.isEmpty()) {
             Map<String, Object> newSystemFolderProps = new HashMap<>();
             newSystemFolderProps.put(CCConstants.CM_NAME, foldername);
             newSystemFolderProps.put(CCConstants.CM_PROP_C_TITLE, foldername);
-            String newRemoteFolderId = createNode(systemFolderRootId, CCConstants.CM_TYPE_FOLDER, newSystemFolderProps);
-            return newRemoteFolderId;
+            return createNode(systemFolderRootId, CCConstants.CM_TYPE_FOLDER, newSystemFolderProps);
         } else {
             return (String) systemFolderProps.get(CCConstants.SYS_PROP_NODE_UID);
         }
@@ -3718,8 +3515,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     @Override
     public boolean isSubOf(String type, String parentType) throws Throwable {
-        boolean isSubOf = serviceRegistry.getDictionaryService().isSubClass(QName.createQName(type), QName.createQName(parentType));
-        return isSubOf;
+        return serviceRegistry.getDictionaryService().isSubClass(QName.createQName(type), QName.createQName(parentType));
     }
 
     public String getType(String nodeId) {
@@ -3833,11 +3629,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     public boolean isOwner(String nodeId, String user) {
 
         String owner = serviceRegistry.getOwnableService().getOwner(new NodeRef(MCAlfrescoAPIClient.storeRef, nodeId));
-        if (owner.equals(user)) {
-            return true;
-        } else {
-            return false;
-        }
+        return owner.equals(user);
     }
 
     public String[] getMetadataSets() {
@@ -3845,18 +3637,12 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
             File mdsDir = new File(MCAlfrescoAPIClient.class.getClassLoader().getResource("org/edu_sharing/metadataset").toURI());
 
-            final FilenameFilter filter = new FilenameFilter() {
-
-                public boolean accept(final File dir, final String name) {
-
-                    if (name.matches("metadataset_[a-zA-Z]*.xml")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            };
+            final FilenameFilter filter = (dir, name) -> name.matches("metadataset_[a-zA-Z]*.xml");
             String[] filesFound = mdsDir.list(filter);
+
+            if(filesFound == null){
+                return new String[0];
+            }
 
             List<String> mdsNames = new ArrayList<>();
             for (String mdsFile : filesFound) {
@@ -3865,7 +3651,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
                 mdsNames.add(name);
             }
 
-            return mdsNames.toArray(new String[mdsNames.size()]);
+            return mdsNames.toArray(new String[0]);
         } catch (URISyntaxException e) {
             log.error(e.getMessage(), e);
         }
@@ -3891,9 +3677,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
     /**
      * returns hash of content, if node has no content -1
      *
-     * @param nodeId
-     * @param property
-     * @return
      */
     public int getContentHash(String nodeId, String property) {
         return getContentHash(nodeId, property, storeRef.getProtocol(), storeRef.getIdentifier());
@@ -3923,46 +3706,44 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         for (QName qname : set) {
             result.add(qname.toString());
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     public String findNodeByPath(String path) {
 
         return serviceRegistry.getTransactionService().getRetryingTransactionHelper().doInTransaction(
 
-                new RetryingTransactionCallback<String>() {
-                    public String execute() throws Throwable {
-                        List<String> paths = null;
-                        if (path == null || path.length() == 0) {
-                            paths = Collections.emptyList();
+                () -> {
+                    List<String> paths;
+                    if (path == null || path.isEmpty()) {
+                        paths = Collections.emptyList();
 
-                        } else {
+                    } else {
 
-                            paths = new ArrayList<>();
+                        paths = new ArrayList<>();
 
-                            StringTokenizer token = new StringTokenizer(path, "/");
-                            while (token.hasMoreTokens()) {
-                                String s = token.nextToken().replaceAll("\\{[^}]*\\}", "");
+                        StringTokenizer token = new StringTokenizer(path, "/");
+                        while (token.hasMoreTokens()) {
+                            String s = token.nextToken().replaceAll("\\{[^}]*}", "");
 
-                                String[] t = s.split(":");
-                                if (t.length == 2) {
-                                    s = t[1];
-                                }
-
-                                paths.add(s);
+                            String[] t = s.split(":");
+                            if (t.length == 2) {
+                                s = t[1];
                             }
+
+                            paths.add(s);
                         }
-
-                        NodeRef companyHome = repositoryHelper.getCompanyHome();
-
-                        if (0 < paths.size() && "company_home".equals(paths.get(0))) {
-
-                            paths.remove(0);
-                        }
-
-                        return serviceRegistry.getFileFolderService().
-                                resolveNamePath(companyHome, paths, true).getNodeRef().getId();
                     }
+
+                    NodeRef companyHome = repositoryHelper.getCompanyHome();
+
+                    if (!paths.isEmpty() && "company_home".equals(paths.get(0))) {
+
+                        paths.remove(0);
+                    }
+
+                    return serviceRegistry.getFileFolderService().
+                            resolveNamePath(companyHome, paths, true).getNodeRef().getId();
                 }, true);
 
     }
@@ -3972,53 +3753,20 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         try {
             serviceRegistry.getTransactionService().getRetryingTransactionHelper().doInTransaction(
 
-                    new RetryingTransactionCallback<Void>() {
-                        public Void execute() throws Throwable {
-                            if (isAdmin()) {
+                    (RetryingTransactionCallback<Void>) () -> {
+                        if (isAdmin()) {
 
-                                eduOrganisationService.bindEduGroupFolder(groupName, new NodeRef(storeRef, folderId));
-                            } else {
-                                throw new Exception("No Permissions to bind edugroup");
-                            }
-
-                            return null;
+                            eduOrganisationService.bindEduGroupFolder(groupName, new NodeRef(storeRef, folderId));
+                        } else {
+                            throw new Exception("No Permissions to bind edugroup");
                         }
+
+                        return null;
                     }, false);
 
         } catch (AlfrescoRuntimeException e) {
             throw (Exception) e.getCause();
         }
-    }
-
-    public void unbindEduGroupFolder(String groupName, String folderId) throws Exception {
-
-        serviceRegistry.getTransactionService().getRetryingTransactionHelper().doInTransaction(
-
-                new RetryingTransactionCallback<Void>() {
-                    public Void execute() throws Throwable {
-                        if (isAdmin()) {
-
-                            AuthorityService authorityService = serviceRegistry.getAuthorityService();
-                            NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(PermissionService.GROUP_PREFIX + groupName);
-
-                            if (authorityNodeRef == null) {
-                                return null;
-                            }
-
-                            NodeService nodeService = serviceRegistry.getNodeService();
-                            NodeRef folderNodeRef = new NodeRef(storeRef, folderId);
-
-                            if (!nodeService.exists(folderNodeRef)) {
-                                return null;
-                            }
-
-                            EduGroupTool.processEduGroupMicroCommand("COMMAND REMOVE " + authorityNodeRef.toString() + " " + folderNodeRef.toString());
-                        }
-
-                        return null;
-                    }
-                }, false);
-
     }
 
     public InputStream getContent(String nodeId) {
@@ -4033,9 +3781,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     /**
      * https://community.alfresco.com/thread/176342-read-document-content-doc-docx-odt
-     * @param nodeId
+     *
      * @param mimetype e.g. MimetypeMap.MIMETYPE_TEXT_PLAIN
-     * @return
      */
     public String getNodeTextContent(String nodeId, String mimetype) {
 		/*
@@ -4085,7 +3832,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         List<NodeRef> nodeRefs = searchService.selectNodes(storeRootNodeRef, folderXPath, null, namespaceService, false);
 
-        NodeRef folderNodeRef = null;
+        NodeRef folderNodeRef;
         if (nodeRefs.size() != 1) {
             throw new AlfrescoRuntimeException("Cannot find folder location: " + folderXPath);
         } else {

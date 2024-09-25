@@ -123,6 +123,25 @@ export class UIService {
         return optionsFiltered;
     }
 
+    /**
+     * helper that updates the "isEnabled" flag on all options for the given, selected node
+     * can be used by dropdown or action menus to update the state for the current element
+     * @param options
+     */
+    async updateOptionEnabledState(
+        options: BehaviorSubject<OptionItem[]>,
+        object: Node | any = null,
+    ) {
+        options.value.forEach((o) => {
+            o.isEnabled = !o.customEnabledCallback;
+            o.enabledCallback(object).then((result) => {
+                o.isEnabled = result;
+                options.next(options.value);
+            });
+        });
+        options.next(options.value);
+    }
+
     public filterToggleOptions(options: OptionItem[], toggle: boolean) {
         let result: OptionItem[] = [];
         for (let option of options) {

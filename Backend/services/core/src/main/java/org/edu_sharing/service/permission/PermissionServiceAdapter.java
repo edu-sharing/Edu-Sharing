@@ -66,10 +66,6 @@ public class PermissionServiceAdapter implements PermissionService {
 	}
 
 	@Override
-	public void removePermissions(String nodeId, String authority, String[] _permissions) throws Exception {
-	}
-
-	@Override
 	public StringBuffer getFindGroupsSearchString(String searchWord, boolean globalContext, boolean skipTpCheck) {
 		return null;
 	}

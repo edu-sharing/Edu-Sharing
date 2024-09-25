@@ -1,5 +1,7 @@
 package org.edu_sharing.restservices.mds.v1.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.edu_sharing.metadataset.v2.MetadataKey;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,11 +14,16 @@ import java.util.List;
 public class MdsValue {
 	private String id,caption,description,parent,url;
 	private List<String> alternativeIds;
+	@Getter
+	@Setter
+	@JsonProperty
+	private String abbreviation;
 	public MdsValue(){};
 	public MdsValue(MetadataKey key) {
 		id=key.getKey();
 		caption=key.getCaption();
 		alternativeIds = key.getAlternativeKeys();
+		abbreviation = key.getAbbreviation();
 		url = key.getUrl();
 		description=key.getDescription();
 		parent=key.getParent();

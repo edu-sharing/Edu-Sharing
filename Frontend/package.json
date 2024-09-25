@@ -57,7 +57,7 @@
     "@angular/router": "^18.0.2",
     "@ngx-translate/core": "^14.0.0",
     "@tinymce/tinymce-angular": "^7.0.0",
-    "tinymce": "^6.8.3",
+    "tinymce": "^7.3.0",
     "tinymce-i18n": "^23.9.11",
     "angular-material-css-vars": "^6.1.2",
     "angular-resizable-element": "^7.0.2",

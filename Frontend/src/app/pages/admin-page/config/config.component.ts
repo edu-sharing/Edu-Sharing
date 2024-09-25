@@ -43,6 +43,7 @@ export class AdminConfigComponent {
         clientConfig: null,
         reference: null,
         clusterDeployment: null,
+        defaultsOverride: null,
         nodeDeployment: null,
         extension: null,
         clusterOverride: null,
@@ -74,6 +75,9 @@ export class AdminConfigComponent {
         this.adminService
             .getConfigFile(AdminConfigComponent.CONFIG_DEPLOYMENT_FILE, 'NODE')
             .subscribe((deployment) => (this.configs.nodeDeployment = deployment));
+        this.adminService
+            .getConfigFile(AdminConfigComponent.OVERRIDE_CONFIG_FILE, 'DEFAULTS')
+            .subscribe((deployment) => (this.configs.defaultsOverride = deployment));
         this.adminService
             .getConfigFile(AdminConfigComponent.OVERRIDE_CONFIG_FILE, 'CLUSTER')
             .subscribe((c) => (this.configs.clusterOverride = c));

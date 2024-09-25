@@ -12,9 +12,9 @@ import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfresco.policy.GuestCagePolicy;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.ConnectionDBAlfresco;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.authentication.ContextManagementFilter;
@@ -132,10 +132,12 @@ public class TrackingServiceImpl extends TrackingServiceDefault {
             " GROUP BY type,date :grouping" +
             " ORDER BY date";
     private final TrackingServiceCustomInterface customTrackingService;
+    private final GuestService guestService;
 
-    public TrackingServiceImpl(TrackingServiceFactory trackingServiceFactory, TransactionService transactionService, @Qualifier("policyBehaviourFilter") BehaviourFilter policyBehaviourFilter) {
+    public TrackingServiceImpl(TrackingServiceFactory trackingServiceFactory, TransactionService transactionService, @Qualifier("policyBehaviourFilter") BehaviourFilter policyBehaviourFilter, GuestService guestService) {
         super(transactionService, policyBehaviourFilter);
         customTrackingService = trackingServiceFactory.getTrackingServiceCustom();
+        this.guestService = guestService;
         try {
             new ConnectionDBAlfresco().getSqlSessionFactoryBean().getConfiguration().addMapper(EduTrackingMapper.class);
         } catch (BindingException ignored) {
@@ -162,7 +164,7 @@ public class TrackingServiceImpl extends TrackingServiceDefault {
     public boolean trackActivityOnUser(String authorityName, EventType type) {
         super.trackActivityOnUser(authorityName, type);
         if (authorityName == null
-                || GuestCagePolicy.getGuestUsers().contains(authorityName)
+                || guestService.getAllGuestAuthorities().contains(authorityName)
                 || authorityName.equals(AuthenticationUtil.getSystemUserName())) {
             return false;
         }

@@ -1,13 +1,18 @@
 package org.edu_sharing.service.rendering;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.edu_sharing.repository.client.tools.I18nAngular;
+import org.edu_sharing.restservices.NodeDao;
 import org.edu_sharing.restservices.shared.*;
 import org.edu_sharing.alfresco.service.config.model.Values;
 
 import java.io.Serializable;
 import java.util.List;
 
+@Getter
+@Setter
 public class RenderingServiceData implements Serializable {
     private Node node;
     private List<Node> children;
@@ -19,62 +24,6 @@ public class RenderingServiceData implements Serializable {
     
     
     private List<Editor> editors;
-
-    public Node getNode() {
-        return node;
-    }
-
-    public void setNode(Node node) {
-        this.node = node;
-    }
-
-    public void setUser(UserRender user) {
-        this.user = user;
-    }
-
-    public UserRender getUser() {
-        return user;
-    }
-
-    public void setMetadataHTML(String metadataHTML) {
-        this.metadataHTML = metadataHTML;
-    }
-
-    public String getMetadataHTML() {
-        return metadataHTML;
-    }
-
-    public void setConfigValues(Values configValues) {
-        this.configValues = configValues;
-    }
-
-    public Values getConfigValues() {
-        return configValues;
-    }
-
-    public void setChildren(List<Node> children) {
-        this.children = children;
-    }
-
-    public List<Node> getChildren() {
-        return children;
-    }
-
-    public void setNodeUrls(NodeUrls nodeUrls) {
-        this.nodeUrls = nodeUrls;
-    }
-
-    public NodeUrls getNodeUrls() {
-        return nodeUrls;
-    }
-
-    public void setEditors(List<Editor> editors) {
-        this.editors = editors;
-    }
-
-    public List<Editor> getEditors() {
-        return editors;
-    }
 
     static class Editor implements Serializable {
 

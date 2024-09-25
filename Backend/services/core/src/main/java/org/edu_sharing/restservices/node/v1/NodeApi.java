@@ -2004,6 +2004,38 @@ public class NodeApi  {
     	}
 
     }
+
+
+	@GET
+	@Path("/nodes/{repository}/{node}/permissions/raw")
+	@Operation(summary = "Get all permission of node (not grouped, requires admin).", description = "Get all permission of node (not grouped, requires admin).")
+	@ApiResponses(
+			value = {
+					@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = org.edu_sharing.repository.client.rpc.ACL.class))),
+					@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+			})
+
+	public Response getRawPermission(
+			@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
+			@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
+			@Context HttpServletRequest req) {
+
+		try {
+
+			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
+			node=NodeDao.mapNodeConstants(repoDao,node);
+			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
+			return Response.status(Response.Status.OK).entity(nodeDao.getRawPermissions()).build();
+
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+
+	}
     @GET
     @Path("/nodes/{repository}/{node}/notifys")    
     

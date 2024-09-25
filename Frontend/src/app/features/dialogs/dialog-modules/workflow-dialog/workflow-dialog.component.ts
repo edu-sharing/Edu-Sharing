@@ -1,5 +1,6 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { NodeService } from 'ngx-edu-sharing-api';
 import {
     LocalEventsService,
     WORKFLOW_STATUS_UNCHECKED,
@@ -62,6 +63,7 @@ export class WorkflowDialogComponent {
         private localEvents: LocalEventsService,
         private nodeHelper: NodeHelperService,
         private nodeService: RestNodeService,
+        private nodeApi: NodeService,
         private toast: Toast,
         private translate: TranslateService,
     ) {
@@ -337,8 +339,13 @@ export class WorkflowDialogComponent {
     }
 
     private async addWritePermission(authority: WorkflowReceiver, node: Node): Promise<void> {
-        const nodePermissions = await this.nodeService.getNodePermissions(node.ref.id).toPromise();
-        const permissions = RestHelper.addCoordinatorPermission(nodePermissions, authority);
-        await this.nodeService.setNodePermissions(node.ref.id, permissions, false).toPromise();
+        const nodePermissions = await this.nodeApi.getPermissions(node.ref.id).toPromise();
+        const permissions = RestHelper.addCoordinatorPermission(
+            nodePermissions.localPermissions,
+            authority,
+        );
+        await this.nodeApi
+            .setPermissions(node.ref.id, permissions, { sendMail: false })
+            .toPromise();
     }
 }

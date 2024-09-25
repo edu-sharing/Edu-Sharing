@@ -10,7 +10,7 @@ import org.edu_sharing.service.InsufficientPermissionException;
 
 public interface RenderingService {
 
-    String getDetails(String nodeId, String nodeVersion, String displayMode, Map<String, String> parameters) throws InsufficientPermissionException, Exception;
+    RenderingDetails getDetails(String nodeId, String nodeVersion, String displayMode, Map<String, String> parameters) throws InsufficientPermissionException, Exception;
 
     String getDetails(String renderingServiceUrl, RenderingServiceData data) throws JsonProcessingException, UnsupportedEncodingException;
 

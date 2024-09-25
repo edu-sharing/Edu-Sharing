@@ -126,6 +126,7 @@ export class AppComponent implements OnInit, DoCheck, AfterViewInit {
     }
 
     ngOnInit(): void {
+        this.elementRef.nativeElement.removeAttribute('ng-version');
         this.translations
             .initialize()
             .pipe(
@@ -199,7 +200,12 @@ export class AppComponent implements OnInit, DoCheck, AfterViewInit {
                 !loginInfo.isValidLogin &&
                 !(
                     route.startsWith(UIConstants.ROUTER_PREFIX + 'login') ||
-                    route.startsWith(UIConstants.ROUTER_PREFIX + 'register')
+                    route.startsWith(UIConstants.ROUTER_PREFIX + 'register') ||
+                    route.startsWith(UIConstants.ROUTER_PREFIX + 'error') ||
+                    route.startsWith(UIConstants.ROUTER_PREFIX + 'message') ||
+                    // public link sharing
+                    route.startsWith(UIConstants.ROUTER_PREFIX + 'sharing') ||
+                    route.startsWith('shibboleth')
                 )
             ) {
                 RestHelper.goToLogin(this.injector.get(Router), this.configuration);

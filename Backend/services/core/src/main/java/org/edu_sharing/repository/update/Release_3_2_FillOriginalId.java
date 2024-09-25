@@ -9,16 +9,18 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
+import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
-import org.edu_sharing.repository.server.tools.cache.EduGroupCache;
 import org.edu_sharing.repository.server.update.UpdateRoutine;
 import org.edu_sharing.repository.server.update.UpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @UpdateService
@@ -31,18 +33,21 @@ public class Release_3_2_FillOriginalId {
 	private final BehaviourFilter policyBehaviourFilter;
 
 
+	OrganisationService organisationService;
+
 	//very important: use the alfrescoDefaultDbNodeService defined in custom-core-services-context.xml
 	//cause of overwriten getChild... methods in org.edu_sharing.alfresco.fixes.DbNodeServiceImpl
 	//this can lead to a problem, that every edugroupfolder is processed for all members of the edugroup again
 	@Autowired
-	public Release_3_2_FillOriginalId(RetryingTransactionHelper retryingTransactionHelper, @Qualifier("alfrescoDefaultDbNodeService") NodeService nodeService, @Qualifier("policyBehaviourFilter")BehaviourFilter policyBehaviourFilter ) {
+	public Release_3_2_FillOriginalId(RetryingTransactionHelper retryingTransactionHelper, @Qualifier("alfrescoDefaultDbNodeService") NodeService nodeService, @Qualifier("policyBehaviourFilter")BehaviourFilter policyBehaviourFilter, OrganisationService organisationService ) {
 		this.retryingTransactionHelper = retryingTransactionHelper;
 		this.nodeService = nodeService;
 		this.policyBehaviourFilter = policyBehaviourFilter;
+		this.organisationService = organisationService;
 
 		try{
-			for(NodeRef nodeRef : EduGroupCache.getKeys()){
-				NodeRef eduGroupFolderNodeId = (NodeRef)nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_EDUGROUP_EDU_HOMEDIR));
+			for(Map<QName, Serializable> orgProps : organisationService.getOrganisations()){
+				NodeRef eduGroupFolderNodeId = (NodeRef)orgProps.get(QName.createQName(CCConstants.CCM_PROP_EDUGROUP_EDU_HOMEDIR));
 				eduGroupFolderNodeIds.add(eduGroupFolderNodeId);
 			}
 		}catch(Throwable e){

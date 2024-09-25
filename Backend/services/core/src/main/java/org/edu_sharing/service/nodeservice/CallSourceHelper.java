@@ -71,7 +71,10 @@ public class CallSourceHelper {
     }
 
     private static boolean isSearch(String path){
-        if(path.startsWith(WEBAPP_BASE_PATH + "/rest/search")){
+        if(
+                path.startsWith(WEBAPP_BASE_PATH + "/rest/search") ||
+                path.startsWith(WEBAPP_BASE_PATH + "/rest/node/v1/nodes/-home-/-frontpage-/children")
+        ){
             return true;
         }
         return false;

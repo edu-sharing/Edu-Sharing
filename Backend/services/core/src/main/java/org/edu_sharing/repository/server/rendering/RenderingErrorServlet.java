@@ -42,9 +42,11 @@ public class RenderingErrorServlet extends HttpServlet {
             File index = new File(Context.getGlobalContext().getRealPath("rendering-error.html"));
             String html = FileUtils.readFileToString(index);
             if(exception!=null) {
+                logger.warn("Rendering error", exception);
                 String exceptionName="";
                 if (exception.getNested() != null) {
                     exceptionName = exception.getNested().getClass().getSimpleName();
+                    logger.warn("Rendering error nested", exception.getNested());
                 }
                 html = html.replace("{{statusCode}}", exception.getStatusCode() + "");
                 html = html.replace("{{message}}", I18nServer.getTranslationDefaultResourcebundleNoException("rendering_error_" + exception.getI18nName()));

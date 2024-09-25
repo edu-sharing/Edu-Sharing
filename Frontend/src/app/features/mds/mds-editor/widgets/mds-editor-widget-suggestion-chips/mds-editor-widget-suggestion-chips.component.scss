@@ -1,28 +1,27 @@
 @import '../../../../../core-ui-module/styles/variables';
 
-$backgroundColor: rgba(var(--colorStatusPositive) 0.5);
-$iconColor: $colorStatusPositive;
+$backgroundColor: rgba($colorStatusPositive, 0.5);
 
-.mat-chip-list .mat-chip {
-    background-color: $backgroundColor;
+mat-chip-grid mat-chip-row {
+    background-color: $backgroundColor !important;
     cursor: pointer;
     display: inline-flex;
-    align-items: center;
     .mat-icon {
-        color: $iconColor;
-        filter: brightness(-0.5);
-        margin-right: 8px;
-        margin-left: 0;
-        height: 18px;
-        width: 18px;
-        font-size: 18px;
+        height: 16px;
+        width: 16px;
+        font-size: 16px;
     }
-    .caption {
-        @include limitLineLength(200px);
-    }
-    .count {
-        margin-left: 5px;
-        color: $textLight;
-        font-size: $fontSizeXSmall;
+    .wrapper {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        .caption {
+            @include limitLineLength(200px);
+        }
+
+        .count {
+            color: $textLight;
+            font-size: $fontSizeXSmall;
+        }
     }
 }

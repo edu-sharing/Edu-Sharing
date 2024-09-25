@@ -1,11 +1,6 @@
 package org.edu_sharing.service.collection;
 
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.search.impl.solr.ESSearchParameters;
@@ -19,15 +14,15 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.transaction.TransactionService;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfresco.service.search.CMISSearchHelper;
+import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
-import org.edu_sharing.metadataset.v2.MetadataReader;
-import org.edu_sharing.metadataset.v2.MetadataSet;
-import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.rpc.ACE;
 import org.edu_sharing.repository.client.rpc.ACL;
 import org.edu_sharing.repository.client.rpc.EduGroup;
@@ -36,8 +31,11 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.AuthenticationTool;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.RepoFactory;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
-import org.edu_sharing.repository.server.tools.*;
+import org.edu_sharing.repository.server.SearchResultNodeRef;
+import org.edu_sharing.repository.server.tools.ApplicationInfo;
+import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.edu_sharing.repository.server.tools.I18nServer;
+import org.edu_sharing.repository.server.tools.ImageTool;
 import org.edu_sharing.repository.server.tools.cache.PreviewCache;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
 import org.edu_sharing.repository.server.tools.forms.DuplicateFinder;
@@ -48,6 +46,7 @@ import org.edu_sharing.restservices.shared.Authority;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityService;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
+import org.edu_sharing.service.model.NodeRefImpl;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
@@ -63,14 +62,20 @@ import org.edu_sharing.service.search.SearchService.ContentType;
 import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SortDefinition;
-import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.service.toolpermission.ToolPermissionHelper;
 import org.edu_sharing.service.toolpermission.ToolPermissionService;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.edu_sharing.service.usage.Usage;
 import org.edu_sharing.service.usage.Usage2Service;
 import org.edu_sharing.spring.ApplicationContextFactory;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
+
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 
 public class CollectionServiceImpl implements CollectionService {
@@ -119,14 +124,13 @@ public class CollectionServiceImpl implements CollectionService {
 
             this.authTool = RepoFactory.getAuthenticationToolInstance(appId);
 
-			String guestUn = ApplicationInfoList.getHomeRepository().getGuest_username();
+            GuestService guestService = applicationContext.getBean(GuestService.class);
 
             //fix for running in runas user mode
             if ((AuthenticationUtil.isRunAsUserTheSystemUser()
                     || "admin".equals(AuthenticationUtil.getRunAsUser()))
 					|| Context.getCurrentInstance().getCurrentInstance() == null
-					|| (guestUn != null
-					&& guestUn.equals(AuthenticationUtil.getFullyAuthenticatedUser()) )) {
+					|| (guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser()) )) {
                 logger.debug("starting in runas user mode");
                 this.authInfo = new HashMap<>();
                 this.authInfo.put(CCConstants.AUTH_USERNAME, AuthenticationUtil.getRunAsUser());
@@ -283,9 +287,9 @@ public class CollectionServiceImpl implements CollectionService {
                 client.setProperty(refId, CCConstants.LOM_PROP_TECHNICAL_SIZE, (String) props.get(CCConstants.LOM_PROP_TECHNICAL_SIZE));
 
                 // run setUsage as admin because the user may not has cc_publish on the original node (but on the ref)
-                new Usage2Service().setUsageInternal(appInfo.getAppId(),
+                new Usage2Service().setUsageInternal(ApplicationInfoList.getHomeRepository().getAppId(),
                         authInfo.get(CCConstants.AUTH_USERNAME),
-                        appInfo.getAppId(),
+                        ApplicationInfoList.getHomeRepository().getAppId(),
                         collectionId,
                         originalNodeId, null, null, null, -1, versLabel, refId, null);
 
@@ -356,7 +360,7 @@ public class CollectionServiceImpl implements CollectionService {
         AuthenticationUtil.runAsSystem(() -> {
             NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, finalId);
             if (getChildren(collectionId, null, new SortDefinition(), Collections.singletonList("files")).stream().anyMatch((ref) ->
-                    nodeRef.getId().equals(NodeServiceHelper.getProperty(ref, CCConstants.CCM_PROP_IO_ORIGINAL))
+                    nodeRef.getId().equals(NodeServiceHelper.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeRef.getId()), CCConstants.CCM_PROP_IO_ORIGINAL))
             )) {
                 throw new DuplicateNodeException("Node id " + nodeRef.getId() + " is already in this collection");
             }
@@ -683,7 +687,7 @@ public class CollectionServiceImpl implements CollectionService {
         return collection;
     }
 
-    protected void addCollectionCountProperties(NodeRef nodeRef, Collection collection) {
+    protected void addCollectionCountProperties(NodeRef nodeRef, Collection collection, BoolQuery readPermissionsQuery) {
         String path = serviceRegistry.getNodeService().getPath(nodeRef).toPrefixString(serviceRegistry.getNamespaceService());
         SearchParameters params = new ESSearchParameters();
         params.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
@@ -697,32 +701,33 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-	public Collection get(org.edu_sharing.service.model.NodeRef nodeRef, boolean fetchCounts) {
+	public Collection get(org.edu_sharing.service.model.NodeRef nodeRef, boolean fetchCounts, boolean resolveUsernames, BoolQuery readPermissionsQuery) {
         try {
 			Map<String,Object> props = nodeRef.getProperties() == null ? nodeService.getProperties(nodeRef.getStoreProtocol(),nodeRef.getStoreId(),nodeRef.getNodeId()) : nodeRef.getProperties();
-			throwIfNotACollection(nodeRef.getStoreProtocol(),nodeRef.getStoreId(),nodeRef.getNodeId());
+			throwIfNotACollection(nodeRef);
 
             Collection collection = asCollection(props);
 
             // using solr to count all underlying refs recursive
             if (fetchCounts) {
-				addCollectionCountProperties(new NodeRef(new StoreRef(nodeRef.getStoreProtocol(), nodeRef.getStoreId()), nodeRef.getNodeId()), collection);
+				addCollectionCountProperties(new NodeRef(new StoreRef(nodeRef.getStoreProtocol(), nodeRef.getStoreId()), nodeRef.getNodeId()), collection, readPermissionsQuery);
             }
             //collection.setChildReferencesCount(client.getChildAssociationByType(storeProtocol,storeId,collectionId, CCConstants.CCM_TYPE_IO).size());
             //collection.setChildCollectionsCount(client.getChildAssociationByType(storeProtocol,storeId,collectionId, CCConstants.CCM_TYPE_MAP).size());
 
-			User owner = client.getOwner(nodeRef.getStoreId(),nodeRef.getStoreProtocol(),nodeRef.getNodeId());
+            if(resolveUsernames) {
+                User owner = client.getOwner(nodeRef.getStoreId(), nodeRef.getStoreProtocol(), nodeRef.getNodeId());
 
-            String currentUser = client.getAuthenticationInfo().get(CCConstants.AUTH_USERNAME);
-            if (!currentUser.equals(owner.getUsername()) && !client.isAdmin(currentUser)) {
-                //leave out username
-                owner.setUsername(null);
-                owner.setEmail(null);
-                owner.setNodeId(null);
+                String currentUser = client.getAuthenticationInfo().get(CCConstants.AUTH_USERNAME);
+                if (!currentUser.equals(owner.getUsername()) && !client.isAdmin(currentUser)) {
+                    //leave out username
+                    owner.setUsername(null);
+                    owner.setEmail(null);
+                    owner.setNodeId(null);
+                }
+                collection.setFromUser(currentUser.equals(owner.getUsername()));
+                collection.setOwner(owner);
             }
-            collection.setFromUser(currentUser.equals(owner.getUsername()));
-
-            collection.setOwner(owner);
 
             String parentId = (String) props.get(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID);
             AuthenticationUtil.runAsSystem(new RunAsWork<Void>() {
@@ -772,95 +777,29 @@ public class CollectionServiceImpl implements CollectionService {
             }
         });
     }
-
     @Override
-    public List<NodeRef> getChildren(String parentId, String scope) {
-
-        try {
-            List<NodeRef> returnVal = new ArrayList<>();
-            if (parentId == null) {
-
-                /**
-                 * @TODO owner + inherit off -> node will be found even if search is done in edu-group context
-                 * level 0 nodes -> maybe cache level 0 with an node property
-                 */
-                String queryString = "ASPECT:\"" + CCConstants.CCM_ASPECT_COLLECTION + "\"" + " AND @ccm\\:collectionlevel0:true";
-                MCAlfrescoAPIClient.ContextSearchMode mode = getContextModeForScope(scope);
-                if (SearchScope.MY.name().equals(scope)) {
-                    queryString += " AND OWNER:\"" + authInfo.get(CCConstants.AUTH_USERNAME) + "\"";
-                }
-                SearchParameters token = new SearchParameters();
-                token.setQuery(queryString);
-                List<NodeRef> searchResult = client.searchNodeRefs(token, mode);
-                for (NodeRef entry : searchResult) {
-                    String parent = nodeService.getPrimaryParent(entry.getStoreRef().getProtocol(), entry.getStoreRef().getIdentifier(), entry.getId());
-                    if (Arrays.asList(client.getAspects(parent)).contains(CCConstants.CCM_ASPECT_COLLECTION)) {
-                        continue;
-                    }
-                    returnVal.add(entry);
-                }
-            } else {
-                List<ChildAssociationRef> list = nodeService.getChildrenChildAssociationRef(parentId);
-                for (ChildAssociationRef entry : list) {
-                    returnVal.add(entry.getChildRef());
-                }
-            }
-            return returnVal;
-        } catch (Throwable e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    public List<org.edu_sharing.service.model.NodeRef> getRecentForCurrentUser() throws Throwable {
+        return permissionService.getRecentProperty(CCConstants.CCM_PROP_PERSON_RECENT_COLLECTIONS).stream().map(
+                ref -> new NodeRefImpl(ref.getId())
+        ).collect(Collectors.toList());
+    }
+    @Override
+    public SearchResultNodeRef getRoot(String scope, SortDefinition sortDefinition, int skipCount, int maxItems) throws Throwable {
+        return searchChildren(scope, sortDefinition, skipCount, maxItems);
     }
 
     @Override
-    public List<NodeRef> getChildren(String parentId, String scope, SortDefinition sortDefinition, List<String> filter) {
+    public List<org.edu_sharing.service.model.NodeRef> getChildren(String parentId, String scope, SortDefinition sortDefinition, List<String> filter) {
         try {
             if (parentId == null) {
-                SearchParameters searchParams = new SearchParameters();
-                sortDefinition.applyToSearchParameters(searchParams);
-
-                MetadataSet mds = MetadataHelper.getMetadataset(appInfo, CCConstants.metadatasetdefault_id);
-
-                String queryId = null;
-                switch (SearchScope.valueOf(scope)) {
-                    case MY:
-                        queryId = "collections_scope_my";
-                        break;
-                    case EDU_ALL:
-                        queryId = "collections_scope_public";
-                        break;
-                    case EDU_GROUPS:
-                        queryId = "collections_scope_shared";
-                        break;
-                    case TYPE_EDITORIAL:
-                        queryId = "collections_scope_editorial";
-                        break;
-                    case TYPE_MEDIA_CENTER:
-                        queryId = "collections_scope_media_center";
-                        break;
-                    case RECENT:
-                        return permissionService.getRecentProperty(CCConstants.CCM_PROP_PERSON_RECENT_COLLECTIONS);
-                }
-                String queryString = mds.findQuery(queryId, MetadataReader.QUERY_SYNTAX_LUCENE).findBasequery(null);
-                /**
-                 * @TODO owner + inherit off -> node will be found even if search is done in edu-group context
-                 */
-                MCAlfrescoAPIClient.ContextSearchMode mode = getContextModeForScope(scope);
-
-                List<NodeRef> returnVal = new ArrayList<>();
-                searchParams.setQuery(queryString);
-                List<NodeRef> nodeRefs = client.searchNodeRefs(searchParams, mode);
-                for (NodeRef nodeRef : nodeRefs) {
-                    if (isSubCollection(nodeRef)) {
-                        continue;
-                    }
-                    returnVal.add(nodeRef);
-                }
-                return returnVal;
+                throw new IllegalArgumentException("parentId must be set, please use getRoot() instead");
             } else {
                 List<ChildAssociationRef> children = nodeService.getChildrenChildAssociationRefAssoc(parentId, null, filter, sortDefinition);
-                List<NodeRef> returnVal = new ArrayList<>();
+                List<org.edu_sharing.service.model.NodeRef> returnVal = new ArrayList<>();
                 for (ChildAssociationRef child : children) {
-                    returnVal.add(child.getChildRef());
+                    returnVal.add(new NodeRefImpl(
+                            child.getChildRef().getId()
+                    ));
                 }
                 return returnVal;
             }
@@ -869,7 +808,34 @@ public class CollectionServiceImpl implements CollectionService {
         }
     }
 
-    private MCAlfrescoAPIClient.ContextSearchMode getContextModeForScope(String scope) {
+    protected SearchResultNodeRef searchChildren(String scope, SortDefinition sortDefinition, int skipCount, int maxItems) throws Throwable {
+        throw new NotImplementedException("Searching collections is not supported without elastic");
+    }
+
+    @Nullable
+    protected static String getQueryForScope(String scope) {
+        String queryId = null;
+        switch (SearchScope.valueOf(scope)) {
+            case MY:
+                queryId = "collections_scope_my";
+                break;
+            case EDU_ALL:
+                queryId = "collections_scope_public";
+                break;
+            case EDU_GROUPS:
+                queryId = "collections_scope_shared";
+                break;
+            case TYPE_EDITORIAL:
+                queryId = "collections_scope_editorial";
+                break;
+            case TYPE_MEDIA_CENTER:
+                queryId = "collections_scope_media_center";
+                break;
+        }
+        return queryId;
+    }
+
+    protected MCAlfrescoAPIClient.ContextSearchMode getContextModeForScope(String scope) {
         MCAlfrescoAPIClient.ContextSearchMode mode = MCAlfrescoAPIClient.ContextSearchMode.Default;
         if (Scope.EDU_GROUPS.name().equals(scope)) {
             mode = MCAlfrescoAPIClient.ContextSearchMode.UserAndGroups;
@@ -879,10 +845,10 @@ public class CollectionServiceImpl implements CollectionService {
         return mode;
     }
 
-    private boolean isSubCollection(NodeRef nodeRef) {
+    protected boolean isSubCollection(org.edu_sharing.service.model.NodeRef nodeRef) {
         return AuthenticationUtil.runAsSystem(() -> {
-            String parent = client.getParent(nodeRef).getParentRef().getId();
-            return Arrays.asList(client.getAspects(parent)).contains(CCConstants.CCM_ASPECT_COLLECTION);
+            NodeRef parent = NodeServiceHelper.getPrimaryParent(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeRef.getNodeId()));
+            return NodeServiceHelper.hasAspect(parent, CCConstants.CCM_ASPECT_COLLECTION);
         });
     }
 
@@ -1007,11 +973,18 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     private void throwIfNotACollection(String storeProtocol, String storeId, String collection) {
-        String[] aspects = nodeService.getAspects(storeProtocol, storeId, collection);
-        if (!Arrays.asList(aspects).contains(CCConstants.CCM_ASPECT_COLLECTION)) {
+        if (!nodeService.hasAspect(storeProtocol, storeId, collection, CCConstants.CCM_ASPECT_COLLECTION)) {
             throw new IllegalArgumentException("Node " + collection + " is not a collection (Aspect " + CCConstants.CCM_ASPECT_COLLECTION + " not found)");
         }
-
+    }
+    private void throwIfNotACollection(org.edu_sharing.service.model.NodeRef nodeRef) {
+        if(nodeRef.getAspects() != null && !nodeRef.getAspects().isEmpty()) {
+            if(!nodeRef.getAspects().contains(CCConstants.CCM_ASPECT_COLLECTION)) {
+                throw new IllegalArgumentException("Node " + nodeRef.getNodeId() + " is not a collection (Aspect " + CCConstants.CCM_ASPECT_COLLECTION + " not found)");
+            }
+        } else {
+            throwIfNotACollection(nodeRef.getStoreProtocol(), nodeRef.getStoreId(), nodeRef.getNodeId());
+        }
     }
 
     @Override
@@ -1031,7 +1004,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void setOrder(String parentId, String[] nodes) {
-		List<NodeRef> refs=getChildren(parentId, null, new SortDefinition(),Arrays.asList("files", "folders"));
+		List<org.edu_sharing.service.model.NodeRef> refs=getChildren(parentId, null, new SortDefinition(),Arrays.asList("files", "folders"));
 		AtomicInteger order=new AtomicInteger(0);
 
         Map<String, Object> collectionProps = new HashMap<>();
@@ -1043,7 +1016,7 @@ public class CollectionServiceImpl implements CollectionService {
 			transactionService.getRetryingTransactionHelper().doInTransaction(() -> {
             NodeRef ref = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, node);
 				policyBehaviourFilter.disableBehaviour(ref, ContentModel.ASPECT_AUDITABLE);
-            if (!refs.contains(ref))
+            if (!refs.contains(new NodeRefImpl(ref.getId())))
                 throw new IllegalArgumentException("Node id " + node + " is not a children of the collection " + parentId);
 
             nodeService.addAspect(node, CCConstants.CCM_ASPECT_COLLECTION_ORDERED);

@@ -27,30 +27,20 @@
  */
 package org.edu_sharing.repository.server;
 
-import java.util.*;
-
 import jakarta.servlet.http.HttpSession;
-
 import org.alfresco.repo.node.MLPropertyInterceptor;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.lightbend.LightbendConfigHelper;
-import org.edu_sharing.metadataset.v2.MetadataReader;
-import org.edu_sharing.metadataset.v2.MetadataSetInfo;
 import org.edu_sharing.metadataset.v2.MetadataSet;
+import org.edu_sharing.metadataset.v2.MetadataSetInfo;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.ApplicationInfo;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.AuthenticatorRemoteAppResult;
-import org.edu_sharing.repository.server.tools.AuthenticatorRemoteRepository;
-import org.edu_sharing.repository.server.tools.PropertiesHelper;
-import org.edu_sharing.service.nodeservice.PropertiesInterceptorFactory;
+import org.edu_sharing.repository.server.tools.*;
 import org.edu_sharing.service.provider.ProviderHelper;
-import org.edu_sharing.spring.ApplicationContextFactory;
-import org.edu_sharing.spring.scope.refresh.ContextRefresher;
+
+import java.util.*;
 
 public class RepoFactory {
 

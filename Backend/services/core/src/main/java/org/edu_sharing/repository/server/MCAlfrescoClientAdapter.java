@@ -1,27 +1,14 @@
 package org.edu_sharing.repository.server;
 
+import org.edu_sharing.repository.client.rpc.*;
+import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.edu_sharing.repository.client.rpc.ACL;
-import org.edu_sharing.repository.client.rpc.EduGroup;
-import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
-import org.edu_sharing.repository.client.rpc.Group;
-import org.edu_sharing.repository.client.rpc.Notify;
-import org.edu_sharing.repository.client.rpc.SearchResult;
-import org.edu_sharing.repository.client.rpc.SearchToken;
-import org.edu_sharing.repository.client.rpc.Share;
-import org.edu_sharing.repository.client.rpc.User;
-
 public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
-
-	@Override
-	public ACL getPermissions(String nodeId) throws Exception {
-		return null;
-	}
 
 	@Override
 	public Map<String,Map<String,Object>> getBaskets() throws Throwable {
@@ -159,11 +146,6 @@ public class MCAlfrescoClientAdapter extends MCAlfrescoBaseClient {
 
 	@Override
 	public void moveNode(String newParentId, String childAssocType, String nodeId) throws Exception {
-	}
-
-	@Override
-	public Group getEduGroupContextOfNode(String nodeId) {
-		return null;
 	}
 
 	@Override

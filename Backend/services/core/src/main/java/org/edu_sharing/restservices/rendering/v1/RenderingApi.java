@@ -7,28 +7,26 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tracking.TrackingTool;
-import org.edu_sharing.restservices.ApiService;
-import org.edu_sharing.restservices.NodeDao;
-import org.edu_sharing.restservices.RenderingDao;
-import org.edu_sharing.restservices.RepositoryDao;
+import org.edu_sharing.restservices.*;
 import org.edu_sharing.restservices.rendering.v1.model.RenderingDetailsEntry;
 import org.edu_sharing.restservices.shared.ErrorResponse;
-import org.edu_sharing.restservices.shared.Filter;
-import org.edu_sharing.restservices.shared.Node;
+import org.edu_sharing.service.rendering.RenderingDetails;
 import org.edu_sharing.service.rendering.RenderingTool;
 import org.edu_sharing.service.repoproxy.RepoProxy;
 import org.edu_sharing.service.repoproxy.RepoProxyFactory;
 import org.edu_sharing.service.tracking.NodeTrackingDetails;
 import org.edu_sharing.service.tracking.TrackingService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 
 
 @Path("/rendering/v1")
@@ -109,13 +107,15 @@ public class RenderingApi {
 				org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry entity = (org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry) RepoProxyFactory.getRepoProxy().getDetailsSnippetWithParameters(remote.getRepository(), remote.getNodeId(), nodeVersion, displayMode, parameters, req).getEntity();
 				return Response.status(Response.Status.OK).entity(entity).build();
 			} else {
-				NodeDao nodeDao = NodeDao.getNodeWithVersion(repoDao, node, nodeVersion);
-				Node nodeJson = nodeDao.asNode();
-
-				String detailsSnippet = new RenderingDao(repoDao).getDetails(node, nodeVersion, displayMode, parameters);
-
-				String mimeType = nodeJson.getMimetype();
-
+				RenderingDetails detailsSnippet = new RenderingDao(repoDao).getDetails(node, nodeVersion, displayMode, parameters);
+				if(detailsSnippet.getException() != null) {
+					if(detailsSnippet.getException().getNested() != null)  {
+						DAOException mapped = DAOException.mapping(detailsSnippet.getException().getNested());
+						if(mapped instanceof DAOMissingException) {
+							throw mapped;
+						}
+					}
+				}
 				if (repoDao.isHomeRepo()) {
 					NodeTrackingDetails details = (NodeTrackingDetails) org.edu_sharing.alfresco.repository.server.authentication.
 							Context.getCurrentInstance().getRequest().getSession().getAttribute(CCConstants.SESSION_RENDERING_DETAILS);
@@ -134,9 +134,12 @@ public class RenderingApi {
 				}
 
 				RenderingDetailsEntry response = new RenderingDetailsEntry();
-				response.setDetailsSnippet(detailsSnippet);
-				response.setMimeType(mimeType);
-				response.setNode(nodeJson);
+				response.setDetailsSnippet(detailsSnippet.getDetails());
+				if(detailsSnippet.getRenderingServiceData() != null) {
+					String mimeType = detailsSnippet.getRenderingServiceData().getNode().getMimetype();
+					response.setMimeType(mimeType);
+					response.setNode(detailsSnippet.getRenderingServiceData().getNode());
+				}
 
 				return Response.status(Response.Status.OK).entity(response).build();
 			}

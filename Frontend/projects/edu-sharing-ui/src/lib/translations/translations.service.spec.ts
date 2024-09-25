@@ -65,6 +65,8 @@ describe('TranslationsService', () => {
                 sessionStorageServiceStub as any as SessionStorageService,
                 translateServiceSpy as TranslateService,
                 null,
+                null,
+                null,
             );
         });
 

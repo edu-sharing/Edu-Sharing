@@ -73,6 +73,9 @@ public class AuthMethodSSO implements AuthMethodInterface {
 			&& springProfiles != null
 			&& (springProfiles.contains("openidEnabled") || springProfiles.contains("samlEnabled"))) {
 			return ssoAuthorityMapper.mapAuthority(params);
+		}else if(SSOAuthorityMapper.SSO_TYPE_Shibboleth.equals(paramAuthType)
+				&& config.getBoolean("security.sso.external.enabled")){
+			return ssoAuthorityMapper.mapAuthority(params);
 		}else if(SSOAuthorityMapper.SSO_TYPE_LTI.equals(paramAuthType) &&
 				config.getBoolean("security.sso.lti.enabled")){
 			return ssoAuthorityMapper.mapAuthority(params);

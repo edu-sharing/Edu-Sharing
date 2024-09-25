@@ -49,6 +49,11 @@ export class OptionItem {
      */
     public onlyMobile = false;
     /**
+     * custom aria-label
+     * @type {string}
+     */
+    public ariaLabel = '';
+    /**
      * If true, only displayed on a desktop device (based on the navigator agent)
      * @type {boolean}
      */
@@ -92,12 +97,12 @@ export class OptionItem {
      * Is handled by optionsHelper and may not be used otherwise
      * Please use @customEnabledCallback instead
      */
-    public enabledCallback: (node?: Node | any) => boolean;
+    public enabledCallback: (node?: Node | any) => Promise<boolean>;
     /**
      * A function called with the node as param which should return true or false if the option should be enabled or not
      * Will be called by the optionsHelper
      */
-    public customEnabledCallback: (nodes?: Node[] | any[]) => boolean;
+    public customEnabledCallback: (nodes?: Node[] | any[]) => Promise<boolean>;
 
     /**
      *   Optional: A callback that is called when the user clicks on the option when it's currently disabled (greyed out)

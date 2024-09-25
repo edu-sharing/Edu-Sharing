@@ -1,11 +1,12 @@
 package org.edu_sharing.restservices.shared;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.edu_sharing.repository.client.rpc.Group;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;import java.io.Serializable;
+;
 
 
 @Schema(description = "")
@@ -17,6 +18,7 @@ public class GroupProfile implements Serializable {
   private String scopeType = null;
 
   public GroupProfile(){}
+
   public GroupProfile(GroupProfile GroupProfile) {
     displayName=GroupProfile.getDisplayName();
     groupType=GroupProfile.getGroupType();
@@ -25,6 +27,7 @@ public class GroupProfile implements Serializable {
   }
   public GroupProfile(Group group) {
     displayName=group.getAuthorityDisplayName();
+    groupType=group.getGroupType();
   }
 /**
    **/

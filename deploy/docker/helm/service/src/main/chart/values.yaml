@@ -139,6 +139,9 @@ service:
 
 ingress:
 
+  ## @param ingress.enabled Enable ingress
+  enabled: true
+
   annotations:
     ## @param ingress.annotations.kubernetes.io/ingress.class Set kubernetes ingress class name
     kubernetes.io/ingress.class: nginx
@@ -233,6 +236,9 @@ config:
 
   connector:
 
+    ## @param config.connector.accesslog Enable access log
+    accesslog: false
+
     external:
       ## @param config.connector.external.threads Set external connector threads
       threads: 200
@@ -309,6 +315,8 @@ config:
     cookieAttributes: ""
     ## @param config.home.urlDynamic Set url_dynamic attribute
     urlDynamic: false
+    ## @param config.home.customHtmlHeaders Set home custom_html_headers attributes
+    customHtmlHeaders: ""
 
   jvm:
     ram:
@@ -488,18 +496,26 @@ persistence:
   share:
 
     config:
-      ## @param persistence.share.config.create Create persistent share
+      ## @param persistence.share.config.create Create persistent config share
       create: true
+      ## @param persistence.share.config.type Set volume type of persistent config share
+      type: |
+        persistentVolumeClaim:
+          claimName: {{ include "edusharing_repository_service.pvc.share.config" . }}
       spec:
-        ## @param persistence.share.config.spec.accessModes Set access modes for persistent share
+        ## @param persistence.share.config.spec.accessModes Set access modes for persistent config share
         accessModes: [ "ReadWriteMany" ]
         resources:
           requests:
-            ## @param persistence.share.config.spec.resources.requests.storage Set storage request for persistent share
+            ## @param persistence.share.config.spec.resources.requests.storage Set storage request for persistent config share
             storage: 1Gi
     data:
       ## @param persistence.share.data.create Create persistent data share
       create: true
+      ## @param persistence.share.data.type Set volume type of persistent data share
+      type: |
+        persistentVolumeClaim:
+          claimName: {{ include "edusharing_repository_service.pvc.share.data" . }}
       spec:
         ## @param persistence.share.data.spec.accessModes Set access modes for persistent data share
         accessModes: [ "ReadWriteMany" ]
@@ -509,10 +525,14 @@ persistence:
             storage: 5Gi
 
     safe:
-      ## @param persistence.share.safe.enabled Enable safe data share
+      ## @param persistence.share.safe.enabled Enable persistent safe share
       enabled: false
-      ## @param persistence.share.safe.create Create safe data share
+      ## @param persistence.share.safe.create Create persistent safe share
       create: true
+      ## @param persistence.share.safe.type Set volume type of persistent safe share
+      type: |
+        persistentVolumeClaim:
+          claimName: {{ include "edusharing_repository_service.pvc.share.safe" . }}
       spec:
         ## @param persistence.share.safe.spec.accessModes Set access modes for persistent safe share
         accessModes: [ "ReadWriteMany" ]

@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@angular/core';
+import { ApplicationRef, Injectable, Optional } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of as observableOf } from 'rxjs';
@@ -27,8 +27,19 @@ export class TranslationsService {
         private route: ActivatedRoute,
         private storage: SessionStorageService,
         private translate: TranslateService,
+        private sessionStorage: SessionStorageService,
+        private ref: ApplicationRef,
         @Optional() private appService: AppService,
-    ) {}
+    ) {
+        this.sessionStorage?.observe('language').subscribe((lang) => {
+            // language has changed, i.e. user has different preference
+            if (this.translate.currentLang && this.translate.currentLang !== lang) {
+                this.initialize().subscribe(() => {
+                    this.ref.tick();
+                });
+            }
+        });
+    }
 
     /**
      * Determines and configures the language to use and triggers loading of translations with

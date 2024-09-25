@@ -18,7 +18,12 @@ export abstract class OptionsHelperService {
         data: OptionData,
     ): Promise<OptionItem[]>;
 
-    abstract pasteNode(components: OptionsHelperComponents, data: OptionData, nodes: Node[]): void;
+    abstract pasteNode(
+        components: OptionsHelperComponents,
+        data: OptionData,
+        addVirutalNodes: boolean,
+        nodes: Node[],
+    ): void;
 
     abstract filterOptions(
         options: OptionItem[],

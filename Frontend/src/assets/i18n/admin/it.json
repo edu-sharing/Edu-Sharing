@@ -294,8 +294,6 @@
     "TOOLKIT": {
       "REFRESH_APP": "Ricarica Info sull'app",
       "REFRESH_APP_INFO": "Ricarica i metadati e le informazioni sull'applicazione",
-      "REFRESH_EDU_GROUP_CACHE": "Aggiorna la cache del gruppo Edu",
-      "EDU_GROUP_CACHE_REFRESHED": "Aggiornare la cache del gruppo Edu",
       "APP_INFO_REFRESHED": "Aggiornare le informazioni sull'applicazione",
       "CACHE": "Gestione della cache",
       "CACHE_INFO": "Ottieni informazioni sulla cache",

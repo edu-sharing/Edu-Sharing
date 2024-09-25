@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfigService } from 'ngx-edu-sharing-api';
+import { Ace, Acl, ConfigService, NodeServiceUnwrapped, Person } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     OptionsHelperDataService,
@@ -16,6 +16,7 @@ import {
     Permissions,
     RestConstants,
     RestNodeService,
+    UserProfile,
 } from '../../../../core-module/core.module';
 import { Toast } from '../../../../services/toast';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';
@@ -27,6 +28,16 @@ import { CardDialogUtilsService } from '../../card-dialog/card-dialog-utils.serv
 export interface NodeInfoDialogData {
     nodes: Node[];
 }
+type RawPermissions = {
+    inherited: boolean;
+    aces: {
+        authority: string;
+        authorityType: string;
+        permission: string;
+    }[];
+    user: any;
+    group: any;
+};
 
 @Component({
     selector: 'es-node-info-dialog',
@@ -41,7 +52,8 @@ export class NodeInfoDialogComponent implements OnInit, AfterViewInit {
     @ViewChild(ActionbarComponent) actionbarComponent: ActionbarComponent;
     _nodes: Node[];
     _children: Node[];
-    _permissions: Permissions;
+    _permissions: RawPermissions;
+    _parentPermissions: RawPermissions;
     _properties: any[];
     _creator: string;
     _json: string;
@@ -55,6 +67,7 @@ export class NodeInfoDialogComponent implements OnInit, AfterViewInit {
         private cardDialogUtils: CardDialogUtilsService,
         private config: ConfigService,
         private nodeApi: RestNodeService,
+        private nodeServiceUnwrapped: NodeServiceUnwrapped,
         private router: Router,
         private breadcrumbsService: BreadcrumbsService,
         private optionsHelperDataService: OptionsHelperDataService,
@@ -117,9 +130,24 @@ export class NodeInfoDialogComponent implements OnInit, AfterViewInit {
                 .subscribe((data: NodeList) => {
                     this._children = data.nodes;
                 });
-            this.nodeApi.getNodePermissions(node.ref.id).subscribe((data) => {
-                this._permissions = data.permissions;
-            });
+            this.nodeServiceUnwrapped
+                .getRawPermission({
+                    repository: node.ref.repo,
+                    node: node.ref.id,
+                })
+                .subscribe((data) => {
+                    this._permissions = data as unknown as RawPermissions;
+                });
+            if (node.parent?.id) {
+                this.nodeServiceUnwrapped
+                    .getRawPermission({
+                        repository: node.parent.repo,
+                        node: node.parent.id,
+                    })
+                    .subscribe((data) => {
+                        this._parentPermissions = data as unknown as RawPermissions;
+                    });
+            }
         }
         console.log(this.actionbarComponent);
         this.optionsHelperDataService.setData({

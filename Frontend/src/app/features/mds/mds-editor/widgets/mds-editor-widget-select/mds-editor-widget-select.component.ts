@@ -4,6 +4,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MdsWidget, MdsWidgetValue } from '../../../types/types';
 import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
 import { MatSelect } from '@angular/material/select';
+import { skip } from 'rxjs/operators';
 
 @Component({
     selector: 'es-mds-editor-widget-select',
@@ -45,10 +46,15 @@ export class MdsEditorWidgetSelectComponent extends MdsEditorWidgetBase implemen
                     );
                 }
             });
+            this.formControl.valueChanges.subscribe((value) =>
+                this.setValue(value ? [value.id] : [null]),
+            );
+        } else {
+            // skip first because the init state will cause a trigger
+            this.formControl.valueChanges
+                .pipe(skip(1))
+                .subscribe((value) => this.setValue(value ? [value.id] : [null]));
         }
-        this.formControl.valueChanges.subscribe((value) => {
-            this.setValue(value ? [value.id] : [null]);
-        });
         this.registerValueChanges(this.formControl);
     }
 

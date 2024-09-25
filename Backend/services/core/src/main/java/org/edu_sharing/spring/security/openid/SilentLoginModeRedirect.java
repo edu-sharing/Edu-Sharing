@@ -7,6 +7,8 @@ import org.edu_sharing.alfresco.service.config.model.Config;
 import org.edu_sharing.alfresco.service.config.model.LoginSilentMode;
 import org.edu_sharing.repository.server.authentication.AuthenticationFilter;
 import org.edu_sharing.service.config.ConfigServiceFactory;
+import org.edu_sharing.spring.ApplicationContextFactory;
+import org.springframework.core.env.Profiles;
 
 public class SilentLoginModeRedirect {
     public static String SESS_ATT_SILENT_LOGIN_TARGET = "SILENT_LOGIN_TARGET";
@@ -30,7 +32,8 @@ public class SilentLoginModeRedirect {
 
         request.getSession().setAttribute(SESS_ATT_SILENT_LOGIN_TARGET, (request.getContextPath()
                         + request.getServletPath()
-                        + (request.getPathInfo() != null ? request.getPathInfo() : ""))
+                        + (request.getPathInfo() != null ? request.getPathInfo() : "")
+                        + (request.getQueryString() != null ? ("?"+ request.getQueryString()) : ""))
         );
         response.sendRedirect(request.getContextPath() + SilentLoginAuthorizationRequestResolver.DEFAULT_SILENT_LOGIN_PATH);
         return true;
@@ -68,10 +71,17 @@ public class SilentLoginModeRedirect {
             return false;
         }
 
+        if(!ApplicationContextFactory.getApplicationContext().getEnvironment()
+                .acceptsProfiles(Profiles.of(SecurityConfigurationOpenIdConnect.PROFILE_ID))){
+            return false;
+        }
+
         Config config = ConfigServiceFactory.getCurrentConfig();
         if(config!=null && !LoginSilentMode.redirect.equals(config.values.loginSilentMode)){
             return false;
         }
+
+
 
         return true;
     }

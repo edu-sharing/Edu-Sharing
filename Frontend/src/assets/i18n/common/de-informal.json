@@ -9,6 +9,7 @@
   "TOOLPERMISSION_ERROR_INLINE": "Du darfst diese Aktion nicht durchführen, da die Berechtigung \"{{permission}}\" fehlt.",
   "TOOLPERMISSION_ERROR_HEADER": "Folgende Berechtigung ist für Dein Konto nicht freigegeben:",
   "TOOLPERMISSION_ERROR_FOOTER": "Falls Du dies für einen Fehler hältst, kontaktiere die Administrierenden und fragen nach Freigabe der Berechtigung {{permission}}",
+  "USER_TUTORIAL_HEADING": "Dein Profil",
   "USER_TUTORIAL_DESCRIPTION": "Hier kannst du ein eigenes Profilbild angeben und zeigen, wer du bist und was du tust. Du entscheidest, was Andere sehen können.",
   "EXTENSION_NOT_MATCH_INFO_NEW": "Bist Du sicher, dass Du die Dateiendung '{{extensionNew}}' hinzufügen möchtest?",
   "BREADCRUMB_LOCATION_PREFIX": "Du bist hier:",

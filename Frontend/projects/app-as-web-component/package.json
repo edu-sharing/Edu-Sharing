@@ -1,9 +1,12 @@
 {
-  "name": "app-as-web-component",
-  "version": "0.1.0",
+  "name": "ngx-edu-sharing-app-as-web-component",
+  "version": "9.1.1",
+  "license": "GNU GPL v2",
+
+  "description": "Full edu-sharing app to use for integration of any edu-sharing view",
   "//": [
     "We use --deploy-url here although Angular complains it is deprecated since this seems to be ",
-    "the only way to get Angular to load lazy scripts from a route that differs from base HREF as ", 
+    "the only way to get Angular to load lazy scripts from a route that differs from base HREF as ",
     "given by index.html (which belongs to the host page and we don't control)."
   ],
   "scripts": {
@@ -11,7 +14,8 @@
     "preview": "npm run build && npm run serve",
     "build": "cd ../.. && npm run build app-as-web-component",
     "build-dev": "cd ../.. && ng build app-as-web-component --configuration development --watch",
-    "serve": "source ../../.env && http-server --port 4200 --proxy $BACKEND_URL example"
+    "serve": "source ../../.env && http-server --port 4200 --proxy $BACKEND_URL example",
+    "publish": "(cp {package.json,README.md} ../../dist/app-as-web-component || true) && cd ../../dist/app-as-web-component && npm publish"
   },
   "devDependencies": {
     "@angular/elements": "^16.2.12"

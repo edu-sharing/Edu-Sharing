@@ -2,12 +2,6 @@ package org.edu_sharing.service.admin;
 
 import com.google.common.io.Files;
 import jakarta.servlet.http.HttpSession;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import lombok.RequiredArgsConstructor;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -21,12 +15,13 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.exception.CCException;
 import org.edu_sharing.repository.client.rpc.ACE;
 import org.edu_sharing.repository.client.rpc.ACL;
@@ -44,11 +39,11 @@ import org.edu_sharing.repository.server.jobs.quartz.*;
 import org.edu_sharing.repository.server.jobs.quartz.annotation.JobFieldDescription;
 import org.edu_sharing.repository.server.tools.*;
 import org.edu_sharing.repository.server.tools.cache.CacheManagerFactory;
-import org.edu_sharing.repository.server.tools.cache.EduGroupCache;
 import org.edu_sharing.repository.server.tools.mailtemplates.MailTemplate;
 import org.edu_sharing.repository.server.update.PrintWriterLogAppender;
 import org.edu_sharing.repository.server.update.UpdaterService;
 import org.edu_sharing.repository.tomcat.ClassHelper;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.repository.update.Protocol;
 import org.edu_sharing.restservices.GroupDao;
 import org.edu_sharing.restservices.RepositoryDao;
@@ -72,14 +67,30 @@ import org.edu_sharing.service.version.RepositoryVersionInfo;
 import org.edu_sharing.service.version.VersionService;
 import org.edu_sharing.spring.ApplicationContextFactory;
 import org.edu_sharing.spring.scope.refresh.ContextRefreshUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.io.Files;
-
-import org.edu_sharing.repository.tools.URLHelper;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.Collator;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -89,22 +100,23 @@ public class AdminServiceImpl implements AdminService {
     private final VersionService versionService;
 
     //cause standard properties class does not save the values sorted
-    class SortedProperties extends Properties {
+    static class SortedProperties extends Properties {
 
         public SortedProperties() {
             super();
         }
 
         public SortedProperties(Properties initWith) {
-            for (Map.Entry entry : initWith.entrySet()) {
+            for (Map.Entry<Object, Object> entry : initWith.entrySet()) {
                 this.setProperty((String) entry.getKey(), (String) entry.getValue());
             }
         }
 
         //for sorted xml storing
+        @NotNull
         @Override
         public Set<Object> keySet() {
-            return new TreeSet<Object>(super.keySet());
+            return new TreeSet<>(super.keySet());
         }
 
     }
@@ -114,6 +126,7 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public Collection<String> getAllValuesFor(String property) throws Throwable {
         Set<String> result = new HashSet<String>();
 
@@ -317,8 +330,8 @@ public class AdminServiceImpl implements AdminService {
 
     public void writePublisherToMDSXml(Result result, String vcardProps, String valueSpaceProp, String ignoreValues, Map<String,String> authInfo) throws Throwable {
 
-        List<String> ignoreValuesList = null;
-        if (ignoreValues != null && !ignoreValues.trim().equals("")) {
+        List<String> ignoreValuesList;
+        if (StringUtils.isNotBlank(ignoreValues)) {
             ignoreValuesList = Arrays.asList(ignoreValues.split(","));
         } else {
             ignoreValuesList = new ArrayList<>();
@@ -330,7 +343,7 @@ public class AdminServiceImpl implements AdminService {
             allValues.addAll(getAllValuesFor(oneVCardProp));
         }
 
-        if (allValues != null && allValues.size() > 0) {
+        if (!allValues.isEmpty()) {
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -353,11 +366,11 @@ public class AdminServiceImpl implements AdminService {
                             toSort.add(splittedVCardString);
                     } else {
                         ArrayList<Map<String, Object>> vcardList = VCardConverter.vcardToMap(splittedVCardString);
-                        if (vcardList != null && vcardList.size() > 0) {
+                        if (!vcardList.isEmpty()) {
                             Map<String, Object> map = vcardList.get(0);
                             String publisherString = (String) map.get(CCConstants.VCARD_T_FN);
 
-                            if (publisherString != null && !publisherString.trim().equals("")) {
+                            if (StringUtils.isNotBlank(publisherString)) {
 
                                 //allow only 80 chars cause suggest box makes Problems with longer values
                                 publisherString = publisherString.trim();
@@ -372,7 +385,7 @@ public class AdminServiceImpl implements AdminService {
 
                                 publisherString = publisherString.trim();
 
-                                if (!publisherString.equals("") && !toSort.contains(publisherString) && !ignoreValuesList.contains(publisherString.trim())) {
+                                if (!publisherString.isEmpty() && !toSort.contains(publisherString) && !ignoreValuesList.contains(publisherString.trim())) {
                                     toSort.add(publisherString);
                                 }
 
@@ -382,15 +395,12 @@ public class AdminServiceImpl implements AdminService {
                 }
             }
 
-            Comparator<String> comp = new Comparator<String>() {
+            Comparator<String> comp = (o1, o2) -> {
 
-                public int compare(String o1, String o2) {
-
-                    Collator collator = Collator.getInstance(Locale.GERMAN);
-                    return collator.compare(o1, o2);
-                }
+                Collator collator = Collator.getInstance(Locale.GERMAN);
+                return collator.compare(o1, o2);
             };
-            Collections.sort(toSort, comp);
+            toSort.sort(comp);
 
             for (String sortedVal : toSort) {
                 Element key = document.createElement("key");
@@ -427,11 +437,11 @@ public class AdminServiceImpl implements AdminService {
         String pathAppRegistry = PropertiesHelper.Config.getAbsolutePathForConfigFile(appRegistryfileName);
 
         //backup
-        propsAppRegistry.storeToXML(new FileOutputStream(new File(pathAppRegistry + System.currentTimeMillis() + ".bak")), " backup of registry");
+        propsAppRegistry.storeToXML(new FileOutputStream(pathAppRegistry + System.currentTimeMillis() + ".bak"), " backup of registry");
 
         propsAppRegistry.setProperty("applicationfiles", newValue);
         //overwrite
-        propsAppRegistry.storeToXML(new FileOutputStream(new File(pathAppRegistry)), comment);
+        propsAppRegistry.storeToXML(new FileOutputStream(pathAppRegistry), comment);
 
     }
 
@@ -448,7 +458,7 @@ public class AdminServiceImpl implements AdminService {
         File appFile = new File(PropertiesHelper.Config.getAbsolutePathForConfigFile(
                 PropertiesHelper.Config.getPropertyFilePath(info.getAppFileName())
         ));
-        appFile.renameTo(new File(appFile.getAbsolutePath() + System.currentTimeMillis() + ".bak"));
+        boolean ignored = appFile.renameTo(new File(appFile.getAbsolutePath() + System.currentTimeMillis() + ".bak"));
         ContextRefreshUtils.refreshContext();
     }
 
@@ -461,7 +471,7 @@ public class AdminServiceImpl implements AdminService {
             throw new CCException(null, "something went wrong. got no result for metadata url: " + appMetadataUrl);
         }
 
-        InputStream is = new ByteArrayInputStream(httpQueryResult.getBytes("UTF-8"));
+        InputStream is = new ByteArrayInputStream(httpQueryResult.getBytes(StandardCharsets.UTF_8));
         return addApplicationFromStream(is);
     }
 
@@ -472,7 +482,7 @@ public class AdminServiceImpl implements AdminService {
         props.loadFromXML(is);
         String appId = props.getProperty(ApplicationInfo.KEY_APPID);
 
-        if (appId == null || appId.trim().equals("")) {
+        if (StringUtils.isBlank(appId)) {
             throw new Exception("no appId found");
         }
 
@@ -523,19 +533,19 @@ public class AdminServiceImpl implements AdminService {
         String filename = "app-" + fileNamePart + ".properties.xml";
 
         //check if appID already exists
-//        if (ApplicationInfoList.getApplicationInfos().keySet().contains(appId)) {
+//        if (ApplicationInfoList.getApplicationInfos().containsKey(appId)) {
 //            throw new Exception("appId is already in registry");
 //        }
 
         //check for mandatory Property type
         String type = props.getProperty(ApplicationInfo.KEY_TYPE);
-        if (type == null || type.trim().equals("")) {
+        if (StringUtils.isBlank(type)) {
             throw new Exception("missing type");
         }
 
         if (type.equals(ApplicationInfo.TYPE_RENDERSERVICE)) {
             String contentUrl = props.getProperty("contenturl");
-            if (contentUrl == null || contentUrl.trim().equals("")) {
+            if (StringUtils.isBlank(contentUrl)) {
                 throw new Exception("a renderservice must have an contenturl");
             }
 
@@ -552,7 +562,7 @@ public class AdminServiceImpl implements AdminService {
 
 		if(existingFileList == null) {
 			try {
-				appFile.delete();
+				boolean ignored = appFile.delete();
 			} catch(Throwable t){
 				logger.warn("Could not rollback app file " + appFile.getName(), t);
 			}
@@ -571,14 +581,14 @@ public class AdminServiceImpl implements AdminService {
             //store that in the homeApplication.properties.xml cause every repository has it's own renderservice
             //and we don't want to config an renderservice of an remote repository
 
-            String homeAppFileName = PropertiesHelper.Config.getPropertyFilePath(AdminServiceFactory.HOME_APPLICATION_PROPERTIES);
+            String homeAppFileName = PropertiesHelper.Config.getPropertyFilePath(CCConstants.REPOSITORY_FILE_HOME);
             Properties homeAppProps = PropertiesHelper.getProperties(homeAppFileName, PropertiesHelper.XML);
             homeAppProps = new SortedProperties(homeAppProps);
 
             String homeAppPath = PropertiesHelper.Config.getAbsolutePathForConfigFile(homeAppFileName);
 
             //backup
-            homeAppProps.storeToXML(new FileOutputStream(new File(homeAppPath + System.currentTimeMillis() + ".bak")), " backup of homeApplication.properties.xml");
+            homeAppProps.storeToXML(new FileOutputStream(homeAppPath + System.currentTimeMillis() + ".bak"), " backup of homeApplication.properties.xml");
 
             homeAppProps.setProperty(ApplicationInfo.KEY_CONTENTURL, contentUrl);
             //homeAppProps.setProperty(ApplicationInfo.KEY_PREVIEWURL, previewUrl);
@@ -661,15 +671,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void refreshEduGroupCache(boolean keepExisting) {
-        if (keepExisting) {
-            EduGroupCache.refreshByKeepExisting();
-        } else {
-            EduGroupCache.refresh();
-        }
-    }
-
-    @Override
     public void testMail(String receiver, String template) {
         try {
             Map<String, String> dummy = new HashMap<>();
@@ -687,21 +688,23 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<Serializable, Serializable> getCacheEntries(String beanName) {
         Map<Serializable, Serializable> result = new HashMap<>();
-        SimpleCache simpleCache = (SimpleCache) AlfAppContextGate.getApplicationContext().getBean(beanName);
-        simpleCache.getKeys().forEach(k -> result.put((Serializable) k, (Serializable) simpleCache.get((Serializable) k)));
+        SimpleCache<Serializable,Serializable> simpleCache = (SimpleCache<Serializable, Serializable>) AlfAppContextGate.getApplicationContext().getBean(beanName);
+        simpleCache.getKeys().forEach(k -> result.put(k, simpleCache.get(k)));
         return result;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void removeCacheEntry(Integer index, String beanName) {
-        SimpleCache simpleCache = (SimpleCache) AlfAppContextGate.getApplicationContext().getBean(beanName);
+        SimpleCache<Serializable, Serializable> simpleCache = (SimpleCache<Serializable, Serializable>) AlfAppContextGate.getApplicationContext().getBean(beanName);
         int idx = 0;
         Serializable keyToRemove = null;
-        for (Object key : simpleCache.getKeys()) {
+        for (Serializable key : simpleCache.getKeys()) {
             if (idx == index) {
-                keyToRemove = (Serializable) key;
+                keyToRemove = key;
             }
         }
 
@@ -712,7 +715,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void clearCache(String beanName) {
-        SimpleCache simpleCache = (SimpleCache) AlfAppContextGate.getApplicationContext().getBean(beanName);
+        SimpleCache<?,?> simpleCache = (SimpleCache<?,?>) AlfAppContextGate.getApplicationContext().getBean(beanName);
         simpleCache.clear();
     }
 
@@ -722,7 +725,7 @@ public class AdminServiceImpl implements AdminService {
         String path = System.getProperty("catalina.base");
         path += "/logs/catalina.out";
         int n_lines = 1000;
-        ReversedLinesFileReader object = new ReversedLinesFileReader(new File(path));
+        ReversedLinesFileReader object = ReversedLinesFileReader.builder().setPath(path).get();
         for (int i = 0; i < n_lines; i++) {
             String line = object.readLine();
             if (line == null)
@@ -763,7 +766,7 @@ public class AdminServiceImpl implements AdminService {
         ft.setTemplate(template, group, folderId);
         List<String> slist = ft.getMessage();
         String error = slist.toString();
-        if (slist.size() > 0 && !error.isEmpty())
+        if (!slist.isEmpty() && !error.isEmpty())
             throw new Exception(error);
     }
 
@@ -809,12 +812,6 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * Import excel data and return the number of rows processed
-     *
-     * @param parent
-     * @param csv
-     * @param addToCollection
-     * @return
-     * @throws Exception
      */
     @Override
     public int importExcel(String parent, InputStream csv, Boolean addToCollection) throws Exception {
@@ -824,10 +821,10 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public String importOaiXml(InputStream xml, String recordHandlerClassName, String binaryHandlerClassName) throws Exception {
         Map<String, Object> paramsMap = new HashMap<>();
-        if (recordHandlerClassName != null && !recordHandlerClassName.trim().equals("")) {
+        if (StringUtils.isNotBlank(recordHandlerClassName)) {
             paramsMap.put(OAIConst.PARAM_RECORDHANDLER, recordHandlerClassName);
         }
-        if (binaryHandlerClassName != null && !binaryHandlerClassName.trim().equals("")) {
+        if (StringUtils.isNotBlank(binaryHandlerClassName)) {
             paramsMap.put(OAIConst.PARAM_BINARYHANDLER, binaryHandlerClassName);
         }
         paramsMap.put(OAIConst.PARAM_USERNAME, AuthenticationUtil.getFullyAuthenticatedUser());
@@ -846,7 +843,7 @@ public class AdminServiceImpl implements AdminService {
             logger.info(e.getMessage());
             // not exists yet
         }
-        FileUtils.write(file, content);
+        FileUtils.write(file, content, Charset.defaultCharset());
     }
 
     @Override
@@ -854,7 +851,7 @@ public class AdminServiceImpl implements AdminService {
         // use new File() to remove any folder like access
         filename = mapConfigFile(new File(filename).getName(), pathPrefix);
         File file = new File(PropertiesHelper.Config.getAbsolutePathForConfigFile(filename));
-        return FileUtils.readFileToString(file);
+        return FileUtils.readFileToString(file, Charset.defaultCharset());
     }
 
     private String mapConfigFile(String filename, PropertiesHelper.Config.PathPrefix pathPrefix) {
@@ -863,10 +860,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void importOai(String set, String fileUrl, String oaiBaseUrl, String metadataSetId, String metadataPrefix, String importerJobClassName, String importerClassName, String recordHandlerClassName, String binaryHandlerClassName, String persistentHandlerClassName, String oaiIds, boolean forceUpdate, String from, String until, String periodInDays) throws Exception {
-        //new JobExecuter().start(ImporterJob.class, authInfo, setsParam.toArray(new String[setsParam.size()]));
-
         Map<String, Object> paramsMap = new HashMap<>();
-        List<String> sets = new ArrayList(Arrays.asList(set.split(",")));
+        List<String> sets = new ArrayList<>(Arrays.asList(set.split(",")));
         if (fileUrl != null && !fileUrl.isEmpty() && !(fileUrl.startsWith("http://") || fileUrl.startsWith("https://")))
             throw new Exception("file url " + fileUrl + " is not a valid url");
         if (fileUrl != null && !fileUrl.isEmpty())
@@ -874,36 +869,35 @@ public class AdminServiceImpl implements AdminService {
         paramsMap.put(JobHandler.AUTH_INFO_KEY, getAuthInfo());
         paramsMap.put("sets", sets);
         paramsMap.put(OAIConst.PARAM_FORCE_UPDATE, forceUpdate);
-        if (oaiBaseUrl != null && !oaiBaseUrl.trim().equals("")) {
+        if (StringUtils.isNotBlank(oaiBaseUrl)) {
             paramsMap.put(OAIConst.PARAM_OAI_BASE_URL, oaiBaseUrl);
         }
-        if (metadataSetId != null && !metadataSetId.trim().equals("")) {
+        if (StringUtils.isNotBlank(metadataSetId)) {
             paramsMap.put(OAIConst.PARAM_METADATASET_ID, metadataSetId);
         }
 
         //metadataPrefix
-        if (metadataPrefix != null && !metadataPrefix.trim().equals("")) {
+        if (StringUtils.isNotBlank(metadataPrefix)) {
             paramsMap.put(OAIConst.PARAM_OAI_METADATA_PREFIX, metadataPrefix);
         }
 
-        if (importerClassName != null && !importerClassName.trim().equals("")) {
+        if (StringUtils.isNotBlank(importerClassName)) {
             paramsMap.put(OAIConst.PARAM_IMPORTERCLASS, importerClassName);
         }
 
-        if (recordHandlerClassName != null && !recordHandlerClassName.trim().equals("")) {
+        if (StringUtils.isNotBlank(recordHandlerClassName)) {
             paramsMap.put(OAIConst.PARAM_RECORDHANDLER, recordHandlerClassName);
         }
-        if (binaryHandlerClassName != null && !binaryHandlerClassName.trim().equals("")) {
+        if (StringUtils.isNotBlank(binaryHandlerClassName)) {
             paramsMap.put(OAIConst.PARAM_BINARYHANDLER, binaryHandlerClassName);
         }
-        if (persistentHandlerClassName != null && !persistentHandlerClassName.trim().equals("")) {
+        if (StringUtils.isNotBlank(persistentHandlerClassName)) {
             paramsMap.put(OAIConst.PARAM_PERSISTENTHANDLER, persistentHandlerClassName);
         }
         if (oaiIds != null && !oaiIds.trim().isEmpty()) {
             paramsMap.put(OAIConst.PARAM_OAI_IDS, oaiIds);
         }
-        if (from != null && !from.trim().equals("")
-                && until != null && !until.trim().equals("")) {
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(until)) {
             paramsMap.put(OAIConst.PARAM_FROM, from);
             paramsMap.put(OAIConst.PARAM_UNTIL, until);
         } else if (periodInDays != null) {
@@ -913,8 +907,8 @@ public class AdminServiceImpl implements AdminService {
 
         paramsMap.put(OAIConst.PARAM_USERNAME, AuthenticationUtil.getFullyAuthenticatedUser());
 
-        Class importerClass = null;
-        for (Class c : AdminServiceFactory.getInstance().getImporterClasses()) {
+        Class<?> importerClass = null;
+        for (Class<?> c : AdminServiceFactory.getInstance().getImporterClasses()) {
             if (c.getName().equals(importerJobClassName)) {
                 importerClass = c;
                 break;
@@ -942,7 +936,7 @@ public class AdminServiceImpl implements AdminService {
             params.put(JobHandler.AUTH_INFO_KEY, getAuthInfo());
         }
 
-        Class job = Class.forName(jobClass);
+        Class<?> job = Class.forName(jobClass);
         ImmediateJobListener jobListener = JobHandler.getInstance().startJob(job, params);
         if (jobListener != null && jobListener.isVetoed()) {
             throw new Exception("job was vetoed by " + jobListener.getVetoBy());
@@ -957,7 +951,7 @@ public class AdminServiceImpl implements AdminService {
 		while(true) {
 			if(listener.wasExecuted()) {
 				Optional<JobInfo> result = getJobs().stream().filter(job -> job.getStatus().equals(JobInfo.Status.Finished) && job.getJobClass().getName().equals(jobClass)).max((a, b) -> Long.compare(a.getFinishTime(), b.getFinishTime()));
-				if(!result.isPresent()) {
+				if(result.isEmpty()) {
 					throw new IllegalStateException("Job status not found");
 				}
 				return result.get().getJobDataMap().get(JobHandler.KEY_RESULT_DATA);
@@ -965,7 +959,8 @@ public class AdminServiceImpl implements AdminService {
 			if(listener.isVetoed()) {
 				throw new Exception("job was vetoed by " + listener.getVetoBy());
 			}
-			Thread.sleep(1000);
+            //noinspection BusyWait
+            Thread.sleep(1000);
 		}
 	}
 
@@ -1000,8 +995,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Properties getPropertiesXML(String xmlFile) throws Exception {
-        Properties homeAppProps = PropertiesHelper.getProperties(PropertiesHelper.Config.getPropertyFilePath(xmlFile), PropertiesHelper.XML);
-        return homeAppProps;
+        return PropertiesHelper.getProperties(PropertiesHelper.Config.getPropertyFilePath(xmlFile), PropertiesHelper.XML);
     }
 
     @Override
@@ -1049,9 +1043,9 @@ public class AdminServiceImpl implements AdminService {
 
         List<JobDescription> result = new ArrayList<>();
 
-        List<Class> jobClasses = ClassHelper.getSubclasses(AbstractJob.class);
+        List<Class<?>> jobClasses = ClassHelper.getSubclasses(AbstractJob.class);
 
-        for (Class clazz : jobClasses) {
+        for (Class<?> clazz : jobClasses) {
             if (!fetchAbstractJobs) {
                 if (Modifier.isAbstract(clazz.getModifiers())) {
                     continue;
@@ -1130,7 +1124,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public RepositoryVersionInfo getVersion() {
+    public Map<String, RepositoryVersionInfo> getVersions() {
         try {
             return versionService.getRepositoryVersionInfo();
         } catch (IOException e) {

@@ -1,13 +1,13 @@
 package org.edu_sharing.restservices.shared;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.AnnotationIntrospector.ReferenceProperty.Type;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
+import org.edu_sharing.repository.client.rpc.ACE;
 
 import java.io.Serializable;
 import java.util.Map;
+
+;
 
 @Schema(description = "")
 public class Authority implements Serializable {
@@ -20,6 +20,14 @@ public class Authority implements Serializable {
 	boolean editable;
 
 	public Authority(){}
+	public Authority(ACE ace) {
+		authorityName = ace.getAuthority();
+		authorityType = Authority.Type.valueOf(ace.getAuthorityType());
+		if(ace.getUser() != null){
+		    editable = ace.getUser().isEditable();
+		}
+	}
+
 	public Authority(String authorityName, String authorityType) {
 		this.authorityName=authorityName;
 		switch(authorityType){
@@ -87,22 +95,22 @@ public class Authority implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		
+
 		if(!(obj instanceof Authority)){
 			return false;
 		}
-		
+
 		if(obj == null) return false;
-		
+
 		Authority toCompare = (Authority)obj;
 		if(this.getAuthorityName().equals(toCompare.getAuthorityName()) &&
 				this.getAuthorityType().equals(toCompare.getAuthorityType())){
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int hash = 7;

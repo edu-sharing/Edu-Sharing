@@ -29,6 +29,7 @@ import {
     MdsHelperService,
     NodeEntriesDisplayType,
     notNull,
+    SearchHelperService,
 } from 'ngx-edu-sharing-ui';
 import {
     fromSearchResults,
@@ -369,7 +370,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 // search criteria.
                 let attach = MdsService.unfoldTreeChilds(c.values, widget);
                 if (attach) {
-                    if (attach.length > RestSearchService.MAX_QUERY_CONCAT_PARAMS) {
+                    if (attach.length > SearchHelperService.MAX_QUERY_CONCAT_PARAMS) {
                         console.info(
                             'param ' +
                                 c.property +

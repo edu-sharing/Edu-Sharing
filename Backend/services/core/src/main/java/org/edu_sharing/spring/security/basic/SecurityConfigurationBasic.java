@@ -10,11 +10,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Profile("basic")
+@Profile(SecurityConfigurationBasic.PROFILE_ID)
 @EnableWebSecurity()
 @Configuration
 public class SecurityConfigurationBasic {
 
+    public static final String PROFILE_ID = "basic";
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

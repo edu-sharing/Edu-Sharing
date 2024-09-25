@@ -1,6 +1,6 @@
-import { DropdownComponent } from '../dropdown/dropdown.component';
-import { ActionbarComponent } from '../actionbar/actionbar.component';
-import {
+import type { DropdownComponent } from '../dropdown/dropdown.component';
+import type { ActionbarComponent } from '../actionbar/actionbar.component';
+import type {
     ListEventInterface,
     NodeEntriesDataType,
     NodeEntriesDisplayType,
@@ -181,6 +181,6 @@ export class OptionsHelperDataService implements OnDestroy {
     }
 
     pasteNode(nodes: Node[] = []) {
-        this.optionsHelperService.pasteNode(this.components, this.data, nodes);
+        this.optionsHelperService.pasteNode(this.components, this.data, true, nodes);
     }
 }

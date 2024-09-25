@@ -27,17 +27,17 @@
  */
 package org.edu_sharing.repository.server.tools;
 
+import lombok.Getter;
+import org.edu_sharing.alfresco.policy.NodeCustomizationPolicies;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.repository.server.RequestHelper;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import lombok.Getter;
-import org.edu_sharing.alfresco.policy.NodeCustomizationPolicies;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
-import org.edu_sharing.repository.server.RequestHelper;
 
 public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializable{
 
@@ -726,14 +726,6 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 
 	public String getPassword() {
 		return password;
-	}
-
-	public String getGuest_username() {
-		return guest_username;
-	}
-
-	public String getGuest_password() {
-		return guest_password;
 	}
 
 	public String getAppCaption() {

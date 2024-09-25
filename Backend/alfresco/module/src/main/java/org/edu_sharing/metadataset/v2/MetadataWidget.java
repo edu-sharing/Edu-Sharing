@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class MetadataWidget extends MetadataTranslatable {
 
     private String configuration;
+	private ValuespaceMerge valuespaceMerge = ValuespaceMerge.separate;
 
     public enum Required {
         mandatory,
@@ -47,7 +48,16 @@ public class MetadataWidget extends MetadataTranslatable {
         auto,
         always
     }
-
+	public enum ValuespaceMerge {
+		/**
+		 * all valuespaces are presented as an invidual tree on the main level (default)
+		 */
+		separate,
+		/**
+		 * all valuespaces are merged into one list/tree
+		 */
+		merge,
+	}
     public enum TextEscapingPolicy {
         // no escaping, strongly discouraged since it can allow XSS vulnerabilities if the data comes from untrusted sources
         none,
@@ -190,4 +200,12 @@ public class MetadataWidget extends MetadataTranslatable {
         return TreeNode.of(values.values(), MetadataKey::getKey, MetadataKey::getParent);
     }
 
+
+	public void setValuespaceCombineStrategy(ValuespaceMerge valuespaceMerge) {
+		this.valuespaceMerge = valuespaceMerge;
+	}
+
+	public ValuespaceMerge getValuespaceMerge() {
+		return valuespaceMerge;
+	}
 }

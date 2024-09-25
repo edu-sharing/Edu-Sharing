@@ -1,19 +1,15 @@
 package org.edu_sharing.restservices.shared;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.edu_sharing.repository.client.rpc.Group;
+import org.edu_sharing.repository.client.rpc.User;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.edu_sharing.repository.client.rpc.Group;
-import org.edu_sharing.repository.client.rpc.User;
-import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.restservices.GroupDao;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
+;
 
 @Schema(description = "")
 public class ACE  {
@@ -21,7 +17,10 @@ public class ACE  {
 	private Authority authority = null;
 	private UserProfile userProfile = null;
 	private GroupProfile groupProfile = null;	
-	private List<String> permissions = null;	
+	private List<String> permissions = null;
+
+	private Long from = null;
+	private Long to = null;
 	
 	boolean isEditable = true;
 	
@@ -100,5 +99,23 @@ public class ACE  {
 	public boolean isEditable() {
 		return isEditable;
 	}
-	
+
+
+	public Long getFrom() {
+		return from;
+	}
+
+	public void setFrom(Long from) {
+		this.from = from;
+	}
+
+	public Long getTo() {
+		return to;
+	}
+
+	public void setTo(Long to) {
+		this.to = to;
+	}
+
+
 }

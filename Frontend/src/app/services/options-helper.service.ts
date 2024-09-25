@@ -21,6 +21,7 @@ import {
     TemporaryStorageService,
 } from 'ngx-edu-sharing-ui';
 import {
+    BehaviorSubject,
     forkJoin,
     forkJoin as observableForkJoin,
     fromEvent,
@@ -85,6 +86,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
     private subscriptions: Subscription[] = [];
     private queryParams: Params;
     private destroyed = new Subject<void>();
+    enabledCache: { [key in string]: { [key in string]: BehaviorSubject<boolean> } } = {};
 
     constructor(
         private bridge: BridgeService,
@@ -149,7 +151,12 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         });
     }
 
-    pasteNode(components: OptionsHelperComponents, data: OptionData, nodes: Node[] = []) {
+    pasteNode(
+        components: OptionsHelperComponents,
+        data: OptionData,
+        addVirtualNodes = true,
+        nodes: Node[] = [],
+    ) {
         const clip = this.storage.get('workspace_clipboard') as ClipboardObject;
         if (!this.canAddObjects(data)) {
             return;
@@ -168,7 +175,9 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                 ),
             };
             this.bridge.showTemporaryMessage(MessageType.info, 'WORKSPACE.TOAST.PASTE', info);
-            this.addVirtualObjects(components, nodes);
+            if (addVirtualNodes) {
+                this.addVirtualObjects(components, nodes);
+            }
             return;
         }
         this.bridge.showProgressSpinner();
@@ -177,7 +186,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         if (clip.copy) {
             this.nodeService.copyNode(target, source).subscribe(
                 (nodeData: NodeWrapper) =>
-                    this.pasteNode(components, data, nodes.concat(nodeData.node)),
+                    this.pasteNode(components, data, addVirtualNodes, nodes.concat(nodeData.node)),
                 (error: any) => {
                     console.log(error);
                     if (error.error?.error?.indexOf('DAORestrictedAccessException') !== -1) {
@@ -191,7 +200,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         } else {
             this.nodeService.moveNode(target, source).subscribe(
                 (nodeData: NodeWrapper) =>
-                    this.pasteNode(components, data, nodes.concat(nodeData.node)),
+                    this.pasteNode(components, data, true, nodes.concat(nodeData.node)),
                 (error: any) => {
                     this.nodeHelper.handleNodeError(clip.nodes[nodes.length].name, error);
                     this.bridge.closeModalDialog();
@@ -236,13 +245,15 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                 components,
                 data,
             );
+            components.dropdown.ngOnChanges();
         }
         if (components.actionbar) {
             components.actionbar.options = this.globalOptions;
+            components.actionbar.invalidate();
         }
     }
 
-    private isOptionEnabled(option: OptionItem, objects: Node[] | any) {
+    private async isOptionEnabled(option: OptionItem, objects: Node[] | any) {
         if (
             option.permissionsMode === HideMode.Disable &&
             option.permissions &&
@@ -256,11 +267,34 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             }
         }
         if (option.customEnabledCallback) {
-            return option.customEnabledCallback(objects);
+            if (!this.enabledCache[option.name]) {
+                this.enabledCache[option.name] = {};
+            }
+            if (this.enabledCache[option.name]?.[objects[0]?.ref?.id] !== undefined) {
+                return await this.enabledCache[option.name][objects[0]?.ref?.id]
+                    .pipe(
+                        filter((f) => f !== null),
+                        first(),
+                    )
+                    .toPromise();
+            }
+            this.enabledCache[option.name][objects[0]?.ref?.id] = new BehaviorSubject<boolean>(
+                null,
+            );
+            const status = await option.customEnabledCallback(objects);
+            this.enabledCache[option.name][objects[0]?.ref?.id].next(status);
+            return status;
         }
         return true;
     }
 
+    /**
+     * get all available default options
+     * usefull for duplicating specific options for custom use cases
+     */
+    async getDefaultOptions(data: OptionData) {
+        return this.prepareOptions(this.mainNavService.getDialogs(), null, null, data);
+    }
     async getAvailableOptions(
         target: Target,
         objects: Node[],
@@ -337,12 +371,11 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             ),
         );
         options = options.filter((o, i) => showState[i]);
-        options.forEach(
-            (o) =>
-                (o.isEnabled = o.enabledCallback(
-                    target === Target.List && objects && objects[0] ? objects[0] : null,
-                )),
-        );
+        options = options.map((o) => {
+            // disable them because the callback will later decide the state
+            o.isEnabled = o.customEnabledCallback == null;
+            return o;
+        });
         return options;
     }
 
@@ -598,20 +631,21 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         ];
         openOriginalNode.toolpermissions = [RestConstants.TOOLPERMISSION_WORKSPACE];
         openOriginalNode.scopes = [Scope.CollectionsReferences, Scope.Search, Scope.Render];
-        openOriginalNode.customEnabledCallback = (nodes) => {
+        openOriginalNode.customEnabledCallback = async (nodes: Node[]) => {
             if (nodes && nodes.length === 1) {
-                openOriginalNode.customEnabledCallback = null;
-                let nodeId = RestHelper.removeSpacesStoreRef(
-                    nodes[0].properties[RestConstants.CCM_PROP_PUBLISHED_ORIGINAL][0],
-                );
-                this.nodeService.getNodeMetadata(nodeId).subscribe(
-                    () => {
-                        openOriginalNode.isEnabled = true;
-                    },
-                    () => {
-                        openOriginalNode.isEnabled = false;
-                    },
-                );
+                return new Promise<boolean>((resolve) => {
+                    const nodeId = RestHelper.removeSpacesStoreRef(
+                        nodes[0].properties[RestConstants.CCM_PROP_PUBLISHED_ORIGINAL][0],
+                    );
+                    this.nodeService.getNodeMetadata(nodeId).subscribe(
+                        () => {
+                            resolve(true);
+                        },
+                        () => {
+                            resolve(false);
+                        },
+                    );
+                });
             }
             return false;
         };
@@ -630,21 +664,22 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         ];
         openParentNode.toolpermissions = [RestConstants.TOOLPERMISSION_WORKSPACE];
         openParentNode.scopes = [Scope.CollectionsReferences, Scope.Search, Scope.Render];
-        openParentNode.customEnabledCallback = (nodes) => {
+        openParentNode.customEnabledCallback = async (nodes: Node[]) => {
             if (nodes && nodes.length === 1) {
-                openParentNode.customEnabledCallback = null;
-                let nodeId = nodes[0].ref.id;
-                if (nodes[0].aspects.indexOf(RestConstants.CCM_ASPECT_IO_REFERENCE) !== -1) {
-                    nodeId = nodes[0].properties[RestConstants.CCM_PROP_IO_ORIGINAL][0];
-                }
-                this.nodeService.getNodeParents(nodeId, false, []).subscribe(
-                    () => {
-                        openParentNode.isEnabled = true;
-                    },
-                    (error) => {
-                        openParentNode.isEnabled = false;
-                    },
-                );
+                return new Promise<boolean>((resolve) => {
+                    let nodeId = nodes[0].ref.id;
+                    if (nodes[0].aspects.indexOf(RestConstants.CCM_ASPECT_IO_REFERENCE) !== -1) {
+                        nodeId = nodes[0].properties[RestConstants.CCM_PROP_IO_ORIGINAL][0];
+                    }
+                    this.nodeService.getNodeParents(nodeId, false, []).subscribe(
+                        () => {
+                            resolve(true);
+                        },
+                        (error) => {
+                            resolve(false);
+                        },
+                    );
+                });
             }
             return false;
         };
@@ -717,7 +752,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         addNodeToCollection.constrains = [Constrain.Files, Constrain.User, Constrain.NoScope];
         addNodeToCollection.customShowCallback = async (nodes) => {
             addNodeToCollection.name =
-                data.scope === Scope.CollectionsReferences
+                data?.scope === Scope.CollectionsReferences
                     ? 'OPTIONS.COLLECTION_OTHER'
                     : 'OPTIONS.COLLECTION';
             return this.nodeHelper.referenceOriginalExists(nodes ? nodes[0] : null);
@@ -742,7 +777,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         addNodeToLTIPlatform.group = DefaultGroups.Primary;
         addNodeToLTIPlatform.priority = 11;
         addNodeToLTIPlatform.permissions = [RestConstants.ACCESS_CC_PUBLISH];
-        addNodeToLTIPlatform.customEnabledCallback = (nodes: Node[]) => {
+        addNodeToLTIPlatform.customEnabledCallback = async (nodes: Node[]) => {
             const ltiSession = this.connectors.getRestConnector().getCurrentLogin().ltiSession;
             if (!ltiSession) {
                 return false;
@@ -805,7 +840,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             Constrain.User,
         ];
         createNodeVariant.toolpermissions = [RestConstants.TOOLPERMISSION_CREATE_ELEMENTS_FILES];
-        createNodeVariant.customEnabledCallback = (nodes) => {
+        createNodeVariant.customEnabledCallback = async (nodes) => {
             if (nodes) {
                 // do not show variant if it's a licensed material and user doesn't has change permission rights
                 return (
@@ -944,7 +979,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         downloadNode.group = DefaultGroups.View;
         // downloadNode.key = 'D';
         downloadNode.priority = 40;
-        downloadNode.customEnabledCallback = (nodes) => {
+        downloadNode.customEnabledCallback = async (nodes) => {
             if (!nodes) {
                 return false;
             }
@@ -1086,7 +1121,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             this.cutCopyNode(data, node, true),
         );
         // do not allow copy of map links if tp is missing
-        copyNodes.customEnabledCallback = (node) =>
+        copyNodes.customEnabledCallback = async (node) =>
             node.every((n) => !n.aspects?.includes(RestConstants.CCM_ASPECT_COLLECTION)) &&
             (node?.some((n) => this.getTypeSingle(n) === ElementType.MapRef)
                 ? this.connector.hasToolPermissionInstant(
@@ -1125,6 +1160,35 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         };
         pasteNodes.group = DefaultGroups.FileOperations;
 
+        const pasteNodeIntoFolder = new OptionItem('OPTIONS.PASTE', 'content_paste', (node) =>
+            this.pasteNode(
+                components,
+                {
+                    parent: this.getObjects(node, data)[0],
+                    scope: null,
+                },
+                false,
+            ),
+        );
+        pasteNodeIntoFolder.elementType = [ElementType.Node];
+        pasteNodeIntoFolder.constrains = [
+            Constrain.ClipboardContent,
+            Constrain.Directory,
+            Constrain.NoBulk,
+            Constrain.AddObjects,
+            Constrain.User,
+        ];
+        pasteNodeIntoFolder.toolpermissions = [
+            RestConstants.TOOLPERMISSION_CREATE_ELEMENTS_FOLDERS,
+            RestConstants.TOOLPERMISSION_CREATE_ELEMENTS_FILES,
+        ];
+        pasteNodes.scopes = [Scope.WorkspaceList];
+        pasteNodes.keyboardShortcut = {
+            keyCode: 'KeyV',
+            modifiers: ['Ctrl/Cmd'],
+        };
+        pasteNodeIntoFolder.group = DefaultGroups.Primary;
+
         const deleteNode = new OptionItem('OPTIONS.DELETE', 'delete', (object) => {
             void this.dialogs.openDeleteNodesDialog({ nodes: this.getObjects(object, data) });
         });
@@ -1143,6 +1207,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         deleteNode.priority = 10;
 
         const unblockNode = new OptionItem('OPTIONS.UNBLOCK_IMPORT', 'sync', async (object) => {
+            const objects = await this.getObjectsAsync(object, data, true);
             const dialogRef = await this.dialogs.openGenericDialog({
                 title: 'WORKSPACE.UNBLOCK_TITLE',
                 message: 'WORKSPACE.UNBLOCK_MESSAGE',
@@ -1150,16 +1215,12 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             });
             dialogRef.afterClosed().subscribe((response) => {
                 if (response === 'OK') {
-                    this.unblockImportedNodes(this.getObjects(object, data));
+                    this.unblockImportedNodes(objects);
                 }
             });
         });
         unblockNode.elementType = [ElementType.NodeBlockedImport];
-        unblockNode.constrains = [
-            Constrain.HomeRepository,
-            Constrain.NoCollectionReference,
-            Constrain.User,
-        ];
+        unblockNode.constrains = [Constrain.HomeRepository, Constrain.User];
         unblockNode.permissions = [RestConstants.PERMISSION_DELETE];
         unblockNode.permissionsMode = HideMode.Hide;
         unblockNode.group = DefaultGroups.Edit;
@@ -1348,7 +1409,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                     break;
             }
         });
-        setDisplayType(components.list?.getDisplayType(), false);
+        setDisplayType(components?.list?.getDisplayType(), false);
         toggleViewType.scopes = [Scope.WorkspaceList, Scope.Search, Scope.CollectionsReferences];
         toggleViewType.constrains = [Constrain.NoSelection];
         toggleViewType.group = DefaultGroups.Toggles;
@@ -1451,6 +1512,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(cutNodes);
         options.push(copyNodes);
         options.push(pasteNodes);
+        options.push(pasteNodeIntoFolder);
         options.push(deleteNode);
         options.push(unpublishNode);
         options.push(unblockNode);
@@ -1459,7 +1521,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(toggleViewType);
         options.push(metadataSidebar);
 
-        if (data.postPrepareOptions) {
+        if (data?.postPrepareOptions) {
             data.postPrepareOptions(options, objects);
         }
         return options;
@@ -1557,9 +1619,9 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                 const list = NodeHelperService.getActionbarNodes(objects, object);
                 return await this.isOptionAvailable(o, list, data);
             };
-            o.enabledCallback = (object) => {
+            o.enabledCallback = async (object) => {
                 const list = NodeHelperService.getActionbarNodes(objects, object);
-                return this.isOptionEnabled(o, list);
+                return await this.isOptionEnabled(o, list);
             };
         });
     }

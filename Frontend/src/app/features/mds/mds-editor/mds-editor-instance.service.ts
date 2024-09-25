@@ -71,6 +71,7 @@ import { MdsEditorWidgetVersionComponent } from './widgets/mds-editor-widget-ver
 import { Helper } from '../../../core-module/rest/helper';
 import { MdsEditorWidgetCore } from './mds-editor-widget-core.directive';
 import { MdsWidgetTree } from './widgets/mds-editor-widget-tree/tree';
+import { SearchHelperService } from 'ngx-edu-sharing-ui';
 
 export interface CompletionStatusField {
     widget: Widget;
@@ -148,10 +149,6 @@ export class MdsEditorInstanceService implements OnDestroy {
         );
         private _internalError: string;
 
-        get definition() {
-            return this._definition;
-        }
-
         constructor(
             private mdsEditorInstanceService: MdsEditorInstanceService,
             private _definition: MdsWidget,
@@ -181,6 +178,10 @@ export class MdsEditorInstanceService implements OnDestroy {
                     }),
                 )
                 .subscribe(this.hasChanged);
+        }
+
+        get definition() {
+            return this._definition;
         }
 
         /**
@@ -262,7 +263,10 @@ export class MdsEditorInstanceService implements OnDestroy {
             }
             // Set initial values, so the initial completion status is calculated correctly.
             this.value$.next([...this.initialValues.jointValues]);
-            if (this.mdsEditorInstanceService.getIsBulk(nodes)) {
+            if (
+                this.mdsEditorInstanceService.getIsBulk(nodes) &&
+                this.bulkMode.value !== 'replace'
+            ) {
                 this.bulkMode.next('no-change');
             }
             this.initialValuesSubject.next(this.initialValues);
@@ -492,7 +496,7 @@ export class MdsEditorInstanceService implements OnDestroy {
                     ...(this.mdsEditorInstanceService.externalFilters ?? {}),
                 };
                 delete values[this.definition.id];
-                criteria = RestSearchService.convertCritierias(
+                criteria = this.mdsEditorInstanceService.searchHelperService.convertCritieria(
                     values,
                     this.mdsEditorInstanceService.widgets.value.map((w) => w.definition),
                 );
@@ -713,6 +717,7 @@ export class MdsEditorInstanceService implements OnDestroy {
         private aboutService: AboutService,
         private restMdsService: RestMdsService,
         private configService: ConfigurationService,
+        public searchHelperService: SearchHelperService,
         private suggestionsService: SuggestionsV1Service,
         private restConnector: RestConnectorService,
         private config: ConfigService,

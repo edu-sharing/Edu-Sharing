@@ -52,6 +52,15 @@ export class AuthorityNamePipe implements PipeTransform {
             }
             return (authority.user.firstName + ' ' + authority.user.lastName).trim();
         }
+        if (authority.user?.givenName || authority.user?.surname) {
+            if (args?.avatarShortcut) {
+                return (
+                    this.getFirstChar(authority.user.givenName) +
+                    this.getFirstChar(authority.user.surname)
+                );
+            }
+            return (authority.user.givenName + ' ' + authority.user.surname).trim();
+        }
         if (authority.group?.displayName) {
             if (args?.avatarShortcut) {
                 return this.getFirstChar(authority.group.displayName);

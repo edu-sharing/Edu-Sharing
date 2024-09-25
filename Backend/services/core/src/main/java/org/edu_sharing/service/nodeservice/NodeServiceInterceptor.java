@@ -6,7 +6,6 @@ import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -28,10 +27,12 @@ import org.edu_sharing.service.stream.StreamServiceFactory;
 import org.edu_sharing.service.stream.StreamServiceHelper;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.toolpermission.ToolPermissionHelper;
+import org.edu_sharing.spring.ApplicationContextFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class NodeServiceInterceptor implements MethodInterceptor {
@@ -39,6 +40,9 @@ public class NodeServiceInterceptor implements MethodInterceptor {
     static ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
     static Logger logger = Logger.getLogger(NodeServiceInterceptor.class);
+
+    List<NodeServiceInterceptorPermissions> customizations;
+
     public void init(){
         
     }
@@ -236,7 +240,14 @@ public class NodeServiceInterceptor implements MethodInterceptor {
     private static boolean hasPermissions(String nodeId, int recursionDepth) {
         return (hasSignature(nodeId) || hasUsage(nodeId)) ||
                 // direct permissions only valid for current node, NOT for parent!
-                (accessibleViaStream(nodeId) || hasCollectionPermissions(nodeId) && recursionDepth == 0);
+                (accessibleViaStream(nodeId) || accessableViaCustomization(nodeId, recursionDepth) || hasCollectionPermissions(nodeId) && recursionDepth == 0);
+    }
+
+    private static boolean accessableViaCustomization(String nodeId, int recursionDepth) {
+        for (NodeServiceInterceptorPermissions customization : PropertiesInterceptorFactory.getNodeServiceInterceptorPermissions()){
+            if (customization.accessable(nodeId, recursionDepth)) return true;
+        }
+        return false;
     }
 
     private static boolean accessibleViaStream(String nodeId) {

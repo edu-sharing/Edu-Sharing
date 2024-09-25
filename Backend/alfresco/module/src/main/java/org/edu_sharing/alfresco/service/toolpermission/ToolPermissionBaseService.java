@@ -332,6 +332,7 @@ public class ToolPermissionBaseService {
         toInit.remove(CCConstants.CCM_VALUE_TOOLPERMISSION_CONTROL_RESTRICTED_ACCESS);
         toInit.remove(CCConstants.CCM_VALUE_TOOLPERMISSION_PUBLISH_COPY);
         toInit.remove(CCConstants.CCM_VALUE_TOOLPERMISSION_CREATE_MAP_LINK);
+        toInit.remove(CCConstants.CCM_VALUE_TOOLPERMISSION_INVITE_TIMEBASED);
         return toInit;
     }
     public List<String> getAllPredefinedToolPermissions(){
@@ -386,6 +387,7 @@ public class ToolPermissionBaseService {
 
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_CONTROL_RESTRICTED_ACCESS);
         toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_COLLECTION_PROPOSAL);
+        toInit.add(CCConstants.CCM_VALUE_TOOLPERMISSION_INVITE_TIMEBASED);
 
         addConnectorToolpermissions(toInit);
         return toInit;

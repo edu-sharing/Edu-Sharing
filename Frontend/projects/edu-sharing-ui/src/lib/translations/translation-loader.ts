@@ -59,11 +59,12 @@ export class TranslationLoader implements TranslateLoader {
         if (lang === 'none') {
             return of({});
         }
-        if (!LANGUAGES[lang]) {
-            console.error('unknown locale for language ' + lang);
+        // backend can not handle sub-languages
+        const langBackend = lang.startsWith('de-') ? 'de' : lang;
+        if (!LANGUAGES[langBackend]) {
+            console.error('unknown locale for language ' + lang + ' / ' + langBackend);
         }
-        console.log('lang', lang);
-        this.configService.setLocale(LANGUAGES[lang]);
+        this.configService.setLocale(LANGUAGES[langBackend], lang);
         return rxjs
             .forkJoin({
                 originalTranslations: this.getOriginalTranslations(lang).pipe(
@@ -91,7 +92,7 @@ export class TranslationLoader implements TranslateLoader {
         switch (this.getSource()) {
             case 'repository':
                 return this.configService.observeDefaultTranslations().pipe(
-                    filter((arg) => !arg || arg.locale === LANGUAGES[lang]),
+                    filter((arg) => !arg?.locale || arg.language === lang),
                     switchMap((arg) => arg?.dict?.pipe(first()) || of(null)),
                     first(),
                 );

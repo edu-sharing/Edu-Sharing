@@ -9,10 +9,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.namespace.QName;
+import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.cache.EduGroupCache;
-
-import java.util.List;
 
 public class BeforeUpdateMap implements NodeServicePolicies.BeforeUpdateNodePolicy {
 
@@ -30,7 +28,7 @@ public class BeforeUpdateMap implements NodeServicePolicies.BeforeUpdateNodePoli
                 || authorityService.isAdminAuthority(AuthenticationUtil.getRunAsUser())){
             return;
         }
-        if(EduGroupCache.isAnOrganisationFolder(nodeRef)){
+        if(nodeService.hasAspect(nodeRef, OrganisationService.ASPECT_EDUGROUP_FOLDER)){
             throw new AccessDeniedException("Organisation Folder should not be modified!");
         }
     }

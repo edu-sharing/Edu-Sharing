@@ -12,17 +12,19 @@ export class MdsEditorWidgetCheckboxComponent extends MdsEditorWidgetBase implem
     formControl: UntypedFormControl;
     isIndeterminate: boolean;
 
-    ngOnInit(): void {
-        const initialValue = this.widget.getInitialValues()?.jointValues?.[0];
-        this.isIndeterminate = !!this.widget.getInitialValues()?.individualValues;
-        this.setIndeterminateValues(this.isIndeterminate);
+    async ngOnInit() {
         this.formControl = new UntypedFormControl(
-            initialValue === 'true',
+            false,
             this.getStandardValidators({ requiredValidator }),
         );
         this.formControl.valueChanges.subscribe((value: boolean) => {
             this.setValue([value ? value.toString() : 'false'], this.formControl.dirty);
         });
+        const initialValue = (await this.widget.getInitalValuesAsync()).jointValues?.[0];
+        this.formControl.setValue(initialValue === 'true');
+        this.isIndeterminate = !!(await this.widget.getInitalValuesAsync()).individualValues;
+        this.setIndeterminateValues(this.isIndeterminate);
+
         this.registerValueChanges(this.formControl);
     }
 

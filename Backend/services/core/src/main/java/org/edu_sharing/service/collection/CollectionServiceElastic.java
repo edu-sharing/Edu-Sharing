@@ -2,21 +2,26 @@ package org.edu_sharing.service.collection;
 
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsAggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.edu_sharing.metadataset.v2.MetadataSet;
+import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.SearchResultNodeRef;
+import org.edu_sharing.service.authority.AuthorityServiceHelper;
+import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.SearchServiceElastic;
+import org.edu_sharing.service.search.SearchServiceFactory;
+import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.edu_sharing.spring.ApplicationContextFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CollectionServiceElastic extends CollectionServiceImpl {
 
@@ -33,7 +38,7 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
     }
 
     @Override
-    protected void addCollectionCountProperties(NodeRef nodeRef, Collection collection) {
+    protected void addCollectionCountProperties(NodeRef nodeRef, Collection collection, BoolQuery readPermissionsQuery) {
         try {
             SearchRequest searchRequest = SearchRequest.of(req -> req
                     .index(SearchServiceElastic.WORKSPACE_INDEX)
@@ -41,7 +46,7 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
                     .aggregations("type", agg -> agg.terms(t -> t.field("type")))
                     .query(q -> q
                             .bool(b -> b
-                                    .must(m -> m.bool(searchServiceElastic::getReadPermissionsQuery))
+                                    .must(m -> readPermissionsQuery != null ? m.bool(readPermissionsQuery) : m.bool(searchServiceElastic::getReadPermissionsQuery))
                                     .must(m -> m.match(match -> match.field("nodeRef.storeRef.protocol").query("workspace")))
                                     .must(m -> m.wildcard(w -> w.field("fullpath").wildcard("*/" + nodeRef.getId() + "*")))
                                     .mustNot(m -> m.match(match -> match.field("aspects").query(CCConstants.getValidLocalName(CCConstants.CCM_ASPECT_IO_CHILDOBJECT)))))));
@@ -90,9 +95,11 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
         List<CollectionProposalInfo.CollectionProposalData> dataList = new ArrayList<>();
         Set<String> authorities = searchServiceElastic.getUserAuthorities();
         String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
+
         for (Hit<Map> hit : result.hits().hits()) {
             CollectionProposalInfo.CollectionProposalData data = new CollectionProposalInfo.CollectionProposalData();
-            data.setNodeRef(searchServiceElastic.transformSearchHit(authorities, user, hit.source(), false));
+            data.setNodeRef(searchServiceElastic.transformSearchHit(isAdmin, authorities, user, hit.source(), false));
             for (Object v : hit.fields().get("proposals").to(List.class)) {
                 Map al = (Map) v;
                 for (Object e : al.entrySet()) {
@@ -114,6 +121,33 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
     @Override
     public void proposeForCollection(String collectionId, String originalNodeId, String sourceRepositoryId) throws DuplicateNodeException, Throwable {
         super.proposeForCollection(collectionId, originalNodeId, sourceRepositoryId);
+    }
+
+    @Override
+    protected SearchResultNodeRef searchChildren(String scope, SortDefinition sortDefinition, int skipCount, int maxItems) throws Throwable {
+
+        MetadataSet mds = MetadataHelper.getMetadataset(appInfo, CCConstants.metadatasetdefault_id);
+
+        String queryId = getQueryForScope(scope);
+        /**
+         * @TODO owner + inherit off -> node will be found even if search is done in edu-group context
+         */
+
+        List<org.edu_sharing.service.model.NodeRef> returnVal = new ArrayList<>();
+        SearchToken token = new SearchToken();
+        token.setContentType(SearchService.ContentType.COLLECTIONS);
+        token.setSortDefinition(sortDefinition);
+        token.setFrom(skipCount);
+        token.setMaxResult(maxItems);
+        SearchResultNodeRef nodeRefs = SearchServiceFactory.getLocalService().search(mds, queryId, Collections.emptyMap(), token);
+        for (org.edu_sharing.service.model.NodeRef nodeRef : nodeRefs.getData()) {
+            if (isSubCollection(nodeRef)) {
+                continue;
+            }
+            returnVal.add(nodeRef);
+        }
+        nodeRefs.setData(returnVal);
+        return nodeRefs;
     }
 }
 

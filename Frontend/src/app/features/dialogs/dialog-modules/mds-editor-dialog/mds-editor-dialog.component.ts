@@ -44,7 +44,12 @@ export class MdsEditorDialogComponent implements OnInit, AfterViewInit {
     }
 
     async ngOnInit(): Promise<void> {
-        await this.initMdsEditor();
+        try {
+            await this.initMdsEditor();
+        } catch (e) {
+            this.handleError(e);
+            this.dialogRef.close(null);
+        }
         this.initButtons();
         this.registerProgressIndicator();
         // `SendFeedbackDialog` works similar to this component. Please update accordingly when
@@ -180,7 +185,7 @@ export class MdsEditorDialogComponent implements OnInit, AfterViewInit {
     }
     private handleError(error: any): void {
         console.error(error);
-        if (error instanceof UserPresentableError) {
+        if (error instanceof UserPresentableError || error.message) {
             this.toast.error(null, error.message);
         } else {
             this.toast.error(error);
@@ -192,11 +197,8 @@ function mapDict<K extends string, T, R>(
     dict: { [key in K]: T },
     f: (element: T) => R,
 ): { [key in K]: R } {
-    return Object.entries(dict).reduce(
-        (acc, [key, value]) => {
-            acc[key as K] = f(value as T);
-            return acc;
-        },
-        {} as { [key in K]: R },
-    );
+    return Object.entries(dict).reduce((acc, [key, value]) => {
+        acc[key as K] = f(value as T);
+        return acc;
+    }, {} as { [key in K]: R });
 }

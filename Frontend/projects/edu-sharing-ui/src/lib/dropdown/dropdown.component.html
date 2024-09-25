@@ -7,16 +7,17 @@
 >
   <!-- MatMenu has role="menu", so the only meaningful role of descendants is "menuitem" -->
   <ul role="none">
-    <ng-container *ngFor="let option of _options; let i = index">
+    <ng-container *ngFor="let option of options$ | async; let i = index">
       <li *ngIf="option.isEnabled || showDisabled" role="none">
         <button
           mat-menu-item
           class="mat-menu-item collection-item-{{
             option.name | replaceChars : { search: '.', replace: '-' }
           }}"
-          matTooltip="{{ option | optionTooltip }}"
+          matTooltip="{{ option | optionTooltip | async }}"
           matTooltipPosition="right"
           matTooltipTouchGestures="off"
+          [attr.aria-label]="option.ariaLabel || option.name | translate"
           [class.mat-menu-item-separate]="option.isSeparate || isNewGroup(i)"
           [class.mat-menu-item-selected]="option.isSelected"
           [disabled]="!option.isEnabled"

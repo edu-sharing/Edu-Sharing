@@ -431,15 +431,12 @@ spec:
       {{- end }}
       volumes:
       - name: share-config
-        persistentVolumeClaim:
-          claimName: {{ include "edusharing_repository_service.pvc.share.config" . }}
+        {{ tpl .Values.persistence.share.config.type . | nindent 8 }}
       - name: share-data
-        persistentVolumeClaim:
-          claimName: {{ include "edusharing_repository_service.pvc.share.data" . }}
+        {{ tpl .Values.persistence.share.data.type . | nindent 8 }}
       {{- if .Values.persistence.share.safe.enabled }}
       - name: share-safe
-        persistentVolumeClaim:
-          claimName: {{ include "edusharing_repository_service.pvc.share.safe" . }}
+        {{ tpl .Values.persistence.share.safe.type . | nindent 8 }}
       {{- end }}
       - name: file
         configMap:

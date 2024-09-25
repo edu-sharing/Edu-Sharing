@@ -10,7 +10,7 @@ import {
 import { LicenseDialogData, LicenseDialogResult } from './license-dialog-data';
 
 import { TranslateService } from '@ngx-translate/core';
-import { Values } from 'dist/edu-sharing-api/lib/api/models';
+import { Acl, Values } from 'dist/edu-sharing-api/lib/api/models';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
@@ -32,6 +32,7 @@ import { UserPresentableError } from '../../../../features/mds/mds-editor/mds-ed
 import { MdsEditorInstanceService } from '../../../../features/mds/mds-editor/mds-editor-instance.service';
 import { ViewInstanceService } from '../../../../features/mds/mds-editor/mds-editor-view/view-instance.service';
 import { MdsEditorWidgetAuthorComponent } from '../../../../features/mds/mds-editor/widgets/mds-editor-widget-author/mds-editor-widget-author.component';
+import { NodeService } from 'ngx-edu-sharing-api';
 
 const ALL_LICENSE_TYPES = [
     'NONE',
@@ -248,7 +249,7 @@ export class LicenseDialogContentComponent implements OnInit {
     private releaseIndeterminate = false;
     private eduDownload = true;
     private _oerMode = true;
-    private permissions: LocalPermissionsResult;
+    private permissions: Acl;
     private allowedLicenses: string[];
     private releaseMulti: string;
     private allowRelease = true; // FIXME: not used.
@@ -262,6 +263,7 @@ export class LicenseDialogContentComponent implements OnInit {
         private iamApi: RestIamService,
         private toast: Toast,
         private nodeApi: RestNodeService,
+        private nodeService: NodeService,
     ) {}
 
     ngOnInit(): void {
@@ -306,12 +308,10 @@ export class LicenseDialogContentComponent implements OnInit {
                 let i = 0;
                 for (const node of nodes) {
                     i++;
-                    this.nodeApi
-                        .getNodePermissions(node.ref.id)
-                        .subscribe((permissions: NodePermissions) => {
-                            this.permissions = permissions.permissions.localPermissions;
-                            this.readPermissions(i == this.getNodes()?.length);
-                        });
+                    this.nodeService.getPermissions(node.ref.id).subscribe((permissions) => {
+                        this.permissions = permissions.localPermissions;
+                        this.readPermissions(i == this.getNodes()?.length);
+                    });
                 }
             },
             (error) => {
@@ -364,7 +364,7 @@ export class LicenseDialogContentComponent implements OnInit {
     private loadConfig() {
         this.config.get('allowedLicenses').subscribe((data: string[]) => {
             if (!data) {
-                this.licenseMainTypes = ALL_LICENSE_TYPES;
+                this.licenseMainTypes = ALL_LICENSE_TYPES.slice();
                 this.allowedLicenses = null;
             } else {
                 this.licenseMainTypes = [];
@@ -608,10 +608,12 @@ export class LicenseDialogContentComponent implements OnInit {
             this.permissions.permissions,
             this.permissions.inherited,
         );
-        this.nodeApi.setNodePermissions(node.ref.id, permissions, false, '', false).subscribe(
-            () => {},
-            (error: any) => this.toast.error(error),
-        );
+        this.nodeService
+            .setPermissions(node.ref.id, permissions, { sendMail: false, sendCopy: false })
+            .subscribe(
+                () => {},
+                (error: any) => this.toast.error(error),
+            );
     }
 
     private readPermissions(last: boolean) {

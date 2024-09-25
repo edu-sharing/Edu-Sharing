@@ -6,9 +6,9 @@ import { OptionItem } from '../types/option-item';
 export class OptionTooltipPipe implements PipeTransform {
     constructor(private translate: TranslateService) {}
 
-    transform(option: OptionItem, args: string[] = null): string {
+    async transform(option: OptionItem, args: string[] = null) {
         return (
-            this.translate.instant(option.name) +
+            (await this.translate.get(option.name).toPromise()) +
             (option.keyboardShortcut ? ' (' + this.getKeyInfo(option) + ')' : '')
         );
     }

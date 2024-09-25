@@ -74,6 +74,9 @@
       "CLUSTER_OVERRIDE_CONFIG_HINT": "Override-Konfiguration für alle Cluster-Knoten",
       "NODE_OVERRIDE_CONFIG_TITLE": "Node-Override",
       "NODE_OVERRIDE_CONFIG_HINT": "Override-Konfiguration für den aktuellen Cluster-Knoten (IP-Adresse überprüfen!)",
+      "DEFAULTS_OVERRIDE_CONFIG_TITLE": "Helm Config override",
+      "DEFAULTS_OVERRIDE_CONFIG_HINT": "Values configured via helm deployment override",
+
       "SIZE": "Editor-Größe",
       "SIZE_MEDIUM": "Normal",
       "SIZE_LARGE": "Groß",
@@ -305,8 +308,6 @@
     "TOOLKIT": {
       "REFRESH_APP": "App Info neu laden",
       "REFRESH_APP_INFO": "Metadaten und Application-Info neu laden",
-      "REFRESH_EDU_GROUP_CACHE": "Edu-Gruppen-Cache aktualisieren",
-      "EDU_GROUP_CACHE_REFRESHED": "Edu-Gruppen-Cache aktualisiert",
       "APP_INFO_REFRESHED": "Aktualisieren der Anwendungsinformationen abgeschlossen",
       "CACHE": "Cache Verwaltung",
       "CACHE_INFO": "Cache Info abrufen",
@@ -800,8 +801,6 @@
   "DATE_SELECT_YEAR": "Jahr wählen",
   "SEARCH_CLEAR": "Löschen",
   "DATE_CLEAR": "Löschen",
-  "USER_TUTORIAL_HEADING": "Dein Profil",
-  "USER_TUTORIAL_DESCRIPTION": "Hier können Sie ein eigenes Profilbild angeben und zeigen, wer Sie sind und was Sie tun. Sie entscheiden, was Andere sehen können.",
   "PROFILE_UPDATED": "Profilinformationen wurden aktualisiert",
   "SHOW_EMAIL_UPDATED": "Die E-Mail ist öffentlich",
   "HIDE_EMAIL_UPDATED": "Die E-Mail ist vertraulich",

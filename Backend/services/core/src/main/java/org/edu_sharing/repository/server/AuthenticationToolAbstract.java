@@ -6,6 +6,7 @@ import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.axis.utils.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
@@ -78,7 +79,21 @@ public abstract class AuthenticationToolAbstract implements AuthenticationTool {
 		}
 	}
 	public String getCurrentLanguage(){
-		return getCurrentLocale().substring(0,2);
+			return getCurrentLocale().substring(0,2);
+	}
+
+	/**
+	 * returns the native angular language, might be the same as getCurrentLanguage, but can also be something like "de-informal"
+	 * @return
+	 */
+	public String getCurrentAngularLanguage(){
+		try {
+			HttpServletRequest request = Context.getCurrentInstance().getRequest();
+			String language = request.getHeader("X-Edu-Sharing-Language");
+			return StringUtils.isEmpty(language) ? getCurrentLanguage() : language;
+		}catch(Throwable t){
+			return getCurrentLanguage();
+		}
 	}
 
 	/**

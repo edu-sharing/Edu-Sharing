@@ -4,13 +4,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.SecurityHeadersFilter;
 import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.config.ConfigServiceFactory;
+import org.edu_sharing.service.permission.PermissionServiceFactory;
 import org.edu_sharing.service.rendering.RenderingService;
 import org.edu_sharing.service.rendering.RenderingServiceFactory;
 import org.edu_sharing.service.rendering.RenderingTool;
@@ -35,6 +38,7 @@ public class RenderingServlet extends HttpServlet {
                 node_id = req.getParameter("node_id");
             }
             String version = req.getParameter("version");
+
             RenderingService renderingService = RenderingServiceFactory.getLocalService();
             Map<String, String> params=new HashMap<>();
             for(Object key:  req.getParameterMap().keySet()){
@@ -59,7 +63,13 @@ public class RenderingServlet extends HttpServlet {
             resp.getWriter().write("<body class= \"eduservlet-render-body\">");
             String response;
             try {
-                response = renderingService.getDetails(node_id, version,DEFAULT_DISPLAY_MODE, params);
+                if(!PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE,
+                        StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),
+                        node_id,
+                        CCConstants.PERMISSION_EMBED)){
+                     throw new AccessDeniedException(CCConstants.PERMISSION_EMBED);
+                }
+                response = renderingService.getDetails(node_id, version,DEFAULT_DISPLAY_MODE, params).getDetails();
                 response = response.replace("{{{LMS_INLINE_HELPER_SCRIPT}}}", URLHelper.getNgRenderNodeUrl(node_id,version)+"?");
                 TrackingServiceFactory.getTrackingService().trackActivityOnNode(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, node_id), null, TrackingService.EventType.VIEW_MATERIAL_EMBEDDED);
             } catch (Throwable t) {

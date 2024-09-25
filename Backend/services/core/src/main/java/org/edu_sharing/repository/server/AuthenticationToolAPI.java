@@ -79,8 +79,11 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 	}
 	
 	public Map<String,String> createNewSession(String userName, String password) throws Exception {
-		authenticationService.authenticate(userName, password.toCharArray());
-		
+		if(password != null) {
+			authenticationService.authenticate(userName, password.toCharArray());
+		}else{
+			authenticationComponent.setCurrentUser(userName);
+		}
 		Map<String,String> returnval = new HashMap<>();
 		returnval.put(CCConstants.AUTH_USERNAME, authenticationService.getCurrentUserName());
 		returnval.put(CCConstants.AUTH_TICKET, authenticationService.getCurrentTicket());

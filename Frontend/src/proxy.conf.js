@@ -20,6 +20,7 @@ const PROXY_CONFIG = [
             '/edu-sharing/themes',
             '/edu-sharing/ccimages',
             '/edu-sharing/oauth2',
+            '/edu-sharing/shibboleth',
         ],
         target: process.env.BACKEND_URL,
         secure: false,

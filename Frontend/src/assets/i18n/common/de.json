@@ -195,8 +195,8 @@
   "SEARCH_CLEAR": "Löschen",
   "TOGGLE_SEARCH_FILTERS": "Suchfilter ein- und ausblenden",
   "DATE_CLEAR": "Löschen",
-  "USER_TUTORIAL_HEADING": "Dein Profil",
-  "USER_TUTORIAL_DESCRIPTION": "Hier kannst du ein eigenes Profilbild angeben und zeigen, wer du bist und was du tust. Du entscheidest, was Andere sehen können.",
+  "USER_TUTORIAL_HEADING": "Ihr Profil",
+  "USER_TUTORIAL_DESCRIPTION": "Hier können Sie ein eigenes Profilbild angeben und zeigen, wer Sie sind und was Sie tun. Sie entscheiden, was Andere sehen können.",
   "PROFILE_UPDATED": "Profilinformationen wurden aktualisiert",
   "SHOW_EMAIL_UPDATED": "Die E-Mail ist öffentlich",
   "HIDE_EMAIL_UPDATED": "Die E-Mail ist vertraulich",
@@ -570,7 +570,8 @@
       "employee": "Mitarbeiter",
       "extern": "Externe nutzende Person",
       "system": "Systemaccount",
-      "function": "Funktionsaccount"
+      "function": "Funktionsaccount",
+      "guest": "Gast"
     }
   },
   "PROFILE_SETTINGS": {
@@ -615,6 +616,7 @@
       "imsqti_xmlv2p1_test": "Test",
       "imsqti_xmlv2p1_item": "Aufgabe",
       "text/html": "HTML-Dokument (.html)",
+      "h5p": "H5P-Datei (.h5p)",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Textdokument (.docx)",
       "application/vnd.oasis.opendocument.text": "Textdokument (.odt)",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Tabelle (.xlsx)",

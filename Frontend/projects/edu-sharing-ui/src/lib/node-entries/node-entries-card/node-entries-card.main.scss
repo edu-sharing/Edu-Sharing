@@ -205,6 +205,10 @@ $cardLineHeight: 1.4;
                     @include limitLineCount(2, $cardLineHeight);
                     > es-list-text {
                         word-break: break-word;
+                        span {
+                            // fix for firefox to calculate offsetHeight correctly
+                            @include limitLineCount(2, $cardLineHeight);
+                        }
                     }
                 }
             }

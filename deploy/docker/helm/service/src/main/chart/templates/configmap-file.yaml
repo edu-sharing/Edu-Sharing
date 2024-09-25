@@ -50,7 +50,7 @@ data:
         return (synth(200, "OK"));
       }
 
-      if (req.method == "POST" || req.method == "PUT" || req.method == "DELETE" || req.url ~ "/rest/") {
+      if (req.method == "POST" || req.method == "PUT" || req.method == "DELETE" || req.url ~ "/rest/" || req.url ~ "/webdav/") {
         return (pass);
       }
 
@@ -61,6 +61,10 @@ data:
       if (req.url ~ "(\.css|\.eot|\.gif|\.ico|\.jpg|\.js|\.map|\.md|\.mjs|\.otf|\.png|\.scss|\.svg|\.svg|\.ts|\.ttf|\.txt|\.woff|\.woff2)") {
         return (hash);
       }
+    }
+
+    sub vcl_pipe {
+      set bereq.http.Connection = "close";
     }
 
     sub vcl_hit {
@@ -86,6 +90,9 @@ data:
         set beresp.http.cache-control = "{{ .Values.proxy.config.cache.control }}, max-age={{ .Values.proxy.config.cache.ttl }}";
         {{- end }}
         return (deliver);
+      } else {
+        set beresp.ttl = 0s;
+        set beresp.http.Connection = "close";
       }
     }
 

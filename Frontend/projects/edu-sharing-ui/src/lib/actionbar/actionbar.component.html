@@ -1,6 +1,6 @@
 <es-dropdown
   #dropdownRef
-  [options]="optionsMenu"
+  [options]="optionsMenu$ | async"
   [showDisabled]="showDisabled"
   [position]="dropdownPosition"
 ></es-dropdown>
@@ -12,15 +12,16 @@
   [class.actionbar-round]="appearance === 'round'"
   [class.actionbar-icon-button]="appearance === 'icon-button'"
 >
-  <ng-container *ngFor="let option of optionsAlways; let i = index">
+  <ng-container *ngFor="let option of optionsAlways$ | async; let i = index">
     <button
       *ngIf="shouldHighlight(i, option)"
       mat-flat-button
       color="primary"
       [disabled]="!option.isEnabled"
       [class.display-none]="!option.isEnabled && !showDisabled"
-      matTooltip="{{ option | optionTooltip }}"
-      [attr.aria-label]="option.name | translate"
+      matTooltip="{{ option | optionTooltip | async }}"
+      [matTooltipPosition]="tooltipPosition"
+      [attr.aria-label]="option.ariaLabel || option.name | translate"
       (click)="click(option)"
     >
       <i [esIcon]="option.icon"></i>
@@ -34,8 +35,9 @@
       color="primary"
       [disabled]="!option.isEnabled"
       [class.display-none]="!option.isEnabled && !showDisabled"
-      matTooltip="{{ option | optionTooltip }}"
-      [attr.aria-label]="option.name | translate"
+      matTooltip="{{ option | optionTooltip | async }}"
+      [matTooltipPosition]="tooltipPosition"
+      [attr.aria-label]="option.ariaLabel || option.name | translate"
       (click)="click(option)"
     >
       <i [esIcon]="option.icon"></i>
@@ -58,13 +60,13 @@
   <div
     *ngIf="optionsToggle.length"
     class="actionToggle"
-    [class.actionToggleDivider]="optionsAlways.length"
+    [class.actionToggleDivider]="(optionsAlways$ | async).length"
   >
     <button
       *ngFor="let option of optionsToggle"
       mat-icon-button
       matTooltip="{{ option.name | translate }}"
-      [attr.aria-label]="option.name | translate"
+      [attr.aria-label]="option.ariaLabel || option.name | translate"
       (click)="click(option)"
       [class.disabled]="!option.isEnabled"
       attr.data-test="toggle-{{ option.name }}"

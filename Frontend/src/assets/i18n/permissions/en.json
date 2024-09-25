@@ -88,6 +88,7 @@
     "STATUS_LAST_CHANGE": "Last change of status",
     "NEW_PASSWORD": "New password",
     "ERROR_PASSWORD_TO_WEAK": "The given password is too weak",
+    "ERROR_PASSWORD_POLICY_NOT_MATCHED": "The chosen password does not align with the configured password policy (details: {{cause}})",
     "TOAST_PASSWORD_RESET": "Password has been reset",
     "GROUP_TYPE": {
       "null": "none / regular group",

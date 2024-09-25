@@ -1,9 +1,17 @@
 {
   "WORKSPACE": {
     "SHARE": {
+      "GROUP_OWNER": "Eigentum",
+      "TYPE_VIEWER": "Leserechte",
+      "TYPE_VIEWER_DESCRIPTION": "Person darf sehen",
+      "TYPE_COWORKER": "Mitarbeit",
+      "TYPE_COWORKER_DESCRIPTION": "Person darf sehen, bearbeiten, Berechtigungen sehen und Objekte hinzufügen",
+      "TYPE_COORDINATOR": "Koordination",
+      "TYPE_COORDINATOR_DESCRIPTION": "Person darf sehen, bearbeiten, löschen, Berechtigungen sehen und ändern, Objekte hinzufügen und entfernen, veröffentlichen",
       "PUBLISH": {
         "AUTHOR_REQUIRED": "Um das Material zu veröffentlichen muss eine Autorin/ein Autor definiert werden"
-      }
+      },
+      "PUBLISH_ENABLED": "Veröffentlichung ist aktiv. Alle können das Dokument ansehen"
     },
 
     "EDITOR": {
@@ -13,28 +21,30 @@
     "LICENSE": {
       "CHECKBOX_AUTHOR": "Ich bin Autorin/Autor des Materials",
       "CC": {
-        "PROFILE_URL": "Profil der Autorin/des Autors"
+        "PROFILE_URL": "Profil der Autorin/des Autors",
+        "CC_BY_INFO": "Andere dürfen Bearbeitungen des Materials teilen, solange sie die Urheberschaft nennen",
+        "CC_BY_SA_INFO": "Andere dürfen Bearbeitungen des Materials teilen, solange sie die Urheberschaft nennen und es auch selbst unter denselben Bedingungen weitergeben"
       }
     },
-
-    "WORKFLOW": {
-      "RECEIVERS": "Nutzende Person/Redaktionsgruppe"
-    },
-
     "CONTRIBUTOR": {
+      "ADD_TITLE": "Neue beteiligte Person angeben",
+      "SCOPE": "Tätigkeit",
       "TYPE": {
         "AUTHOR": "Autorin/Autor",
-        "ADD_TITLE": "Neue beteiligte Person angeben",
         "PUBLISHER": "Herausgeberschaft",
         "INITIATOR": "Auftrag",
         "GRAPHICAL_DESIGNER": "Grafik",
         "CONTENT_PROVIDER": "Inhaltlicher Beitrag",
         "TECHNICAL_VALIDATOR": "Technik-Validation",
+        "TECHNICAL_IMPLEMENTER": "Technische Umsetzung",
         "EDUCATIONAL_VALIDATOR": "Bildungsvalidation",
         "SCRIPT_WRITER": "Scriptwriting",
         "CREATOR": "Erstellung",
         "PROVIDER": "Herausgeberschaft"
       }
+    },
+    "WORKFLOW": {
+      "RECEIVERS": "Nutzende Person/Redaktionsgruppe"
     }
   }
 }

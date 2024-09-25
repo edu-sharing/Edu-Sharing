@@ -236,6 +236,8 @@ public class CCConstants {
 
 	public final static String CCM_TYPE_SYSUPDATE = "{http://www.campuscontent.de/model/1.0}sysupdate";
 
+	public final static String CCM_TYPE_CONTEXT = "{http://www.campuscontent.de/model/1.0}context";
+
 	public final static String CCM_TYPE_MAPRELATION = "{http://www.campuscontent.de/model/1.0}maprelation";
 
 	public final static String CCM_TYPE_REMOTEOBJECT = "{http://www.campuscontent.de/model/1.0}remoteobject";
@@ -477,6 +479,8 @@ public class CCConstants {
 
 	public final static String CCM_ASPECT_EDUGROUP = "{http://www.campuscontent.de/model/1.0}edugroup";
 
+	public final static String CCM_ASPECT_EDUGROUP_FOLDER = "{http://www.campuscontent.de/model/1.0}edugroup_folder";
+
 	public final static String CCM_ASPECT_MAP_REF = "{http://www.campuscontent.de/model/1.0}map_ref";
 
 	public final static String CCM_ASPECT_GROUPEXTENSION = "{http://www.campuscontent.de/model/1.0}groupExtension";
@@ -519,6 +523,8 @@ public class CCConstants {
     public final static String CCM_PROP_SERVICE_NODE_DATA = "{http://www.campuscontent.de/model/1.0}service_node_data";
 
     public final static String CCM_PROP_EDUGROUP_EDU_HOMEDIR = "{http://www.campuscontent.de/model/1.0}edu_homedir";
+
+	public final static String CCM_PROP_EDUGROUP_FOLDER_ORGANISATION = "{http://www.campuscontent.de/model/1.0}edu_organisation";
 
 	public final static String CCM_ASPECT_SHARES = "{http://www.campuscontent.de/model/1.0}shares";
 
@@ -859,6 +865,8 @@ public class CCConstants {
 	public final static String CCM_PROP_SYSUPDATE_ID = "{http://www.campuscontent.de/model/1.0}sysupdate_id";
 	public final static String CCM_PROP_SYSUPDATE_DATE = "{http://www.campuscontent.de/model/1.0}sysupdate_date";
 
+	public final static String CCM_PROP_CONTEXT_CONFIG = "{http://www.campuscontent.de/model/1.0}context_config";
+
 	public final static String CCM_PROP_AUTHORITYCONTAINER_EDUHOMEDIR = "{http://www.campuscontent.de/model/1.0}edu_homedir";
 
 	public final static String CCM_PROP_NOTIFY_EVENT = "{http://www.campuscontent.de/model/1.0}notify_event";
@@ -879,6 +887,8 @@ public class CCConstants {
 	public final static String CCM_VALUE_TOOLPERMISSION_INVITE = "TOOLPERMISSION_INVITE";
 
 	public final static String CCM_VALUE_TOOLPERMISSION_INVITE_STREAM = "TOOLPERMISSION_INVITE_STREAM";
+
+	public final static String CCM_VALUE_TOOLPERMISSION_INVITE_TIMEBASED = "TOOLPERMISSION_INVITE_TIMEBASED";
 
 	public final static String CCM_VALUE_TOOLPERMISSION_INVITE_LINK = "TOOLPERMISSION_INVITE_LINK";
 
@@ -976,6 +986,8 @@ public class CCConstants {
 	public final static String CM_VALUE_PERSON_EDU_SCHOOL_PRIMARY_AFFILIATION_EXTERN = "extern";
 
 	public final static String CM_VALUE_PERSON_EDU_SCHOOL_PRIMARY_AFFILIATION_SYSTEM = "system";
+
+	public final static String CM_VALUE_PERSON_EDU_SCHOOL_PRIMARY_AFFILIATION_GUEST = "guest";
 
 	public final static String CM_VALUE_PERSON_EDU_SCHOOL_PRIMARY_AFFILIATION_FUNCTION = "function";
 
@@ -1362,6 +1374,8 @@ public class CCConstants {
 
 	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_UPDATE = "EDUSYSTEM_UPDATE";
 
+	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_CONTEXT = "EDUSYSTEM_CONTEXT";
+
 	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_NOTIFY = "EDUSYSTEM_NOTIFY";
 
 	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_TEMPLATE = "EDUSYSTEM_TEMPLATE";
@@ -1591,6 +1605,8 @@ public class CCConstants {
 
 	public final static String I18n_SYSTEMFOLDER_UPDATE = "systemfolder_update";
 
+	public final static String I18n_SYSTEMFOLDER_CONTEXT = "systemfolder_context";
+
 	public final static String I18n_SYSTEMFOLDER_CONFIG = "systemfolder_config";
 
 	public final static String I18n_SYSTEMFOLDER_MEDIACENTER = "systemfolder_mediacenter";
@@ -1744,6 +1760,7 @@ public class CCConstants {
 	public final static String PERMISSION_READ_ALL = "ReadAll";
 
 	public final static String PERMISSION_DOWNLOAD_CONTENT = "DownloadContent";
+	public final static String PERMISSION_EMBED = "Embed";
 	public final static String PERMISSION_READ_PREVIEW = "ReadPreview";
 
 	public final static String PERMISSION_COMMENT = "Comment";
@@ -2238,6 +2255,9 @@ public class CCConstants {
 	public static final String VERSION_COMMENT_BULK_MIGRATION = "BULK_MIGRATION";
 	public static final String VERSION_COMMENT_BULK_UPDATE_RESYNC = "BULK_UPDATE_RESYNC";
 	public static final String VERSION_COMMENT_REMOTE_OBJECT_INIT = "REMOTE_OBJECT_INIT";
+
+	public static final String ELASTICSEARCH_SYNONYMSET_PREFIX = "es-synonym-set";
+	public static final String ELASTICSEARCH_ANALYZER_PREFIX = "synonyms";
 
 	/**
 	 * Methos that set all the Properties for ProfileSettings

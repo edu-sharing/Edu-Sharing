@@ -1,36 +1,21 @@
 package org.edu_sharing.alfresco.service.config.model;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
 @XmlRootElement
 public class Config implements Serializable {
 
 	static Logger logger=Logger.getLogger(Config.class);
-	private static final ObjectReader jacksonReader;
+	private static final ObjectReader jacksonReader = new ObjectMapper().readerFor(Config.class);
 
-	static{
-		Unmarshaller jaxbUnmarshaller1;
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(Config.class);
-			jaxbUnmarshaller1 = jaxbContext.createUnmarshaller();
-		} catch (JAXBException e) {
-			jaxbUnmarshaller1 = null;
-			logger.error(e.getMessage(),e);
-		}
-		Unmarshaller jaxbUnmarshaller = jaxbUnmarshaller1;
-		jacksonReader = new ObjectMapper().reader(Config.class);
-	}
 
 	@XmlElement public Values values;
 	@XmlElement public Contexts contexts;

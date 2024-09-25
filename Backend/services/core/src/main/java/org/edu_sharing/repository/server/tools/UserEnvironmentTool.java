@@ -3,10 +3,6 @@
  */
 package org.edu_sharing.repository.server.tools;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -17,6 +13,10 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserEnvironmentTool {
 
@@ -30,8 +30,25 @@ public class UserEnvironmentTool {
         this(AuthenticationUtil.getFullyAuthenticatedUser());
     }
 
+    public void createAllSystemFolders() {
+        AuthenticationUtil.runAsSystem(() -> {
+            getEdu_SharingSystemFolderBase();
+            getEdu_SharingSystemFolderUpdate();
+            getEdu_SharingConfigFolder();
+            getEdu_SharingContextFolder();
+            getEdu_SharingMediacenterFolder();
+            getEdu_SharingReportsFolder();
+            getEdu_SharingNotifyFolder();
+            getEdu_SharingServiceFolder();
+            getEdu_SharingTemplateFolder();
+            getEdu_SharingValuespaceFolder();
+            return null;
+        });
+    }
+
     /**
      * use this for running this class in an runAs context
+     *
      * @throws Throwable
      */
     public UserEnvironmentTool(String runAsUser) {
@@ -55,7 +72,7 @@ public class UserEnvironmentTool {
         this(nodeService, authInfo.get(CCConstants.AUTH_USERNAME));
     }
 
-    public String getDefaultUserDataFolder() throws Throwable {
+    public String getDefaultUserDataFolder() throws Exception {
 
         String homeFolderId = mcBaseClient.getHomeFolderID(username);
 
@@ -72,7 +89,7 @@ public class UserEnvironmentTool {
         return result;
     }
 
-    public String getDefaultImageFolder() throws Throwable {
+    public String getDefaultImageFolder() throws Exception {
 
         String homeFolderId = mcBaseClient.getHomeFolderID(username);
 
@@ -89,7 +106,7 @@ public class UserEnvironmentTool {
         return result;
     }
 
-    public String getEdu_SharingSystemFolderBase() throws Throwable {
+    public String getEdu_SharingSystemFolderBase() throws Exception {
         if (!mcBaseClient.isAdmin() && !AuthenticationUtil.isRunAsUserTheSystemUser()) {
             throw new Exception("Admin group required");
         }
@@ -117,8 +134,8 @@ public class UserEnvironmentTool {
         return result;
     }
 
-    public String getEdu_SharingSystemFolderUpdate() throws Throwable {
-        if (!mcBaseClient.isAdmin()) {
+    public String getEdu_SharingSystemFolderUpdate() throws Exception {
+        if (!mcBaseClient.isAdmin() && !AuthenticationUtil.isRunAsUserTheSystemUser()) {
             throw new Exception("Admin group required");
         }
 
@@ -145,8 +162,7 @@ public class UserEnvironmentTool {
         return result;
     }
 
-
-    public String getEdu_SharingNotifyFolder() throws Throwable {
+    public String getEdu_SharingNotifyFolder() throws Exception {
         String systemFolderId = getEdu_SharingSystemFolderBase();
 
         String currentScope = NodeServiceInterceptor.getEduSharingScope();
@@ -176,23 +192,27 @@ public class UserEnvironmentTool {
         return result;
     }
 
-    public String getEdu_SharingConfigFolder() throws Throwable {
+    public String getEdu_SharingContextFolder() throws Exception {
+        return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_SERVICE, CCConstants.I18n_SYSTEMFOLDER_CONTEXT);
+    }
+
+    public String getEdu_SharingConfigFolder() throws Exception {
         return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_SERVICE, CCConstants.I18n_SYSTEMFOLDER_CONFIG);
     }
 
-    public String getEdu_SharingMediacenterFolder() throws Throwable {
+    public String getEdu_SharingMediacenterFolder() throws Exception {
         return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_MEDIACENTER, CCConstants.I18n_SYSTEMFOLDER_MEDIACENTER);
     }
 
-    public String getEdu_SharingReportsFolder() throws Throwable {
+    public String getEdu_SharingReportsFolder() throws Exception {
         return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_REPORTS, CCConstants.I18n_SYSTEMFOLDER_REPORTS);
     }
 
-    public String getEdu_SharingServiceFolder() throws Throwable {
+    public String getEdu_SharingServiceFolder() throws Exception {
         return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_SERVICE, CCConstants.I18n_SYSTEMFOLDER_SERVICE);
     }
 
-    public String getEdu_SharingTemplateFolder() throws Throwable {
+    public String getEdu_SharingTemplateFolder() throws Exception {
         return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_TEMPLATE, CCConstants.I18n_SYSTEMFOLDER_TEMPLATE);
 	    /*
 		String systemFolderId = getEdu_SharingSystemFolderBase();
@@ -218,7 +238,7 @@ public class UserEnvironmentTool {
 		*/
     }
 
-    public String getOrCreateSystemFolderByName(String constantName, String i18nId) throws Throwable {
+    public String getOrCreateSystemFolderByName(String constantName, String i18nId) throws Exception {
         String result;
         String systemFolderId = getEdu_SharingSystemFolderBase();
         Map<String, Object> edu_SharingSystemFolderTemplate = mcBaseClient.getChild(systemFolderId, CCConstants.CCM_TYPE_MAP, CCConstants.CCM_PROP_MAP_TYPE, constantName);
@@ -248,7 +268,7 @@ public class UserEnvironmentTool {
      * @return
      * @throws Throwable
      */
-    public String getEdu_SharingNotifyFolderToSafe() throws Throwable {
+    public String getEdu_SharingNotifyFolderToSafe() throws Exception {
         String notifyFolder = getEdu_SharingNotifyFolder();
 
         String year = new Integer(Calendar.getInstance().get(Calendar.YEAR)).toString();
@@ -263,7 +283,7 @@ public class UserEnvironmentTool {
         return dayMapId;
     }
 
-    public String getEdu_SharingValuespaceFolder() throws Throwable {
+    public String getEdu_SharingValuespaceFolder() throws Exception {
         String systemFolderId = getEdu_SharingSystemFolderBase();
         Map<String, Object> edu_SharingSystemFolderValuespace = mcBaseClient.getChild(systemFolderId, CCConstants.CCM_TYPE_MAP, CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_VALUESPACE);
         String result = null;
@@ -289,12 +309,13 @@ public class UserEnvironmentTool {
 
     /**
      * returns the child map with name. when it does not exist it will be created
+     *
      * @param parentId
      * @param name
      * @return
      * @throws Throwable
      */
-    private String getMap(String parentId, String name, String mapType) throws Throwable {
+    private String getMap(String parentId, String name, String mapType) throws Exception {
         NodeRef child = nodeService.getChild(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME, name);
         if (child == null) {
             Map<String, Object> props = new HashMap<>();

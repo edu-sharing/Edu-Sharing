@@ -1,5 +1,6 @@
 package org.edu_sharing.repository.update;
 
+import jakarta.transaction.UserTransaction;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.acegisecurity.providers.dao.UsernameNotFoundException;
 import org.alfresco.model.ContentModel;
@@ -9,13 +10,13 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.repository.server.tools.KeyTool;
 import org.edu_sharing.repository.server.update.UpdateRoutine;
 import org.edu_sharing.repository.server.update.UpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import jakarta.transaction.UserTransaction;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +29,15 @@ public class FixMissingUserstoreNode {
     private final PersonService personService;
     private final NodeService nodeService;
     private final TransactionService transactionService;
+    private final GuestService guestService;
 
     @Autowired
-    public FixMissingUserstoreNode(@Qualifier("authenticationDao") MutableAuthenticationDao authenticationDao, PersonService personService, NodeService nodeService, TransactionService transactionService) {
+    public FixMissingUserstoreNode(@Qualifier("authenticationDao") MutableAuthenticationDao authenticationDao, PersonService personService, NodeService nodeService, TransactionService transactionService, GuestService guestService) {
         this.authenticationDao = authenticationDao;
         this.personService = personService;
         this.nodeService = nodeService;
         this.transactionService = transactionService;
+        this.guestService = guestService;
     }
 
 
@@ -61,7 +64,7 @@ public class FixMissingUserstoreNode {
 
             String userName = (String) nodeService.getProperty(childref.getChildRef(), ContentModel.PROP_USERNAME);
 
-            if ("guest".equals(userName)) {
+            if (guestService.isGuestUser(userName)) {
                 log.info("ignoring guest");
                 continue;
             }

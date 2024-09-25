@@ -18,16 +18,21 @@ public class I18nAngular {
     public static final String GENDER_SEPARATOR = "*";
     public static Logger logger=Logger.getLogger(I18nAngular.class);
     public static String getTranslationAngular(String scope,String key){
-        return getTranslationAngular(scope,key,new AuthenticationToolAPI().getCurrentLanguage());
+        return getTranslationAngular(scope,key,new AuthenticationToolAPI().getCurrentAngularLanguage());
     }
 
     public static JSONObject getLanguageStrings() throws Exception{
-        String language=new AuthenticationToolAPI().getCurrentLanguage();
+        String language=new AuthenticationToolAPI().getCurrentAngularLanguage();
         ServletContext context = Context.getCurrentInstance().getRequest().getSession().getServletContext();
         File[] dirs = new File(context.getRealPath("/assets/i18n/")).listFiles(File::isDirectory);
         JSONObject result=new JSONObject();
         for(File dir : dirs) {
             File i18n = new File(dir, language + ".json");
+            // fallback to the base language
+            if(language.startsWith("de-") && !i18n.exists()) {
+                // ignore missing files
+                continue;
+            }
             String json = FileUtils.readFileToString(i18n,"UTF-8");
             JSONObject jsonObject = new JSONObject(json);
             try {
@@ -58,14 +63,23 @@ public class I18nAngular {
                 logger.debug("Trying to fetch angular translation before context initalization");
                 return key;
             }
-            String json=FileUtils.readFileToString(new File(servletContext.getRealPath("/assets/i18n/"+scope+"/"+language+".json")),"UTF-8");
+            File i18nFile = new File(servletContext.getRealPath("/assets/i18n/"+scope+"/"+language+".json"));
+            // fallback to the base language
+            if(language.startsWith("de-") && !i18nFile.exists()) {
+                return getTranslationAngular(scope, key, "de");
+            }
+            String json=FileUtils.readFileToString(i18nFile,"UTF-8");
             JSONObject object=new JSONObject(json);
             String[] list=key.split("\\.");
             for(int i=0;i<list.length-1;i++){
                 object=object.getJSONObject(list[i]);
             }
-            return replaceGenderSeperator(object.getString(list[list.length-1]));
+            String result = object.getString(list[list.length-1]);
+            return replaceGenderSeperator(result);
         } catch (Exception e) {
+            if(language.startsWith("de-")) {
+                return getTranslationAngular(scope, key, "de");
+            }
             logger.info("No translation in Angular found for " + scope + " " + key + " " + language);
             return key;
         }

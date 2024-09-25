@@ -90,9 +90,11 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1160,6 +1162,14 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
     }
 
 
+    protected PostMethod createNewPostMethod(String url)
+    {
+        PostMethod postMethod = new PostMethod(url);
+        if(Context.getCurrentInstance() != null && Context.getCurrentInstance().getB3() != null) {
+            Context.getCurrentInstance().getB3().addToRequest(postMethod);
+        }
+        return postMethod;
+    }
 
     private StringBuffer buildSortParameters(BasicSearchParameters searchParameters, URLCodec encoder)
             throws UnsupportedEncodingException
@@ -1243,7 +1253,6 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
             Pair<HttpClient, String> httpClientAndBaseUrl = mapping.getHttpClientAndBaseUrl();
             HttpClient httpClient = httpClientAndBaseUrl.getFirst();
 
-
             for (String key : params.keySet())
             {
                 String value = params.get(key);
@@ -1279,6 +1288,9 @@ public class SolrQueryHTTPClient extends AbstractSolrQueryHTTPClient implements 
 
             // PostMethod post = new PostMethod(url.toString());
             GetMethod get = new GetMethod(url.toString());
+            if(Context.getCurrentInstance() != null && Context.getCurrentInstance().getB3() != null) {
+                Context.getCurrentInstance().getB3().addToRequest(get);
+            }
 
             try
             {

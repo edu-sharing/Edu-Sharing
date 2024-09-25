@@ -82,3 +82,4 @@ export * from './lib/util/rest-helper';
 export * from './lib/util/ui-animation';
 export * from './lib/util/ui-constants';
 export * from './lib/mds/mds-helper.service';
+export * from './lib/services/search-helper.service';

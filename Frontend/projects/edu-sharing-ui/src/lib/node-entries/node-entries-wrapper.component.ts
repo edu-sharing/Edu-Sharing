@@ -43,7 +43,7 @@ import { OptionItem, Scope } from '../types/option-item';
 import { NodeHelperService } from '../services/node-helper.service';
 import { ListItem } from '../types/list-item';
 import { TemporaryStorageService } from '../services/temporary-storage.service';
-import { CollectionReference, Node, User } from 'ngx-edu-sharing-api';
+import { CollectionReference, GenericAuthority, Node, User } from 'ngx-edu-sharing-api';
 import { VirtualNode } from '../types/api-models';
 import { OptionsHelperDataService } from '../services/options-helper-data.service';
 import { UIService } from '../services/ui.service';
@@ -271,14 +271,22 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
             return;
         }
         this.dataSource.getData().forEach((d) => {
-            let hits = (nodes as T[]).filter((n) => (n as Node).ref.id === (d as Node).ref.id);
+            let hits = (nodes as T[]).filter((n) =>
+                (n as Node)?.ref
+                    ? (n as Node)?.ref.id === (d as Node)?.ref.id
+                    : (n as GenericAuthority)?.authorityName ===
+                      (d as GenericAuthority)?.authorityName,
+            );
             if (hits.length === 0) {
                 // handle if the original has changed (for collection refs)
                 hits = (nodes as T[]).filter(
-                    (n) => (n as Node).ref.id === (d as unknown as CollectionReference).originalId,
+                    (n) =>
+                        (n as Node)?.ref &&
+                        (n as Node)?.ref?.id === (d as unknown as CollectionReference)?.originalId,
                 );
             }
             if (hits.length === 1) {
+                console.log('copy', d, hits);
                 this.nodeHelperService.copyDataToNode(d as Node, hits[0] as Node);
             }
         });

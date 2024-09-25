@@ -89,6 +89,7 @@
     "STATUS_LAST_CHANGE": "Letzte Änderung des Status",
     "NEW_PASSWORD": "Neues Passwort",
     "ERROR_PASSWORD_TO_WEAK": "Das gewählte Passwort ist nicht sicher genug",
+    "ERROR_PASSWORD_POLICY_NOT_MATCHED": "Das gewählte Passwort erfüllt nicht die gesetzte Passwort-Richtlinie (Details: {{cause}})",
     "TOAST_PASSWORD_RESET": "Passwort wurde zurückgesetzt",
     "GROUP_TYPE": {
       "null": "Kein / Normale Gruppe",

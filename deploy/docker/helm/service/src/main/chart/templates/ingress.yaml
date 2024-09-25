@@ -1,4 +1,5 @@
 {{- if not .Values.global.cluster.istio.enabled }}
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -58,4 +59,5 @@ spec:
               number: {{ $.Values.service.port.api.external }}
       {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}

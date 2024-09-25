@@ -38,11 +38,12 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -79,24 +80,25 @@ public class RemoveUsersNodes extends HttpServlet{
 				out.println(username+" is not an admin");
 				return;
 			}
-			
-			String guestUserName = ApplicationInfoList.getHomeRepository().getGuest_username();
-			if(guestUserName == null || guestUserName.trim().equals("")){
-				logger.error("No Username for guest found in homeapplication");
-				out.println("No Username found in guest.properties.xml");
-				return;
-			}
-			String searchString = "@cm\\:creator:"+guestUserName;
-			SearchService searchService = serviceRegistry.getSearchService();
-			NodeService nodeService = serviceRegistry.getNodeService();
-			ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, searchString);
-			for(NodeRef nodeRef : resultSet.getNodeRefs()){
-				if(nodeService.exists(nodeRef)){
-					String nodeType = nodeService.getType(nodeRef).toString();
-					logger.info("removing Object "+nodeRef.getId()+" Type:"+nodeType);
-					nodeService.deleteNode(nodeRef);
+
+			GuestService guestService = applicationContext.getBean(GuestService.class);
+			guestService.getAllGuestAuthorities().forEach(guestUserName -> {
+				if (StringUtils.isBlank(guestUserName)) {
+					return;
 				}
-			}
+
+				String searchString = "@cm\\:creator:" + guestUserName;
+				SearchService searchService = serviceRegistry.getSearchService();
+				NodeService nodeService = serviceRegistry.getNodeService();
+				ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, searchString);
+				for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+					if (nodeService.exists(nodeRef)) {
+						String nodeType = nodeService.getType(nodeRef).toString();
+						logger.info("removing Object " + nodeRef.getId() + " Type:" + nodeType);
+						nodeService.deleteNode(nodeRef);
+					}
+				}
+			});
 			
 		}catch(AuthenticationException e){
 			e.printStackTrace();

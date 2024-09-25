@@ -1,10 +1,6 @@
 package org.edu_sharing.repository.update;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -22,25 +18,30 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.jobs.helper.NodeRunner;
 import org.edu_sharing.repository.server.tools.UserEnvironmentTool;
-
-
-import com.google.gson.Gson;
 import org.edu_sharing.repository.server.update.UpdateRoutine;
 import org.edu_sharing.repository.server.update.UpdateService;
+import org.edu_sharing.service.permission.PermissionService;
 import org.edu_sharing.service.permission.PermissionServiceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @UpdateService
 public class Release_5_0_NotifyRefactoring {
 
 	private final NodeService nodeService;
+	private final PermissionService permissionService;
 	private final MCAlfrescoAPIClient apiClient=new MCAlfrescoAPIClient();
 
 	@Autowired
-	public Release_5_0_NotifyRefactoring(NodeService nodeService) {
+	public Release_5_0_NotifyRefactoring(NodeService nodeService, PermissionService permissionService) {
 		this.nodeService = nodeService;
-	}
+        this.permissionService = permissionService;
+    }
 
 	@UpdateRoutine(
 			id = "Release_5_0_NotifyRefactoring",
@@ -135,7 +136,7 @@ public class Release_5_0_NotifyRefactoring {
 			 */
 			ACL acl = null;
 			try {
-				acl = apiClient.getPermissions(entry.getKey().getId());
+				acl = permissionService.getPermissions(entry.getKey().getId());
 			} catch (Exception e) {
 				log.warn("getPermissions() failed: "+e.getMessage());
 				throw new RuntimeException(e);

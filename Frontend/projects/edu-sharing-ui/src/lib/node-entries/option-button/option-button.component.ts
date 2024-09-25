@@ -14,7 +14,7 @@ import { OptionItem } from '../../types/option-item';
             color="primary"
             matTooltip="{{ option.name | translate }}"
             [class.display-none]="!isShown"
-            [disabled]="!optionIsValid(option, node)"
+            [disabled]="!isEnabled"
             (click)="click(option, node)"
             attr.data-test="option-button-{{ option.name }}"
         >
@@ -27,13 +27,15 @@ export class OptionButtonComponent implements OnChanges {
     @Input() node: Node;
 
     isShown = false;
+    isEnabled = false;
     async ngOnChanges(changes: SimpleChanges) {
+        this.isEnabled = await this.optionIsValid(this.option, this.node);
         this.isShown = await this.optionIsShown(this.option, this.node);
     }
 
-    optionIsValid(optionItem: OptionItem, node: Node): boolean {
+    async optionIsValid(optionItem: OptionItem, node: Node): Promise<boolean> {
         if (optionItem.enabledCallback) {
-            return optionItem.enabledCallback(node);
+            return await optionItem.enabledCallback(node);
         }
         return optionItem.isEnabled;
     }

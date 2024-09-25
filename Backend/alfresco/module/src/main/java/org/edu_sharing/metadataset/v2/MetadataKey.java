@@ -44,7 +44,12 @@ public class MetadataKey extends MetadataTranslatable {
     @JacksonXmlProperty(isAttribute = true)
     private String description;
     @JacksonXmlProperty(isAttribute = true)
+    private String abbreviation;
+    @JacksonXmlProperty(isAttribute = true)
     private String parent;
+
+    // Hint if the given key shall be removed. Use in conjunction with @MetadataWidget.ValuespaceMerge
+    private  Boolean delete =false;
     @JacksonXmlProperty(isAttribute = true)
     private String locale;
     /**
@@ -66,4 +71,6 @@ public class MetadataKey extends MetadataTranslatable {
     public void addRelated(MetadataKeyRelated related) {
         this.related.add(related);
     }
+
+
 }

@@ -21,11 +21,12 @@ class ConfigStub {
     }
     observeDefaultTranslations(lang: string): Observable<{
         locale: Locale;
+        language: string;
         dict: Observable<TranslationsDict>;
     }> {
         return rxjs.of(null);
     }
-    setLocale(lang: string): void {}
+    setLocale(locale: Locale, language: string): void {}
 }
 
 describe('TranslationLoader', () => {
@@ -103,7 +104,7 @@ describe('TranslationLoader', () => {
             it('should call setLocale with correct locale', async () => {
                 const setLocaleSpy = spyOn(config, 'setLocale').and.callThrough();
                 await callGetTranslation('de');
-                expect(setLocaleSpy.calls.mostRecent().args).toEqual(['de_DE']);
+                expect(setLocaleSpy.calls.mostRecent().args).toEqual(['de_DE', 'de']);
             });
 
             it('should not call observeDefaultTranslations', async () => {
@@ -299,12 +300,16 @@ describe('TranslationLoader', () => {
             it('should call setLocale with correct locale', async () => {
                 const setLocaleSpy = spyOn(config, 'setLocale').and.callThrough();
                 await callGetTranslation('de');
-                expect(setLocaleSpy.calls.mostRecent().args).toEqual(['de_DE']);
+                expect(setLocaleSpy.calls.mostRecent().args).toEqual(['de_DE', 'de']);
             });
 
             it('should include translations via observeDefaultTranslations', async () => {
-                config.observeDefaultTranslations = (lang) =>
-                    rxjs.of({ locale: LANGUAGES['de'], dict: rxjs.of({ foo: 'bar' }) });
+                config.observeDefaultTranslations = (language) =>
+                    rxjs.of({
+                        locale: LANGUAGES[language],
+                        language,
+                        dict: rxjs.of({ foo: 'bar' }),
+                    });
                 const result = await callGetTranslation('de');
                 expect(result).toEqual({ foo: 'bar' });
             });
@@ -318,8 +323,12 @@ describe('TranslationLoader', () => {
             });
 
             it('should merge translations via observeTranslationOverrides', async () => {
-                config.observeDefaultTranslations = (lang) =>
-                    rxjs.of({ locale: LANGUAGES['de'], dict: rxjs.of({ foo: 'bar' }) });
+                config.observeDefaultTranslations = (language) =>
+                    rxjs.of({
+                        locale: LANGUAGES[language],
+                        language,
+                        dict: rxjs.of({ foo: 'bar' }),
+                    });
                 config.observeTranslationOverrides = (lang) => {
                     return rxjs.of({ bar: 'baz' });
                 };
@@ -328,8 +337,12 @@ describe('TranslationLoader', () => {
             });
 
             it('should override nested translations via observeTranslationOverrides', async () => {
-                config.observeDefaultTranslations = (lang) =>
-                    rxjs.of({ locale: LANGUAGES['de'], dict: rxjs.of({ prefix: { foo: 'bar' } }) });
+                config.observeDefaultTranslations = (language) =>
+                    rxjs.of({
+                        locale: LANGUAGES[language],
+                        language,
+                        dict: rxjs.of({ prefix: { foo: 'bar' } }),
+                    });
                 config.observeTranslationOverrides = (lang) => {
                     return rxjs.of({ prefix: { bar: 'baz' } });
                 };
@@ -338,8 +351,12 @@ describe('TranslationLoader', () => {
             });
 
             it('should deep-merge translations via observeTranslationOverrides', async () => {
-                config.observeDefaultTranslations = (lang) =>
-                    rxjs.of({ locale: LANGUAGES['de'], dict: rxjs.of({ prefix: { foo: 'bar' } }) });
+                config.observeDefaultTranslations = (language) =>
+                    rxjs.of({
+                        locale: LANGUAGES[language],
+                        language,
+                        dict: rxjs.of({ prefix: { foo: 'bar' } }),
+                    });
                 config.observeTranslationOverrides = (lang) => rxjs.of({ 'prefix.bar': 'baz' });
                 const result = await callGetTranslation('de');
                 expect(result).toEqual({ prefix: { foo: 'bar', bar: 'baz' } });

@@ -32,6 +32,7 @@ public class JobLogger extends AbstractAppender {
 
     static {
         IGNORABLE_JOBS.add(SystemStatisticJob.class.getName());
+        IGNORABLE_JOBS.add(TimedPermissionJob.class.getName());
         IGNORABLE_JOBS.add("org.edu_sharing.repository.server.jobs.quartz.ClusterInfoJob");
     }
 

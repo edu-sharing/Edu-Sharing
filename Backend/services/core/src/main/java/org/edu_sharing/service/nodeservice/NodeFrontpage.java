@@ -6,7 +6,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.json.JsonData;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.apache.commons.io.IOUtils;
@@ -17,6 +16,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.admin.RepositoryConfigFactory;
 import org.edu_sharing.service.admin.model.RepositoryConfig;
+import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.collection.CollectionServiceFactory;
 import org.edu_sharing.service.model.NodeRef;
 import org.edu_sharing.service.model.NodeRefImpl;
@@ -67,17 +67,7 @@ public class NodeFrontpage {
             sortDefinition.addSortDefinitionEntry(
                     new SortDefinition.SortDefinitionEntry(CCConstants.getValidLocalName(CCConstants.CCM_PROP_COLLECTION_ORDERED_POSITION),true),0);
 
-            Collection<org.alfresco.service.cmr.repository.NodeRef> alfNodeRef = CollectionServiceFactory.getLocalService().getChildren(config.collection, null,sortDefinition, Collections.singletonList("files"));
-            Collection<NodeRef> result = new ArrayList<>();
-            alfNodeRef.stream().forEach((n)->{
-                NodeRef nodeRef = new NodeRefImpl();
-                nodeRef.setNodeId(n.getId());
-                nodeRef.setStoreId(n.getStoreRef().getIdentifier());
-                nodeRef.setStoreProtocol(n.getStoreRef().getProtocol());
-                result.add(nodeRef);
-            });
-
-            return result;
+            return CollectionServiceFactory.getLocalService().getChildren(config.collection, null,sortDefinition, Collections.singletonList("files"));
         }
 
         BoolQuery.Builder query = new BoolQuery.Builder()
@@ -136,8 +126,9 @@ public class NodeFrontpage {
         List<NodeRef> result=new ArrayList<>();
         Set<String> authorities = searchServiceElastic.getUserAuthorities();
         String user = AuthenticationUtil.getFullyAuthenticatedUser();
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
         for(Hit<Map> hit : searchResult.hits().hits()){
-            result.add(searchServiceElastic.transformSearchHit(authorities, user,hit.source(),false));
+            result.add(searchServiceElastic.transformSearchHit(isAdmin, authorities, user,hit.source(),false));
         }
         result = result.subList(0, result.size() > config.totalCount ? config.totalCount : result.size());
         if(config.displayCount<config.totalCount) {

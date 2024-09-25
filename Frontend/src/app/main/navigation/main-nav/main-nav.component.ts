@@ -552,7 +552,7 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
             return [];
         }
         const versionParts = this.about.version.repository.split('.');
-        const version = versionParts[0] + versionParts[1];
+        const version = versionParts[0] + '.' + versionParts[1];
         const group = new OptionGroup('help', 10);
         return this.config.helpMenuOptions.map(
             (entry: { key: string; icon: string; url: string }) => {

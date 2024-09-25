@@ -72,7 +72,7 @@ export class NodeEntriesCardComponent<T extends Node> implements OnChanges, OnIn
         // return options.filter((o) => o.showAsAction && o.showCallback(this.node)).slice(0, 3);
     }
 
-    openContextmenu(event: MouseEvent | Event) {
+    openContextmenu(event: MouseEvent | Event, node: T) {
         event.stopPropagation();
         event.preventDefault();
         if (!this.dropdown) {
@@ -93,6 +93,8 @@ export class NodeEntriesCardComponent<T extends Node> implements OnChanges, OnIn
         }
         // Wait for the menu to reflect changed options.
         setTimeout(() => {
+            this.dropdown.callbackObject = node;
+            this.dropdown.ngOnChanges();
             if (this.dropdown.canShowDropdown()) {
                 this.menuTrigger.openMenu();
             } else {

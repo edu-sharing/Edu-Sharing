@@ -43,6 +43,7 @@ import { SessionStorageService } from '../core-module/rest/services/session-stor
 import { map } from 'rxjs/operators';
 import { RestNodeService } from '../core-module/rest/services/rest-node.service';
 import {
+    Ace,
     ApiHelpersService,
     ConfigService,
     HOME_REPOSITORY,
@@ -281,7 +282,7 @@ export class NodeHelperService extends NodeHelperServiceBase {
     /**
      * Add custom options to the node menu (loaded via config)
      */
-    public applyCustomNodeOptions(
+    public async applyCustomNodeOptions(
         custom: ConfigOptionItem[],
         allNodes: Node[],
         selectedNodes: Node[],
@@ -385,13 +386,13 @@ export class NodeHelperService extends NodeHelperServiceBase {
                 item.showAsAction = c.showAsAction;
                 item.isSeparate = c.isSeparate;
                 if (c.changeStrategy !== 'update') {
-                    item.customEnabledCallback = (nodes) => {
+                    item.customEnabledCallback = async (nodes) => {
                         if (c.permission) {
                             return this.getNodesRight(nodes, c.permission);
                         }
                         return true;
                     };
-                    item.isEnabled = item.customEnabledCallback(null);
+                    item.isEnabled = await item.customEnabledCallback(null);
                     item.customShowCallback = async (nodes) => {
                         if (c.mode == 'nodes' && !nodes?.length) return false;
                         if (c.mode == 'noNodes' && nodes && nodes.length) return false;
@@ -597,7 +598,7 @@ export class NodeHelperService extends NodeHelperServiceBase {
      * @param {Permissions} permissions
      * @returns {boolean}
      */
-    getHandleStates(node: Node, permissions: Permission[]) {
+    getHandleStates(node: Node, permissions: Ace[]) {
         const states: HandleState = {};
         if (
             node.aspects.indexOf(RestConstants.CCM_ASPECT_PUBLISHED) != -1 &&

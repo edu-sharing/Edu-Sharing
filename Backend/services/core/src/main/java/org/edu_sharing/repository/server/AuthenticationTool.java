@@ -32,7 +32,10 @@ import java.util.Map;
 import jakarta.servlet.http.HttpSession;
 
 public interface AuthenticationTool {
-	 Map<String, String> createNewSession(String userName, String password) throws Exception;
+	Map<String, String> createNewSession(String userName, String password) throws Exception;
+	default Map<String, String> createNewSession(String userName) throws Exception {
+		return createNewSession(userName, null);
+	}
 
 	/**
 	 * username and ticket are stored in a ThreadLocal variable in Both implementations API and WS Client

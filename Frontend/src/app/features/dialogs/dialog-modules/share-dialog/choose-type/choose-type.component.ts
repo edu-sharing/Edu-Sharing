@@ -18,6 +18,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FocusableOptionDirective } from './focusable-option.directive';
 
+export type TypeResult = {
+    permissions: string[];
+    wasMain: boolean;
+};
 @Component({
     selector: 'es-share-dialog-choose-type',
     templateUrl: 'choose-type.component.html',
@@ -37,7 +41,7 @@ export class ShareDialogChooseTypeComponent implements AfterViewInit, OnDestroy 
     @Input('aria-label') ariaLabel: string;
 
     @Output() onCancel = new EventEmitter();
-    @Output() onType = new EventEmitter();
+    @Output() onType = new EventEmitter<TypeResult>();
 
     readonly _options = [
         {

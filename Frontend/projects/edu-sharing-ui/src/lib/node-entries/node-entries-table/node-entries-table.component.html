@@ -41,7 +41,7 @@
       <mat-checkbox
         [checked]="entriesService.selection.isSelected(node)"
         (change)="entriesService.onCheckboxChanged(node, $event.checked)"
-        aria-label="{{ 'SELECT' | translate: { element: (node | nodeTitle) } }}"
+        aria-label="{{ 'SELECT' | translate : { element: (node | nodeTitle) } }}"
         color="primary"
       ></mat-checkbox>
     </mat-cell>
@@ -157,10 +157,6 @@
             attribute: column,
           })
         "
-        esCheckTextOverflow
-        #text="esCheckTextOverflow"
-        [matTooltip]="text.hasTextOverflow() ? cell.innerText : null"
-        matTooltipTouchGestures="off"
       ></es-list-base>
       <ng-container *ngIf="first">
         <div class="childobjects" *ngIf="node.properties?.['virtual:childobjectcount'] > 0">
@@ -168,7 +164,7 @@
             class="childobject-count"
             matTooltip="{{
               'CHILDOBJECT_COUNT'
-                | translate: { count: node.properties['virtual:childobjectcount'] * 1 + 1 }
+                | translate : { count: node.properties['virtual:childobjectcount'] * 1 + 1 }
             }}"
           >
             <span>{{ node.properties['virtual:childobjectcount'] * 1 + 1 }}</span

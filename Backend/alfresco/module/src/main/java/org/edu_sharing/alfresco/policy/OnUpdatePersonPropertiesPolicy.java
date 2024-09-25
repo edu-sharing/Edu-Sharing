@@ -38,6 +38,8 @@ public class OnUpdatePersonPropertiesPolicy implements OnCreateNodePolicy, OnUpd
 	Logger logger = Logger.getLogger(OnUpdatePersonPropertiesPolicy.class);
 	private UserCache userCache;
 
+	public static ThreadLocal<Boolean> constructPersonFolders = new ThreadLocal<>();
+
 	public void init(){
 		policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onCreateNode"));
 		policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateNode"));
@@ -99,6 +101,14 @@ public class OnUpdatePersonPropertiesPolicy implements OnCreateNodePolicy, OnUpd
 			logger.debug("will do nothing cause homeFolder is not present in after update props");
 			return;
 		}
+
+		//create esuid that will be used for user creation in remote repositories
+		createESUIDIfNotExists(nodeService, nodeRef);
+
+		if(constructPersonFolders.get() != null && constructPersonFolders.get() == false){
+			logger.debug("thread local constructPersonFolders is false. will skip constructPersonFolders.");
+			return;
+		}
 		
 		logger.debug("will create edu folders in userhome");
 		new HomeFolderTool(serviceRegistry).constructPersonFolders(nodeRef);
@@ -106,10 +116,6 @@ public class OnUpdatePersonPropertiesPolicy implements OnCreateNodePolicy, OnUpd
 		if(HttpContext.getCurrentMetadataSet() != null) {
 			nodeService.setProperty(homeFolderNodeRef, QName.createQName(CCConstants.CM_PROP_METADATASET_EDU_METADATASET), HttpContext.getCurrentMetadataSet());
 		}
-		//create esuid that will be used for user creation in remote repositories
-
-		createESUIDIfNotExists(nodeService, nodeRef);
-
 	}
 
 	public static boolean createESUIDIfNotExists(NodeService nodeService, NodeRef nodeRef) {

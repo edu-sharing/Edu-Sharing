@@ -43,6 +43,7 @@ export class ToolpermissionManagerComponent {
                 RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH,
                 RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_SHARE,
                 RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_FUZZY,
+                RestConstants.TOOLPERMISSION_INVITE_TIMEBASED,
                 RestConstants.TOOLPERMISSION_INVITE_HISTORY,
             ],
         },

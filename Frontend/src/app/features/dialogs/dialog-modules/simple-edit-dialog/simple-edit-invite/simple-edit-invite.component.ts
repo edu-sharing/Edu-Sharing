@@ -1,17 +1,15 @@
 import { trigger } from '@angular/animations';
 import { ApplicationRef, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatButtonToggleGroup } from '@angular/material/button-toggle';
-import { AuthenticationService } from 'ngx-edu-sharing-api';
+import { Ace, Acl, AuthenticationService, NodeService } from 'ngx-edu-sharing-api';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
-import { Observable, forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import {
     AuthorityProfile,
     ConfigurationService,
     Group,
     Node,
     Organization,
-    Permission,
-    Permissions,
     RestConnectorService,
     RestConstants,
     RestHelper,
@@ -45,8 +43,8 @@ export class SimpleEditInviteComponent {
     _nodes: Node[];
     multipleParents: boolean;
     dirty = false;
-    parentPermissions: Permission[];
-    parentAuthorities: Permission[] = [];
+    parentPermissions: Ace[];
+    parentAuthorities: Ace[] = [];
     organizations: Org[];
     /**
      * When true, we know that we only handling with simple permissions
@@ -55,10 +53,10 @@ export class SimpleEditInviteComponent {
     stablePermissionState = false;
     organizationGroups: string[];
     globalGroups: Group[] | any = [];
-    private nodesPermissions: Permissions[];
+    private nodesPermissions: Acl[];
     private initialState: string;
     recentAuthorities: AuthorityProfile[];
-    private currentPermissions: Permission[];
+    private currentPermissions: Ace[];
     tpInvite: boolean;
     tpInviteEveryone: boolean;
     missingNodePermissions: boolean;
@@ -75,6 +73,7 @@ export class SimpleEditInviteComponent {
 
     constructor(
         private nodeApi: RestNodeService,
+        private nodeService: NodeService,
         private connector: RestConnectorService,
         private applicationRef: ApplicationRef,
         private configService: ConfigurationService,
@@ -122,15 +121,17 @@ export class SimpleEditInviteComponent {
                 return;
             }
             const authority = this.getSelectedAuthority();
-            let addPermission: Permission = null;
+            let addPermission: Ace = null;
             const publish = authority === RestConstants.AUTHORITY_EVERYONE;
             if (authority != null) {
-                addPermission = new Permission();
-                addPermission.authority = {
-                    authorityName: authority,
-                    authorityType: authority.startsWith(RestConstants.GROUP_PREFIX)
-                        ? RestConstants.AUTHORITY_TYPE_GROUP
-                        : RestConstants.AUTHORITY_TYPE_USER,
+                addPermission = {
+                    authority: {
+                        authorityName: authority,
+                        authorityType: authority.startsWith(RestConstants.GROUP_PREFIX)
+                            ? RestConstants.AUTHORITY_TYPE_GROUP
+                            : (RestConstants.AUTHORITY_TYPE_USER as any),
+                    },
+                    permissions: [RestConstants.PERMISSION_CONSUMER],
                 };
                 // if EVERYONE, we do a "publishing"
                 if (publish) {
@@ -138,26 +139,23 @@ export class SimpleEditInviteComponent {
                         RestConstants.PERMISSION_CONSUMER,
                         RestConstants.ACCESS_CC_PUBLISH,
                     ];
-                } else {
-                    addPermission.permissions = [RestConstants.PERMISSION_CONSUMER];
                 }
             }
             forkJoin(
                 this._nodes.map((n, i) => {
-                    let permissions = this.nodesPermissions[i].localPermissions;
+                    let permissions = this.nodesPermissions[i].permissions;
                     // if currentPermissions available (single node mode), we will check the state and override if possible
                     if (this.currentPermissions && this.currentPermissions.length) {
-                        permissions.permissions = [];
+                        permissions = [];
                     }
                     if (addPermission) {
                         if (this.stablePermissionState) {
-                            permissions.permissions = [addPermission];
+                            permissions = [addPermission];
                         } else {
-                            permissions.permissions =
-                                UIHelper.mergePermissionsWithHighestPermission(
-                                    permissions.permissions,
-                                    [addPermission],
-                                );
+                            permissions = UIHelper.mergePermissionsWithHighestPermission(
+                                permissions,
+                                [addPermission],
+                            );
                         }
                     }
                     if (this.currentPermissions && this.currentPermissions.length) {
@@ -168,16 +166,18 @@ export class SimpleEditInviteComponent {
                                     p.authority.authorityName,
                                 ) === -1,
                         );
-                        permissions.permissions = UIHelper.mergePermissionsWithHighestPermission(
-                            permissions.permissions,
+                        permissions = UIHelper.mergePermissionsWithHighestPermission(
+                            permissions,
                             this.currentPermissions,
                         );
                     }
-                    permissions = RestHelper.copyAndCleanPermissions(
-                        permissions.permissions,
-                        this.nodesPermissions[i].localPermissions.inherited,
+                    const finalPermissions = RestHelper.copyAndCleanPermissions(
+                        permissions,
+                        this.nodesPermissions[i].inherited,
                     );
-                    return this.nodeApi.setNodePermissions(n.ref.id, permissions, false);
+                    return this.nodeService.setPermissions(n.ref.id, finalPermissions, {
+                        sendMail: false,
+                    });
                 }),
             ).subscribe(
                 () => {
@@ -227,10 +227,10 @@ export class SimpleEditInviteComponent {
             this.setInitialState();
             return;
         }
-        this.nodeApi.getNodePermissions(parents[0]).subscribe(
+        this.nodeService.getPermissions(parents[0]).subscribe(
             (parent) => {
-                this.parentPermissions = parent.permissions.localPermissions.permissions.concat(
-                    parent.permissions.inheritedPermissions,
+                this.parentPermissions = parent.localPermissions.permissions.concat(
+                    parent.inheritedPermissions,
                 );
                 // filter and distinct them first
                 const authorities = Array.from(
@@ -257,10 +257,10 @@ export class SimpleEditInviteComponent {
                 }
             },
         );
-        forkJoin(this._nodes.map((n) => this.nodeApi.getNodePermissions(n.ref.id))).subscribe(
+        forkJoin(this._nodes.map((n) => this.nodeService.getPermissions(n.ref.id))).subscribe(
             (permissions) => {
-                this.nodesPermissions = permissions.map((p) => p.permissions);
-                this.inherited = permissions.some((p) => p.permissions.localPermissions.inherited);
+                this.nodesPermissions = permissions.map((p) => p.localPermissions);
+                this.inherited = permissions.some((p) => p.localPermissions.inherited);
                 // The amount of orgs is still limited to the maximum amount returned by default!
                 this.organizationApi.getOrganizations('', true).subscribe((orgs) => {
                     const filter = this.configService.instant('simpleEdit.organizationFilter');
@@ -373,7 +373,7 @@ export class SimpleEditInviteComponent {
         let invalid = false;
         let activeToggle: string;
         for (const perm of this.nodesPermissions) {
-            const list = perm.localPermissions.permissions;
+            const list = perm.permissions;
             // filter((p) => p.authority.authorityName !== this.connector.getCurrentLogin().authorityName);
             if (this._nodes.length === 1) {
                 this.currentPermissions = list;
@@ -496,12 +496,10 @@ export class SimpleEditInviteComponent {
             );
             console.log(this.currentPermissions);
         } else {
-            const permission = new Permission();
-            permission.authority = {
-                authorityName: authority.authorityName,
-                authorityType: authority.authorityType,
-            };
-            permission.permissions = [RestConstants.PERMISSION_CONSUMER];
+            const permission = {
+                authority,
+                permissions: [RestConstants.PERMISSION_CONSUMER],
+            } as Ace;
             this.currentPermissions.push(permission);
         }
     }

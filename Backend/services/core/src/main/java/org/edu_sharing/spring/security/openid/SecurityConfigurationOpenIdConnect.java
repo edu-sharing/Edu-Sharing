@@ -12,6 +12,7 @@ import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.edu_sharing.spring.security.basic.EduAuthSuccsessHandler;
 import org.edu_sharing.spring.security.basic.EduWebSecurityCustomizer;
+import org.edu_sharing.spring.security.basic.HeadersConfig;
 import org.edu_sharing.spring.security.openid.config.OpenIdConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -98,6 +99,7 @@ public class SecurityConfigurationOpenIdConnect {
                 ).headers(h -> h.frameOptions(f -> f.disable()));
 
         CSRFConfig.config(http);
+        HeadersConfig.config(http);
 
         return http.build();
     }

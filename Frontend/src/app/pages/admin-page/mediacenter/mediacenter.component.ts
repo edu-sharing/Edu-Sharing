@@ -12,6 +12,7 @@ import {
     NodeEntriesWrapperComponent,
     OptionItem,
     Scope,
+    SearchHelperService,
     VCard,
 } from 'ngx-edu-sharing-ui';
 import {
@@ -135,6 +136,7 @@ export class AdminMediacenterComponent {
         private mediacenterService: MediacenterService,
         private mdsService: RestMdsService,
         private optionsHelperService: OptionsHelperService,
+        private searchHelperService: SearchHelperService,
         private translate: TranslateService,
         private connector: RestConnectorService,
         private ngZone: NgZone,
@@ -235,7 +237,7 @@ export class AdminMediacenterComponent {
             });
         }
         return criteria.concat(
-            RestSearchService.convertCritierias(
+            this.searchHelperService.convertCritieria(
                 await this.mediacenterMds.getValues(),
                 this.mediacenterMds.currentWidgets,
             ),

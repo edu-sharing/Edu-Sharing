@@ -70,8 +70,6 @@ public interface PermissionService {
 
     void removeAllPermissions(String nodeId) throws Exception;
 
-     void removePermissions(String nodeId, String authority, String[] _permissions) throws Exception;
-
     StringBuffer getFindGroupsSearchString(String searchWord, boolean globalContext, boolean skipTpCheck);
 
      Result<List<User>> findUsers(String query, Map<String, Double> searchFields, boolean globalContext, int from, int nrOfResults);

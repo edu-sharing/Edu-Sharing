@@ -29,6 +29,7 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
      *  the given count will be multiplied by this value since facets are filtered for the containing string afterwards and we need some overhead
      */
     public static final int FACET_LIMIT_MULTIPLIER = 5;
+    public static final String FACET_SELECTED_POSTFIX = "_selected";
     static Logger logger = Logger.getLogger(MetadataElasticSearchHelper.class);
     private static MetadataQueryPreprocessor preprocessor = new MetadataQueryPreprocessor(MetadataReader.QUERY_SYNTAX_DSL);
 
@@ -41,7 +42,7 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
 
         BoolQuery.Builder result = new BoolQuery.Builder();
         if(asFilter == null || (asFilter == query.getBasequeryAsFilter())) {
-            String baseQuery = replaceCommonQueryVariables(query.getBasequery().get(null));
+            String baseQuery = replaceCommonQueryVariables(query.getPrimaryBasequery());
             String baseQueryConditional = replaceCommonQueryVariables(query.findBasequery(parameters == null ? null : parameters.keySet()));
 
             if(Objects.equals(baseQuery,baseQueryConditional)) {
@@ -267,7 +268,7 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
         String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
         for (String facet : facets) {
 
-            Map<String, String[]> tmp = new HashMap<>(parameters);
+            Map<String, String[]> tmp = new HashMap<>(parameters == null ? Collections.emptyMap() : parameters);
             if (excludeOwn.stream().anyMatch(mdqp -> mdqp.getName().equals(facet))) {
                 tmp.remove(facet);
             }
@@ -376,10 +377,10 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
                 );
             }
 
-            if(parameters.get(facet) != null && parameters.get(facet).length > 0) {
+            if(parameters != null && parameters.get(facet) != null && parameters.get(facet).length > 0) {
                 List<MetadataQueryParameter.MetadataQueryFacet> facetDetails = query.findParameterByName(facet).getFacets();
                 result.put(
-                        facet + "_selected",
+                        facet + FACET_SELECTED_POSTFIX,
                         new Aggregation.Builder().filter(
                                 bqbQuery
                         ).aggregations(facet, agg->agg

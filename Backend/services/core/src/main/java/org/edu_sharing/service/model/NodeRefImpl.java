@@ -1,9 +1,6 @@
 package org.edu_sharing.service.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.restservices.shared.Contributor;
@@ -219,5 +216,18 @@ public class NodeRefImpl implements NodeRef {
 	@Override
 	public List<Contributor> getContributors() {
 		return contributors;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		NodeRefImpl nodeRef = (NodeRefImpl) o;
+		return Objects.equals(storeProtocol, nodeRef.storeProtocol) && Objects.equals(storeId, nodeRef.storeId) && Objects.equals(nodeId, nodeRef.nodeId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(storeProtocol, storeId, nodeId);
 	}
 }

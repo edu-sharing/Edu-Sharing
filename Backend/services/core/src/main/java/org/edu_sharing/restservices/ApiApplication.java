@@ -8,8 +8,10 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -76,7 +78,7 @@ public class ApiApplication extends ResourceConfig {
         this.packages("io.swagger.v3.jaxrs2.integration.resources");
         // required in order to catch invalid json data exception
         this.register(JacksonXmlBindJsonProvider.class);
-
+        this.register(JacksonFeature.withoutExceptionMappers());
         //final BeanConfig beanConfig = new BeanConfig();
 
         OpenAPI oas = new OpenAPI();

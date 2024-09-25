@@ -1,11 +1,14 @@
 import { trigger } from '@angular/animations';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { UIAnimation } from '../util/ui-animation';
 import { UIConstants } from '../util/ui-constants';
 import { OptionItem } from '../types/option-item';
 import { UIService } from '../services/ui.service';
 import { Helper } from '../util/helper';
+import { TooltipPosition } from '@angular/material/tooltip';
+import { OptionsHelperDataService } from '../services/options-helper-data.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'es-actionbar',
@@ -59,6 +62,12 @@ export class ActionbarComponent implements OnChanges {
      * Should disabled ("greyed out") options be shown or hidden?
      */
     @Input() showDisabled = true;
+
+    /**
+     * the position of the mat tooltips
+     */
+    @Input() tooltipPosition: TooltipPosition = 'below';
+
     /**
      * Set the options, see @OptionItem
      */
@@ -67,9 +76,13 @@ export class ActionbarComponent implements OnChanges {
         this.prepareOptions(options);
     }
 
+    /**
+     * breakpoint width at which point the mobile display count is used
+     */
+    @Input() mobileBreakpoint = UIConstants.MOBILE_WIDTH;
     optionsIn: OptionItem[] = [];
-    optionsAlways: OptionItem[] = [];
-    optionsMenu: OptionItem[] = [];
+    optionsAlways$ = new BehaviorSubject<OptionItem[]>([]);
+    optionsMenu$ = new BehaviorSubject<OptionItem[]>([]);
     optionsToggle: OptionItem[] = [];
 
     constructor(private uiService: UIService, private translate: TranslateService) {}
@@ -77,23 +90,32 @@ export class ActionbarComponent implements OnChanges {
     private prepareOptions(options: OptionItem[]) {
         options = this.uiService.filterValidOptions(Helper.deepCopyArray(options));
         if (options == null) {
-            this.optionsAlways = [];
-            this.optionsMenu = [];
+            this.optionsAlways$.next([]);
+            this.optionsMenu$.next([]);
             return;
         }
         this.optionsToggle = this.uiService.filterToggleOptions(options, true);
-        this.optionsAlways = this.getActionOptions(
-            this.uiService.filterToggleOptions(options, false),
-        ).slice(0, this.getNumberOptions());
-        if (!this.optionsAlways.length) {
-            this.optionsAlways = this.uiService
-                .filterToggleOptions(options, false)
-                .slice(0, this.getNumberOptions());
-        }
-        this.optionsMenu = this.hideActionOptions(
-            this.uiService.filterToggleOptions(options, false),
-            this.optionsAlways,
+        this.optionsAlways$.next(
+            this.getActionOptions(this.uiService.filterToggleOptions(options, false)).slice(
+                0,
+                this.getNumberOptions(),
+            ),
         );
+        if (!this.optionsAlways$.value.length) {
+            this.optionsAlways$.next(
+                this.uiService
+                    .filterToggleOptions(options, false)
+                    .slice(0, this.getNumberOptions()),
+            );
+        }
+        this.optionsMenu$.next(
+            this.hideActionOptions(
+                this.uiService.filterToggleOptions(options, false),
+                this.optionsAlways$.value,
+            ),
+        );
+        this.uiService.updateOptionEnabledState(this.optionsAlways$);
+        this.uiService.updateOptionEnabledState(this.optionsMenu$);
         // may causes weird looking
         /*if(this.optionsMenu.length<2) {
       this.optionsAlways = this.optionsAlways.concat(this.optionsMenu);
@@ -102,7 +124,7 @@ export class ActionbarComponent implements OnChanges {
     }
 
     public getNumberOptions() {
-        if (window.innerWidth < UIConstants.MOBILE_WIDTH) {
+        if (window.innerWidth < this.mobileBreakpoint) {
             return this.numberOfAlwaysVisibleOptionsMobile;
         }
         return this.numberOfAlwaysVisibleOptions;
@@ -151,10 +173,10 @@ export class ActionbarComponent implements OnChanges {
     }
 
     canShowDropdown() {
-        if (!this.optionsMenu.length) {
+        if (!this.optionsMenu$.value.length) {
             return false;
         }
-        return this.optionsMenu.filter((o) => o.isEnabled).length > 0;
+        return this.optionsMenu$.value.filter((o) => o.isEnabled).length > 0;
     }
 
     shouldHighlight(optionIndex: number, option: OptionItem): boolean {
@@ -162,7 +184,7 @@ export class ActionbarComponent implements OnChanges {
             case 'first':
                 return optionIndex === 0;
             case 'last':
-                return optionIndex === this.optionsAlways.length - 1;
+                return optionIndex === this.optionsAlways$.value.length - 1;
             case 'manual':
                 return option.isPrimary;
         }

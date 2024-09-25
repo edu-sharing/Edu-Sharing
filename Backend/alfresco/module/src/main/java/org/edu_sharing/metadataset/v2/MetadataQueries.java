@@ -24,8 +24,8 @@ public class MetadataQueries extends MetadataQueryBase implements Serializable {
 	public void overrideWith(MetadataQueries queries2) {
 		if(queries2==null)
 			return;
-		if(queries2.getBasequery()!=null)
-			setBasequery(queries2.getBasequery());
+		if(queries2.basequery!=null)
+			setBasequery(queries2.basequery);
 		for(MetadataQuery query: queries2.getQueries()){
 			if(queries!=null) {
 				int pos = queries.lastIndexOf(query);

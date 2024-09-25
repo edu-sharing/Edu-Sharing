@@ -1,3 +1,11 @@
 {
-  "Konto": "Nutzende Person"
+  "Konto": "Nutzende Person",
+  "ADMIN": {
+    "GLOBAL_CONFIG": {
+      "EXTENSION_CONFIG_TITLE": "Extension-Konfigurationsdatei (Kundinnen/Kunden und Projektspezifische Werte)"
+    },
+    "CONFIG": {
+      "TEST_MAIL_RECEIVER": "Empfängerin/Empfänger Test-E-Mail:"
+    }
+  }
 }

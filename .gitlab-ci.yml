@@ -19,7 +19,6 @@ default:
       command: [ "dockerd-entrypoint.sh" ]
 
 stages:
-  - lint
   - test
   - deploy
 
@@ -202,7 +201,7 @@ e2e:
       - $E2E_TEST == "true"
 
 check-helmreadme:
-  stage: lint
+  stage: test
   image: node:lts-alpine3.20
   before_script:
     - ln -s $CI_PROJECT_DIR/deploy/docker/helm/search-solr/src/main/chart /tmp/search-solr && cp /tmp/search-solr/README.md /tmp/README_search-solr.md

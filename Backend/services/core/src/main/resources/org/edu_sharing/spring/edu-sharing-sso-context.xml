@@ -39,6 +39,15 @@
 	        </map>
 	    </constructor-arg>
 	</bean>
+
+	<!-- list of attributes required for successfull logn -->
+	<!--<bean id="personDataRequired" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="email" value="([a-zA-Z0-9]*@test.de)" />
+			</map>
+		</constructor-arg>
+	</bean>-->
 	
 	<!-- Group Mapping-->
 	<bean id="groupIlmenauStudent" class="org.edu_sharing.service.authentication.sso.config.MappingGroup">

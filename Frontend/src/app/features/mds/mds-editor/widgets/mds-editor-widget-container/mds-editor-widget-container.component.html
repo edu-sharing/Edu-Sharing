@@ -56,6 +56,7 @@
     <p
       *ngIf="
         mdsEditorInstance.editorMode !== 'viewer' &&
+        showBottomCaption &&
         widget?.definition.bottomCaption &&
         !shouldShowError()
       "
@@ -97,9 +98,9 @@
     <ng-container *ngTemplateOutlet="content"></ng-container>
     <!-- Use [hidden] instead of *ngIf to avoid changed-after-checked errors when setting
   bottomCaption. -->
-    <mat-hint [hidden]="!widget.definition.bottomCaption">
-      {{ widget.definition.bottomCaption }}
-    </mat-hint>
+    <mat-hint [hidden]="!widget.definition.bottomCaption || !showBottomCaption">{{
+      widget.definition.bottomCaption
+    }}</mat-hint>
     <mat-error [hidden]="!control.errors?.required">
       <ng-container *ngTemplateOutlet="error"></ng-container>
     </mat-error>

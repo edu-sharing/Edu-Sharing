@@ -164,6 +164,16 @@
       </properties>
     </type>
 
+    <type name="ccm:context">
+      <title>edu-sharing context configuration object</title>
+      <parent>cm:cmobject</parent>
+      <properties>
+        <property name="ccm:context_config">
+          <type>d:text</type>
+          <mandatory>true</mandatory>
+        </property>
+      </properties>
+    </type>
 
     <type name="ccm:io">
       <title>Campus Content IO</title>
@@ -1780,6 +1790,18 @@
         </property>
       </properties>
     </aspect>
+
+    <aspect name="ccm:edugroup_folder">
+      <title>EduGroupFolder - with ref to home organisation</title>
+      <properties>
+        <property name="ccm:edu_organisation">
+          <title>home organisation of the folder</title>
+          <type>d:noderef</type>
+          <mandatory>false</mandatory>
+        </property>
+      </properties>
+    </aspect>
+
     <!-- campuscontent aspect for alfresco groups extending them and making it,
       possible to signup to  -->
     <aspect name="ccm:group_signup">

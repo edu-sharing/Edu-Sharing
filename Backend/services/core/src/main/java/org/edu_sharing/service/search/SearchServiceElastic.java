@@ -32,6 +32,8 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.alfresco.service.guest.GuestConfig;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.metadataset.v2.*;
@@ -95,7 +97,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
     ServiceRegistry serviceRegistry = (ServiceRegistry) alfApplicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
     PermissionModel permissionModel = (PermissionModel) alfApplicationContext.getBean("permissionsModelDAO");
-
+    GuestService guestService = alfApplicationContext.getBean(GuestService.class);
     public static int MAX_RESPONSE_ENTITY_SIZE = -1;
 
     public static HttpHost[] getConfiguredHosts() {
@@ -114,7 +116,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
     public static BoolQuery getFilesSharedToMeQuery(MetadataQueries queries, SharedToMeType type) {
         String username = AuthenticationUtil.getFullyAuthenticatedUser();
         Set<String> memberships = getAllMemberships(username);
-        String basequery = queries.findQuery("sharedToMe").getBasequery().get(null);
+        String basequery = queries.findQuery("sharedToMe").getPrimaryBasequery();
 
         BoolQuery.Builder builder = QueryBuilders.bool()
                 .must(b -> b.bool(b2 -> b2.mustNot(
@@ -150,7 +152,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
 
     public static BoolQuery getFilesSharedByMeQuery(MetadataQueries queries) {
         String username = AuthenticationUtil.getFullyAuthenticatedUser();
-        String basequery = queries.findQuery("sharedByMe").getBasequery().get(null);
+        String basequery = queries.findQuery("sharedByMe").getPrimaryBasequery();
         BoolQuery.Builder builder = QueryBuilders.bool()
                 .must(b -> b.bool(b2 -> b2.must(
                         b3 -> b3.match(m -> m.field("properties.ccm:ph_users.keyword").query(username))
@@ -176,10 +178,11 @@ public class SearchServiceElastic extends SearchServiceImpl {
         sr.setNodeCount(total);
         JSONArray hitsList = hits.getJSONArray("hits");
         Set<String> authorities = getUserAuthorities();
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
         String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
         for (int i = 0; i < hitsList.length(); i++) {
             Map hit = new ObjectMapper().readValue(hitsList.getJSONObject(i).getJSONObject("_source").toString(), Map.class);
-            data.add(transformSearchHit(authorities, user, hit, false));
+            data.add(transformSearchHit(isAdmin, authorities, user, hit, false));
         }
         return sr;
     }
@@ -304,6 +307,19 @@ public class SearchServiceElastic extends SearchServiceImpl {
                         .aggregations(aggregations)
                 , Map.class));
 
+        List<NodeSearch.Facet> facetsResult = getFacets(aggregations, resp);
+
+        SearchResultNodeRef searchResultNodeRef = new SearchResultNodeRef();
+        searchResultNodeRef.setData(new ArrayList<>());
+        searchResultNodeRef.setFacets(facetsResult);
+        searchResultNodeRef.setStartIDX(searchToken.getFrom());
+        searchResultNodeRef.setNodeCount(0);
+
+        return searchResultNodeRef;
+    }
+
+    @NotNull
+    private List<NodeSearch.Facet> getFacets(Map<String, Aggregation> aggregations, SearchResponse<Map> resp) {
         List<NodeSearch.Facet> facetsResult = new ArrayList<>();
         for (Map.Entry<String, Aggregate> a : resp.aggregations().entrySet()) {
             if (a.getValue().isFilter()) {
@@ -328,14 +344,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 logger.error("non supported aggregation " + a.getKey());
             }
         }
-
-        SearchResultNodeRef searchResultNodeRef = new SearchResultNodeRef();
-        searchResultNodeRef.setData(new ArrayList<>());
-        searchResultNodeRef.setFacets(facetsResult);
-        searchResultNodeRef.setStartIDX(searchToken.getFrom());
-        searchResultNodeRef.setNodeCount(0);
-
-        return searchResultNodeRef;
+        return facetsResult;
     }
 
     private NodeSearch.Facet getMultitermFacet(String name, MultiTermsAggregate mta, Aggregation definition) {
@@ -380,7 +389,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
 
         Set<String> authorities = getUserAuthorities();
         String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
-
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
 
         SearchResultNodeRef sr = new SearchResultNodeRef();
         List<NodeRef> data = new ArrayList<>();
@@ -428,7 +437,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
 
                 HitsMetadata<Map> hits = searchResponse.hits();
                 for (Hit<Map> hit : hits.hits()) {
-                    data.add(transformSearchHit(authorities, user, hit.source(), searchToken.isResolveCollections()));
+                    data.add(transformSearchHit(isAdmin, authorities, user, hit.source(), searchToken.isResolveCollections()));
                 }
                 if (hits.hits().isEmpty()) {
                     break;
@@ -493,11 +502,13 @@ public class SearchServiceElastic extends SearchServiceImpl {
                     .index(WORKSPACE_INDEX)
                     .source(src -> src.filter(filter -> filter.excludes(appendDefaultExcludes(searchToken.getExcludes()))));
 
+            List<NodeSearch.Facet> facetsResult = null;
             SearchResponse<Map> searchResponseAggregations = null;
+            Map<String, Aggregation> aggregations;
             if (searchToken.getFacets() != null) {
                 Set<MetadataQueryParameter> excludeOwnFacets = MetadataElasticSearchHelper.getExcludeOwnFacets(queryData, criterias, searchToken.getFacets());
                 if (!excludeOwnFacets.isEmpty()) {
-                    Map<String, Aggregation> aggregations = MetadataElasticSearchHelper.getAggregations(
+                    Map<String, Aggregation> excludedOwnAggregations = MetadataElasticSearchHelper.getAggregations(
                             mds,
                             queryData,
                             criterias,
@@ -506,23 +517,28 @@ public class SearchServiceElastic extends SearchServiceImpl {
                             queryBuilderGlobalConditions._toQuery(),
                             searchToken);
 
+                    // remove duplicate facet entries
+                    excludedOwnAggregations.entrySet().removeIf(e -> e.getKey().endsWith(MetadataElasticSearchHelper.FACET_SELECTED_POSTFIX));
+
                     SearchRequest searchSourceAggs = SearchRequest.of(req -> req
                             .index(WORKSPACE_INDEX)
                             .from(0)
                             .size(0)
-                            .aggregations(aggregations));
+                            .aggregations(excludedOwnAggregations));
 
                     logger.info("query aggs: " + JsonpUtils.toJsonString(searchSourceAggs, new JacksonJsonpMapper()));
                     searchResponseAggregations = LogTime.log("Searching elastic for facets", () -> client.search(searchSourceAggs, Map.class));
+                    facetsResult = getFacets(excludedOwnAggregations, searchResponseAggregations);
+                    aggregations = null;
                 } else {
-                    for (String facet : searchToken.getFacets()) {
+                    aggregations = MetadataElasticSearchHelper.getAggregations(mds, queryData, searchToken.getParameters(), searchToken.getFacets(), Collections.emptySet(), queryBuilderGlobalConditions._toQuery(), searchToken);
+                    for (Map.Entry<String, Aggregation> agg : aggregations.entrySet()) {
                         // we use a higher facet limit since the facets will be filtered for the containing string!
-                        searchRequestBuilder.aggregations(facet, b -> b.terms(t -> t
-                                .field("properties." + facet + ".keyword")
-                                .size(searchToken.getFacetLimit() * MetadataElasticSearchHelper.FACET_LIMIT_MULTIPLIER)
-                                .minDocCount(searchToken.getFacetsMinCount())));
+                        searchRequestBuilder.aggregations(agg.getKey(), agg.getValue());
                     }
                 }
+            } else {
+                aggregations = null;
             }
 
             if (searchToken.isReturnSuggestion()) {
@@ -569,91 +585,14 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 logger.info("result count: " + hits.total());
 
                 long millisPerm = System.currentTimeMillis();
+                boolean isAdmin = AuthorityServiceHelper.isAdmin();
                 for (Hit<Map> hit : hits.hits()) {
-                    data.add(transformSearchHit(authorities, user, hit.source(), searchToken.isResolveCollections()));
+                    data.add(transformSearchHit(isAdmin, authorities, user, hit.source(), searchToken.isResolveCollections()));
                 }
                 logger.info("permission stuff took:" + (System.currentTimeMillis() - millisPerm));
 
-                List<NodeSearch.Facet> facetsResult = new ArrayList<>();
-                List<NodeSearch.Facet> facetsResultSelected = new ArrayList<>();
 
                 Long total = null;
-
-                Map<String, Aggregate> aggregations = new HashMap<>();
-                if (searchResponseAggregations != null) {
-                    aggregations.putAll(searchResponseAggregations.aggregations());
-                }
-                if (searchResponse.aggregations() != null) aggregations.putAll(searchResponse.aggregations());
-
-                for (Map.Entry<String, Aggregate> a : aggregations.entrySet()) {
-                    if (a.getValue().isSterms()) {
-                        facetsResult.add(getFacet(a.getKey(), a.getValue().sterms(), null));
-                    } else if (a.getValue()._kind().equals(Aggregate.Kind.Cardinality)) {
-                        if (a.getKey().equals("original_count")) {
-                            total = a.getValue().cardinality().value();
-                        } else {
-                            logger.error("unknown cardinality aggregation");
-                        }
-
-                    } else if (a.getValue().isFilter()) {
-                        FilterAggregate filter = a.getValue().filter();
-                        for (Map.Entry<String, Aggregate> aggregationEntry : filter.aggregations().entrySet()) {
-                            if (aggregationEntry.getValue().isSterms()) {
-                                if (a.getKey().endsWith("_selected")) {
-                                    if (a.getValue().isFilter()) {
-                                        Map<String, Aggregate> agg = a.getValue().filter().aggregations();
-                                        facetsResultSelected.add(getFacet(a.getKey(), agg.entrySet().iterator().next().getValue().sterms(), null));
-                                    } else {
-                                        facetsResultSelected.add(getFacet(a.getKey(), a.getValue().sterms(), null));
-                                    }
-                                } else {
-                                    if (a.getValue().isFilter()) {
-                                        Map<String, Aggregate> agg = a.getValue().filter().aggregations();
-                                        facetsResult.add(getFacet(a.getKey(), agg.entrySet().iterator().next().getValue().sterms(), null));
-                                    } else {
-                                        facetsResult.add(getFacet(a.getKey(), a.getValue().sterms(), null));
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        logger.error("non supported aggreagtion " + a.getKey());
-                    }
-                }
-                // add selected when missing
-                if (searchToken.getFacets() != null && !searchToken.getFacets().isEmpty()) {
-                    for (String facet : searchToken.getFacets()) {
-                        if (!criterias.containsKey(facet)) {
-                            continue;
-                        }
-                        for (String value : criterias.get(facet)) {
-                            Optional<NodeSearch.Facet> facetResult = facetsResult.stream()
-                                    .filter(f -> f.getProperty().equals(facet)).findFirst();
-                            Optional<NodeSearch.Facet> selected = facetsResultSelected
-                                    .stream()
-                                    .filter(f ->
-                                            f.getProperty().equals(facet))
-                                    .findFirst();
-                            if (selected.isPresent()) {
-                                if (facetResult.isPresent()) {
-                                    if (facetResult.get().getValues().stream().noneMatch(v -> v.getValue().equals(value))) {
-                                        if (selected.get().getValues().stream().anyMatch(v -> value.equals(v.getValue()))) {
-                                            facetResult.get().getValues().add(selected.get().getValues().stream()
-                                                    .filter(v -> value.equals(v.getValue()))
-                                                    .findFirst()
-                                                    .get()
-                                            );
-                                        }
-                                    }
-                                } else {
-                                    if (selected.get().getValues().stream().anyMatch(v -> value.equals(v.getValue()))) {
-                                        facetsResult.add(selected.get());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
                 if (!searchResponse.suggest().isEmpty()) {
                     List<co.elastic.clients.elasticsearch.core.search.Suggestion<Map>> phraseSuggestion = searchResponse.suggest().get("ngsearchword");
@@ -680,7 +619,9 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 if (total == null) {
                     total = Optional.of(hits).map(HitsMetadata::total).map(TotalHits::value).orElse(0L);
                 }
-
+                if(facetsResult == null) {
+                    facetsResult = getFacets(aggregations, searchResponse);
+                }
                 sr.setFacets(facetsResult);
                 sr.setStartIDX(searchToken.getFrom());
                 sr.setNodeCount((int) total.longValue());
@@ -862,16 +803,15 @@ public class SearchServiceElastic extends SearchServiceImpl {
         return false;
     }
 
-    public NodeRef transformSearchHit(Set<String> authorities, String user, Map hit, boolean resolveCollections) {
+    public NodeRef transformSearchHit(boolean isAdmin, Set<String> authorities, String user, Map hit, boolean resolveCollections) {
         try {
-            return this.transform(NodeRefImpl.class, authorities, user, hit, resolveCollections);
+            return this.transform(NodeRefImpl.class, isAdmin, authorities, user, hit, resolveCollections);
         } catch (IllegalAccessException | InstantiationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private <T extends NodeRefImpl> T transform(Class<T> clazz, Set<String> authorities, String user, Map<String, Object> sourceAsMap, boolean resolveCollections) throws IllegalAccessException, InstantiationException {
-        boolean isAdmin = AuthorityServiceHelper.isAdmin();
+    private <T extends NodeRefImpl> T transform(Class<T> clazz, boolean isAdmin, Set<String> authorities, String user, Map<String, Object> sourceAsMap, boolean resolveCollections) throws IllegalAccessException, InstantiationException {
         Map<String, MetadataSet> mdsCache = new HashMap<>();
         String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
 
@@ -930,7 +870,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 if (i18nProps != null) {
                     List<String> displayNames = (List<String>) i18nProps.get(entry.getKey());
                     if (displayNames != null) {
-                        props.put(CCConstants.getValidGlobalName(entry.getKey()) + CCConstants.DISPLAYNAME_SUFFIX, StringUtils.join(displayNames, CCConstants.MULTIVALUE_SEPARATOR));
+                        props.put(CCConstants.getValidGlobalName(entry.getKey()) + CCConstants.DISPLAYNAME_SUFFIX, String.join(CCConstants.MULTIVALUE_SEPARATOR, displayNames));
                     }
                 }
             } else {
@@ -1011,7 +951,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
 
         Map<String, Boolean> permissions = new HashMap<>();
         permissions.put(CCConstants.PERMISSION_READ, true);
-        String guestUser = ApplicationInfoList.getHomeRepository().getGuest_username();
+        GuestConfig guestConfig = guestService.getCurrentGuestConfig();
         long millis = System.currentTimeMillis();
         eduNodeRef.setPublic(false);
         Map<String, List<String>> permissionsElastic = (Map) sourceAsMap.get("permissions");
@@ -1020,7 +960,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
             if ("read".equals(entry.getKey())) {
                 continue;
             }
-            if (!eduNodeRef.getPublic() && guestUser != null && entry.getValue().contains(CCConstants.AUTHORITY_GROUP_EVERYONE)) {
+            if (!eduNodeRef.getPublic() && guestConfig != null && guestConfig.isEnabled() && entry.getValue().contains(CCConstants.AUTHORITY_GROUP_EVERYONE)) {
                 PermissionReference pr = permissionModel.getPermissionReference(null, entry.getKey());
                 Set<PermissionReference> granteePermissions = permissionModel.getGranteePermissions(pr);
                 eduNodeRef.setPublic(granteePermissions.stream().anyMatch(p -> p.getName().equals(CCConstants.PERMISSION_READ_ALL)));
@@ -1123,7 +1063,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
                         }
                     }
                     if (hasPermission) {
-                        CollectionRefImpl transform = transform(CollectionRefImpl.class, authorities, user, collection, false);
+                        CollectionRefImpl transform = transform(CollectionRefImpl.class, isAdmin, authorities, user, collection, false);
                         if (isProposal) {
                             transform.setRelationType(CollectionRef.RelationType.Proposal);
                         }
@@ -1135,7 +1075,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
         if (isProposal && sourceAsMap.containsKey("original")) {
             eduNodeRef.getRelations().put(
                     NodeRefImpl.Relation.Original,
-                    transform(NodeRefImpl.class, authorities, user, (Map) sourceAsMap.get("original"), false)
+                    transform(NodeRefImpl.class, isAdmin, authorities, user, (Map) sourceAsMap.get("original"), false)
             );
         }
         if (eduNodeRef instanceof CollectionRefImpl) {
@@ -1149,7 +1089,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
                 } else {
                     collectionRef.setRelationType(CollectionRef.RelationType.Usage);
                 }
-                collectionRef.setRelationNode(transform(NodeRefImpl.class, authorities, user, relation, false));
+                collectionRef.setRelationNode(transform(NodeRefImpl.class, isAdmin, authorities, user, relation, false));
             }
         }
         long permMillisSingle = (System.currentTimeMillis() - millis);
@@ -1376,9 +1316,10 @@ public class SearchServiceElastic extends SearchServiceImpl {
         logger.info("query: " + JsonpUtils.toJsonString(searchRequest, new JacksonJsonpMapper()));
         HitsMetadata<Map> hits = searchResponse.hits();
         logger.info("result count: " + hits.total().value());
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
 
         for (Hit<Map> hit : hits.hits()) {
-            data.add(transformSearchHit(getUserAuthorities(), AuthenticationUtil.getFullyAuthenticatedUser(), hit.source(), true));
+            data.add(transformSearchHit(isAdmin, getUserAuthorities(), AuthenticationUtil.getFullyAuthenticatedUser(), hit.source(), true));
         }
         sr.setStartIDX(0);
         sr.setNodeCount((int) hits.total().value());
@@ -1452,7 +1393,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
         builder.mustNot(b -> b.match(m -> m.field("aspects").query(CCConstants.getValidLocalName(CCConstants.CCM_ASPECT_COLLECTION_IO_REFERENCE))));
         builder.must(getContentTypeQuery(contentType));
         MetadataQueries queries = MetadataHelper.getLocalDefaultMetadataset().getQueries(MetadataReader.QUERY_SYNTAX_DSL);
-        String basequery = queries.findQuery("workflowReceive").getBasequery().get(null);
+        String basequery = queries.findQuery("workflowReceive").getPrimaryBasequery();
         if(StringUtils.isNotBlank(basequery)) {
             builder.must(b -> b.wrapper(new ReadableWrapperQueryBuilder(basequery).build()));
         }
@@ -1494,8 +1435,9 @@ public class SearchServiceElastic extends SearchServiceImpl {
         HitsMetadata<Map> hits = searchResponse.hits();
         Set<String> authorities = getUserAuthorities();
         String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
+        boolean isAdmin = AuthorityServiceHelper.isAdmin();
         SearchResultNodeRef sr = new SearchResultNodeRef();
-        sr.setData(hits.hits().stream().map(h -> transformSearchHit(authorities, user, h.source(), false)).collect(Collectors.toList()));
+        sr.setData(hits.hits().stream().map(h -> transformSearchHit(isAdmin, authorities, user, h.source(), false)).collect(Collectors.toList()));
         sr.setStartIDX(skipCount);
         sr.setNodeCount((int) hits.total().value());
         return sr;

@@ -294,8 +294,6 @@
     "TOOLKIT": {
       "REFRESH_APP": "Reload App Info",
       "REFRESH_APP_INFO": "Recharger les métadonnées et les informations sur l'application",
-      "REFRESH_EDU_GROUP_CACHE": "Rafraîchir le cache du groupe Edu",
-      "EDU_GROUP_CACHE_REFRESHED": "Rafraîchir le cache du groupe Edu fait",
       "APP_INFO_REFRESHED": "Rafraîchir les informations sur l'application fait",
       "CACHE": "Gestion du cache",
       "CACHE_INFO": "Obtenir des informations sur le cache",
@@ -621,7 +619,7 @@
       "TOKEN": "Jeton",
       "TS": "Date d'expiration",
       "GENERATE": "Ajouter un jeton",
-      "SAVE": "Économiser",
+      "SAVE": "Sauver",
       "REMOVE_TITLE": "Supprimer le jeton ?",
       "REMOVE_MESSAGE": "Voulez-vous vraiment supprimer le jeton avec l'url \"{{url}}\" ?\n\nLes liens existants peuvent devenir indisponibles en raison de ce processus.",
       "DYNAMIC_INFO": "Avec l'enregistrement dynamique lti, vous pouvez interconnecter edu-sharing avec d'autres systèmes compatibles lti. Cliquez sur \"Generate Token\" pour générer un nouveau jeton url.\n\nInsérez-le dans votre système compatible lti (par exemple moodle). Le système externe sera ensuite automatiquement connecté.",

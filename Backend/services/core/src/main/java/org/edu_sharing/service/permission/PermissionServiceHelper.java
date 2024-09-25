@@ -26,6 +26,7 @@ public class PermissionServiceHelper {
 			 CCConstants.PERMISSION_READ_PREVIEW,
 			 CCConstants.PERMISSION_READ_ALL,
 			 CCConstants.PERMISSION_COMMENT,
+			 CCConstants.PERMISSION_EMBED,
 			 CCConstants.PERMISSION_FEEDBACK,
 			 CCConstants.PERMISSION_RATE_READ,
 			 CCConstants.PERMISSION_DOWNLOAD_CONTENT,

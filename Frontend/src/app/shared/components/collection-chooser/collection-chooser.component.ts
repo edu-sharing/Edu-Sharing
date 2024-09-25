@@ -46,6 +46,7 @@ export class CollectionChooserComponent implements OnInit {
     readonly NodeEntriesDisplayType = NodeEntriesDisplayType;
     readonly InteractionType = InteractionType;
     readonly COLLECTION_LATEST_DEFAULT_COUNT = 3;
+    readonly COLLECTION_MY_MAX_COUNT = 100;
     @ContentChild('beforeRecent') beforeRecentRef: TemplateRef<any>;
     /**
      * The caption of the dialog, will be translated automatically
@@ -254,7 +255,7 @@ export class CollectionChooserComponent implements OnInit {
                 {
                     sortBy: this.sortBy,
                     sortAscending: false,
-                    count: RestConstants.COUNT_UNLIMITED,
+                    count: this.COLLECTION_MY_MAX_COUNT,
                 },
             )
             .subscribe((data) => {

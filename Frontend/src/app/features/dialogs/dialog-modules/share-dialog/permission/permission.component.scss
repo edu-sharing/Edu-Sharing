@@ -44,7 +44,7 @@
     align-items: center;
     left: -15px;
     top: 0;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     border-radius: 25px;
     font-weight: bold;
@@ -73,8 +73,13 @@
 .container {
     width: 100%;
 }
-.readOnly button {
-    color: $textLight;
+.readOnly {
+    button {
+        color: $textLight;
+    }
+    .timebased-active {
+        color: mix($colorStatusWarning, $colorStatusNeutral, 30%);
+    }
 }
 .permission {
     justify-content: flex-end;
@@ -118,5 +123,30 @@
 @media screen and (max-width: $mobileWidth) {
     .permission > div > div span {
         display: none;
+    }
+}
+.timebased-active {
+    color: $colorStatusWarning;
+}
+.timebased-invalid {
+    color: $colorStatusNegative;
+}
+.timebased-overlay {
+    @include materialShadowLarge();
+    background-color: #fff;
+    padding: 10px 10px 10px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    .content {
+        display: flex;
+        flex-direction: column;
+    }
+    .close {
+        display: flex;
+        justify-content: flex-end;
+    }
+    es-share-dialog-choose-date {
+        padding-top: 10px;
     }
 }

@@ -1,18 +1,21 @@
 $button-margin-horizontal: 20px;
 $button-margin-vertical: 10px;
 
-.mat-radio-group {
+mat-radio-group {
     display: flex;
     flex-wrap: wrap;
     margin-right: -$button-margin-horizontal;
-    margin-bottom: -$button-margin-vertical;
     padding: 5px 20px;
     &.vertical {
         flex-direction: column;
     }
 }
 
-.mat-radio-button {
+mat-radio-button.mat-mdc-radio-button {
     margin-right: $button-margin-horizontal;
-    margin-bottom: $button-margin-vertical;
+    ::ng-deep {
+        .mdc-radio {
+            --mdc-radio-state-layer-size: 32px;
+        }
+    }
 }

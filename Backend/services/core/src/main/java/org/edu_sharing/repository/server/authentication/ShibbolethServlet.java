@@ -31,6 +31,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.alfresco.repo.security.authentication.AuthenticationException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -41,6 +43,7 @@ import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.security.ShibbolethSessions;
 import org.edu_sharing.repository.server.tools.security.ShibbolethSessions.SessionInfo;
+import org.edu_sharing.restservices.lti.v13.ApiTool;
 import org.edu_sharing.service.authentication.AuthenticationExceptionMessages;
 import org.edu_sharing.service.authentication.EduAuthentication;
 import org.edu_sharing.service.authentication.SSOAuthorityMapper;
@@ -50,6 +53,7 @@ import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.surf.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -58,6 +62,7 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -248,17 +253,19 @@ public class ShibbolethServlet extends HttpServlet {
 			redirect(resp,req);
 
 		} catch(org.alfresco.repo.security.authentication.AuthenticationException e) {
-			if(e.getMessage() != null
-					&& e.getMessage().contains(AuthenticationExceptionMessages.USER_BLOCKED)){
-				logger.error(e.getMessage());
-				resp.sendError(HttpServletResponse.SC_FORBIDDEN, AuthenticationExceptionMessages.USER_BLOCKED);
-				return;
-			}else{
-				logger.error("INVALID ACCESS!",e);
-				resp.getOutputStream().println("INVALID ACCESS! "+e.getMessage());
-				return;
-			}
+			processError(req, resp, e);
 		}
+	}
+
+	private static void processError(HttpServletRequest req, HttpServletResponse resp, AuthenticationException e) throws IOException {
+		String message = e.getMsgId();
+		logger.error("shibboleth process error:" + message);
+		if(StringUtils.isEmpty(message)){
+			message = "SSO_UNKNOWN_ERROR";
+		}
+		message = URLEncoder.encode(message.trim());
+		resp.sendRedirect("/edu-sharing/components/error/"+message+"/"+message
+				);
 	}
 
 	private void redirect(HttpServletResponse resp, HttpServletRequest req) throws IOException{

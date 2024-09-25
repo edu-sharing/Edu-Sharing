@@ -43,6 +43,9 @@ import java.util.*;
 /**
  * Servlet Filter implementation class CockpitAuthenticationFilter
  */
+/**
+ * Servlet Filter implementation class CockpitAuthenticationFilter
+ */
 public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilter {
 
 	private static final String CONTEXT = LDAPAuthenticationFilter.class.getCanonicalName();
@@ -68,7 +71,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 	 * edu-sharing customization
 	 */
 	private static final String INIT_USE_ALFRESCO_AUTHENTICATION_COMPONENT = INIT_CONFIG_BASE + "ldap.alfrescoAuthComponent";
-	
+
 
 	// Allow an authentication ticket to be passed as part of a request to bypass authentication
 
@@ -99,48 +102,48 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 
 	private boolean useAlfrescoAuthenticationComponent = false;
 	private String ldapBase = null;
-	
+
 	//rember the env global
 	private Properties env = null;
 	private String ldapUidProp = null;
 	private String ldapUrl = null;
-	
-	
+
+
 	/**
 	 * edu-sharing fix from 4.2.f
-	 * 
-	 * 
+	 *
+	 *
 	 * ALF-13621: Due to browser inconsistencies we have to try a fallback path of encodings
 	 */
 	/** The password encodings to try in priority order **/
-    private static final String[] ENCODINGS = new String[] {
-        "UTF-8", 
-        System.getProperty("file.encoding"),
-        "ISO-8859-1"
-    };
-    
-    /** Corresponding array of CharsetDecoders with CodingErrorAction.REPORT. Duplicates removed. */
-    private static final CharsetDecoder[] DECODERS;
-    
-    static
-    {
+	private static final String[] ENCODINGS = new String[] {
+			"UTF-8",
+			System.getProperty("file.encoding"),
+			"ISO-8859-1"
+	};
+
+	/** Corresponding array of CharsetDecoders with CodingErrorAction.REPORT. Duplicates removed. */
+	private static final CharsetDecoder[] DECODERS;
+
+	static
+	{
         Map<String, CharsetDecoder> decoders = new LinkedHashMap<>(ENCODINGS.length * 2);
-        for (String encoding : ENCODINGS)
-        {
-            if (!decoders.containsKey(encoding))
-            {
-                decoders.put(encoding, Charset.forName(encoding).newDecoder()
-                        .onMalformedInput(CodingErrorAction.REPORT));
-            }
-        }
-        DECODERS = new CharsetDecoder[decoders.size()];
-        decoders.values().toArray(DECODERS);
-    }
-	
-	
+		for (String encoding : ENCODINGS)
+		{
+			if (!decoders.containsKey(encoding))
+			{
+				decoders.put(encoding, Charset.forName(encoding).newDecoder()
+						.onMalformedInput(CodingErrorAction.REPORT));
+			}
+		}
+		DECODERS = new CharsetDecoder[decoders.size()];
+		decoders.values().toArray(DECODERS);
+	}
+
+
 	/**
 	 * Initialize the filter
-	 * 
+	 *
 	 * @param config FitlerConfig
 	 * @exception ServletException
 	 */
@@ -156,7 +159,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		// Setup the authentication context
 
 		//WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.m_context);
-		
+
 		ApplicationContext context = AlfAppContextGate.getApplicationContext();
 		ServiceRegistry serviceRegistry = (ServiceRegistry) context.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
@@ -184,6 +187,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		env.put(Context.SECURITY_AUTHENTICATION, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_AUTH));
 		env.put(Context.SECURITY_PRINCIPAL, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_USER));
 		env.put(Context.SECURITY_CREDENTIALS, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_PWD));
+
 	}
 
 	/**
@@ -209,7 +213,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 	}
 	/**
 	 * Run the authentication filter
-	 * 
+	 *
 	 * @param req ServletRequest
 	 * @param resp ServletResponse
 	 * @param chain FilterChain
@@ -218,7 +222,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 	 */
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
-	ServletException
+			ServletException
 	{
 		if(this.jndi == null){
 			try {
@@ -243,7 +247,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		{
 			// Get the authorization header
 
-			
+
 			String authHdr = httpReq.getHeader("Authorization");
 			logger.debug("user == null authHdr:"+authHdr);
 			if ( (authHdr != null) && (authHdr.length() > 5) && authHdr.substring(0,5).equalsIgnoreCase("BASIC"))
@@ -277,118 +281,119 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 						this.jndi = new InitialDirContext(env);
 						user = searchForUser(username,password);
 					}catch(CommunicationException ce){
-						
+
 						logger.error(e.getMessage() + " still occurs will give up. maybe restart alfresco.");
-						
+
 					}catch (NamingException ne) {
 						logger.error(ne.getMessage(), ne);
 					}
 				}
-				
+
 				if(user != null){
 					httpReq.getSession().setAttribute(BaseAuthenticationFilter.AUTHENTICATION_USER, user);
 				}
 
-				
+
 */
-				
+
 				/**
 				 * edu-sharing fix
 				 */
-				 if (logger.isDebugEnabled())
-	                    logger.debug("Basic authentication details present in the header.");
-	                byte[] encodedString = java.util.Base64.getDecoder().decode(authHdr.substring(5).trim().getBytes());
-	                
-	                // ALF-13621: Due to browser inconsistencies we have to try a fallback path of encodings
-	                Set<String> attemptedAuths = new HashSet<String>(DECODERS.length * 2);
-	                for (CharsetDecoder decoder : DECODERS)
-	                {                  
-	                    try
-	                    {
-	                        // Attempt to decode using this charset 
-	                        String basicAuth = decoder.decode(ByteBuffer.wrap(encodedString)).toString();
-	                        
-	                        
-	                        
-	                        // It decoded OK but we may already have tried this string.
-	                        if (!attemptedAuths.add(basicAuth))
-	                        {
-	                            // Already tried - no need to try again
-	                            continue;
-	                        }
-	                        
-	                        
-	                        String username = null;
-	        				String password = null;
-	                        
-	                     
-	                        // Split the username and password
-	                        int pos = basicAuth.indexOf(":");
-	                        if (pos != -1)
-	                        {
-	                            username = basicAuth.substring(0, pos);
-	                            password = basicAuth.substring(pos + 1);
-	                        }
-	                        else
-	                        {
-	                            username = basicAuth;
-	                            password = "";
-	                        }
-	    
-	                        // Authenticate the user    
-	                        try{
-	        					user = searchForUser(username,password);
-	        				}catch(CommunicationException e){
-	        					logger.error(e.getMessage() +" Will create new InitialDirContext and retry.");
-	        					try{
-	        						this.jndi = new InitialDirContext(env);
-	        						user = searchForUser(username,password);
-	        					}catch(CommunicationException ce){
-	        						
-	        						logger.error(e.getMessage() + " still occurs will give up. maybe restart alfresco.");
-	        						
-	        					}catch (NamingException ne) {
-	        						logger.error(ne.getMessage(), ne);
-	        					}
-	        				}
-	        				
-	        				if(user != null){
-	        					httpReq.getSession().setAttribute(BaseAuthenticationFilter.AUTHENTICATION_USER, user);
-	        					 // Success so break out
-		                        break;
-	        				}
-	                        
-	                        
-	                        
-	                       
-	                    }
-	                    catch (CharacterCodingException e)
-	                    {
-	                        if (logger.isDebugEnabled())
-	                            logger.debug("Didn't decode using " + decoder.getClass().getName(), e);
-	                    }
-	                    catch (AuthenticationException ex)
-	                    {
-	                        if (logger.isDebugEnabled())
-	                            logger.debug("Authentication error ", ex);
-	                    }
-	                    catch (NoSuchPersonException e)
-	                    {
-	                        if (logger.isDebugEnabled())
-	                            logger.debug("There is no such person error ", e);
-	                    }
-	                }
-				
-				
-				
-				
+				if (logger.isDebugEnabled())
+					logger.debug("Basic authentication details present in the header.");
+				byte[] encodedString = java.util.Base64.getDecoder().decode(authHdr.substring(5).trim().getBytes());
+
+				// ALF-13621: Due to browser inconsistencies we have to try a fallback path of encodings
+				Set<String> attemptedAuths = new HashSet<String>(DECODERS.length * 2);
+				for (CharsetDecoder decoder : DECODERS)
+				{
+					try
+					{
+						// Attempt to decode using this charset
+						String basicAuth = decoder.decode(ByteBuffer.wrap(encodedString)).toString();
+
+
+
+						// It decoded OK but we may already have tried this string.
+						if (!attemptedAuths.add(basicAuth))
+						{
+							// Already tried - no need to try again
+							continue;
+						}
+
+
+						String username = null;
+						String password = null;
+
+
+						// Split the username and password
+						int pos = basicAuth.indexOf(":");
+						if (pos != -1)
+						{
+							username = basicAuth.substring(0, pos);
+							password = basicAuth.substring(pos + 1);
+						}
+						else
+						{
+							username = basicAuth;
+							password = "";
+						}
+
+						// Authenticate the user
+						try{
+							logger.info("webdav ldap authentication: starting. loginName:####");
+							user = searchForUser(username,password);
+						}catch(CommunicationException e){
+							logger.error(e.getMessage() +" Will create new InitialDirContext and retry.");
+							try{
+								this.jndi = new InitialDirContext(env);
+								user = searchForUser(username,password);
+							}catch(CommunicationException ce){
+								logger.error(e.getMessage() + " still occurs will give up. maybe restart alfresco.");
+							}catch (NamingException ne) {
+								logger.error(ne.getMessage(), ne);
+							}
+						}catch(NoSuchPersonException e){
+							logger.error("person does not exist in alfresco");
+						}
+
+						if(user != null){
+							httpReq.getSession().setAttribute(BaseAuthenticationFilter.AUTHENTICATION_USER, user);
+							// Success so break out
+							break;
+						}
+
+
+
+
+					}
+					catch (CharacterCodingException e)
+					{
+						if (logger.isDebugEnabled())
+							logger.debug("Didn't decode using " + decoder.getClass().getName(), e);
+					}
+					catch (AuthenticationException ex)
+					{
+						if (logger.isDebugEnabled())
+							logger.debug("Authentication error ", ex);
+					}
+					catch (NoSuchPersonException e)
+					{
+						if (logger.isDebugEnabled())
+							logger.debug("There is no such person error ", e);
+					}
+				}
+
+
+
+
 			}
 			else
 			{
 				// Check if the request includes an authentication ticket
 
 				String ticket = req.getParameter( LDAPAuthenticationFilter.ARG_TICKET);
-				
+
 				logger.debug("auth by ticket:"+ticket);
 
 				if ( (ticket != null) &&  (ticket.length() > 0))
@@ -490,7 +495,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		}
 		else
 		{
-			
+
 			logger.debug("user != null :"+user.getTicket());
 			try
 			{
@@ -517,20 +522,22 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 
 		chain.doFilter(req, resp);
 	}
-	
+
 	/**
 	 * search for user encapsulated in a method to catch a potential CommunicationException and retry
-	 * 
+	 *
 	 *https://issues.apache.org/jira/browse/HADOOP-9125
 	 *https://issues.apache.org/jira/secure/attachment/12560771/HADOOP-9125.patch
 	 */
-	WebDAVUser searchForUser(String username, String password) throws CommunicationException{
-		
-		
-		String ldapUsername = username;
-		
+	WebDAVUser searchForUser(String loginName, String password) throws CommunicationException{
+
+
 		String uid = null;
-		
+
+		String dn = null;
+
+		String username = loginName;
+
 		try
 		{
 			SearchControls ctls = new SearchControls();
@@ -554,11 +561,16 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 				if (attr != null) {
 					username = (String) attr.get();
 				}
-				
+
 				Attribute uidAttr = r.getAttributes().get(this.ldapUidProp);
 				if(uidAttr != null){
 					uid = (String) uidAttr.get();
 				}
+
+				dn = r.getNameInNamespace();
+
+			}else{
+				throw new AuthenticationException("webdav ldap authentication: user not found in directory. loginName:###");
 			}
 			rs.close();
 
@@ -567,7 +579,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 			if(username != null){
 				final String fusername = username;
 				boolean allowed = AuthenticationUtil.runAsSystem(() -> {
-					NodeRef personRef = this.m_personService.getPerson(fusername);
+					NodeRef personRef = this.m_personService.getPerson(fusername, false);
 					if(!LightbendConfigLoader.get().getIsNull("repository.personActiveStatus")) {
 						String personActiveStatus = LightbendConfigLoader.get().getString("repository.personActiveStatus");
 						String personStatus = (String)this.m_nodeService.getProperty(personRef, QName.createQName(CCConstants.CM_PROP_PERSON_ESPERSONSTATUS));
@@ -579,17 +591,16 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 					return true;
 				});
 				if(!allowed){
-					throw new AuthenticationException("USER_BLOCKED");
+					throw new AuthenticationException("webdav ldap authentication: USER_BLOCKED. loginName: ###  / userName: ###");
 				}
-
 			}
 
 			if(useAlfrescoAuthenticationComponent){
 				this.m_authService.authenticate(username, password.toCharArray());
 			}else{
-				
-				logger.debug("using direct ldap auth ldapUsername:" + ldapUsername + " uid:" +uid +" username:" +username +" password:" +password);
-				this.authenticate(ldapUsername, uid, username, password);
+
+				logger.debug("using ldap auth dn:" + dn + " uid:" +uid +" username:" +username);
+				this.authenticate(dn, username, password, loginName);
 			}
 
 			// Set the user name as stored by the back end
@@ -604,7 +615,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 
 			return new WebDAVUser(username, this.m_authService.getCurrentTicket(), homeSpaceRef);
 
-			
+
 
 		}catch(CommunicationException ce){
 			throw ce;
@@ -613,53 +624,61 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 			logger.error(e.getMessage(),e);
 		} catch (AuthenticationException ex) {
 			// Do nothing, user object will be null
-			logger.error(ex.getMessage(),ex);
-		} catch (NoSuchPersonException e) {
-			// Do nothing, user object will be null
-			logger.error(e.getMessage(),e);
+			if(ex.getMessage() != null && ex.getMessage().contains("Invalid Credentials")){
+				logger.warn("webdav ldap authentication: failed with Invalid Credentials. loginName: ### / userName: ###");
+			}
+			if (ex.getMessage() != null && ex.getMessage().contains("DN with no password")) {
+				logger.warn("webdav ldap authentication: no password provided. loginName: ### / userName: ###");
+			}else {
+				logger.warn(ex.getMsgId());
+				if (logger.isDebugEnabled()) {
+					logger.error(ex.getMessage(), ex);
+				}
+			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
-	 * edu-sharing customization: try to authenticate at ldap directly 
-	 *  
-	 * @param ldapUsername
+	 * edu-sharing customization: try to authenticate at ldap directly
+	 *
 	 * @param username
 	 * @param password
+	 * @param loginName
 	 * @throws AuthenticationException
 	 */
-	private void authenticate(String ldapUsername, String ldapUid, String username, String password) throws  AuthenticationException{
-		
+	private void authenticate(String ldapUserDn, String username, String password, String loginName) throws  AuthenticationException{
+
 		if(env != null){
 			Properties authEnv = new Properties();
 			authEnv.put(Context.INITIAL_CONTEXT_FACTORY,
-			"com.sun.jndi.ldap.LdapCtxFactory");
+					"com.sun.jndi.ldap.LdapCtxFactory");
 			//authEnv.put(Context.PROVIDER_URL, env.get(Context.PROVIDER_URL));
 			authEnv.put(Context.PROVIDER_URL,this.ldapUrl);
 			//authEnv.put(Context.SECURITY_PRINCIPAL,"uid="+ldapUid);
-			authEnv.put(Context.SECURITY_PRINCIPAL,"uid="+ldapUid+","+this.ldapBase);
-			
+			//authEnv.put(Context.SECURITY_PRINCIPAL,"uid="+ldapUid+","+this.ldapBase);
+			authEnv.put(Context.SECURITY_PRINCIPAL,ldapUserDn);
+
 			authEnv.put(Context.SECURITY_AUTHENTICATION,env.get(Context.SECURITY_AUTHENTICATION));
 			authEnv.put(Context.SECURITY_CREDENTIALS,password);
-			
-			
+
+
 			try {
 				new InitialDirContext(authEnv);
 				ApplicationContext context = AlfAppContextGate.getApplicationContext();
 				AuthenticationComponent authComp = (AuthenticationComponent)context.getBean("authenticationComponent");
 				authComp.setCurrentUser(username);
-				logger.info("auth at ldap sucessfull with user:"+username);
+				logger.info("webdav ldap authentication: sucessfull. loginName: ###  / userName: ###");
 				return;
 			}catch(javax.naming.AuthenticationException e){
-				logger.error(e.getMessage(), e);
+				logger.debug(e.getMessage(), e);
 				throw new AuthenticationException(e.getMessage());
 			} catch (NamingException e) {
-				logger.error(e.getMessage(), e);
+				logger.debug(e.getMessage(), e);
 				throw new AuthenticationException(e.getMessage());
 			}
-			
+
 		}
 		throw new AuthenticationException("LDAPAuthenticationFilter env seems to be null");
 	}

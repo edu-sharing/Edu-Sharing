@@ -17,7 +17,7 @@ import {
     UIAnimation,
     UIConstants,
 } from 'ngx-edu-sharing-ui';
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, Subject } from 'rxjs';
 import { SuggestItem } from './autocomplete/autocomplete.component';
 import {
     Application,
@@ -56,6 +56,7 @@ import { DialogsService } from '../../features/dialogs/dialogs.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
 import { AuthoritySearchMode } from '../../shared/components/authority-search-input/authority-search-input.component';
 import { WorkspaceExplorerComponent } from '../workspace-page/explorer/explorer.component';
+import { delay, filter, repeat, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 type LuceneData = {
     mode: 'NODEREF' | 'SOLR' | 'ELASTIC';
@@ -90,6 +91,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
     @ViewChild('keyValueTable') keyValueTable: TemplateRef<undefined>;
     elasticResponse: NodeListElastic;
     cancelJobInfo: Job;
+    private readonly destroyed$ = new Subject();
 
     constructor(
         private about: AboutService,
@@ -260,6 +262,8 @@ export class AdminPageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.onDestroyTasks.forEach((task) => task());
+        this.destroyed$.next();
+        this.destroyed$.complete();
     }
 
     public startJob() {
@@ -602,19 +606,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             },
         );
     }
-    public refreshEduGroupCache() {
-        this.globalProgress = true;
-        this.admin.refreshEduGroupCache().subscribe(
-            () => {
-                this.globalProgress = false;
-                this.toast.toast('ADMIN.TOOLKIT.EDU_GROUP_CACHE_REFRESHED');
-            },
-            (error: any) => {
-                this.globalProgress = false;
-                this.toast.error(error);
-            },
-        );
-    }
+
     public refreshCache(sticky: boolean) {
         this.globalProgress = true;
         this.admin
@@ -986,14 +978,12 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             },
         );
     }
-    reloadJobStatus() {
-        this.admin.getJobs().subscribe((jobs) => {
-            if (!jobs) {
-                this.jobs = null;
-            }
-            this.jobs = jobs.filter((j: any) => !!j);
-            this.updateJobLogs();
-        });
+    reloadJobStatus(jobs: any) {
+        if (!jobs) {
+            this.jobs = null;
+        }
+        this.jobs = jobs.filter((j: any) => !!j);
+        this.updateJobLogs();
     }
     getMajorVersion(version: string) {
         const v = version.split('.');
@@ -1405,17 +1395,22 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             this.storage.get('admin_lucene', this.lucene).subscribe((data: any) => {
                 this.lucene = data;
             });
-            this.reloadJobStatus();
+            this.reloadJobStatus([]);
             this.runTpChecks();
             this.runChecks();
             this.admin.getAllJobs().subscribe((jobs) => {
                 this.availableJobs = jobs;
                 this.prepareJobClasses();
             });
-            const interval = setInterval(() => {
-                if (this.mode == 'JOBS') this.reloadJobStatus();
-            }, 10000);
-            this.onDestroyTasks.push(() => clearInterval(interval));
+            this.admin
+                .getJobs()
+                .pipe(
+                    tap((jobs) => this.reloadJobStatus(jobs)),
+                    delay(5000),
+                    repeat(),
+                    takeUntil(this.destroyed$),
+                )
+                .subscribe((_) => {});
             this.admin.getOAIClasses().subscribe((classes: string[]) => {
                 this.oaiClasses = classes;
                 this.storage.get('admin_oai').subscribe((data: any) => {
@@ -1443,6 +1438,10 @@ export class AdminPageComponent implements OnInit, OnDestroy {
                 },
             );
         }
+    }
+    async reloadJobs() {
+        const jobs = await this.admin.getJobs().toPromise();
+        this.reloadJobStatus(jobs);
     }
 
     private async showWarningDialog(): Promise<void> {

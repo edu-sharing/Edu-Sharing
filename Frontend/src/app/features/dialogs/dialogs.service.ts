@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { RestConnectorService, UIConstants } from '../../core-module/core.module';
+import { DialogButton, RestConnectorService, UIConstants } from '../../core-module/core.module';
 import { Closable } from './card-dialog/card-dialog-config';
 import { CardDialogRef } from './card-dialog/card-dialog-ref';
 import { CardDialogUtilsService } from './card-dialog/card-dialog-utils.service';
@@ -46,6 +46,7 @@ import {
     FileUploadProgressDialogResult,
 } from './dialog-modules/file-upload-progress-dialog/file-upload-progress-dialog-data';
 import {
+    GenericDialogButton,
     GenericDialogConfig,
     GenericDialogData,
 } from './dialog-modules/generic-dialog/generic-dialog-data';
@@ -128,6 +129,8 @@ import {
 } from './dialog-modules/xml-app-properties-dialog/xml-app-properties-dialog-data';
 import { NotificationDialogComponent } from '../../main/navigation/top-bar/notification-dialog/notification-dialog.component';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { Node } from 'ngx-edu-sharing-api';
+import { DropSource, DropTarget, NodeRoot, NodeTitlePipe } from 'ngx-edu-sharing-ui';
 
 @Injectable({
     providedIn: 'root',
@@ -503,6 +506,7 @@ export class DialogsService {
             title: 'MDS.TITLE',
             ...(await this.cardDialogUtils.configForNodes(data.nodes)),
             minWidth: 600,
+            maxWidth: 900,
             minHeight: 700,
             contentPadding: 0,
             data,
@@ -519,6 +523,7 @@ export class DialogsService {
         return this.cardDialog.open(MdsEditorDialogComponent, {
             title: 'MDS.TITLE',
             minWidth: 600,
+            maxWidth: 900,
             minHeight: 700,
             contentPadding: 0,
             data,
@@ -723,6 +728,73 @@ export class DialogsService {
             autoFocus: false,
             data,
             closable: Closable.Standard,
+        });
+    }
+
+    async openCopyMoveDialog(
+        oldParent: Node | NodeRoot,
+        source: DropSource<Node>,
+        target: DropTarget,
+        allowedModes = ['copy', 'move'],
+    ) {
+        let buttons: GenericDialogButton<string>[];
+        if (source.mode === 'move') {
+            buttons = [];
+            if (allowedModes.includes('copy')) {
+                buttons.push({
+                    config: DialogButton.TYPE_CANCEL,
+                    label: 'WORKSPACE.COPY_MOVE.COPY',
+                    callback: async (ref) => {
+                        return true;
+                    },
+                });
+            }
+            if (allowedModes.includes('move')) {
+                buttons.push({
+                    config: DialogButton.TYPE_PRIMARY,
+                    label: 'WORKSPACE.COPY_MOVE.MOVE',
+                    callback: async (ref) => {
+                        ref.close('move');
+                        return true;
+                    },
+                });
+            }
+        } else {
+            buttons = [];
+            if (allowedModes.includes('move')) {
+                buttons.push({
+                    config: DialogButton.TYPE_CANCEL,
+                    label: 'WORKSPACE.COPY_MOVE.MOVE',
+                    callback: async (ref) => {
+                        ref.close('move');
+                        return true;
+                    },
+                });
+            }
+            if (allowedModes.includes('copy')) {
+                buttons.push({
+                    config: DialogButton.TYPE_PRIMARY,
+                    label: 'WORKSPACE.COPY_MOVE.COPY',
+                    callback: async (ref) => {
+                        return true;
+                    },
+                });
+            }
+        }
+        const nodeTitle = new NodeTitlePipe(this.translate);
+        return await this.openGenericDialog({
+            buttons,
+            nodes: source.element?.slice(),
+            title: 'WORKSPACE.COPY_MOVE.TITLE',
+            message:
+                'WORKSPACE.COPY_MOVE.MESSAGE' +
+                (source.element?.length === 1 ? '_SINGLE' : '_MULTIPLE'),
+            messageParameters: {
+                count: source.element?.length.toString(),
+                element: nodeTitle.transform(source.element[0]),
+                source: nodeTitle.transform(oldParent),
+                target: nodeTitle.transform(target),
+            },
         });
     }
 }

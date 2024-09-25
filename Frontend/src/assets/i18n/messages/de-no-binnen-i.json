@@ -1,6 +1,6 @@
 {
   "MESSAGES": {
-    "share_file_deleted": "Die Linkfreigabe zeigt auf eine bereits gelöschte Datei. Bitte kontaktieren Sie den/die Bitte kontaktieren Sie die Autorin/den Autor",
+    "share_file_deleted": "Die Linkfreigabe zeigt auf eine bereits gelöschte Datei. Bitte kontaktieren Sie die Autorin/den Autor",
     "usage_missing": "Der Zugriff auf das Element ist fehlgeschlagen, da die Freigabe für den aktuellen Kontext entfernt wurde. Bitte wenden Sie sich an die Autorin/den Autorin der Seite, von welcher der Aufruf erfolgte"
   }
 }

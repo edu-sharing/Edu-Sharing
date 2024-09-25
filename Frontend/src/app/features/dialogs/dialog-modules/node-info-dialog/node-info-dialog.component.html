@@ -58,32 +58,29 @@
     <div *ngIf="_permissions">
       <div class="inherited">
         <span>{{ 'NODE_INFO.PERMISSIONS_INHERITED' | translate }}</span>
-        <div *ngIf="!_permissions.localPermissions.inherited">
+        <div *ngIf="!_permissions.inherited">
           {{ 'NODE_INFO.PERMISSIONS_INHERIT_DISABLED' | translate }}
         </div>
-        <div *ngIf="_permissions.localPermissions.inherited">
-          <div *ngIf="!_permissions.inheritedPermissions.length">
-            {{ 'NODE_INFO.PERMISSIONS_INHERIT_EMPTY' | translate }}
-          </div>
-          <div *ngFor="let permission of _permissions.inheritedPermissions">
-            <div class="authority">
-              {{ permission.authority.authorityName }} ({{ permission.authority.authorityType }})
-            </div>
-            <div class="permissions">{{ permission.permissions.join(', ') }}</div>
-          </div>
+        <div *ngIf="_permissions.inherited && _parentPermissions">
+          <ng-container
+            *ngTemplateOutlet="
+              permissions;
+              context: {
+                permissions: _parentPermissions,
+                empty: 'NODE_INFO.PERMISSIONS_LOCAL_EMPTY'
+              }
+            "
+          ></ng-container>
         </div>
       </div>
       <div class="local">
         <span>{{ 'NODE_INFO.PERMISSIONS_LOCAL' | translate }}</span>
-        <div *ngIf="!_permissions.localPermissions.permissions.length">
-          {{ 'NODE_INFO.PERMISSIONS_LOCAL_EMPTY' | translate }}
-        </div>
-        <div *ngFor="let permission of _permissions.localPermissions.permissions">
-          <div class="authority">
-            {{ permission.authority.authorityName }} ({{ permission.authority.authorityType }})
-          </div>
-          <div class="permissions">{{ permission.permissions.join(', ') }}</div>
-        </div>
+        <ng-container
+          *ngTemplateOutlet="
+            permissions;
+            context: { permissions: _permissions, empty: 'NODE_INFO.PERMISSIONS_LOCAL_EMPTY' }
+          "
+        ></ng-container>
       </div>
     </div>
   </div>
@@ -166,3 +163,14 @@
     ><span class="json">{{ _json }}</span>
   </div>
 </div>
+<ng-template #permissions let-permissions="permissions" let-empty="empty">
+  <div *ngIf="!permissions.aces.length">
+    {{ empty | translate }}
+  </div>
+  <div *ngFor="let permission of permissions.aces">
+    <div class="authority">
+      {{ permission.authority }} ({{ permission.authorityType }}) / {{ permission | authorityName }}
+    </div>
+    <div class="permissions">{{ permission.permission }}</div>
+  </div>
+</ng-template>

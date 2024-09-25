@@ -14,6 +14,7 @@
     "SAFE_SEARCH": "Safe durchsuchen...",
     "ALL_FILES": "Alle Dateien",
     "MY_FILES": "Meine Inhalte",
+    "COLLECTION_HOME": "Hauptebene",
     "ADD": "Neu",
     "ADD_OBJECT_LTI": "Als LTI-Ressource einbinden",
     "ADD_CAMERA": "Bild aufnehmen",
@@ -170,6 +171,16 @@
           "ReadAll": "Betrachten (Vorschaubild, Metadaten & Inhaltsanzeige)",
           "DownloadContent": "Herunterladen"
         }
+      },
+      "TIMEBASED": {
+        "TOOLTIP": "Zeitgesteuerte Berechtigung konfigurieren",
+        "INVALID_STATE": "Diese zeitgesteuerte Berechtigung wird von einer anderen, dauerhaften Berechtigung überschrieben und hat keine Auswirkung",
+        "INVALID_STATE_TITLE": "Ungültige Einstellungen erkannt",
+        "INVALID_STATE_DETAILS": "Es existieren zeitgesteuerte Berechtigungen, welche durch dauerhafte Berechtigungen ersetzt werden. Ändern Sie die Berechtigungsstufe der zeitgesteueren Berechtigung oder löschen Sie diese, damit die Werte gespeichert werden können.",
+        "FROM_CHECKBOX": "Start-Zeitpunkt festlegen",
+        "TO_CHECKBOX": "End-Zeitpunkt festlegen",
+        "DATE_LABEL": "Datum",
+        "TIME_LABEL": "Uhrzeit"
       },
       "PUBLISH": {
         "OPEN_VERSION": "Version anzeigen",
@@ -347,7 +358,8 @@
       "PASSWORD": "Passwortschutz",
       "PASSWORD_INFO": "Dieser Link wird mit einem Passwort geschützt",
       "PASSWORD_PLACEHOLDER": "Passwort angeben...",
-      "PASSWORD_PLACEHOLDER_EDIT": "Passwort ist schon gesetzt",
+      "PASSWORD_PLACEHOLDER_EDIT": "Passwort bereits gesetzt",
+      "PASSWORD_EDIT_HINT": "Durch Eingabe in das Feld wird ein neues Passwort gesetzt",
       "DISABLED": "Linkfreigabe ist deaktiviert",
       "LINK": "Link zum Objekt",
       "ACTIVATE": "Linkfreigabe aktivieren",
@@ -491,6 +503,13 @@
       "PERMISSIONS": "Sie haben im aktuellen Ordner keine Rechte, Elemente hinzuzufügen.",
       "VIRTUAL": "Sie befinden sich in einem Ordner, wo das Ablegen von Elementen nicht möglich ist.",
       "GENERAL": "Navigieren Sie in einen anderen Ordner und fügen Sie die Elemente dort hinzu."
+    },
+    "COPY_MOVE": {
+      "TITLE": "Element(e) verschieben/kopieren",
+      "MESSAGE_SINGLE": "Möchten Sie das Element \"{{element}}\" von \"{{source}}\" nach \"{{target}}\" verschieben/kopieren?",
+      "MESSAGE_MULTIPLE": "Möchten Sie {{count}} Elemente von \"{{source}}\" nach \"{{target}}\" verschieben/kopieren?",
+      "MOVE": "Verschieben",
+      "COPY": "Kopieren"
     },
     "TOAST": {
       "FOLDER_ADDED": "Ordner wurde erstellt",

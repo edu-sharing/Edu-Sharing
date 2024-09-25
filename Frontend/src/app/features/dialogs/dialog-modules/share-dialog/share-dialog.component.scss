@@ -167,6 +167,9 @@
     background: transparent;
     border-color: $workspaceInheritColor;
 }
+.invalid {
+    background: rgba($warning, 0.2);
+}
 
 .inherit {
     color: $textLight;

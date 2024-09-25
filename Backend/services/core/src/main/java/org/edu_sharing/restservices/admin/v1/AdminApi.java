@@ -77,7 +77,7 @@ import java.util.stream.Collectors;
 public class AdminApi {
 	static Map<String, String[]> XML_FILTER = new HashMap<>();
 	static {
-		XML_FILTER.put(AdminServiceFactory.HOME_APPLICATION_PROPERTIES, new String[] { "private_key", "password" });
+		XML_FILTER.put(CCConstants.REPOSITORY_FILE_HOME, new String[] { "private_key", "password" });
 	}
 
 	private static Logger logger = Logger.getLogger(AdminApi.class);
@@ -102,13 +102,14 @@ public class AdminApi {
 		}
 	}
 
+
 	@GET
 	@Path("/version")
 
 	@Operation(summary = "get detailed version information", description="detailed information about the running system version")
 
 	@ApiResponses(value = {
-			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = RepositoryVersionInfo.class))),
+			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Map.class))),
 			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -117,7 +118,7 @@ public class AdminApi {
 	})
 	public Response getVersion(@Context HttpServletRequest req){
 		try {
-			RepositoryVersionInfo result = AdminServiceFactory.getInstance().getVersion();
+			Map<String, RepositoryVersionInfo> result = AdminServiceFactory.getInstance().getVersions();
 			return Response.ok().entity(result).build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);
@@ -553,38 +554,6 @@ public class AdminApi {
 		return Response.status(Response.Status.OK).header("Allow", "OPTIONS, POST").build();
 	}
 
-	@POST
-	@Path("/cache/refreshEduGroupCache")
-
-	@Operation(summary = "Refresh the Edu Group Cache", description = "Refresh the Edu Group Cache.")
-
-	@ApiResponses(value = {
-			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Void.class))),
-	        @ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-	        @ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-	        @ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-	        @ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-	        @ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-	    })
-	public Response refreshEduGroupCache(
-            @Parameter(description = "keep existing", schema = @Schema(defaultValue="false")) @QueryParam("keepExisting") Boolean keepExisting,
-            @Context HttpServletRequest req){
-		try {
-            AdminServiceFactory.getInstance().refreshEduGroupCache(keepExisting);
-	    	return Response.ok().build();
-		} catch (Throwable t) {
-			return ErrorResponse.createResponse(t);
-		}
-	}
-
-	@OPTIONS
-	@Path("/cache/refreshEduGroupCache")
-	@Hidden
-
-	public Response options4() {
-
-		return Response.status(Response.Status.OK).header("Allow", "OPTIONS, GET").build();
-	}
 
 	@POST
 	@Path("/cache/removeCacheEntry")

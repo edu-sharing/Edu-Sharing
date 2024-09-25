@@ -1,14 +1,7 @@
 package org.edu_sharing.alfresco.policy;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateNodePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteAssociationPolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteChildAssociationPolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeMoveNodePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeRemoveAspectPolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeSetNodeTypePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.BeforeUpdateNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.*;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -16,18 +9,17 @@ import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
-import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 
 public class GuestCagePolicy implements BeforeCreateNodePolicy, BeforeDeleteAssociationPolicy,
 										BeforeDeleteChildAssociationPolicy,BeforeDeleteNodePolicy,BeforeMoveNodePolicy,
 										BeforeRemoveAspectPolicy,BeforeSetNodeTypePolicy,BeforeUpdateNodePolicy{
 	
 	PolicyComponent policyComponent;
-	
+
+
+	GuestService guestService;
+
 	public GuestCagePolicy() {
 	}
 	
@@ -56,20 +48,11 @@ public class GuestCagePolicy implements BeforeCreateNodePolicy, BeforeDeleteAsso
 		
 	}
 
-	static List<String> guestUsers = new ArrayList<>();
 
-	
-	private void checkGuest() throws GuestPermissionDeniedException{
-		
-		//System.out.println("guest fully: "+AuthenticationUtil.getFullyAuthenticatedUser());
-		//System.out.println("guest run as: "+AuthenticationUtil.getRunAsUser());
-		//String currentUser = eduSharingWebappUser.get();
-		//System.out.println("guest current: "+currentUser);
-
-
+	private void checkGuest() throws GuestPermissionDeniedException {
 		if(AuthenticationUtil.getFullyAuthenticatedUser() != null
-				&& guestUsers.contains(AuthenticationUtil.getFullyAuthenticatedUser())
-				&& guestUsers.contains(AuthenticationUtil.getRunAsUser())){
+				&& guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser())
+				&& guestService.isGuestUser(AuthenticationUtil.getRunAsUser())){
 			throw new GuestPermissionDeniedException("guest has no permissions to do that");
 		}
 	}
@@ -127,19 +110,7 @@ public class GuestCagePolicy implements BeforeCreateNodePolicy, BeforeDeleteAsso
 		this.policyComponent = policyComponent;
 	}
 
-	public static List<String> getGuestUsers() {
-
-		if (guestUsers.size() == 0) {
-			guestUsers.add(CCConstants.PROXY_USER);
-			guestUsers.add("guest");
-		}
-
-		String guestUsername = ApplicationInfoList.getHomeRepository().getGuest_username();
-		if (guestUsername != null && !guestUsers.contains(guestUsername)) {
-			guestUsers.add(guestUsername);
-		}
-
-		return guestUsers;
-
+	public void setGuestService(GuestService guestService) {
+		this.guestService = guestService;
 	}
 }

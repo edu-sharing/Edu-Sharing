@@ -545,6 +545,9 @@ public class MetadataReader {
 									type == null ? null : ValuespaceInfo.ValuespaceType.valueOf(type.getNodeValue())
 					));
 				}
+                if(name.equals("valuespaceCombineStrategy")) {
+                    widget.setValuespaceCombineStrategy(MetadataWidget.ValuespaceMerge.valueOf(value));
+                }
                 if (name.equals("values"))
                     widget.setValues(getValues(data.getChildNodes(), valuespaceI18n, valuespaceI18nPrefix));
                 if (name.equals("subwidgets"))
@@ -552,17 +555,26 @@ public class MetadataReader {
             }
 			if(valuespaces.size() > 1) {
 				List<MetadataKey> keys = new ArrayList<>();
-				for (ValuespaceInfo v : valuespaces) {
-					ValuespaceData values = getValuespace(v, widget, valuespaceI18n, valuespaceI18nPrefix);
-					if(values.getTitle() == null) {
-						throw new IllegalArgumentException("Multiple valuespace entries are not supported by the given provider used for your vocabularies");
-					}
-					values.getEntries().stream().filter(e -> e.getParent() == null).forEach(e -> {
-						e.setParent(values.getTitle().getKey());
-					});
-					keys.add(values.getTitle());
-					keys.addAll(values.getEntries());
-				}
+                if(widget.getValuespaceMerge().equals(MetadataWidget.ValuespaceMerge.separate)) {
+                    for (ValuespaceInfo v : valuespaces) {
+                        ValuespaceData values = getValuespace(v, widget, valuespaceI18n, valuespaceI18nPrefix);
+                        if (values.getTitle() == null) {
+                            throw new IllegalArgumentException("Multiple valuespace entries are not supported by the given provider used for your vocabularies");
+                        }
+                        values.getEntries().stream().filter(e -> e.getParent() == null).forEach(e -> {
+                            e.setParent(values.getTitle().getKey());
+                        });
+                        keys.add(values.getTitle());
+                        keys.addAll(values.getEntries());
+                    }
+                } else {
+                    for (ValuespaceInfo v : valuespaces) {
+                        ValuespaceData values = getValuespace(v, widget, valuespaceI18n, valuespaceI18nPrefix);
+                        keys.addAll(values.getEntries());
+                        // remove keys which have the delete flag attached
+                        values.getEntries().stream().filter(MetadataKey::getDelete).forEach(k -> keys.removeIf(k2 -> Objects.equals(k2.getKey(), k.getKey())));
+                    }
+                }
 				widget.setValues(keys);
 			} else if (valuespaces.size() == 1) {
 				widget.setValues(getValuespace(valuespaces.get(0),widget,valuespaceI18n,valuespaceI18nPrefix).getEntries());
@@ -636,10 +648,11 @@ public class MetadataReader {
         for (int i = 0; i < keysNode.getLength(); i++) {
             Node keyNode = keysNode.item(i);
             NamedNodeMap attributes = keyNode.getAttributes();
-            String cap = null;
-            String description = null;
+            String cap = null, abbreviation = null, description = null;
             if (attributes != null && attributes.getNamedItem("cap") != null)
                 cap = attributes.getNamedItem("cap").getTextContent();
+            if (attributes != null && attributes.getNamedItem("abbreviation") != null)
+                abbreviation = attributes.getNamedItem("abbreviation").getTextContent();
             if (attributes != null && attributes.getNamedItem("description") != null)
                 description = attributes.getNamedItem("description").getTextContent();
             if (cap == null) cap = "";
@@ -651,6 +664,8 @@ public class MetadataReader {
             key.setI18nPrefix(valuespaceI18nPrefix);
             if (attributes != null && attributes.getNamedItem("parent") != null)
                 key.setParent(attributes.getNamedItem("parent").getTextContent());
+            if (attributes != null && attributes.getNamedItem("delete") != null)
+                key.setDelete(attributes.getNamedItem("delete").getTextContent().equalsIgnoreCase("true"));
             if (attributes != null && attributes.getNamedItem("icon") != null)
                 key.setIcon(attributes.getNamedItem("icon").getTextContent());
             if (attributes != null && attributes.getNamedItem("url") != null)
@@ -663,6 +678,7 @@ public class MetadataReader {
                             : cap,
                     fallback));
             key.setDescription(getTranslation(key, description));
+            key.setAbbreviation(getTranslation(key, abbreviation));
             keys.add(key);
         }
         return keys;

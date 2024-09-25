@@ -80,7 +80,7 @@
     <ng-container *ngIf="node.type !== 'suggestionInput'">
       <mat-checkbox
         [id]="getCheckboxId(node)"
-        [checked]="getIsChecked(node)"
+        [checked]="getIsChecked(node) || node.isIndeterminate"
         [indeterminate]="node.isIndeterminate"
         [disabled]="getIsDisabled(node)"
         (change)="toggleNode(node, $event.checked)"

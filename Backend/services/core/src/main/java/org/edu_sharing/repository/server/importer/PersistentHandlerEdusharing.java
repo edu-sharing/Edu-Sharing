@@ -27,7 +27,9 @@
  */
 package org.edu_sharing.repository.server.importer;
 
+import jakarta.transaction.*;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
@@ -51,7 +53,6 @@ import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.nodeservice.RecurseMode;
 import org.springframework.context.ApplicationContext;
 
-import jakarta.transaction.*;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -398,21 +399,24 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 			serviceRegistry.getTransactionService().getRetryingTransactionHelper().doInTransaction(() -> {
 				policyBehaviourFilter.disableBehaviour(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId));
 				NodeServiceFactory.getLocalService().updateNodeNative(nodeId,
-						(HashMap<String, ?>) propertiesToRemove.stream().collect(
-								Collectors.toMap((o) -> o, (o) -> null)
+						propertiesToRemove.stream().collect(
+								HashMap::new, (m, v) -> m.put(v, null), HashMap::putAll
 						)
 				);
 				policyBehaviourFilter.enableBehaviour(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId));
 				return null;
 			});
 		}catch(Throwable t) {
-			getLogger().warn("failed to remove props from node "+nodeId);
+			getLogger().warn("failed to remove props from node "+nodeId+": " + t.getMessage());
 		}
 
 		try {
 			NodeServiceFactory.getLocalService().updateNodeNative(nodeId, simpleProps);
 		}catch(DuplicateChildNodeNameException e){
 			simpleProps.put(CCConstants.CM_NAME, EduSharingNodeHelper.makeUniqueName((String) simpleProps.get(CCConstants.CM_NAME)));
+			NodeServiceFactory.getLocalService().updateNodeNative(nodeId, simpleProps);
+		} catch (IntegrityException e) {
+			simpleProps.put(CCConstants.CM_NAME, EduSharingNodeHelper.makeUniqueName((String)simpleProps.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID)));
 			NodeServiceFactory.getLocalService().updateNodeNative(nodeId, simpleProps);
 		}
 		createChildobjects(nodeId, nodeProps);
@@ -466,6 +470,9 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 			newNodeId = NodeServiceFactory.getLocalService().createNodeBasic(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentId, type, association, simpleProps);
 		} catch (DuplicateChildNodeNameException e) {
 			simpleProps.put(CCConstants.CM_NAME, EduSharingNodeHelper.makeUniqueName((String)simpleProps.get(CCConstants.CM_NAME)));
+			newNodeId = NodeServiceFactory.getLocalService().createNodeBasic(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentId, type, association, simpleProps);
+		} catch (IntegrityException e) {
+			simpleProps.put(CCConstants.CM_NAME, EduSharingNodeHelper.makeUniqueName((String)simpleProps.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID)));
 			newNodeId = NodeServiceFactory.getLocalService().createNodeBasic(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentId, type, association, simpleProps);
 		}
 		if (aspects != null) {

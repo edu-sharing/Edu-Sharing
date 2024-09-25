@@ -52,7 +52,7 @@ public class FixOrganisationAdminGroup extends AbstractJob{
             Set<String> allGroups = authorityService.getAllAuthoritiesInZone(AuthorityService.ZONE_APP_DEFAULT, AuthorityType.GROUP);
             Set<String> allOrganisations = allGroups.stream()
                     .filter(g ->
-                            nodeService.hasAspect(authorityService.getAuthorityNodeRef(g), OrganisationService.QNAME_EDUGROUP)
+                            nodeService.hasAspect(authorityService.getAuthorityNodeRef(g), OrganisationService.ASPECT_EDUGROUP)
                                     && (organisationFilter.size() == 0 || organisationFilter.contains(g)) )
                     .collect(Collectors.toSet());
 

@@ -18,35 +18,8 @@ package org.edu_sharing.spring.scope.refresh;
  * <a href="https://github.com/spring-cloud/spring-cloud-commons">Source by spring cloud</a>
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.edu_sharing.lightbend.LightbendConfigHelper;
-import org.edu_sharing.metadataset.v2.MetadataReader;
-import org.edu_sharing.repository.server.RepoFactory;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.service.nodeservice.PropertiesInterceptorFactory;
-import org.edu_sharing.service.provider.ProviderHelper;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.CommandLinePropertySource;
-import org.springframework.core.env.CompositePropertySource;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.StandardEnvironment;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.context.support.StandardServletEnvironment;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,14 +31,15 @@ public class ContextRefresher {
         return this.scope;
     }
 
-    public synchronized void refresh() {
-        RepoFactory.refresh();
-        ApplicationInfoList.refresh();
-        LightbendConfigHelper.refresh();
-        MetadataReader.refresh();
-        PropertiesInterceptorFactory.refresh();
-        ProviderHelper.clearCache();
+    public synchronized void refresh(){
+        refresh(true);
+    }
 
-        this.scope.refreshAll();
+    /**
+     * Fires a ContextRefreshEvent to enforce a context reload of Refresh scoped beans.
+     * @param isCaller true if this event was called by the same cluster instance otherwise false
+     */
+    public synchronized void refresh(boolean isCaller) {
+        this.scope.refreshAll(isCaller);
     }
 }

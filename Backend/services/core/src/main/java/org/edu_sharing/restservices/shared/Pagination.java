@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.edu_sharing.repository.server.SearchResultNodeRef;
 
 
 @Schema(description = "")
@@ -21,6 +22,11 @@ public class Pagination  {
 	  from=result.getSkipCount();
 	  total=result.getTotalCount();
 	  count=result.getCount();
+  }
+  public Pagination(SearchResultNodeRef result) {
+    from=result.getStartIDX();
+    total=result.getNodeCount();
+    count=result.getData().size();
   }
   public <T extends Node>  Pagination(List<T> result) {
     from=0;

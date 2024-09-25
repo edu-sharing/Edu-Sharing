@@ -7,6 +7,7 @@ import {
     Node,
     NodeEntries,
     NodePermissions,
+    NodePermissionsGet,
     NodeVersion,
     NodeVersionEntries,
     NodeVersionRefEntries,
@@ -36,10 +37,7 @@ export class NodeService {
     private readonly _nodesChanged = new Subject<void>();
     readonly nodesChanged = this._nodesChanged.asObservable();
 
-    constructor(
-        private nodeV1: NodeV1Service,
-        private searchV1: SearchV1Service,
-    ) {}
+    constructor(private nodeV1: NodeV1Service, private searchV1: SearchV1Service) {}
 
     getNode(id: string, { repository = HOME_REPOSITORY } = {}): Observable<Node> {
         return this.nodeV1
@@ -385,6 +383,17 @@ export class NodeService {
         });
     }
 
+    getPermissions(
+        id: string,
+        { repository = HOME_REPOSITORY } = {},
+    ): Observable<NodePermissionsGet> {
+        return this.nodeV1
+            .getPermission({
+                node: id,
+                repository,
+            })
+            .pipe(map((n) => n.permissions));
+    }
     setPermissions(
         id: string,
         permissions: NodePermissions,

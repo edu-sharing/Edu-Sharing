@@ -1,20 +1,17 @@
 package org.edu_sharing.service.authority;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.edu_sharing.repository.client.rpc.EduGroup;
+import org.edu_sharing.repository.client.rpc.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.util.MD5;
-import org.edu_sharing.repository.client.rpc.EduGroup;
-import org.edu_sharing.repository.client.rpc.User;
-import org.edu_sharing.restservices.DAOException;
-import org.edu_sharing.restservices.iam.v1.model.ProfileSettings;
-
 public interface AuthorityService {
-	Set<String> getMemberships(String username) throws Exception;
+	Set<String> getMemberships(String username);
 	boolean isGlobalAdmin();
 	boolean hasAdminAccessToOrganization(String orgName);
 	void deleteAuthority(String authorityName);

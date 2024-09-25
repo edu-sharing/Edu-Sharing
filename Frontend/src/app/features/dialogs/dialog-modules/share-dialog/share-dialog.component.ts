@@ -8,17 +8,15 @@ import {
     ViewChild,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { LocalEventsService, UIAnimation, UIConstants } from 'ngx-edu-sharing-ui';
+import { LocalEventsService, UIAnimation } from 'ngx-edu-sharing-ui';
 import * as rxjs from 'rxjs';
 import { forkJoin as observableForkJoin } from 'rxjs';
 import {
     CollectionUsage,
     ConfigurationService,
     DialogButton,
-    LocalPermissions,
     LoginResult,
     Node,
-    NodePermissions,
     NodeShare,
     NodeWrapper,
     Permission,
@@ -42,8 +40,20 @@ import { DialogsService } from '../../dialogs.service';
 import { ShareDialogPublishComponent } from './publish/publish.component';
 import { ShareDialogData, ShareDialogResult } from './share-dialog-data';
 import { trigger } from '@angular/animations';
-import { AuthenticationService } from 'ngx-edu-sharing-api';
+import { Ace, Acl, AuthenticationService, Authority, NodeService } from 'ngx-edu-sharing-api';
 import { ShareDialogRestrictedAccessComponent } from './restricted-access/restricted-access.component';
+
+export type ExtendedAcl = {
+    inherited: boolean;
+    permissions: ExtendedAce[];
+};
+export type ExtendedAuthority = Omit<Authority, 'authorityType'> & {
+    authorityType: string;
+};
+export type ExtendedAce = Omit<Ace, 'authority'> & {
+    authority: ExtendedAuthority;
+    editable?: boolean;
+};
 
 @Component({
     selector: 'es-share-dialog',
@@ -81,11 +91,13 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         'Coordinator',
         'ReadPermissions',
         'ChangePermissions',
+        'ESChildManager',
         'CCPublish',
         'Relation',
         'Comment',
         'Feedback',
         'Deny',
+        'Embed',
     ];
     readonly PERMISSIONS_FORCES = [
         ['Read', ['ConsumerMetadata']],
@@ -97,6 +109,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         ['Comment', ['Consumer']],
         ['Feedback', ['Consumer']],
         ['Rate', ['Consumer']],
+        ['Embed', ['Consumer']],
         ['Write', ['Editor']],
         ['DeleteChildren', ['Delete']],
         ['DeleteNode', ['Delete']],
@@ -115,16 +128,16 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
     get tab() {
         return this._tab;
     }
-    permissionsUser: Permission[];
-    permissionsGroup: Permission[];
-    newPermissions: Permission[] = [];
+    permissionsUser: ExtendedAce[];
+    permissionsGroup: ExtendedAce[];
+    newPermissions: ExtendedAce[] = [];
     inheritAccessDenied = false;
     bulkMode = 'extend';
     bulkInvite = false;
-    owner: Permission;
-    publishEnabled: Permission;
-    linkEnabled: Permission;
-    linkDisabled: Permission;
+    owner: ExtendedAce;
+    publishEnabled: ExtendedAce;
+    linkEnabled: ExtendedAce;
+    linkDisabled: ExtendedAce;
     link = false;
     _nodes: Node[];
     searchStr: string;
@@ -141,7 +154,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
     collectionColumns = UIHelper.getDefaultCollectionColumns();
     collections: CollectionUsage[];
     // store authorities marked for deletion
-    deletedPermissions: string[] = [];
+    deletedPermissions: ExtendedAce[] = [];
     deletedUsages: any[] = [];
     usages: { [type: string]: Usage[] };
 
@@ -149,9 +162,9 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
     inherited: boolean;
     notifyUsers = true;
     notifyMessage: string;
-    inherit: Permission[] = [];
-    permissions: Permission[] = null;
-    private originalPermissions: LocalPermissions[];
+    inherit: ExtendedAce[] = [];
+    permissions: ExtendedAce[] = null;
+    private originalPermissions: ExtendedAcl[];
     showChooseType = false;
     private showChooseTypeList: Permission;
 
@@ -167,34 +180,35 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         private localEvents: LocalEventsService,
         private dialogs: DialogsService,
         private iam: RestIamService,
-        private nodeApi: RestNodeService,
+        private nodeApiLegacy: RestNodeService,
+        private nodeApi: NodeService,
         private toast: Toast,
         private translate: TranslateService,
         private usageApi: RestUsageService,
     ) {
         //this.dataService=new SearchData(iam);
 
-        this.linkEnabled = new Permission();
-        this.linkEnabled.authority = {
-            authorityName: this.translate.instant('WORKSPACE.SHARE.LINK_ENABLED_INFO'),
-            authorityType: 'LINK',
+        this.linkEnabled = {
+            authority: {
+                authorityName: this.translate.instant('WORKSPACE.SHARE.LINK_ENABLED_INFO'),
+                authorityType: 'LINK',
+            },
+            permissions: [RestConstants.PERMISSION_CONSUMER],
         };
-        this.linkEnabled.permissions = [RestConstants.PERMISSION_CONSUMER];
-        this.linkDisabled = new Permission();
-        this.linkDisabled.authority = {
-            authorityName: this.translate.instant('WORKSPACE.SHARE.LINK_DISABLED_INFO'),
-            authorityType: 'LINK',
+        this.linkDisabled = {
+            authority: {
+                authorityName: this.translate.instant('WORKSPACE.SHARE.LINK_DISABLED_INFO'),
+                authorityType: 'LINK',
+            },
+            permissions: [],
         };
-        this.linkDisabled.permissions = [];
-        this.publishEnabled = new Permission();
-        this.publishEnabled.authority = {
-            authorityName: this.translate.instant('WORKSPACE.SHARE.PUBLISH_ENABLED'),
-            authorityType: 'EVERYONE',
+        this.publishEnabled = {
+            authority: {
+                authorityName: this.translate.instant('WORKSPACE.SHARE.PUBLISH_ENABLED'),
+                authorityType: 'EVERYONE',
+            },
+            permissions: [RestConstants.PERMISSION_CONSUMER, RestConstants.ACCESS_CC_PUBLISH],
         };
-        this.publishEnabled.permissions = [
-            RestConstants.PERMISSION_CONSUMER,
-            RestConstants.ACCESS_CC_PUBLISH,
-        ];
 
         this.connector.isLoggedIn(false).subscribe((data: LoginResult) => {
             this.isSafe = data.currentScope != null;
@@ -228,15 +242,12 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         const isStringArray = (a: string[] | Node[]): a is string[] => typeof a[0] === 'string';
         if (isStringArray(this.data.nodes)) {
             this.dialogRef.patchState({ isLoading: true });
-            rxjs.forkJoin(
-                this.data.nodes.map((nodeId) =>
-                    this.nodeApi.getNodeMetadata(nodeId, [RestConstants.ALL]),
-                ),
-            ).subscribe((nodeWrappers) => {
-                this.dialogRef.patchState({ isLoading: false });
-                const nodes = nodeWrappers.map(({ node }) => node);
-                this.setNodes(nodes);
-            });
+            rxjs.forkJoin(this.data.nodes.map((nodeId) => this.nodeApi.getNode(nodeId))).subscribe(
+                (nodes) => {
+                    this.dialogRef.patchState({ isLoading: false });
+                    this.setNodes(nodes);
+                },
+            );
         } else {
             this.setNodes(this.data.nodes);
         }
@@ -297,15 +308,17 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
             this.updateNodeLink();
             this.dialogRef.patchState({ isLoading: true });
             observableForkJoin(
-                this._nodes.map((n) => this.nodeApi.getNodePermissions(n.ref.id)),
+                this._nodes.map((n) => this.nodeApi.getPermissions(n.ref.id)),
             ).subscribe((permissions) => {
                 this.originalPermissions = Helper.deepCopy(
-                    permissions.map((p) => p.permissions.localPermissions),
+                    permissions.map((p) => p.localPermissions),
                 );
-                if (permissions.length === 1 && permissions[0].permissions) {
+                if (permissions.length === 1 && permissions[0]) {
                     //this.originalPermissions=Helper.deepCopy(permissions[0].permissions.localPermissions);
-                    this.setPermissions(permissions[0].permissions.localPermissions.permissions);
-                    this.isInherited(permissions[0].permissions.localPermissions.inherited);
+                    this.setPermissions(
+                        permissions[0].localPermissions.permissions as unknown as ExtendedAce[],
+                    );
+                    this.isInherited(permissions[0].localPermissions.inherited);
                     setTimeout(() => this.setInitialState());
                 } else {
                     this.setPermissions([]);
@@ -315,10 +328,10 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
             this.reloadUsages();
         }
         if (this._nodes.length === 1 && this._nodes[0].parent && this._nodes[0].parent.id) {
-            this.nodeApi.getNodePermissions(this._nodes[0].parent.id).subscribe(
-                (data: NodePermissions) => {
-                    if (data.permissions) {
-                        this.inherit = data.permissions.inheritedPermissions;
+            this.nodeApi.getPermissions(this._nodes[0].parent.id).subscribe(
+                (data) => {
+                    if (data) {
+                        this.inherit = data.inheritedPermissions as ExtendedAce[];
                         this.removePermissions(this.inherit, 'OWNER');
                         this.inherit = this.inherit.filter(
                             (p) =>
@@ -326,13 +339,13 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                                 this.connector.getCurrentLogin()?.authorityName,
                         );
                         this.removePermissions(
-                            data.permissions.localPermissions.permissions,
+                            data.localPermissions.permissions as ExtendedAce[],
                             'OWNER',
                         );
                         this.inherit = UIHelper.mergePermissions(
                             this.inherit,
-                            data.permissions.localPermissions.permissions,
-                        );
+                            data.localPermissions.permissions,
+                        ) as ExtendedAce[];
                         // dealy on tick to let sub-components (share-publish) init
                         this.initialState = this.getState();
                     }
@@ -341,7 +354,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                     this.inheritAccessDenied = true;
                 },
             );
-            this.nodeApi.getNodeParents(this._nodes[0].ref.id).subscribe(
+            this.nodeApiLegacy.getNodeParents(this._nodes[0].ref.id).subscribe(
                 (data) => {
                     //this.inheritAllowed = !this.isCollection() && data.nodes.length > 1;
                     // changed in 4.1 to keep inherit state of collections
@@ -356,7 +369,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                 },
             );
             if (this._nodes[0].ref.id) {
-                this.nodeApi
+                this.nodeApiLegacy
                     .getNodeMetadata(this._nodes[0].ref.id, [RestConstants.ALL])
                     .subscribe((data: NodeWrapper) => {
                         let authority = data.node.properties[RestConstants.CM_CREATOR][0];
@@ -366,15 +379,18 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                             authority = data.node.properties[RestConstants.CM_OWNER][0];
                             user = data.node.owner;
                         }
-                        this.owner = new Permission();
-                        this.owner.authority = {
-                            authorityName: authority,
-                            authorityType: 'USER',
+                        this.owner = {
+                            authority: {
+                                authorityName: authority,
+                                authorityType: 'USER',
+                            },
+                            user: user,
+                            permissions: ['Owner'],
                         };
-                        (this.owner as any).user = user;
+                        this.owner.user = user;
                         this.iam.getUser(authority).subscribe(
                             (apiUser) => {
-                                (this.owner as any).user = apiUser.person.profile;
+                                this.owner.user = apiUser.person.profile as any;
                                 // force a refresh of the data for ui update
                                 this.owner = Helper.deepCopy(this.owner);
                             },
@@ -382,7 +398,6 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                                 // ignore, only relevant for the avatar of the owner
                             },
                         );
-                        this.owner.permissions = ['Owner'];
                     });
             }
         }
@@ -390,9 +405,16 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
             this.isAdmin = data.isAdmin;
         });
     }
-
-    isDeleted(p: Permission) {
-        return this.deletedPermissions.indexOf(p.authority.authorityName) !== -1;
+    findDeleted(p: ExtendedAce) {
+        return this.deletedPermissions.findIndex(
+            (p2) =>
+                p.authority.authorityName === p2.authority.authorityName &&
+                p.from === p2.from &&
+                p.to === p2.to,
+        );
+    }
+    isDeleted(p: ExtendedAce) {
+        return this.findDeleted(p) !== -1;
     }
 
     cancel() {
@@ -408,18 +430,18 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         void this.dialogs.openShareHistoryDialog({ node });
     }
 
-    filterDisabledPermissions(permissions: Permission[]) {
-        let result: Permission[] = [];
+    filterDisabledPermissions(permissions: ExtendedAce[]) {
+        let result: ExtendedAce[] = [];
         if (!permissions) return result;
         for (let p of permissions) {
-            if (this.deletedPermissions.indexOf(p.authority.authorityName) === -1) result.push(p);
+            if (this.findDeleted(p) === -1) result.push(p);
         }
         return result;
     }
 
-    setPermission(permission: Permission, name: string, status: any) {
+    setPermission(permission: ExtendedAce, name: string, status: any) {
         if (status.checked) {
-            if (permission.permissions.indexOf(name) == -1) permission.permissions.push(name);
+            if (permission.permissions.indexOf(name) === -1) permission.permissions.push(name);
         } else {
             let index = permission.permissions.indexOf(name);
             if (index != -1) {
@@ -429,7 +451,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         this.applicationRef.tick();
     }
 
-    isImplicitPermission(permission: Permission, name: string) {
+    isImplicitPermission(permission: ExtendedAce, name: string) {
         //if(name=="Consumer") // this is the default permission, can't be removed
         //  return true;
         if (name != 'All' && permission.permissions.indexOf('All') != -1)
@@ -454,13 +476,13 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         return false;
     }
 
-    hasImplicitPermission(permission: Permission, name: string) {
+    hasImplicitPermission(permission: ExtendedAce, name: string) {
         if (permission.permissions.indexOf(name) != -1) return true;
         return this.isImplicitPermission(permission, name);
     }
 
     private updateNodeLink() {
-        this.nodeApi
+        this.nodeApiLegacy
             .getNodeShares(this._nodes[0].ref.id, RestConstants.SHARE_LINK)
             .subscribe((data: NodeShare[]) => {
                 this.link = data.length > 0 && data[0].expiryDate != 0;
@@ -477,10 +499,6 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                 this.usages = RestUsageService.getNodeUsagesByRepositoryType(filteredUsages);
             });
         });
-    }
-
-    openCollection(collection: Node) {
-        window.open(UIConstants.ROUTER_PREFIX + 'collections?id=' + collection.ref.id);
     }
 
     isStateModified() {
@@ -522,17 +540,12 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         this.showChooseType = true;
     }
 
-    private chooseTypeList(p: Permission) {
-        this.showChooseTypeList = p;
-    }
-
-    removePermission(p: Permission) {
-        if (this.isDeleted(p))
-            this.deletedPermissions.splice(
-                this.deletedPermissions.indexOf(p.authority.authorityName),
-                1,
-            );
-        else this.deletedPermissions.push(p.authority.authorityName);
+    removePermission(p: ExtendedAce) {
+        if (this.isDeleted(p)) {
+            this.deletedPermissions.splice(this.findDeleted(p), 1);
+        } else {
+            this.deletedPermissions.push(p);
+        }
         /*
     if(this.newPermissions.indexOf(p)!=-1)
     this.newPermissions.splice(this.newPermissions.indexOf(p),1);
@@ -550,14 +563,19 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
     }
 
     private contains(
-        permissions: Permission[],
-        permission: Permission,
+        permissions: ExtendedAce[],
+        permission: ExtendedAce,
         comparePermissions: boolean,
     ): boolean {
         for (let p of permissions) {
             if (p.authority.authorityName == permission.authority.authorityName) {
-                if (!comparePermissions) return true;
-                if (Helper.arrayEquals(p.permissions, permission.permissions)) return true;
+                if (
+                    (!comparePermissions || this.permissionsAreIdentical(p, permission)) &&
+                    p.from === permission.from &&
+                    p.to === permission.to
+                ) {
+                    return true;
+                }
             }
         }
         return false;
@@ -576,13 +594,14 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
             permission.group = selected.profile;
         }
         permission.permissions = this.currentType;
+        permission.editable = true;
+        permission.from = null;
+        permission.to = null;
         permission = Helper.deepCopy(permission);
-        if (this.deletedPermissions.indexOf(permission.authority.authorityName) != -1) {
-            this.deletedPermissions.splice(
-                this.deletedPermissions.indexOf(permission.authority.authorityName),
-                1,
-            );
+        if (this.isDeleted(permission)) {
+            this.deletedPermissions.splice(this.findDeleted(permission), 1);
         } else if (!this.contains(this.permissions, permission, false)) {
+            console.log('does not contain', this.permissions, permission);
             this.newPermissions.push(permission);
             this.permissions.push(permission);
             this.setPermissions(this.permissions);
@@ -590,7 +609,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         this.searchStr = '';
     }
 
-    isNewPermission(p: Permission) {
+    isNewPermission(p: ExtendedAce) {
         if (!this.originalPermissions?.length || !this.originalPermissions[0].permissions)
             return true;
         return !this.contains(this.originalPermissions[0].permissions, p, true);
@@ -598,11 +617,30 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
 
     async save() {
         if (this.permissions != null) {
+            if (!!this.hasInvalidPermissions()) {
+                console.warn(this.hasInvalidPermissions());
+                const errorDialog = this.dialogs.openGenericDialog({
+                    buttons: [
+                        {
+                            label: 'OK',
+                            config: DialogButton.TYPE_PRIMARY,
+                            callback: (ref) => {
+                                ref.close();
+                                return null;
+                            },
+                        },
+                    ],
+                    title: 'WORKSPACE.SHARE.TIMEBASED.INVALID_STATE_TITLE',
+                    message: 'WORKSPACE.SHARE.TIMEBASED.INVALID_STATE_DETAILS',
+                    nodes: this._nodes,
+                });
+                return;
+            }
             this.dialogRef.patchState({ isLoading: true });
             let inherit = this.inherited && this.inheritAllowed && !this.isCollection();
             const actions = this._nodes.map((n, i) => {
                 return async () => {
-                    let permissions: Permission[] = Helper.deepCopy(this.permissions);
+                    let permissions: Ace[] = Helper.deepCopy(this.permissions);
                     if (this.isBulk()) {
                         if (this.bulkInvite) {
                             const permission = RestHelper.getAllAuthoritiesPermission();
@@ -616,17 +654,37 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                         inherit = this.originalPermissions[i].inherited;
                         if (this.bulkMode === 'extend') {
                             permissions = UIHelper.mergePermissionsWithHighestPermission(
-                                this.originalPermissions[i].permissions,
+                                this.originalPermissions[i].permissions as Ace[],
                                 permissions,
                             );
                         } else {
                             // we do nothing, because the original ones are getting deleted
                         }
                     }
-                    permissions = permissions.filter((p: Permission) => !this.isDeleted(p));
+                    permissions = permissions.filter((p) => !this.isDeleted(p as ExtendedAce));
                     // handle the invitation of group everyone
                     if (this.publishComponent) {
                         permissions = this.publishComponent.updatePermissions(permissions);
+                        if (this.publishComponent.shareModeDirect) {
+                            // add the virtual "publishEnabled" since from/to is only represented on this element
+                            const everyone = permissions.filter(
+                                (p) =>
+                                    p.authority.authorityType ===
+                                    RestConstants.AUTHORITY_TYPE_EVERYONE,
+                            )?.[0];
+                            if (everyone) {
+                                everyone.from = this.publishEnabled.from;
+                                everyone.to = this.publishEnabled.to;
+                            }
+                            permissions = permissions
+                                .filter(
+                                    (p) =>
+                                        p.authority.authorityType !==
+                                        RestConstants.AUTHORITY_TYPE_EVERYONE,
+                                )
+                                .concat(everyone);
+                            console.log(permissions, this.publishEnabled);
+                        }
                         try {
                             await this.publishComponent.save().toPromise();
                         } catch (error) {
@@ -657,7 +715,10 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                         return;
                     }
                     this.updateUsages(
-                        RestHelper.copyPermissions(Helper.deepCopy(this.permissions), inherit),
+                        RestHelper.copyPermissions(
+                            Helper.deepCopy(this.permissions),
+                            inherit,
+                        ) as ExtendedAcl,
                     );
                 },
                 (error: any) => {
@@ -712,7 +773,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         if (type) this.currentType = type;
     }
 
-    private removePermissions(permissions: Permission[], remove: string) {
+    private removePermissions(permissions: ExtendedAce[], remove: string) {
         for (let i = 0; i < remove.length; i++) {
             if (permissions[i] && permissions[i].authority.authorityType == remove) {
                 permissions.splice(i, 1);
@@ -721,11 +782,20 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         }
     }
 
-    private setPermissions(permissions: Permission[]) {
+    private setPermissions(permissions: ExtendedAce[]) {
         if (permissions == null) {
             permissions = [];
         }
         this.permissions = permissions;
+
+        // restore timebased state for everyone
+        const everyone = permissions.filter(
+            (p) => p.authority.authorityType === RestConstants.AUTHORITY_TYPE_EVERYONE,
+        )?.[0];
+        if (everyone) {
+            this.publishEnabled.from = everyone.from;
+            this.publishEnabled.to = everyone.to;
+        }
         this.permissionsUser = this.permissions.slice();
         this.permissionsGroup = this.permissions.slice();
         this.removePermissions(this.permissionsUser, RestConstants.AUTHORITY_TYPE_GROUP);
@@ -740,12 +810,6 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
             this.getAuthorityPos(this.inherit, RestConstants.AUTHORITY_EVERYONE) !== -1
         );
     }
-    localPublish() {
-        return (
-            this.getAuthorityPos(this.permissions, RestConstants.AUTHORITY_EVERYONE) !== -1 &&
-            this.deletedPermissions?.indexOf(RestConstants.AUTHORITY_EVERYONE) === -1
-        );
-    }
     getPublishActive() {
         return (
             this.getPublishInherit() ||
@@ -755,7 +819,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         );
     }
 
-    private getAuthorityPos(permissions: Permission[], authority: string) {
+    private getAuthorityPos(permissions: ExtendedAce[], authority: string) {
         let i = 0;
         for (let permission of permissions) {
             if (permission.authority.authorityName == authority) return i;
@@ -764,7 +828,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         return -1;
     }
 
-    private updateUsages(permissions: LocalPermissions, pos = 0, error = false) {
+    private updateUsages(permissions: ExtendedAcl, pos = 0, error = false) {
         // skip for bulk mode
         if (pos === this.deletedUsages.length || this.isBulk()) {
             if (this.data.sendToApi) {
@@ -803,7 +867,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
         }
     }
 
-    private getEmitObject(localPermissions: LocalPermissions) {
+    private getEmitObject(localPermissions: ExtendedAcl) {
         return {
             permissions: localPermissions,
             notify: this.notifyUsers,
@@ -813,24 +877,22 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
 
     private async handlePermissionsPerNode(
         n: Node,
-        permissions: Permission[],
+        permissions: Ace[],
         inherit: boolean,
     ): Promise<void> {
         const permissionsCopy = RestHelper.copyAndCleanPermissions(permissions, inherit);
         if (!this.data.sendToApi) {
             this.dialogRef.close(
-                this.getEmitObject(RestHelper.copyPermissions(permissions, inherit)),
+                this.getEmitObject(RestHelper.copyPermissions(permissions, inherit) as ExtendedAcl),
             );
             return null;
         }
         await this.nodeApi
-            .setNodePermissions(
-                n.ref.id,
-                permissionsCopy,
-                this.notifyUsers && this.data.sendMessages,
-                this.notifyMessage,
-                false,
-            )
+            .setPermissions(n.ref.id, permissionsCopy as unknown as Acl, {
+                sendMail: this.notifyUsers && this.data.sendMessages,
+                mailText: this.notifyMessage,
+                sendCopy: false,
+            })
             .toPromise();
     }
 
@@ -891,13 +953,9 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
      * @return true | false | not exist return false
      */
     isLicenseEmpty() {
-        if (
-            this._nodes == null ||
-            !this._nodes[0].properties[RestConstants.CCM_PROP_LICENSE]?.[0]
-        ) {
-            return true;
-        }
-        return false;
+        return (
+            this._nodes == null || !this._nodes[0].properties[RestConstants.CCM_PROP_LICENSE]?.[0]
+        );
     }
 
     /**
@@ -923,12 +981,57 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
      * @return true | false | not exist return false
      */
     isAuthorEmpty() {
-        if (
+        return (
             this._nodes == null ||
             !this._nodes[0].properties[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR]?.[0]
-        ) {
+        );
+    }
+
+    isOnlyTimebasedForAuthority(permission: ExtendedAce) {
+        if (permission.from || permission.to) {
             return true;
         }
-        return false;
+        return !this.permissions.find(
+            (p) =>
+                p.authority.authorityName === permission.authority.authorityName &&
+                (p.from || p.to),
+        );
+    }
+
+    timebasedInvalid(permission: ExtendedAce) {
+        return (
+            (permission.from || permission.to) &&
+            permission.authority.authorityType !== RestConstants.AUTHORITY_TYPE_EVERYONE &&
+            this.isOnlyTimebasedForAuthority(permission) &&
+            !!this.permissions
+                .filter(
+                    (p) =>
+                        !(p.from || p.to) &&
+                        permission.authority.authorityName === p.authority.authorityName,
+                )
+                .find((p) =>
+                    UIHelper.permissionIsGreaterThanOrEqual(
+                        p.permissions[0],
+                        permission.permissions[0],
+                    ),
+                )
+        );
+    }
+
+    private hasInvalidPermissions() {
+        return this.permissions.find((p) => !this.isDeleted(p) && this.timebasedInvalid(p));
+    }
+
+    private permissionsAreIdentical(p1: ExtendedAce, p2: ExtendedAce) {
+        return (
+            p1.permissions
+                .map((p) => RestConstants.BASIC_PERMISSIONS.indexOf(p))
+                .sort()
+                .reverse()?.[0] ===
+            p2.permissions
+                .map((p) => RestConstants.BASIC_PERMISSIONS.indexOf(p))
+                .sort()
+                .reverse()?.[0]
+        );
     }
 }

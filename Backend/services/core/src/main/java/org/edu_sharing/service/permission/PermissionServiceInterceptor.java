@@ -5,6 +5,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.service.nodeservice.NodeServiceInterceptor;
+import org.edu_sharing.service.nodeservice.NodeServiceInterceptorPermissions;
+import org.edu_sharing.service.nodeservice.PropertiesInterceptorFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +31,13 @@ public class PermissionServiceInterceptor implements MethodInterceptor {
                 // to improve performance, if node seems to have already valid permission, return true
                 if (result)
                     return result;
+
+                for (NodeServiceInterceptorPermissions nodeServiceInterceptorPermission : PropertiesInterceptorFactory.getNodeServiceInterceptorPermissions()) {
+                    if(nodeServiceInterceptorPermission.hasPermission(nodeId,(String) data)){
+                        return true;
+                    }
+                }
+
                 if (!CCConstants.getUsagePermissions().contains((String) data)) {
                     return false;
                 }

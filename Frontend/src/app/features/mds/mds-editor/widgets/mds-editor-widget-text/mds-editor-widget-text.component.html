@@ -36,10 +36,16 @@
   [injectedView]="this"
   [widget]="widget"
   [label]="false"
+  [control]="formControl"
   [wrapInFormField]="false"
+  [showBottomCaption]="false"
   [valueType]="valueType"
 >
-  <mat-form-field class="mat-form-textarea" [hideRequiredMarker]="true">
+  <mat-form-field
+    class="mat-form-textarea"
+    [hideRequiredMarker]="true"
+    [floatLabel]="widget.definition.placeholder ? 'always' : 'auto'"
+  >
     <mat-label>
       {{ widget.definition.caption }}
       <!-- We use our own required marker to show it even on disabled controls for bulk editing.
@@ -63,12 +69,12 @@
       (blur)="blur()"
       (keydown.enter)="submit()"
     ></textarea>
-    <mat-hint [hidden]="!widget.definition.bottomCaption">
-      {{ widget.definition.bottomCaption }}
-    </mat-hint>
-    <mat-error [hidden]="!formControl.errors?.required">
-      <ng-container *ngTemplateOutlet="error"></ng-container>
-    </mat-error>
+    <mat-hint [hidden]="!widget.definition.bottomCaption">{{
+      widget.definition.bottomCaption
+    }}</mat-hint>
+    <mat-error [hidden]="!formControl.errors?.required"
+      ><ng-container *ngTemplateOutlet="error"></ng-container
+    ></mat-error>
   </mat-form-field>
 </es-mds-editor-widget-container>
 <div class="suggestions" *ngIf="getSuggestions()?.length">

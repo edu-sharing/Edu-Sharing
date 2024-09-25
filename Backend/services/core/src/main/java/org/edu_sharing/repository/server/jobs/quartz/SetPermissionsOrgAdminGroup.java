@@ -2,13 +2,14 @@ package org.edu_sharing.repository.server.jobs.quartz;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
-import org.edu_sharing.repository.server.tools.cache.EduGroupCache;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.context.ApplicationContext;
@@ -45,7 +46,7 @@ public class SetPermissionsOrgAdminGroup extends AbstractJob {
 	
 	private void run(String[] orgs, boolean execute) {
 		if(orgs == null) {
-			orgs = EduGroupCache.getNames();
+			orgs = organisationService.getOrganisations().stream().map(o -> o.get(ContentModel.PROP_AUTHORITY_NAME)).collect(Collectors.toList()).toArray(new String[0]);
 		}
 		
 		logger.info("running for " + orgs.length + " orgs");

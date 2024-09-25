@@ -68,6 +68,25 @@ a:active {
             color: $primary;
             font-weight: 400;
         }
+        .mdsWidget_vcard,
+        .mds_license {
+            .mdsValue > div {
+                flex-direction: column;
+                align-items: flex-start;
+                a {
+                    color: $primary;
+                    text-decoration: underline;
+                }
+
+                a:hover {
+                    text-decoration: none;
+                }
+
+                a:focus {
+                    @include setGlobalKeyboardFocus();
+                }
+            }
+        }
     }
     // Again, `&.cdk-keyboard-focused` would be better.
     .edusharing_rendering_metadata_body .mds_license a:focus {

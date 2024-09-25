@@ -1,11 +1,5 @@
 package org.edu_sharing.alfresco.authentication.subsystems;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -19,10 +13,15 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.policy.GuestCagePolicy;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.springframework.dao.ConcurrencyFailureException;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 public class SubsystemChainingAuthenticationService extends org.alfresco.repo.security.authentication.subsystems.SubsystemChainingAuthenticationService {
 
@@ -32,10 +31,10 @@ public class SubsystemChainingAuthenticationService extends org.alfresco.repo.se
     static ThreadLocal<String> successFullAuthenticationMethod = new ThreadLocal<String>();
     static ThreadLocal<String> currentPath = new ThreadLocal<>();
 
-    NodeService nodeService;
-    PersonService personService;
-
-    TransactionService transactionService;
+    private NodeService nodeService;
+    private PersonService personService;
+    private TransactionService transactionService;
+    private GuestService guestService;
 
     /**
      * {@inheritDoc}
@@ -69,15 +68,10 @@ public class SubsystemChainingAuthenticationService extends org.alfresco.repo.se
 
     public void setLoginTimestampToNow(String userName, String property) {
         NodeRef nodeRefPerson = personService.getPerson(userName, false);
+        String currentUser = ApplicationInfoList.getHomeRepository().getUsername();
 
         // we won't do this for the guest
-        List<String> ignoreList = new ArrayList<>(GuestCagePolicy.getGuestUsers());
-        String currentUser = ApplicationInfoList.getHomeRepository().getUsername();
-		if (currentUser != null && !ignoreList.contains(currentUser)) {
-			ignoreList.add(currentUser);
-		}
-
-        if (userName != null && ignoreList.contains(userName)) {
+        if (userName != null && (guestService.isGuestUser(userName) || Objects.equals(currentUser, userName))) {
             return;
         }
 
@@ -140,5 +134,9 @@ public class SubsystemChainingAuthenticationService extends org.alfresco.repo.se
 
     public void setTransactionService(TransactionService transactionService) {
         this.transactionService = transactionService;
+    }
+
+    public void setGuestService(GuestService guestService) {
+        this.guestService = guestService;
     }
 }

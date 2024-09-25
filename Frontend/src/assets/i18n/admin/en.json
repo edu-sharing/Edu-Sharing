@@ -72,6 +72,8 @@
       "NODE_OVERRIDE_CONFIG_HINT": "Override-Configuration for this cluster node (check ip address!)",
       "EXTENSION_CONFIG_TITLE": "Extension config (customer/project specific values)",
       "EXTENSION_CONFIG_HINT": "This file is managed via the git repository of the customer project and applies to all nodes.",
+      "DEFAULTS_OVERRIDE_CONFIG_TITLE": "Helm Config override",
+      "DEFAULTS_OVERRIDE_CONFIG_HINT": "Values configured via helm deployment override",
 
       "SIZE": "Editor-size",
       "SIZE_MEDIUM": "normal",
@@ -297,8 +299,6 @@
     "TOOLKIT": {
       "REFRESH_APP": "Reload App Info",
       "REFRESH_APP_INFO": "Reload metadata and application info",
-      "REFRESH_EDU_GROUP_CACHE": "Refresh Edu Group Cache",
-      "EDU_GROUP_CACHE_REFRESHED": "Refresh Edu Group Cache done",
       "APP_INFO_REFRESHED": "Refresh Application Info done",
       "CACHE": "Cache management",
       "CACHE_INFO": "Get Cache Info",

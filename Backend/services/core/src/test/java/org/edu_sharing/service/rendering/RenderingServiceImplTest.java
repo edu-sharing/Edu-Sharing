@@ -4,6 +4,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.edu_sharing.alfresco.service.connector.Connector;
 import org.edu_sharing.alfresco.service.connector.ConnectorFileType;
 import org.edu_sharing.alfresco.service.connector.ConnectorList;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.I18nAngular;
 import org.edu_sharing.service.connector.ConnectorServiceFactory;
@@ -20,7 +21,10 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,13 +35,15 @@ class RenderingServiceImplTest {
     private NodeService nodeService;
     @Mock
     private PermissionService permissionService;
+    @Mock
+    private GuestService guestService;
     private RenderingServiceImpl underTest;
     private MockedStatic<ConnectorServiceFactory> connectorServiceFactoryMockedStatic;
     private MockedStatic<I18nAngular> i18nAngularMockedStatic;
 
     @BeforeEach
     void setUp() {
-        underTest = new RenderingServiceImpl(nodeService, permissionService);
+        underTest = new RenderingServiceImpl(nodeService, permissionService, guestService);
 
         ConnectorList connectorList = Mockito.mock(ConnectorList.class);
         connectorServiceFactoryMockedStatic = Mockito.mockStatic(ConnectorServiceFactory.class);

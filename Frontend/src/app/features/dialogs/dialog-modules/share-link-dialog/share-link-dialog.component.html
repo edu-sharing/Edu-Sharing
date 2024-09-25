@@ -34,7 +34,13 @@
     <es-input-password
       *ngIf="passwordEnabled"
       (change)="setPassword()"
+      [displayStrength]="true"
       [(value)]="passwordString"
+      [hint]="
+        passwordAlreadySet && !passwordString
+          ? ('WORKSPACE.SHARE_LINK.PASSWORD_EDIT_HINT' | translate)
+          : ''
+      "
       label="{{
         (passwordAlreadySet
           ? 'WORKSPACE.SHARE_LINK.PASSWORD_PLACEHOLDER_EDIT'

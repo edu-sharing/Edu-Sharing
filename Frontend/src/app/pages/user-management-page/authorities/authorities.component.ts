@@ -692,7 +692,11 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
         this.addToList = this.nodeMemberAdd.getSelection().selected;
         this.addMembers = null;
 
-        this.addToSingle(() => this.refresh());
+        this.addToSingle(() => {
+            if (this.org && this._mode === 'USER') {
+                this.refresh();
+            }
+        });
     }
     private checkOrgExists(orgName: string) {
         this.organization
@@ -719,7 +723,8 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                             this.edit = null;
                             this.iam.editGroup(result.authorityName, profile).subscribe(
                                 () => {
-                                    setTimeout(() => this.checkOrgExists(name), 2000);
+                                    this.addVirtualEntry(result);
+                                    this.toast.closeProgressSpinner();
                                 },
                                 (error) => {
                                     this.toast.error(error);
@@ -737,11 +742,11 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                     this.iam
                         .createGroup(name, this.edit.profile, this.org ? this.org.groupName : '')
                         .subscribe(
-                            () => {
+                            (group) => {
                                 this.edit = null;
                                 this.toast.closeProgressSpinner();
                                 this.toast.toast('PERMISSIONS.GROUP_CREATED');
-                                this.refresh();
+                                this.addVirtualEntry(group);
                             },
                             (error: any) => {
                                 this.toast.error(error);
@@ -752,10 +757,12 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                 return;
             }
             this.iam.editGroup(this.editId, this.edit.profile).subscribe(
-                () => {
+                async () => {
                     this.edit = null;
                     this.toast.toast('PERMISSIONS.GROUP_EDITED');
-                    this.refresh();
+                    this.addVirtualEntry(
+                        (await this.iam.getGroup(this.editId).toPromise()).group as Group,
+                    );
                 },
                 (error: any) => this.toast.error(error),
             );
@@ -764,40 +771,50 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
             if (this.edit.profile?.vcard) {
                 editStore.profile.vcard = this.edit.profile.vcard.copy();
             }
+            const password = this.editDetails.password?.trim() || null;
             editStore.profile.sizeQuota *= 1024 * 1024;
+            // we allow fully empty password since this means the backend will not create an authentication
+            // useful for system managed users like i.e. guests
+            if (this.passwordRef.passwordStrength === 'weak') {
+                this.toast.error(null, 'PERMISSIONS.ERROR_PASSWORD_TO_WEAK');
+                this.toast.closeProgressSpinner();
+                return;
+            }
             this.toast.showProgressSpinner();
             if (this.editId == null) {
                 const name = this.editDetails.authorityName;
-                const password = this.editDetails.password;
                 this.iam.createUser(name, password, editStore.profile).subscribe(
-                    () => {
+                    (user) => {
                         this.edit = null;
                         this.toast.closeProgressSpinner();
                         if (this.org) {
                             this.iam.addGroupMember(this.org.authorityName, name).subscribe(
                                 () => {
                                     this.toast.toast('PERMISSIONS.USER_CREATED');
-                                    this.refresh();
+                                    this.addVirtualEntry(user);
                                 },
                                 (error: any) => this.toast.error(error),
                             );
                         } else {
                             this.toast.toast('PERMISSIONS.USER_CREATED');
-                            this.refresh();
+                            this.addVirtualEntry(user);
                         }
                     },
                     (error: any) => {
-                        this.toast.error(error);
+                        this.handleError(error);
                         this.toast.closeProgressSpinner();
                     },
                 );
             } else {
                 this.iam.editUser(this.editId, editStore.profile).subscribe(
-                    () => {
+                    async () => {
                         this.edit = null;
                         this.toast.toast('PERMISSIONS.USER_EDITED');
-                        this.refresh();
                         this.toast.closeProgressSpinner();
+                        this.addVirtualEntry(
+                            (await this.iam.getUser(this.editId).toPromise())
+                                .person as unknown as User,
+                        );
                     },
                     (error: any) => {
                         this.toast.error(error);
@@ -1219,9 +1236,13 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
     }
 
     private handleError(error: any) {
-        if (error.status == RestConstants.DUPLICATE_NODE_RESPONSE)
+        if (error.status == RestConstants.DUPLICATE_NODE_RESPONSE) {
             this.toast.error(null, 'PERMISSIONS.USER_EXISTS_IN_GROUP');
-        else this.toast.error(error);
+        } else if (error?.error?.details?.PasswordPolicyViolation) {
+            this.toast.error(null, 'PERMISSIONS.ERROR_PASSWORD_POLICY_NOT_MATCHED', {
+                cause: error?.error?.details?.PasswordPolicyViolation[0]?.cause,
+            });
+        } else this.toast.error(error);
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -1396,7 +1417,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                 },
                 (error) => {
                     this.toast.closeProgressSpinner();
-                    this.toast.error(error);
+                    this.handleError(error);
                 },
             );
     }
@@ -1485,5 +1506,9 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
             subtype: ToastType.InfoData,
             html: true,
         });
+    }
+
+    private addVirtualEntry(entry: GenericAuthority | Group) {
+        this.nodeEntries.addVirtualNodes([entry]);
     }
 }

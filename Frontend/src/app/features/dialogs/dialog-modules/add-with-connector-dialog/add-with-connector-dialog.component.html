@@ -11,10 +11,9 @@
           'CONNECTOR.MIMETYPE.' +
             (filetype.mimetype === 'application/zip'
               ? filetype.ccressourcetype +
-                '_' +
-                filetype.ccressourceversion +
-                '_' +
-                filetype.ccresourcesubtype
+                (filetype.ccressourceversion
+                  ? '_' + filetype.ccressourceversion + '_' + filetype.ccresourcesubtype
+                  : '')
               : filetype.mimetype) | translate
         }}</mat-option
       >

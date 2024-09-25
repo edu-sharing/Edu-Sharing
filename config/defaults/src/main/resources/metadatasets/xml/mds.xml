@@ -1178,27 +1178,6 @@
         <multiplejoin>AND</multiplejoin>
       </property>
     </query>
-    <query join="AND" id="collections_scope_my">
-      <basequery>ASPECT:"ccm:collection" AND @ccm\:collectionlevel0:true AND OWNER:"${authority}"</basequery>
-    </query>
-    <query join="AND" id="collections_scope_shared">
-      <basequery>ASPECT:"ccm:collection" AND @ccm\:collectionlevel0:true AND NOT OWNER:"${authority}" AND NOT
-        @ccm\:collectiontype:"EDITORIAL" AND NOT @ccm\:collectiontype:"MEDIA_CENTER"
-      </basequery>
-    </query>
-    <query join="AND" id="collections_scope_editorial">
-      <basequery>ASPECT:"ccm:collection" AND @ccm\:collectionlevel0:true AND @ccm\:collectiontype:"EDITORIAL"
-      </basequery>
-    </query>
-    <query join="AND" id="collections_scope_media_center">
-      <basequery>ASPECT:"ccm:collection" AND @ccm\:collectionlevel0:true AND @ccm\:collectiontype:"MEDIA_CENTER"
-      </basequery>
-    </query>
-    <query join="AND" id="collections_scope_public">
-      <basequery>ASPECT:"ccm:collection" AND @ccm\:collectionlevel0:true AND NOT @ccm\:collectiontype:"EDITORIAL" AND
-        NOT @ccm\:collectiontype:"MEDIA_CENTER"
-      </basequery>
-    </query>
     <query join="AND" id="archive" applyBasequery="false">
       <basequery>ASPECT:"sys:archived"</basequery>
       <property name="ngsearchword">
@@ -1285,6 +1264,75 @@
       ]
       }}
     </basequery>
+    <query join="AND" id="collections_scope_my">
+      <basequery>
+        {"bool":
+        {"must":[
+          {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+          {"match":{"aspects":"ccm:collection"}},
+          {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
+          {"match":{"properties.cm:owner.keyword":"${authority}"}}
+        ]}
+        }
+      </basequery>
+    </query>
+    <query join="AND" id="collections_scope_shared">
+      <basequery>
+        {"bool":
+        {"must":[
+          {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+          {"match":{"aspects":"ccm:collection"}},
+          {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
+        ],
+        "must_not":[
+          {"match":{"permissions.Read":"GROUP_EVERYONE"}},
+          {"match":{"properties.cm:owner.keyword":"${authority}"}},
+          {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
+          {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
+        ]}
+        }
+      </basequery>
+    </query>
+    <query join="AND" id="collections_scope_editorial">
+      <basequery>
+        {"bool":
+        {"must":[
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}}
+        ]}
+        }
+      </basequery>
+    </query>
+    <query join="AND" id="collections_scope_media_center">
+      <basequery>
+        {"bool":
+        {"must":[
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
+        ]}
+        }
+      </basequery>
+    </query>
+    <query join="AND" id="collections_scope_public">
+      <basequery>
+        {"bool":
+        {"must":[
+        {"match":{"permissions.Read":"GROUP_EVERYONE"}},
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
+        ],
+        "must_not":[
+        {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
+        ]}
+        }
+      </basequery>
+    </query>
     <allowSearchWithoutCriteria>true</allowSearchWithoutCriteria>
     <query join="AND" id="sharedToMe">
       <basequery>

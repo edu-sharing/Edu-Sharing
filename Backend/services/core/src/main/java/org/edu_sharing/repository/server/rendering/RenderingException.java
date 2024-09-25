@@ -1,28 +1,27 @@
 package org.edu_sharing.repository.server.rendering;
 
-import com.google.gson.JsonObject;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import jakarta.servlet.http.HttpServletResponse;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.ErrorFilter;
 import org.edu_sharing.repository.server.tools.HttpException;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.json.JSONObject;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-
 public class RenderingException extends ErrorFilter.ErrorFilterException {
 
     public static RenderingException fromThrowable(Throwable throwable) {
-        if(throwable instanceof InsufficientPermissionException) {
+        if(throwable instanceof InsufficientPermissionException || throwable instanceof AccessDeniedException)   {
+            I18N i18nKey = I18N.permissions_missing;
+
+            if(throwable instanceof AccessDeniedException && CCConstants.PERMISSION_EMBED.equals(((AccessDeniedException) throwable).getMsgId())){
+                i18nKey = I18N.permissions_embed_missing;
+            }
+
             return new RenderingException(
                     HttpServletResponse.SC_FORBIDDEN,
                     throwable.getMessage(),
-                    I18N.permissions_missing,
+                    i18nKey,
                     throwable
             );
         }
@@ -41,6 +40,7 @@ public class RenderingException extends ErrorFilter.ErrorFilterException {
         node_missing,
         usage_missing_permissions,
         permissions_missing,
+        permissions_embed_missing,
         internal,
         unknown,
     }

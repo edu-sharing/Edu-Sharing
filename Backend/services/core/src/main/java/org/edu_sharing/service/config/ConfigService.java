@@ -4,6 +4,8 @@ import org.edu_sharing.alfresco.service.config.model.Config;
 import org.edu_sharing.alfresco.service.config.model.Context;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public interface ConfigService {
 
 	Config getConfig() throws Exception;
@@ -16,6 +18,9 @@ public interface ConfigService {
      * @throws Exception
      */
     Context getContext(String domain) throws Exception;
+    List<Context> getAvailableContext() throws Exception;
+
+    Context createOrUpdateContext(Context context);
 
     Config getConfigByDomain(String domain) throws Exception;
 
@@ -25,4 +30,6 @@ public interface ConfigService {
     DynamicConfig setDynamicValue(String key, boolean readPublic, JSONObject object) throws Throwable;
 
     DynamicConfig getDynamicValue(String key) throws Throwable;
+
+    void deleteContext(String id) throws Exception;
 }

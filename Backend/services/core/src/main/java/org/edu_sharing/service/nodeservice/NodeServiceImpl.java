@@ -455,7 +455,8 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 		return childAssocList;
 	}
 
-	public Map<String, Map<String, Object>> getChildrenByType(StoreRef store, String nodeId, String type) {
+	@Override
+	public Map<String, Map<String, Object>> getChildrenPropsByType(StoreRef store, String nodeId, String type) {
 		Map<String, Map<String, Object>> result = new HashMap<>();
 		List<ChildAssociationRef> childAssocList = getChildrenAssocsByType(store,nodeId,type);
 		for (ChildAssociationRef child : childAssocList) {
@@ -720,7 +721,9 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 					logger.warn("Error while calling interceptor " + i.getClass().getName() + ": " + e.toString());
 				}
 			}
-			Map<QName, Serializable> propsStore = propsFinal.entrySet().stream().collect(
+			Map<QName, Serializable> propsStore = propsFinal.entrySet().stream().
+					filter(e -> e.getValue() != null).
+					collect(
 					HashMap::new,
 					(m,entry)-> m.put(QName.createQName(entry.getKey()), (Serializable) entry.getValue()),
 					HashMap::putAll

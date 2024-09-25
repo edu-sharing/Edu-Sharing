@@ -199,7 +199,8 @@
                <index enabled="true">
 		           <atomic>true</atomic>
 		           <stored>false</stored>
-		           <tokenised>both</tokenised>
+                   <!-- https://hub.alfresco.com/t5/alfresco-content-services-forum/how-to-perform-fts-exact-exact-phrase-searches-in-alfresco-6/td-p/176334 -->
+		           <tokenised>false</tokenised>
 		       </index>
             </property>
             <property name="cm:organizationId">

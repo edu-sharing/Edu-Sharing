@@ -16,7 +16,7 @@ import { debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
 import { RestSearchService } from '../../../../../core-module/rest/services/rest-search.service';
 import { Node, SearchRequestCriteria } from '../../../../../core-module/rest/data-object';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
-import { MdsHelperService } from 'ngx-edu-sharing-ui';
+import { MdsHelperService, SearchHelperService } from 'ngx-edu-sharing-ui';
 import { RestMdsService } from '../../../../../core-module/rest/services/rest-mds.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ListItem, NodesRightMode, UIAnimation } from 'ngx-edu-sharing-ui';
@@ -80,6 +80,7 @@ export class NodeSearchSelectorComponent implements AfterViewInit {
         private mdsService: RestMdsService,
         private translate: TranslateService,
         private nodeHelper: NodeHelperService,
+        private searchHelperService: SearchHelperService,
         private changeDetectorRef: ChangeDetectorRef,
     ) {}
 
@@ -98,7 +99,10 @@ export class NodeSearchSelectorComponent implements AfterViewInit {
         }
         if (this.values) {
             criterias = criterias.concat(
-                RestSearchService.convertCritierias(this.values, this.mdsEditor.currentWidgets),
+                this.searchHelperService.convertCritieria(
+                    this.values,
+                    this.mdsEditor.currentWidgets,
+                ),
             );
         }
         criterias = criterias.concat(this.criteria);

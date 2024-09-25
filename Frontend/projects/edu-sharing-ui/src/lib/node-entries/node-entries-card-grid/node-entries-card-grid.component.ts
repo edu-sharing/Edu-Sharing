@@ -278,15 +278,17 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
                 )
                 .some((c2) => c.type === c2.type && c2.name === c.name);
             if (!result && !this.entriesService.configureColumns) {
-                const warning =
-                    'Sort field ' +
-                    c.name +
-                    ' was specified but is not present as a column. ' +
-                    'It will be ignored. Please also configure this field in the <lists> section';
-                if (!displayedWarnings.includes(warning)) {
-                    console.warn(warning);
-                    displayedWarnings.push(warning);
-                }
+                return this.entriesService.sort?.columns;
+                /*
+                    const warning =
+                        'Sort field ' +
+                        c.name +
+                        ' was specified but is not present as a column. ' +
+                        'It will be ignored. Please also configure this field in the <lists> section';
+                    if (!displayedWarnings.includes(warning)) {
+                        console.warn(warning);
+                        displayedWarnings.push(warning);
+                    }*/
             }
             return result;
         });

@@ -1,12 +1,11 @@
 package org.edu_sharing.service.version;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RepositoryVersionInfo implements Serializable {
+    public String repository;
     public Version version;
-    public VersionMaven maven;
+//    public VersionMaven maven;
     public VersionGit git;
 
     public VersionBuild build;
@@ -36,15 +35,15 @@ public class RepositoryVersionInfo implements Serializable {
         public String datetime;
     }
 
-
-    public static class VersionMaven implements Serializable {
-        public Map<String, String> bom;
-        public VersionProject project;
-
-        public static class VersionProject implements Serializable {
-            public String artifactId;
-            public String groupId;
-            public String version;
-        }
-    }
+//
+//    public static class VersionMaven implements Serializable {
+//        public HashMap<String, String> bom;
+//        public VersionProject project;
+//
+//        public static class VersionProject implements Serializable {
+//            public String artifactId;
+//            public String groupId;
+//            public String version;
+//        }
+//    }
 }

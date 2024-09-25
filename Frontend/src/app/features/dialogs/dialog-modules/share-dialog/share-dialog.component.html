@@ -189,7 +189,7 @@
         *ngIf="owner"
         [permission]="owner"
         [isDirectory]="_nodes[0].isDirectory"
-        [readOnly]="true"
+        [isEditable]="false"
         [showDelete]="false"
       ></es-share-dialog-permission>
       <div *ngIf="inheritAllowed && !isCollection()">
@@ -215,7 +215,7 @@
               [permission]="permission"
               [isDirectory]="_nodes[0].isDirectory"
               [inherit]="true"
-              [readOnly]="true"
+              [isEditable]="false"
             ></es-share-dialog-permission>
           </div>
         </div>
@@ -238,7 +238,7 @@
             class="groupEntry"
             [class.added]="isNewPermission(permission)"
             [permission]="permission"
-            [readOnly]="!permission.editable && !isNewPermission(permission)"
+            [isEditable]="permission.editable || isNewPermission(permission)"
             [showDelete]="permission.editable || isNewPermission(permission)"
             [isDeleted]="isDeleted(permission)"
             [isDirectory]="_nodes[0].isDirectory"
@@ -256,9 +256,12 @@
           <es-share-dialog-permission
             class="groupEntry"
             [class.added]="isNewPermission(permission)"
+            [class.invalid]="timebasedInvalid(permission)"
             [permission]="permission"
-            [readOnly]="!permission.editable && !isNewPermission(permission)"
+            [isEditable]="permission.editable || isNewPermission(permission)"
             [showDelete]="permission.editable || isNewPermission(permission)"
+            [timebasedAllowed]="isOnlyTimebasedForAuthority(permission)"
+            [timebasedInvalid]="timebasedInvalid(permission)"
             [isDeleted]="isDeleted(permission)"
             [isDirectory]="_nodes[0].isDirectory"
             [canPublish]="!isSafe"
@@ -277,7 +280,7 @@
           class="groupEntry link"
           [permission]="linkEnabled"
           [isDirectory]="_nodes[0].isDirectory"
-          [readOnly]="true"
+          [isEditable]="false"
           [showDelete]="false"
         ></es-share-dialog-permission>
       </ng-container>
@@ -306,7 +309,7 @@
           "
           [permission]="publishEnabled"
           [isDirectory]="_nodes[0].isDirectory"
-          [readOnly]="true"
+          [isEditable]="publishComponent.shareModeDirect ? 'timebasedOnly' : false"
           [showDelete]="false"
           [isDeleted]="
             (publishComponent.initialState?.direct || publishComponent.initialState?.copy) &&

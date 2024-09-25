@@ -35,7 +35,10 @@ export const LANGUAGES: { [key: string]: Locale } = {
 })
 export class ConfigService {
     private readonly updateTrigger = new Subject<void>();
-    private readonly localeSubject = new BehaviorSubject<Locale | null>(null);
+    private readonly localeSubject = new BehaviorSubject<{
+        locale: Locale;
+        language: string;
+    } | null>(null);
     private configSubject = new BehaviorSubject<apiModels.Values | undefined>(undefined);
     private readonly config$ = this.updateTrigger.pipe(
         startWith(void 0 as void),
@@ -51,9 +54,19 @@ export class ConfigService {
     private readonly defaultTranslations$ = this.localeSubject.pipe(
         filter((locale) => locale !== null),
         distinctUntilChanged(),
-        switchMap((locale) => of({ locale: locale, dict: this.configV1.getLanguageDefaults() })),
+        switchMap((locale) =>
+            of({
+                locale: locale?.locale,
+                language: locale?.language,
+                dict: this.configV1.getLanguageDefaults(),
+            }),
+        ),
         shareReplay(1),
-    ) as unknown as Observable<{ locale: Locale; dict: Observable<TranslationsDict> }>;
+    ) as unknown as Observable<{
+        locale: Locale;
+        language: string;
+        dict: Observable<TranslationsDict>;
+    }>;
     private readonly translationOverrides$ = this.localeSubject.pipe(
         filter((locale) => locale !== null),
         distinctUntilChanged(),
@@ -99,10 +112,14 @@ export class ConfigService {
      *
      * This affects translations and localized MDS widget values.
      */
-    setLocale(locale: Locale): void {
+    setLocale(locale: Locale, language: string): void {
         if (locale) {
             this.apiRequestConfiguration.setLocale(locale);
-            this.localeSubject.next(locale);
+            this.apiRequestConfiguration.setLanguage(language);
+            this.localeSubject.next({
+                locale: locale,
+                language: language,
+            });
         } else {
             console.warn('Called `setLocale` with undefined `locale`');
         }
@@ -117,6 +134,7 @@ export class ConfigService {
      */
     observeDefaultTranslations(): Observable<{
         locale: Locale;
+        language: string;
         dict: Observable<TranslationsDict>;
     }> {
         return this.defaultTranslations$;

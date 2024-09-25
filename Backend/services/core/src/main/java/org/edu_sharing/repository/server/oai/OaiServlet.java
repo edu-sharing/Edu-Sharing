@@ -52,6 +52,10 @@ public class OaiServlet extends HttpServlet{
             throws ServletException, IOException {
         try {
             Config config = LightbendConfigLoader.get().getConfig("exporter.oai.identify");
+            if(!LightbendConfigLoader.get().getBoolean("exporter.oai.enabled")) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             int itemsPerPage =  LightbendConfigLoader.get().getInt("exporter.oai.itemsPerPage");
             //oai/provider?verb=GetRecord&metadataPrefix=lom&identifier=3410648a-465e-47ff-87fe-706b89cecd65
             RepositoryConfiguration configuration = new RepositoryConfiguration().

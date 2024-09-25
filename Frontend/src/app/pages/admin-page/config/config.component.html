@@ -7,7 +7,7 @@
   <es-info-message mode="info" *ngIf="!editSupported">
     {{
       'ADMIN.GLOBAL_CONFIG.EDIT_DISABLED'
-        | translate: { key: 'security.configuration.inlineEditing' }
+        | translate : { key: 'security.configuration.inlineEditing' }
     }}
   </es-info-message>
   <!--<div class="size-chooser">
@@ -65,6 +65,21 @@
       ></es-code-editor>
       <mat-hint
         ><div>{{ 'ADMIN.GLOBAL_CONFIG.EXTENSION_CONFIG_HINT' | translate }}</div></mat-hint
+      >
+    </div>
+  </ng-container>
+  <ng-container *ngIf="showRO && configs.defaultsOverride">
+    <h3 class="mat-heading-3 mat-heading-underline">
+      {{ 'ADMIN.GLOBAL_CONFIG.DEFAULTS_OVERRIDE_CONFIG_TITLE' | translate }}
+    </h3>
+    <div class="monaco-editor">
+      <es-code-editor
+        class="roConfig"
+        [options]="codeOptionsHocoonRO"
+        [(ngModel)]="configs.defaultsOverride"
+      ></es-code-editor>
+      <mat-hint
+        ><div>{{ 'ADMIN.GLOBAL_CONFIG.DEFAULTS_OVERRIDE_CONFIG_HINT' | translate }}</div></mat-hint
       >
     </div>
   </ng-container>

@@ -1,7 +1,5 @@
 package org.edu_sharing.spring.scope.refresh;
 
-import java.io.Serializable;
-
 import lombok.Setter;
 import org.edu_sharing.spring.scope.GenericScope;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +16,8 @@ import org.springframework.core.Ordered;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -118,17 +118,17 @@ public class RefreshScope extends GenericScope
      * @param type bean type to rebind.
      * @return true, if successful.
      */
-    public boolean refresh(Class<?> type) {
+    public boolean refresh(Class<?> type, boolean isCaller) {
         String[] beanNamesForType = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(this.applicationContext, type);
         if (beanNamesForType.length > 0) {
-            return refresh(beanNamesForType[0]);
+            return refresh(beanNamesForType[0], isCaller);
         }
         return false;
     }
 
     @ManagedOperation(description = "Dispose of the current instance of bean name "
             + "provided and force a refresh on next method execution.")
-    public boolean refresh(String name) {
+    public boolean refresh(String name, boolean isCaller) {
         if (!ScopedProxyUtils.isScopedTarget(name)) {
             // User wants to refresh the bean with this name but that isn't the one in the
             // cache...
@@ -136,7 +136,7 @@ public class RefreshScope extends GenericScope
         }
         // Ensure lifecycle is finished if bean was disposable
         if (super.destroy(name)) {
-            this.applicationContext.publishEvent(new RefreshScopeRefreshedEvent(name));
+            this.applicationContext.publishEvent(new RefreshScopeRefreshedEvent(name, isCaller));
             return true;
         }
         return false;
@@ -144,9 +144,9 @@ public class RefreshScope extends GenericScope
 
     @ManagedOperation(description = "Dispose of the current instance of all beans "
             + "in this scope and force a refresh on next method execution.")
-    public void refreshAll() {
+    public void refreshAll(boolean isCaller) {
         super.destroy();
-        this.applicationContext.publishEvent(new RefreshScopeRefreshedEvent());
+        this.applicationContext.publishEvent(new RefreshScopeRefreshedEvent(isCaller));
     }
 
 }

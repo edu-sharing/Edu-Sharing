@@ -79,6 +79,10 @@ export class MdsEditorWidgetContainerComponent
     @Input() injectedView: MdsEditorWidgetBase | NativeWidgetComponent;
     @Input() valueType: ValueType;
     @Input() label: string | boolean;
+    /*+
+        display the bottom caption, if present on the widget
+     */
+    @Input() showBottomCaption = true;
     @Input() control: AbstractControl;
     /**
      * Whether to wrap in a `mat-form-field`.

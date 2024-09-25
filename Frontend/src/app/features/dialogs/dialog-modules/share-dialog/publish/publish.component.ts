@@ -11,7 +11,14 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { About, AboutService, HandleParam, NodeService, FeatureInfo } from 'ngx-edu-sharing-api';
+import {
+    About,
+    AboutService,
+    HandleParam,
+    NodeService,
+    FeatureInfo,
+    Ace,
+} from 'ngx-edu-sharing-api';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { BridgeService } from '../../../../../services/bridge.service';
@@ -36,6 +43,7 @@ import {
 import { DialogsService } from '../../../dialogs.service';
 import { OPEN_URL_MODE } from 'ngx-edu-sharing-ui';
 import { YES_OR_NO } from '../../generic-dialog/generic-dialog-data';
+import { ExtendedAce } from '../share-dialog.component';
 
 class PublishedNode extends Node {
     status?: 'new' | 'update' | null; // flag if this node is manually added later and didn't came from the repo
@@ -49,7 +57,7 @@ class PublishedNode extends Node {
 })
 export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy {
     @Input() node: Node;
-    @Input() permissions: Permission[];
+    @Input() permissions: ExtendedAce[];
     @Input() inherited: boolean;
     @Input() isAuthorEmpty: boolean;
     @Input() isLicenseEmpty: boolean;
@@ -186,7 +194,7 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
     }
 
     private refresh() {
-        this.handleActive = this.nodeHelper.getHandleStates(this.node, this.permissions);
+        this.handleActive = this.nodeHelper.getHandleStates(this.node, this.permissions as Ace[]);
         this.handleInitialState = Helper.deepCopy(this.handleActive);
 
         const prop = this.node?.properties?.[RestConstants.CCM_PROP_PUBLISHED_MODE]?.[0];
@@ -208,7 +216,7 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
         }
         // if GROUP_EVERYONE is not yet invited -> reset to off
         this.shareModeDirect = this.permissions.some(
-            (p: Permission) => p.authority?.authorityName === RestConstants.AUTHORITY_EVERYONE,
+            (p) => p.authority?.authorityName === RestConstants.AUTHORITY_EVERYONE,
         );
         this.initialState = {
             copy: this.shareModeCopy,
@@ -243,9 +251,9 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
         this.updatePublishedVersions();
     }
 
-    updatePermissions(permissions: Permission[]) {
+    updatePermissions(permissions: Ace[]) {
         permissions = permissions.filter(
-            (p: Permission) => p.authority.authorityName !== RestConstants.AUTHORITY_EVERYONE,
+            (p) => p.authority.authorityName !== RestConstants.AUTHORITY_EVERYONE,
         );
         if (this.shareModeDirect) {
             const permission = RestHelper.getAllAuthoritiesPermission();

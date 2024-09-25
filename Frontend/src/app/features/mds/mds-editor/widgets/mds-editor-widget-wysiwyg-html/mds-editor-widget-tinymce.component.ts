@@ -84,6 +84,8 @@ export class MdsEditorWidgetTinyMCE extends MdsEditorWidgetBase implements OnIni
 
     async ngAfterViewInit() {
         this._html = (await this.widget.getInitalValuesAsync()).jointValues[0];
+        (this.editorConfigDefault as any).base_url =
+            this.platformLocation.getBaseHrefFromDOM() + 'tinymce/';
         if (this.widget.definition.configuration) {
             this.editorConfig = {
                 ...this.editorConfigDefault,

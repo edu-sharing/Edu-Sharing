@@ -1,13 +1,13 @@
 package org.edu_sharing.spring.security.openid.config;
 
-import lombok.Builder;
+import com.typesafe.config.Optional;
 import lombok.Data;
 
-@Builder
 @Data
 public class OpenIdConfig {
-   String issuer;
-   String clientId;
-   String secret;
-   String contextId;
+   private String issuer;
+   private String clientId;
+   private String secret;
+   @Optional
+   private String contextId;
 }

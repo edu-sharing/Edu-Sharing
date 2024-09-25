@@ -22,18 +22,20 @@ $mainMenuSelectedBackground: linear-gradient(
         @if variable-exists(mainMenuBackgroundColor) {
             background-color: $mainMenuBackgroundColor;
         }
-        .mat-menu-item {
+        .mat-mdc-menu-item {
             @if variable-exists(mainMenuForegroundColor) {
                 &:not(:disabled) {
-                    color: $mainMenuForegroundColor;
-                    @if variable-exists(mainMenuForegroundColorIcon) {
-                        > i {
-                            color: $mainMenuForegroundColorIcon;
+                    > span {
+                        color: $mainMenuForegroundColor;
+                        @if variable-exists(mainMenuForegroundColorIcon) {
+                            > i {
+                                color: $mainMenuForegroundColorIcon;
+                            }
                         }
                     }
                 }
             }
-            &.mat-menu-item-selected {
+            &.mat-mdc-menu-item-selected {
                 background: $mainMenuSelectedBackground;
             }
             &.cdk-focused {
@@ -45,10 +47,12 @@ $mainMenuSelectedBackground: linear-gradient(
             &.cdk-key-focused {
                 background-color: $mainMenuHoverBackgroundColor;
                 @if variable-exists(mainMenuBackgroundColor) {
-                    color: $mainMenuHoverForegroundColor;
-                    @if variable-exists(mainMenuHoverForegroundColorIcon) {
-                        > i {
-                            color: $mainMenuHoverForegroundColorIcon;
+                    > span {
+                        color: $mainMenuHoverForegroundColor;
+                        @if variable-exists(mainMenuHoverForegroundColorIcon) {
+                            > i {
+                                color: $mainMenuHoverForegroundColorIcon;
+                            }
                         }
                     }
                 }

@@ -416,65 +416,109 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
     dropOnRef = (target: Node, source: DropSource<CollectionReference>) => {
         return;
     };
-    dropOnCollection = (target: Node | 'HOME', source: DropSource<Node>) => {
+    dropOnCollection = async (target: Node | 'HOME', source: DropSource<Node>) => {
         if (source.element[0] === target) {
             return;
         }
-        this.toast.showProgressSpinner();
         if (source.element[0].mediatype === 'collection') {
             if (source.mode === 'copy') {
                 this.toast.error(null, 'INVALID_OPERATION');
-                this.toast.closeProgressSpinner();
                 return;
             }
-            this.nodeService
-                .moveNode(
-                    (target as Node)?.ref?.id || RestConstants.COLLECTIONHOME,
-                    source.element[0].ref.id,
-                )
-                .subscribe(
-                    () => {
-                        this.toast.closeProgressSpinner();
-                        this.refreshContent();
-                    },
-                    (error) => {
-                        this.handleError(error);
-                        this.toast.closeProgressSpinner();
-                    },
+            if (source.mode === 'move') {
+                let parent: Node | 'COLLECTION_HOME';
+                try {
+                    parent = (
+                        await this.nodeService
+                            .getNodeMetadata(source.element?.[0]?.parent.id, [RestConstants.ALL])
+                            .toPromise()
+                    ).node;
+                    if (!parent.aspects.includes(RestConstants.CCM_ASPECT_COLLECTION)) {
+                        // root collection
+                        parent = 'COLLECTION_HOME';
+                    }
+                } catch (e) {
+                    console.info(e);
+                }
+                const dialogRef = await this.dialogs.openCopyMoveDialog(
+                    parent,
+                    source,
+                    target === 'HOME' ? 'COLLECTION_HOME' : target,
+                    ['move'],
                 );
+                dialogRef.afterClosed().subscribe((result) => {
+                    if (result === 'WORKSPACE.COPY_MOVE.MOVE') {
+                        this.toast.showProgressSpinner();
+                        this.nodeService
+                            .moveNode(
+                                (target as Node)?.ref?.id || RestConstants.COLLECTIONHOME,
+                                source.element[0].ref.id,
+                            )
+                            .subscribe(
+                                () => {
+                                    this.toast.closeProgressSpinner();
+                                    this.refreshContent();
+                                },
+                                (error) => {
+                                    this.handleError(error);
+                                    this.toast.closeProgressSpinner();
+                                },
+                            );
+                    }
+                });
+            }
         } else {
-            if (source.mode === 'copy') {
-                UIHelper.addToCollection(
-                    this.nodeHelper,
-                    this.collectionService,
-                    this.router,
-                    this.bridge,
-                    target as Node,
-                    source.element,
-                    false,
-                    (nodes) => {
-                        this.toast.closeProgressSpinner();
-                        this.refreshContent();
-                    },
+            let parent: Node | 'COLLECTION_HOME';
+            try {
+                parent = (
+                    await this.nodeService
+                        .getNodeMetadata(source.element?.[0]?.parent.id, [RestConstants.ALL])
+                        .toPromise()
+                ).node;
+            } catch (e) {
+                console.info(e);
+            }
+            if (source.mode === 'copy' || source.mode === 'move') {
+                const dialogRef = await this.dialogs.openCopyMoveDialog(
+                    parent,
+                    source,
+                    target === 'HOME' ? 'COLLECTION_HOME' : target,
                 );
-            } else if (source.mode === 'move') {
-                forkJoin(
-                    source.element.map((toMove) =>
-                        this.nodeService.moveNode(
-                            (target as Node)?.ref?.id || RestConstants.COLLECTIONHOME,
-                            toMove.ref.id,
-                        ),
-                    ),
-                ).subscribe(
-                    () => {
-                        this.toast.closeProgressSpinner();
-                        this.refreshContent();
-                    },
-                    (error) => {
-                        this.handleError(error);
-                        this.toast.closeProgressSpinner();
-                    },
-                );
+                dialogRef.afterClosed().subscribe((result) => {
+                    if (result === 'WORKSPACE.COPY_MOVE.COPY') {
+                        UIHelper.addToCollection(
+                            this.nodeHelper,
+                            this.collectionService,
+                            this.router,
+                            this.bridge,
+                            target as Node,
+                            source.element,
+                            false,
+                            (nodes) => {
+                                this.toast.closeProgressSpinner();
+                                this.refreshContent();
+                            },
+                        );
+                    } else if (result === 'WORKSPACE.COPY_MOVE.MOVE') {
+                        forkJoin(
+                            source.element.map((toMove) =>
+                                this.nodeService.moveNode(
+                                    (target as Node)?.ref?.id || RestConstants.COLLECTIONHOME,
+                                    toMove.ref.id,
+                                ),
+                            ),
+                        ).subscribe(
+                            () => {
+                                this.toast.closeProgressSpinner();
+                                this.refreshContent();
+                            },
+                            (error) => {
+                                this.handleError(error);
+                                this.toast.closeProgressSpinner();
+                            },
+                        );
+                    }
+                });
             } else {
                 this.toast.error(null, 'INVALID_OPERATION');
             }

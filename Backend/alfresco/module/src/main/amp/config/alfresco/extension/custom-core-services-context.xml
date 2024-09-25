@@ -1,8 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!--<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>-->
 
 <!-- Core and miscellaneous bean definitions -->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
   <bean id="global-properties" class="org.alfresco.config.JndiPropertiesFactoryBean">
     <property name="locations">
@@ -58,11 +61,11 @@
     <!-- Load runtime-dependent properties (e.g.: alfresco.jmx.dir).     -->
     <!-- Note:  This bean relies on PropertyPlaceholderConfigurer        -->
     <!--<bean id="runtimeProperties"  class="org.alfresco.util.RuntimeSystemPropertiesSetter"/>-->
-    
+
     <!-- this bean is overwritten to get the alfresco classloader for the ccsearch webapp when using the native alfresco api -->
     <bean id="runtimeProperties"  class="org.edu_sharing.alfrescocontext.MVRuntimeSystemPropertiesSetter"/>
-    
-    
+
+
     <!-- edu-sharing customization: disabling the archiving of Nodes
     	release_1.6:
     	- it seems that the alfresco bug(getting archivedNodes when calling querychildren) is fixed
@@ -70,13 +73,13 @@
     	  the problem is that removing a subobject(i.e. contributer) also causes the object to be removed in the versionstore
     	  because the deleted asscoiation was the primary one. when archiving is on, the primary association exsists in archive store
     	  when its deleted so the version fix works.
-    
+
     	alfresco-4.2.a: disable cause of
-    	Search failed due to: org.alfresco.service.cmr.repository.InvalidNodeRefException: Node does not exist: missing://missing/missing(null) 	
-    	
+    	Search failed due to: org.alfresco.service.cmr.repository.InvalidNodeRefException: Node does not exist: missing://missing/missing(null)
+
     	release_1.7 / alfresco-4.0.e: enable archiving
     -->
-    
+
   <!--  <bean id="storeArchiveMap" class="org.edu_sharing.alfresco.StoreArchiveMap">
      <property name="archiveMap">
         <map>
@@ -87,10 +90,10 @@
       </property>
   	</bean>
   	-->
-  	
-    
-    
-    
+
+
+
+
      <!-- campuscontent customization: extending the contentmodel-->
     <bean id="custom.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
@@ -100,7 +103,7 @@
             </list>
         </property>
     </bean>
-    
+
     	<!-- campuscontent customization:  custom Permission Definitions -->
 	<bean id='permissionsModelDAO' class="org.alfresco.repo.security.permissions.impl.model.PermissionModel" init-method="init">
        <property name="model">
@@ -116,18 +119,18 @@
             <ref bean="dictionaryService" />
         </property>
     </bean>
-   	 
-   
+
+
    	 <!--                               -->
     <!--  Version Service Bug with versioning children we put our version  -->
     <!--   org.edu_sharing.alfresco.fixes                            -->
 
- 
+
    <!-- <bean id="versionService" class="org.alfresco.repo.version.Version2ServiceImpl" init-method="initialise">-->
    <!-- org.alfresco.repo.version <bean id="versionService" class="org.edu_sharing.alfresco.fixes.Version2ServiceImpl" init-method="initialise">-->
-   
+
    	<bean id="versionService" class="org.alfresco.repo.version.EduVersion2ServiceImpl" init-method="initialise">
-   
+
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
@@ -157,7 +160,7 @@
             <ref bean="actionService"/>
         </property>
     </bean>
-    
+
     <!-- edu-sharing alfresco node scoping -->
    	<bean id="scopePolicies" class="org.edu_sharing.alfresco.policy.ScopePolicies" init-method="init">
    	  	<property name="policyComponent">
@@ -193,8 +196,8 @@
         <property name="policyBehaviourFilter">
         	<ref bean="policyBehaviourFilter"/>
         </property>
-   	 </bean>   	 
-    
+   	 </bean>
+
     <bean id='ioAfterCreateVersionPolicy' class="org.edu_sharing.alfresco.fixes.IOAfterCreateVersionPolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -206,10 +209,10 @@
             <ref bean="nodeService" />
         </property>
    	 </bean>
-   	 
 
- 	<!-- 
- 		edu-sharing alfresco node customizations 
+
+ 	<!--
+ 		edu-sharing alfresco node customizations
  		depends on scopePolicies cause the need to run before this so that the scope is set
  	-->
    	<bean id="nodeCustomizationPolicies" class="org.edu_sharing.alfresco.policy.NodeCustomizationPolicies" init-method="init" depends-on="scopePolicies">
@@ -263,7 +266,7 @@
             <ref bean="nodeService" />
         </property>
     </bean>
- 	
+
  	<!-- inherit permissions to false for maps and folders -->
   	<!-- <bean id="onCreateInheritPermFalsePolicy" class="org.edu_sharing.alfresco.policy.OnCreateInheritPermFalsePolicy" init-method="initForFolders">
   		<property name="policyComponent">
@@ -274,7 +277,7 @@
         </property>
   	</bean>
   	 -->
-  	  	<!-- inherit permissions to false for maps and folders in safe-->  	
+  	  	<!-- inherit permissions to false for maps and folders in safe-->
   	 <bean id="onCreateInheritPermFalsePolicy" class="org.edu_sharing.alfresco.policy.OnCreateInheritPermFalsePolicy" init-method="initForFoldersSafe">
   		<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -318,10 +321,10 @@
             <ref bean="authorityService" />
         </property>
     </bean>
-   
+
     <!-- edu-sharing group folder policies -->
-   	 
-   	  
+
+
    	  <bean id="beforeMapDeletePolicy" class="org.edu_sharing.alfresco.policy.BeforeMapDeletePolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -338,9 +341,9 @@
         <property name="authorityService">
         	<ref bean="authorityService" />
         </property>
-        
+
    	 </bean>
-   	 
+
    	  <bean id="beforeDeleteEduGroupHomeDir" class="org.edu_sharing.alfresco.policy.BeforeDeleteEduGroupHomeDir" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -351,8 +354,11 @@
         <property name="authorityService">
         	<ref bean="authorityService" />
         </property>
+          <property name="nodeService">
+              <ref bean="nodeService" />
+          </property>
    	 </bean>
-   	 	 
+
    	 <bean id="beforeMoveSharedFolderPolicy" class="org.edu_sharing.alfresco.policy.BeforeMoveSharedFolderPolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -385,24 +391,6 @@
         </property>
     </bean>
 
-   	  <bean id="beforeEduGroupDeletePolicy" class="org.edu_sharing.alfresco.policy.BeforeEduGroupDeletePolicy" init-method="init">
-   	  <property name="policyComponent">
-            <ref bean="policyComponent"/>
-        </property>
-         <property name="nodeService">
-            <ref bean="nodeService" />
-        </property>
-   	 </bean>
-   	 
-   	 <bean id="onAddRemoveEduGroupAspectPolicy" class="org.edu_sharing.alfresco.policy.OnAddRemoveEduGroupAspectPolicy" init-method="init">
-   	  <property name="policyComponent">
-            <ref bean="policyComponent"/>
-        </property>
-         <property name="nodeService">
-            <ref bean="nodeService" />
-        </property>
-   	 </bean>
-
     <bean id="onAddIOChildObjectAspect" class="org.edu_sharing.alfresco.policy.OnAddIOChildObjectAspect" init-method="init">
         <property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -417,16 +405,16 @@
             <ref bean="ownableService" />
         </property>
     </bean>
-   	 
-   	 
-   	  
+
+
+
    	 <bean id="beforeCreateNodeInEduGroupFolder" class="org.edu_sharing.alfresco.policy.BeforeCreateNodeInEduGroupFolder" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
         </property>
          <property name="nodeService">
             <ref bean="nodeService" />
-        </property> 
+        </property>
    	 </bean>
 
     <bean id="BeforeCreateNodePolicyGuardSysFolders" class="org.edu_sharing.alfresco.policy.BeforeCreateNodePolicyGuardSysFolders" init-method="init">
@@ -437,7 +425,7 @@
             <ref bean="nodeService" />
         </property>
     </bean>
-   	 
+
    	 <bean id="onThumbnailContentUpdatePolicy" class="org.edu_sharing.alfresco.policy.OnThumbnailContentUpdatePolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -446,8 +434,8 @@
             <ref bean="nodeService" />
         </property>
    	 </bean>
- 
- 
+
+
  	 <bean id="onCopyCollectionRefPolicy" class="org.edu_sharing.alfresco.policy.OnCopyCollectionRefPolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -456,7 +444,7 @@
             <ref bean="nodeService" />
         </property>
    	 </bean>
-   	 
+
    	  <bean id="onCopyTinymcePolicy" class="org.edu_sharing.alfresco.policy.OnCopyTinymcePolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -468,7 +456,7 @@
             <ref bean="versionService" />
         </property>
    	 </bean>
-   	 
+
    <bean id="onCopyIOPolicy" class="org.edu_sharing.alfresco.policy.OnCopyIOPolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -501,11 +489,14 @@
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
         </property>
+        <property name="guestService">
+          <ref bean="guestService"/>
+        </property>
    	 </bean>
- 
- 
- 
- 
+
+
+
+
  	 <alias name="dbNodeService" alias="dbNodeServiceImpl" />
    <bean id="dbNodeService" class="org.edu_sharing.alfresco.fixes.DbNodeServiceImpl" init-method="init" >
       <property name="dictionaryService">
@@ -521,7 +512,7 @@
          <ref bean="nodeDAO" />
       </property>
       <property name="permissionService" ref="permissionServiceImpl" />
-      
+
       <property name="policyComponent">
          <ref bean="policyComponent"/>
       </property>
@@ -541,7 +532,7 @@
 			<ref bean="ServiceRegistry" />
 		</property>
    </bean>
-   
+
     <bean id="alfrescoDefaultDbNodeService" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
       <property name="dictionaryService" ref="dictionaryService" />
       <property name="transactionService" ref="transactionService" />
@@ -557,17 +548,17 @@
       </property>
       <property name="enableTimestampPropagation" value="${system.enableTimestampPropagation}" />
    </bean>
-   
+
    <bean id="storesToIgnorePolicies" class="org.springframework.beans.factory.config.SetFactoryBean">
       <property name="sourceSet">
          <set>
             <value>${spaces.archive.store}</value>
             <value>${version.store.version2Store}</value>
          </set>
-      </property>   
+      </property>
    </bean>
-   
-   
+
+
     <bean name="homeFolderManager"
     	class="org.alfresco.repo.security.person.PortableHomeFolderManager">
     	<property name="nodeService">
@@ -590,8 +581,8 @@
             <ref bean="immutableSingletonCache" />
         </property>
     </bean>
-   	 
-   	<!--  
+
+   	<!--
     <bean id='usagePolicy' class="org.edu_sharing.alfresco.fixes.UsagePolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -604,9 +595,9 @@
         </property>
    	 </bean>
    -->
-   
-  
-   <!--	 
+
+
+   <!--
    	<bean id="ioSubOnCreateVersionPolicy" class="org.edu_sharing.alfresco.fixes.IOSubOnCreateVersionPolicy" init-method="init">
    	 	<property name="policyComponent">
             <ref bean="policyComponent"/>
@@ -633,7 +624,7 @@
         	<ref bean="authorityService" />
         </property>
    </bean>
-   
+
     <bean id="_nodeService" class="org.springframework.aop.framework.ProxyFactoryBean" >
       <property name="targetName">
          <value>mlAwareNodeService</value>
@@ -648,7 +639,7 @@
             <value>nodeRefPropertyInterceptor</value>
             <value>mlPropertyInterceptor</value>
             <value>tagscopeSummaryPropertyInterceptor</value>
-            <value>eduNodeServiceInterceptor</value> 
+            <value>eduNodeServiceInterceptor</value>
          </list>
       </property>
    </bean>
@@ -760,17 +751,22 @@
              </list>
          </property>
     </bean>
-    
+
     <bean id="eduAuthorityService" class="org.edu_sharing.alfresco.service.AuthorityService">
     		<property name="authorityService">
         		<ref bean="AuthorityService" />
         </property>
     </bean>
-    
+
      <bean id="eduOrganisationService" class="org.edu_sharing.alfresco.service.OrganisationService">
      	<property name="authorityService">
         		<ref bean="AuthorityService" />
         </property>
+
+         <property name="authorityServiceInsecure">
+             <ref bean="authorityService" />
+         </property>
+
         <property name="nodeService">
     	    		<ref bean="NodeService" />
     		</property>
@@ -812,11 +808,11 @@
             <ref bean="versionService" />
         </property>
    	 </bean>
-    
-     
+
+
        <!-- for remembering current authentication method, record login date -->
-     <bean id="authenticationService"
-        class="org.edu_sharing.alfresco.authentication.subsystems.SubsystemChainingAuthenticationService">
+     <bean id="authenticationService" class="org.edu_sharing.alfresco.authentication.subsystems.SubsystemChainingAuthenticationService">
+
         <property name="sysAdminParams">
             <ref bean="sysAdminParams" />
         </property>
@@ -835,6 +831,9 @@
         <property name="transactionService">
         	<ref bean="transactionService" />
       	</property>
+        <property name="guestService">
+          <ref bean="guestService" />
+        </property>
     </bean>
 
     <bean id="AuthorityService" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -865,6 +864,17 @@
     </bean>
     <bean id="eduAuthorityServiceInterceptor" class="org.edu_sharing.alfresco.interceptors.AuthorityServiceGuestInterceptor">
     </bean>
-    
-    
+
+
+  <bean id="lightbendConfigLoader" class="org.edu_sharing.alfresco.lightbend.LightbendConfigLoader">
+    <constructor-arg name="configCache" ref="eduSharingLightBendConfigCache"/>
+  </bean>
+
+  <bean id="guestService" class="org.edu_sharing.alfresco.service.guest.GuestServiceImpl">
+    <constructor-arg name="personService" ref="personService"/>
+    <constructor-arg name="authenticationService" ref="authenticationService"/>
+    <constructor-arg name="authorityService" ref="authorityService"/>
+    <constructor-arg name="configLoader" ref="lightbendConfigLoader"/>
+  </bean>
+
 </beans>

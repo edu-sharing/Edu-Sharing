@@ -1,8 +1,9 @@
-import { Component, Input, ViewChild } from '@angular/core';
-import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { OptionItem } from '../types/option-item';
 import { Helper } from '../util/helper';
 import { UIService } from '../services/ui.service';
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * The dropdown is one base component of the action bar (showing more actions),
@@ -13,15 +14,13 @@ import { UIService } from '../services/ui.service';
     templateUrl: 'dropdown.component.html',
     styleUrls: ['dropdown.component.scss'],
 })
-export class DropdownComponent {
+export class DropdownComponent implements OnChanges {
     @ViewChild('dropdown', { static: true }) menu: MatMenu;
     @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
 
     @Input() position: 'left' | 'right' = 'left';
-
-    @Input() set options(options: OptionItem[]) {
-        this._options = this.ui.filterValidOptions(Helper.deepCopyArray(options));
-    }
+    @Input() options: OptionItem[];
+    options$ = new BehaviorSubject<OptionItem[]>([]);
 
     /**
      * The object that should be returned via the option's callback.
@@ -43,9 +42,16 @@ export class DropdownComponent {
      */
     @Input() menuClass: string;
 
-    _options: OptionItem[];
-
     constructor(private ui: UIService) {}
+
+    ngOnChanges(changes?: SimpleChanges): void {
+        if (changes == null || changes?.options || changes?.callbackObject) {
+            this.options$.next(this.ui.filterValidOptions(Helper.deepCopyArray(this.options)));
+            if (this.callbackObject) {
+                this.ui.updateOptionEnabledState(this.options$, this.callbackObject);
+            }
+        }
+    }
 
     click(option: OptionItem) {
         if (!option.isEnabled) {
@@ -56,7 +62,7 @@ export class DropdownComponent {
 
     isNewGroup(i: number) {
         if (i > 0) {
-            return this._options[i].group !== this._options[i - 1].group;
+            return this.options$.value[i].group !== this.options$.value[i - 1].group;
         }
         return false;
     }
@@ -66,6 +72,6 @@ export class DropdownComponent {
         // We can only open the dropdown menu, when there is at least one enabled option. Even when
         // there are options with `showDisabled: true`, showing a menu with no selectable option
         // causes a11y issues.
-        return this._options?.some((o) => o.isEnabled);
+        return this.options$.value?.some((o) => o.isEnabled);
     }
 }

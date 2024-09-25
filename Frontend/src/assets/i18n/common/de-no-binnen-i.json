@@ -1,14 +1,31 @@
 {
+  "PERMISSION_TYPE": {
+    "Consumer": "Leserechte",
+    "Collaborator": "Mitarbeiter",
+    "Coordinator": "Koordinator",
+    "CCPublish": "veröffentlichen"
+  },
   "NODE": {
     "ccm:lifecyclecontributer_publisher": "Herausgeberschaft",
     "ccm:lifecyclecontributer_authorFN": "Autorin/Autor",
-    "ccm:author_freetext": "Weitere Angaben zur Urheberschaft"
+    "ccm:author_freetext": "Weitere, ergänzende Angaben zur Urheberschaft und zu Nutzungsrechten"
+  },
+  "USER": {
+    "PRIMARY_AFFILIATION": {
+      "teacher": "Lehrende",
+      "student": "Lernende",
+      "employee": "Mitarbeitende"
+    }
+  },
+  "TOOLPERMISSION": {
+    "TOOLPERMISSION_COLLECTION_CHANGE_OWNER": "Erlaubnis zum Ändern des Namens der erstellenden Person einer Sammlung"
   },
 
   "LICENSE": {
     "LINK_AUTHOR": "Link zur Autorin/zum Autor",
     "DESCRIPTION": {
-      "CC_BY": "Autorin/Autor muss genannt werden."
+      "CC_BY": "Autorin/Autor muss genannt werden.",
+      "UNTERRICHTS_UND_LEHRMEDIEN": "Herstellende von Unterrichts- und Lehrmedien dürfen für solche Sammlungen bis zu 10 Prozent eines veröffentlichten Werkes vervielfältigen, verbreiten und öffentlich zugänglich machen.<br />§ 60a Absatz 2 und 3 ist entsprechend anzuwenden.<br />Unterrichts- und Lehrmedien im Sinne dieses Gesetzes sind Sammlungen, die Werke einer größeren Anzahl von Urhebern vereinigen und ausschließlich zur Veranschaulichung des Unterrichts und der Lehre an Bildungseinrichtungen (§ 60a) zu nicht kommerziellen Zwecken geeignet, bestimmt und entsprechend gekennzeichnet sind."
     }
   },
   "ACCESSIBILITY": {
@@ -18,7 +35,7 @@
     "WARNING": {
       "NO_LICENSE": "Dieses Material besitzt noch keine Lizenz.\nSetzen Sie sich ggf. mit der Autorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden.",
       "COPYRIGHT": "Dieses Material besitzt eine Copyright-Lizenz.\nSetzen Sie sich ggf. mit der Autorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden.",
-      "ND": "Dieses Material besitzt eine Non Derivative Lizenz. Diese Lizenz legt fest, dass das Material nicht verändert werden darf.\nSetzen Sie sich ggf. mit der AUtorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden."
+      "ND": "Dieses Material besitzt eine Non Derivative Lizenz. Diese Lizenz legt fest, dass das Material nicht verändert werden darf.\nSetzen Sie sich ggf. mit der Autorin/dem Autor in Verbindung, um Lizenzverstöße zu vermeiden."
     }
   },
   "FEEDBACK": {
@@ -27,6 +44,7 @@
   "MDS": {
     "AUTHOR_LABEL": "Angaben zur Urheberschaft",
     "AUTHOR_FREETEXT": "Weitere Angaben zur Urheberschaft",
-    "AUTHOR_PERSON": "Beteiligte"
+    "AUTHOR_PERSON": "Beteiligte",
+    "AUTHOR_FREETEXT_PLACEHOLDER": "Weitere Angaben zur Urheberschaft (Namen)"
   }
 }
