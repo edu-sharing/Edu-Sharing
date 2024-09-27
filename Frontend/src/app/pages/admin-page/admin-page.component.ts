@@ -91,7 +91,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
     @ViewChild('keyValueTable') keyValueTable: TemplateRef<undefined>;
     elasticResponse: NodeListElastic;
     cancelJobInfo: Job;
-    private readonly destroyed$ = new Subject();
+    private readonly destroyed$ = new Subject<void>();
 
     constructor(
         private about: AboutService,
