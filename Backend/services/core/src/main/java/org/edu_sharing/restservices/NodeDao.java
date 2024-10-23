@@ -28,7 +28,6 @@ import org.edu_sharing.repository.client.rpc.Share;
 import org.edu_sharing.repository.client.rpc.User;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.repository.server.tools.*;
@@ -40,8 +39,8 @@ import org.edu_sharing.restservices.node.v1.model.*;
 import org.edu_sharing.restservices.shared.NodeRef;
 import org.edu_sharing.restservices.shared.*;
 import org.edu_sharing.restservices.shared.NodeSearch.Facet;
-import org.edu_sharing.restservices.shared.NodeSearch.Facet.Value;
 import org.edu_sharing.restservices.shared.SearchResult;
+import org.edu_sharing.restservices.shared.NodeSearch.Facet.Value;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityService;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
@@ -1083,7 +1082,7 @@ public class NodeDao {
 
         try {
             org.alfresco.service.cmr.repository.NodeRef newNode = nodeService.copyNode(sourceId, nodeId, withChildren);
-            permissionService.createNotifyObject(newNode.getId(), new AuthenticationToolAPI().getCurrentUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+            permissionService.createNotifyObject(newNode.getId(),AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
             return new NodeDao(repoDao, newNode.getId(), Filter.createShowAllFilter());
 
         } catch (Throwable t) {
@@ -2714,7 +2713,7 @@ public class NodeDao {
             RunAsWork<NodeDao> work = () -> {
                 try {
                     org.alfresco.service.cmr.repository.NodeRef newNode = nodeService.copyNode(source[0], nodeId, false);
-                    permissionService.createNotifyObject(newNode.getId(), new AuthenticationToolAPI().getCurrentUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+                    permissionService.createNotifyObject(newNode.getId(),AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
                     nodeService.addAspect(newNode.getId(), CCConstants.CCM_ASPECT_FORKED);
                     nodeService.setProperty(newNode.getStoreRef().getProtocol(), newNode.getStoreRef().getIdentifier(), newNode.getId(), CCConstants.CCM_PROP_FORKED_ORIGIN,
                             new org.alfresco.service.cmr.repository.NodeRef(storeProtocol, storeId, source[0]), false);

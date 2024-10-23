@@ -22,7 +22,7 @@ public interface TimedPermissionMapper {
     @Select("SELECT * FROM edu_timed_node_permission WHERE \"to\" < #{date}")
     List<TimedPermission> findAllByToBefore(@Param("date") Date date);
 
-    @Insert("INSERT INTO edu_timed_node_permission(node_id,authority,permission,\"from\",\"to\", activated)VALUES(#{node_id},#{authority},#{permission},#{from},#{to}, #{activated}) ON CONFLICT (node_id, authority, permission) DO UPDATE SET \"from\" = #{from}, \"to\" = #{to}, activated = #{activated};")
+    @Insert("INSERT INTO edu_timed_node_permission(node_id,authority,\"user\",permission,\"from\",\"to\", activated)VALUES(#{node_id},#{authority},#{user},#{permission},#{from},#{to}, #{activated}) ON CONFLICT (node_id, authority, permission) DO UPDATE SET \"from\" = #{from}, \"to\" = #{to}, \"user\" = #{user}, activated = #{activated};")
     void save(TimedPermission timedPermission);
 
     @Delete("DELETE FROM edu_timed_node_permission WHERE node_id = #{node_id} AND authority = #{authority} AND permission = #{permission}")
