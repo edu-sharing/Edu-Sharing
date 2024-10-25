@@ -1221,6 +1221,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             node = this.getObjects(node, data)[0];
             this.dialogs.openNodeEmbedDialog({ node });
         });
+        embedNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         embedNode.constrains = [Constrain.NoBulk, Constrain.HomeRepository];
         embedNode.scopes = [Scope.Render];
         embedNode.group = DefaultGroups.View;
