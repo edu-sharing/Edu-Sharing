@@ -189,6 +189,7 @@ export class AuthoritySearchInputComponent {
                             label: 'WORKSPACE.INVITE_GLOBAL_RESULTS',
                             values: this.convertData(authorities),
                         })),
+                        catchError(() => of({ values: [] } as SuggestionGroup)),
                     ),
             );
         }
