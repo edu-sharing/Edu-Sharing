@@ -1,5 +1,5 @@
 import { TranslateService } from '@ngx-translate/core';
-import { forkJoin, Observable, Observer } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import {
@@ -31,7 +31,6 @@ import {
     AuthorityProfile,
     CollectionReference,
     DeepLinkResponse,
-    Permission,
     Repository,
     User,
 } from '../core-module/rest/data-object';
@@ -39,18 +38,21 @@ import { RestConstants } from '../core-module/rest/rest-constants';
 import { RestHelper } from '../core-module/rest/rest-helper';
 import { RestConnectorService } from '../core-module/rest/services/rest-connector.service';
 import { UniversalNode } from '../core-module/rest/definitions';
-import { SessionStorageService } from '../core-module/rest/services/session-storage.service';
+import { SessionStorageService, Store } from '../core-module/rest/services/session-storage.service';
 import { map } from 'rxjs/operators';
 import { RestNodeService } from '../core-module/rest/services/rest-node.service';
 import {
     Ace,
     ApiHelpersService,
+    AuthenticationService,
     ConfigService,
     HOME_REPOSITORY,
     NetworkService,
     Node,
     TrackingV1Service,
 } from 'ngx-edu-sharing-api';
+import { DialogsService } from '../features/dialogs/dialogs.service';
+import { DialogButton } from '../util/dialog-button';
 
 export interface ConfigEntry {
     name: string;
@@ -90,7 +92,9 @@ export class NodeHelperService extends NodeHelperServiceBase {
         repoUrlService: RepoUrlService,
         @Optional() @Inject(ASSETS_BASE_PATH) assetsBasePath: string,
         private componentFactoryResolver: ComponentFactoryResolver,
+        private authenticationService: AuthenticationService,
         private config: ConfigService,
+        private dialogsService: DialogsService,
         private rest: RestConnectorService,
         private bridge: BridgeService,
         private http: HttpClient,
@@ -492,9 +496,49 @@ export class NodeHelperService extends NodeHelperServiceBase {
 
     /**
      * Download one or multiple nodes
-     * @param node
      */
-    async downloadNodes(nodes: Node[], fileName = 'download.zip') {
+    async downloadNodes(nodes: Node[], fileName = 'download.zip', confirmed = false) {
+        const safe = nodes.some((n) =>
+            n.properties?.[RestConstants.CCM_PROP_EDUSCOPENAME]?.includes(RestConstants.SAFE_SCOPE),
+        );
+        if (
+            safe &&
+            !confirmed &&
+            !(await this.sessionStorage
+                .get(
+                    SessionStorageService.KEY_WORKSPACE_SAFE_DOWNLOAD_CONFIRM,
+                    false,
+                    Store.Session,
+                )
+                .toPromise())
+        ) {
+            const buttons = [
+                new DialogButton('CANCEL', DialogButton.TYPE_CANCEL, null),
+                new DialogButton('DOWNLOAD', DialogButton.TYPE_PRIMARY, null),
+            ];
+            const dialog = await this.dialogsService.openCheckboxConfirmDialog({
+                nodes,
+                buttons,
+                title: 'WORKSPACE.SAFE_CONFIRM_DOWNLOAD_TITLE',
+                label: 'WORKSPACE.SAFE_CONFIRM_DOWNLOAD_CHECKBOX',
+                message: 'WORKSPACE.SAFE_CONFIRM_DOWNLOAD_MESSAGE',
+            });
+            buttons[0].callback = () => dialog.close();
+            buttons[1].callback = () => {
+                if (dialog.config.data.state) {
+                    this.sessionStorage
+                        .set(
+                            SessionStorageService.KEY_WORKSPACE_SAFE_DOWNLOAD_CONFIRM,
+                            true,
+                            Store.Session,
+                        )
+                        .then(() => {});
+                }
+                this.downloadNodes(nodes, fileName, true);
+                dialog.close();
+            };
+            return;
+        }
         if (nodes.length === 1) return await this.downloadNode(nodes[0]);
 
         const nodesString = RestHelper.getNodeIds(nodes).join(',');

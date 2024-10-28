@@ -453,6 +453,9 @@
     "DRAG_DROP_COPY": "Kopieren",
     "DRAG_DROP_MOVE": "Verschieben",
     "FEATURE_NOT_IMPLEMENTED": "Die Funktion ist derzeit leider noch nicht verfügbar",
+    "SAFE_CONFIRM_DOWNLOAD_TITLE": "Hinweis",
+    "SAFE_CONFIRM_DOWNLOAD_CHECKBOX": "In dieser Sitzung nicht erneut anzeigen",
+    "SAFE_CONFIRM_DOWNLOAD_MESSAGE": "Bitte beachten Sie, dass lokal gespeicherte Dateien aus dem Datensafe wieder gelöscht werden sollten. Wir empfehlen die Synchronisation mit eigenen Cloudservices zusätzlich zu deaktivieren.",
     "LICENSE": {
       "TITLE": "Lizenz festlegen",
       "TYPE": "Lizenz wählen",

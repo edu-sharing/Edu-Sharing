@@ -1,0 +1,4 @@
+<p *ngFor="let line of data.message | translate : data.messageParameters | splitNewLines">
+  {{ line }}
+</p>
+<mat-checkbox [formControl]="control">{{ data.label | translate }}</mat-checkbox>
