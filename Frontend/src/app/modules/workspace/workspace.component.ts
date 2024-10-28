@@ -473,6 +473,7 @@ export class WorkspaceMainComponent implements EventListener, OnInit, OnDestroy 
         await this.prepareActionbar();
         await this.initUser();
         this.loadFolders(this.user);
+        this.initMainNav();
 
         this.connector.scope = this.isSafe ? RestConstants.SAFE_SCOPE : null;
         this.isLoggedIn = true;
@@ -520,8 +521,6 @@ export class WorkspaceMainComponent implements EventListener, OnInit, OnDestroy 
             this.reurl = params.reurl;
         }
         this.mainnav = params.mainnav === 'false' ? false : true;
-
-        this.initMainNav();
 
         if (params.file && params.file !== this.oldParams?.file) {
             void this.showNodeInCurrentFolder(params.file);
