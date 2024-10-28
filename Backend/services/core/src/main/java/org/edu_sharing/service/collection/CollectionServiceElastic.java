@@ -13,6 +13,8 @@ import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
+import org.edu_sharing.restservices.CollectionDao;
+import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.SearchServiceElastic;
@@ -139,6 +141,12 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
         token.setSortDefinition(sortDefinition);
         token.setFrom(skipCount);
         token.setMaxResult(maxItems);
+        if(CollectionDao.SearchScope.valueOf(scope).equals(CollectionDao.SearchScope.EDU_GROUPS)) {
+            ArrayList<String> authorities = new ArrayList<>(serviceRegistry.getAuthorityService().getAuthorities());
+            authorities.add(serviceRegistry.getAuthenticationService().getCurrentUserName());
+            authorities.remove(CCConstants.AUTHORITY_GROUP_EVERYONE);
+            token.setAuthorityScope(authorities);
+        }
         SearchResultNodeRef nodeRefs = SearchServiceFactory.getLocalService().search(mds, queryId, Collections.emptyMap(), token);
         for (org.edu_sharing.service.model.NodeRef nodeRef : nodeRefs.getData()) {
             if (isSubCollection(nodeRef)) {
