@@ -1004,48 +1004,8 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             }
             return isAllowed;
          */
-        const downloadNode = new OptionItem('OPTIONS.DOWNLOAD', 'cloud_download', (object) =>
-            this.nodeHelper.downloadNodes(this.getObjects(object, data)),
-        );
-        downloadNode.elementType = OptionsHelperService.DownloadElementTypes;
-        downloadNode.constrains = [Constrain.Files];
-        downloadNode.group = DefaultGroups.View;
-        // downloadNode.key = 'D';
-        downloadNode.priority = 40;
-        downloadNode.customEnabledCallback = async (nodes) => {
-            if (!nodes) {
-                return false;
-            }
-
-            if (
-                nodes.some((n) =>
-                    n.properties?.[RestConstants.CCM_PROP_EDUSCOPENAME]?.includes(
-                        RestConstants.SAFE_SCOPE,
-                    ),
-                )
-            ) {
-                downloadNode.name = 'OPTIONS.DOWNLOAD_SAFE';
-            } else {
-                downloadNode.name = 'OPTIONS.DOWNLOAD';
-            }
-            for (const item of nodes) {
-                // if at least one is allowed -> allow download (download servlet will later filter invalid files)
-                if (
-                    item.downloadUrl != null &&
-                    item.properties &&
-                    (!item.properties[RestConstants.CCM_PROP_IO_WWWURL] ||
-                        !RestNetworkService.isFromHomeRepo(item)) &&
-                    this.nodeHelper.referenceOriginalExists(item)
-                ) {
-                    // bulk upload is not supported for remote nodes
-                    if (!RestNetworkService.isFromHomeRepo(item) && nodes.length !== 1) {
-                        continue;
-                    }
-                    return true;
-                }
-            }
-            return false;
-        };
+        const downloadNode = this.getDownloadOption(data, false);
+        const downloadNodeSafe = this.getDownloadOption(data, true);
         const downloadMetadataNode = new OptionItem(
             'OPTIONS.DOWNLOAD_METADATA',
             'format_align_left',
@@ -1528,6 +1488,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(contributorNode);
         options.push(workflowNode);
         options.push(downloadNode);
+        options.push(downloadNodeSafe);
         options.push(downloadMetadataNode);
         options.push(qrCodeNode);
         options.push(relationNode);
@@ -1552,6 +1513,52 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             this.globalOptionsService.postPrepareOptions(options, objects);
         }
         return options;
+    }
+
+    private getDownloadOption(data: OptionData, safe = false) {
+        const downloadNode = new OptionItem(
+            'OPTIONS.DOWNLOAD' + (safe ? '_SAFE' : ''),
+            'cloud_download',
+            (object) => this.nodeHelper.downloadNodes(this.getObjects(object, data)),
+        );
+        downloadNode.elementType = OptionsHelperService.DownloadElementTypes;
+        downloadNode.constrains = [Constrain.Files];
+        downloadNode.group = DefaultGroups.View;
+        // downloadNode.key = 'D';
+        downloadNode.priority = 40;
+        downloadNode.customShowCallback = async (nodes) => {
+            return (
+                nodes.some((n) =>
+                    n.properties?.[RestConstants.CCM_PROP_EDUSCOPENAME]?.includes(
+                        RestConstants.SAFE_SCOPE,
+                    ),
+                ) === safe
+            );
+        };
+        downloadNode.customEnabledCallback = async (nodes) => {
+            if (!nodes) {
+                return false;
+            }
+
+            for (const item of nodes) {
+                // if at least one is allowed -> allow download (download servlet will later filter invalid files)
+                if (
+                    item.downloadUrl != null &&
+                    item.properties &&
+                    (!item.properties[RestConstants.CCM_PROP_IO_WWWURL] ||
+                        !RestNetworkService.isFromHomeRepo(item)) &&
+                    this.nodeHelper.referenceOriginalExists(item)
+                ) {
+                    // bulk upload is not supported for remote nodes
+                    if (!RestNetworkService.isFromHomeRepo(item) && nodes.length !== 1) {
+                        continue;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        };
+        return downloadNode;
     }
 
     private async revokeNode(object: any, data: OptionData) {
