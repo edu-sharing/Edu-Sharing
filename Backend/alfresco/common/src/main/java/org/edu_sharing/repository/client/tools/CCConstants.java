@@ -2022,6 +2022,8 @@ public class CCConstants {
 				usagePermissions.add(PERMISSION_READ_PREVIEW);
 				usagePermissions.add(PERMISSION_READ_ALL);
 				usagePermissions.add(PERMISSION_CONSUMER);
+				usagePermissions.add(PERMISSION_DOWNLOAD_CONTENT);
+				usagePermissions.add(PERMISSION_EMBED);
 				usagePermissions.add(PERMISSION_COMMENT);
 				usagePermissions.add(PERMISSION_RATE);
 				usagePermissions.add(PERMISSION_RATE_READ);
