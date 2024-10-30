@@ -1469,7 +1469,10 @@ public class NodeDao {
         data.setAccess(access);
         // set access effective for original elements only
         if (!(data instanceof CollectionReference) && Objects.equals(CallSourceHelper.CallSource.Render, CallSourceHelper.getCallSource())) {
-            List<String> permissions = org.edu_sharing.service.nodeservice.NodeServiceInterceptor.getIndirectPermissions(getId(), List.of(DAO_PERMISSIONS));
+            java.util.Collection<String> permissions = org.edu_sharing.service.nodeservice.NodeServiceInterceptor.getIndirectPermissions(getId(), List.of(DAO_PERMISSIONS));
+            // since it's an original: we join the permissions with the original ones
+            permissions.addAll(access);
+            permissions = new HashSet<>(permissions);
             data.setAccessEffective(permissions);
         }
         data.setPublic(isPublic);
