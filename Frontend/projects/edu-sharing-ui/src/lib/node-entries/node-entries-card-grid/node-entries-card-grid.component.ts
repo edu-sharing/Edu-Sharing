@@ -367,8 +367,11 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
         });
     }
 
-    isCustomTemplate() {
-        return this.entriesService.dataSource instanceof CustomTemplatesDataSource;
+    isCustomTemplate(node: T) {
+        return (
+            this.entriesService.dataSource instanceof CustomTemplatesDataSource ||
+            (node as any).elementRef
+        );
     }
 
     isBlocked(node: Node) {

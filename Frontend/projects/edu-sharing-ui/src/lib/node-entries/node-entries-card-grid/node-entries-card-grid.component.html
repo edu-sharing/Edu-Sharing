@@ -107,10 +107,10 @@
           (nodeDropped)="onNodesDropped($event)"
           #dropTarget="esNodesDropTarget"
         >
-          <ng-container *ngIf="isCustomTemplate()">
+          <ng-container *ngIf="isCustomTemplate(node)">
             <ng-container *ngTemplateOutlet="$any(node)"></ng-container>
           </ng-container>
-          <ng-container *ngIf="!isCustomTemplate()">
+          <ng-container *ngIf="!isCustomTemplate(node)">
             <es-node-entries-card
               *ngIf="displayType === NodeEntriesDisplayType.Grid"
               #item
