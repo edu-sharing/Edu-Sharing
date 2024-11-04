@@ -98,8 +98,8 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
     @JobFieldDescription(description = "When set to true, the job will generate a yearly report as well (only on 1st January)")
     private boolean generateYearly = false;
 
-    @JobFieldDescription(description = "When set to true, the job will generate a quaternary report as well (only on 1st of January, April, July and October)")
-    private boolean generateQuaternary = false;
+    @JobFieldDescription(description = "When set to true, the job will generate a quarterly report as well (only on 1st of January, April, July and October)")
+    private boolean generateQuarterly = false;
 
     @JobFieldDescription(description = "use a custom date (month) to run the job for. Note: The job will run the month BEFORE the given date!", sampleValue = "YYYY-MM-DD")
     private Date customDate = null;
@@ -142,7 +142,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             }
 
             LocalDate lastMonth = localDate.minusMonths(1);
-            LocalDate from = LocalDate.of(lastMonth.getYear(), lastMonth.getMonth(), 1);
+            LocalDate from = lastMonth.withDayOfMonth(1);
 
             YearMonth month = YearMonth.from(from);
             LocalDate to = month.atEndOfMonth();
@@ -158,13 +158,15 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
                 generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
 
                 if (generateYearly && localDate.getMonthValue() == 1) {
-                    from = localDate.minusYears(1);
+                    from = localDate.minusYears(1).withDayOfMonth(1);
                     startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
                     generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Yearly);
                 }
 
-                if (generateQuaternary && List.of(1, 4, 7, 10).contains(localDate.getMonthValue())) {
-                    from = localDate.minusMonths(3);
+                if (generateQuarterly && List.of(1, 4, 7, 10).contains(localDate.getMonthValue())) {
+                    from = lastMonth.withMonth(lastMonth.getMonth().firstMonthOfQuarter().getValue())
+                            .withDayOfMonth(1);
+
                     startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
                     generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Quarterly);
                 }
