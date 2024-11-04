@@ -503,8 +503,13 @@ public class SearchServiceElastic extends SearchServiceImpl {
             logger.info("Query " + query + " is not defined within dsl language, switching to lucene...");
             return super.search(mds, query, criterias, searchToken);
         }
-
-        Set<String> authorities = getUserAuthorities();
+        Set<String> authorities;
+        if(searchToken.getAuthorityScope() != null && !searchToken.getAuthorityScope().isEmpty()) {
+            logger.debug("Searching elastic with authority scope: " + StringUtils.join(searchToken.getAuthorityScope()));
+            authorities = new HashSet<>(searchToken.getAuthorityScope());
+        } else {
+            authorities = getUserAuthorities();
+        }
         String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
 
 

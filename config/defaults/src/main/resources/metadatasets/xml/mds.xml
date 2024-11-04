@@ -1329,7 +1329,6 @@
           {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
         ],
         "must_not":[
-          {"match":{"permissions.Read":"GROUP_EVERYONE"}},
           {"match":{"properties.cm:owner.keyword":"${authority}"}},
           {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
           {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}

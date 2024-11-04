@@ -9,6 +9,7 @@ import org.alfresco.repo.search.impl.solr.SolrJSONResultSet;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.impl.acegi.FilteringResultSet;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -88,6 +89,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
     MCAlfrescoAPIClient repoClient = new MCAlfrescoAPIClient();
 	private GuestService guestService = applicationContext.getBean(GuestService.class);
     private PermissionService permissionService;
+    private final RetryingTransactionHelper retryingTransactionHelper = serviceRegistry.getRetryingTransactionHelper();
 
     public PermissionServiceImpl(
             ToolPermissionService toolPermissionService,
@@ -252,7 +254,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         }
 
         if (createNotify) {
-            createNotifyObject(nodeId, new AuthenticationToolAPI().getCurrentUser(),
+            createNotifyObject(nodeId, AuthenticationUtil.getFullyAuthenticatedUser(),
                     CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_CHANGE);
         }
 
@@ -299,10 +301,61 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
     }
 
     @Override
+    public void updateTimedPermissions() {
+        List<TimedPermission> permissionsToAdd = timedPermissionMapper.findAllByFromAfterAndNotActivated(new Date());
+        List<TimedPermission> permissionsToRemove = timedPermissionMapper.findAllByToBefore(new Date());
+
+        for (TimedPermission timedPermission : permissionsToAdd) {
+            retryingTransactionHelper.doInTransaction(() ->
+                    AuthenticationUtil.runAs(() -> {
+                        NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, timedPermission.getNode_id());
+                        if(!nodeService.exists(nodeRef)) {
+                            timedPermissionMapper.delete(timedPermission);
+                            return null;
+                        }
+
+                        try {
+                            addPermissions(timedPermission.getNode_id(),
+                                    Map.of(timedPermission.getAuthority(), new String[]{timedPermission.getPermission()}), false, null, false, timedPermission.getUser());
+                            if (timedPermission.getTo() == null) {
+                                timedPermissionMapper.delete(timedPermission);
+                            } else {
+                                timedPermission.setActivated(true);
+                                timedPermissionMapper.save(timedPermission);
+                            }
+                        } catch (Throwable e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        return null;
+                    }, timedPermission.getUser()));
+        }
+
+        for (TimedPermission timedPermission : permissionsToRemove) {
+            retryingTransactionHelper.doInTransaction(() ->
+                    AuthenticationUtil.runAs(() -> {
+                        NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, timedPermission.getNode_id());
+                        if(nodeService.exists(nodeRef)) {
+                            permissionService.deletePermission(
+                                    nodeRef,
+                                    timedPermission.getAuthority(),
+                                    timedPermission.getPermission());
+                            createNotifyObject(timedPermission.getNode_id(), timedPermission.getUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_CHANGE);
+                        }
+                        timedPermissionMapper.delete(timedPermission);
+                        return null;
+                    }, timedPermission.getUser()));
+        }
+    }
+
+    @Override
     public void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions,
                                String _mailText, Boolean _sendMail, Boolean _sendCopy) throws Throwable {
+        String user = AuthenticationUtil.getFullyAuthenticatedUser();
+        addPermissions(_nodeId, _authPerm, _inheritPermissions, _mailText, _sendMail, user);
+    }
 
-        String user = new AuthenticationToolAPI().getCurrentUser();
+    private void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions, String _mailText, Boolean _sendMail, String user) throws Throwable {
+
         for (String authority : _authPerm.keySet()) {
             String[] permissions = _authPerm.get(authority);
             setPermissions(_nodeId, authority, permissions, _inheritPermissions);
@@ -317,7 +370,12 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             if (AuthorityType.GROUP.equals(authorityType)) {
                 addToRecent(authorityService.getAuthorityNodeRef(authority));
             }
+        }
 
+            createNotifyObject(_nodeId, user, CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+
+        for (String authority : _authPerm.keySet()) {
+            String[] permissions = _authPerm.get(authority);
             if (_sendMail) {
                 String nodeType = eduNodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
                 Map<String, Object> props = eduNodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
@@ -326,11 +384,6 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
                         .notifyPermissionChanged(user, authority, _nodeId, nodeType, aspects, props, permissions, _mailText);
             }
         }
-
-        org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory
-                .getPermissionService(ApplicationInfoList.getHomeRepository().getAppId());
-
-        permissionService.createNotifyObject(_nodeId, user, CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
     }
 
 
@@ -803,6 +856,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         permission.setAuthority(ace.getAuthority());
         permission.setPermission(ace.getPermission());
         permission.setActivated(activated);
+        permission.setUser(AuthenticationUtil.getFullyAuthenticatedUser());
         return permission;
     }
 

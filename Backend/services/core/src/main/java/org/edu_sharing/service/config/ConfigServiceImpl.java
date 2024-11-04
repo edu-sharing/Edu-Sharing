@@ -126,6 +126,8 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
 
     private void buildContextCache() throws Exception {
         if (contextCache.getKeys().isEmpty()) {
+            // put an element so that next time, the cache is never empty!
+            contextCache.put("", null);
             Config config = getConfig();
             if (config.contexts != null && config.contexts.context != null) {
                 for (Context context : config.contexts.context) {

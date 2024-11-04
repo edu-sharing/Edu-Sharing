@@ -1,21 +1,21 @@
 package org.edu_sharing.service.permission;
 
-import java.util.*;
-
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.edu_sharing.repository.client.rpc.ACE;
-import org.edu_sharing.repository.client.rpc.ACL;
-import org.edu_sharing.repository.client.rpc.Authority;
-import org.edu_sharing.repository.client.rpc.Group;
-import org.edu_sharing.repository.client.rpc.Notify;
-import org.edu_sharing.repository.client.rpc.Result;
-import org.edu_sharing.repository.client.rpc.User;
+import org.edu_sharing.repository.client.rpc.*;
 import org.edu_sharing.service.InsufficientPermissionException;
+
+import java.util.Collection;
+import java.util.*;
 
 public class PermissionServiceAdapter implements PermissionService {
 	
 	protected List<String> ALLOWED_PERMISSIONS=new ArrayList<>();
-	
+
+	@Override
+	public void updateTimedPermissions() {
+
+	}
+
 	@Override
 	public void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions,
 							   String _mailText, Boolean _sendMail, Boolean _sendCopy) throws Throwable {

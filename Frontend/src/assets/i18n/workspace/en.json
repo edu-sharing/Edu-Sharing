@@ -455,6 +455,9 @@
     "DRAG_DROP_COPY": "copy",
     "DRAG_DROP_MOVE": "move",
     "FEATURE_NOT_IMPLEMENTED": "This feature is currently not available",
+    "SAFE_CONFIRM_DOWNLOAD_TITLE": "Notice",
+    "SAFE_CONFIRM_DOWNLOAD_CHECKBOX": "Don't show again in this session",
+    "SAFE_CONFIRM_DOWNLOAD_MESSAGE": "Please note that locally stored files fron the data safe should be deleted afterwards. We also recommend to disable any synchronisations with cloud services.",
     "LICENSE": {
       "TITLE": "Define license",
       "TYPE": "Choose license",

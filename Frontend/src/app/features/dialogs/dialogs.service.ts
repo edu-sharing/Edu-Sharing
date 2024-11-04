@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { DialogButton, RestConnectorService, UIConstants } from '../../core-module/core.module';
+import { DialogButton, RestConnectorService } from '../../core-module/core.module';
 import { Closable } from './card-dialog/card-dialog-config';
 import { CardDialogRef } from './card-dialog/card-dialog-ref';
 import { CardDialogUtilsService } from './card-dialog/card-dialog-utils.service';
@@ -128,13 +128,16 @@ import {
     XmlAppPropertiesDialogResult,
 } from './dialog-modules/xml-app-properties-dialog/xml-app-properties-dialog-data';
 import { NotificationDialogComponent } from '../../main/navigation/top-bar/notification-dialog/notification-dialog.component';
-import { CardComponent } from '../../shared/components/card/card.component';
 import { Node } from 'ngx-edu-sharing-api';
 import { DropSource, DropTarget, NodeRoot, NodeTitlePipe } from 'ngx-edu-sharing-ui';
 import {
     RevocationDialogData,
     RevocationDialogResult,
 } from './dialog-modules/revocation-dialog/revocation-dialog-data';
+import {
+    CheckboxDialogData,
+    CheckboxDialogResult,
+} from './dialog-modules/checkbox-dialog/checkbox-dialog-data';
 
 @Injectable({
     providedIn: 'root',
@@ -201,6 +204,27 @@ export class DialogsService {
             avatar,
             width: 600,
             closable: Closable.Standard,
+            data,
+        });
+    }
+
+    async openCheckboxConfirmDialog(
+        config: CheckboxDialogData,
+    ): Promise<CardDialogRef<CheckboxDialogData, CheckboxDialogResult>> {
+        const { title, subtitle, avatar, buttons, ...data } = {
+            ...new CheckboxDialogData(),
+            ...config,
+        };
+        const { CheckboxDialogComponent } = await import(
+            './dialog-modules/checkbox-dialog/checkbox-dialog.component'
+        );
+        return this.cardDialog.open(CheckboxDialogComponent, {
+            title,
+            ...(await this.cardDialogUtils.configForNodes(data.nodes)),
+            avatar,
+            buttons,
+            width: 600,
+            closable: Closable.Casual,
             data,
         });
     }
