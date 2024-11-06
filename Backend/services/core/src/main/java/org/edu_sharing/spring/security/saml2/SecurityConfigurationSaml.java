@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
@@ -42,6 +43,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -51,6 +53,7 @@ import java.net.URISyntaxException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -198,8 +201,25 @@ public class SecurityConfigurationSaml {
             RSAPrivateKey privateKey = converter.convert(pkInputStream);
 
             String globalSPRegistrationId = "one";
-            List<RelyingPartyRegistration> relyingPartyRegistration = RelyingPartyRegistrations
-                    .collectionFromMetadataLocation(config.getString("security.sso.saml.idp.metadata.url"))
+
+
+            Collection<RelyingPartyRegistration.Builder> b = null;
+            String cfgMetadataPath = "security.sso.saml.idp.metadata";
+            if(config.hasPath(cfgMetadataPath +".content")){
+                b = RelyingPartyRegistrations.collectionFromMetadata(IOUtils.toInputStream(config.getString(cfgMetadataPath +".content")));
+            }else if(config.hasPath(cfgMetadataPath +".filePath")){
+                File f = new File(config.getString(cfgMetadataPath +".filePath"));
+                b = RelyingPartyRegistrations.collectionFromMetadata(FileUtils.openInputStream(f));
+            }else if(config.hasPath(cfgMetadataPath + ".url")){
+                b = RelyingPartyRegistrations
+                        .collectionFromMetadataLocation(config.getString(cfgMetadataPath + ".url"));
+            }
+
+            if(b == null){
+                throw new RuntimeException("no IDP metadata configured");
+            }
+
+            List<RelyingPartyRegistration> relyingPartyRegistration = b
                     .stream().map((builder) -> {
                         String relyingPartyId = getRelyingPartyId(builder);
                         return builder.registrationId(relyingPartyId)

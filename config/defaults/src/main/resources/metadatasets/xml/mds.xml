@@ -1321,6 +1321,9 @@
         {"bool":{
         "must":[
         {"term":{"nodeRef.storeRef.protocol":"workspace"}}
+        ],
+        "must_not":[
+        {"exists":{"field": "properties.ccm:published_original"}}
         ]
         }}
       </basequery>
