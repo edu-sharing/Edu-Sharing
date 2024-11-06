@@ -14,7 +14,8 @@ RUN set -eux \
     && rm \
         tomcat/webapps/alfresco/WEB-INF/lib/jsr305-* \
         tomcat/webapps/alfresco/WEB-INF/lib/spring-security-* \
-        tomcat/webapps/alfresco/WEB-INF/lib/oauth2-oidc-sdk-*
+        tomcat/webapps/alfresco/WEB-INF/lib/oauth2-oidc-sdk-* \
+        tomcat/webapps/alfresco/WEB-INF/lib/stax2-api-*
 
 COPY --chown=worker:worker artifacts/edu_sharing-community-repository-backend-tomcat-${org.edu_sharing:edu_sharing-community-repository-backend-tomcat:jar.version}.jar tomcat/lib/
 COPY --chown=worker:worker webapp/*.war tomcat/webapps/edu-sharing.war

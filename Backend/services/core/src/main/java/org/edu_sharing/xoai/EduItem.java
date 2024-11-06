@@ -1,12 +1,12 @@
 package org.edu_sharing.xoai;
 
-import org.dspace.xoai.dataprovider.model.Item;
-import org.dspace.xoai.dataprovider.model.Set;
-import org.dspace.xoai.model.oaipmh.About;
-import org.dspace.xoai.model.oaipmh.Metadata;
+import io.gdcc.xoai.dataprovider.model.Item;
+import io.gdcc.xoai.dataprovider.model.Set;
+import io.gdcc.xoai.model.oaipmh.results.record.About;
+import io.gdcc.xoai.model.oaipmh.results.record.Metadata;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EduItem implements Item {
@@ -20,7 +20,7 @@ public class EduItem implements Item {
 
     @Override
     public List<About> getAbout() {
-        return null;
+        return List.of();
     }
 
     @Override
@@ -34,8 +34,8 @@ public class EduItem implements Item {
     }
 
     @Override
-    public Date getDatestamp() {
-        return new Date();
+    public Instant getDatestamp() {
+        return Instant.now();
     }
 
     @Override

@@ -1,17 +1,17 @@
 package org.edu_sharing.xoai;
 
-import org.dspace.xoai.dataprovider.model.ItemIdentifier;
-import org.dspace.xoai.dataprovider.model.Set;
+import io.gdcc.xoai.dataprovider.model.ItemIdentifier;
+import io.gdcc.xoai.dataprovider.model.Set;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EduItemIdentifier implements ItemIdentifier {
     private final String identifier;
-    private final Date modifiedDate;
+    private final Instant modifiedDate;
 
-    public EduItemIdentifier(String identifier,Date modifiedDate) {
+    public EduItemIdentifier(String identifier, Instant modifiedDate) {
         this.identifier=identifier;
         this.modifiedDate=modifiedDate;
     }
@@ -22,7 +22,7 @@ public class EduItemIdentifier implements ItemIdentifier {
     }
 
     @Override
-    public Date getDatestamp() {
+    public Instant getDatestamp() {
         return modifiedDate;
     }
 

@@ -1,23 +1,27 @@
 package org.edu_sharing.repository.server.oai;
 
-import com.typesafe.config.Config;
+import io.gdcc.xoai.dataprovider.exceptions.handler.HandlerException;
+import io.gdcc.xoai.dataprovider.exceptions.handler.IdDoesNotExistException;
+import io.gdcc.xoai.dataprovider.filter.ScopedFilter;
+import io.gdcc.xoai.dataprovider.model.Item;
+import io.gdcc.xoai.dataprovider.model.ItemIdentifier;
+import io.gdcc.xoai.dataprovider.model.MetadataFormat;
+import io.gdcc.xoai.dataprovider.repository.RepositoryConfiguration;
+import io.gdcc.xoai.dataprovider.repository.ResultsPage;
+import io.gdcc.xoai.model.oaipmh.DeletedRecord;
+import io.gdcc.xoai.model.oaipmh.Granularity;
+import io.gdcc.xoai.model.oaipmh.OAIPMH;
+import io.gdcc.xoai.model.oaipmh.ResumptionToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
-import org.apache.log4j.Logger;
-import org.dspace.xoai.dataprovider.exceptions.IdDoesNotExistException;
-import org.dspace.xoai.dataprovider.exceptions.OAIException;
-import org.dspace.xoai.dataprovider.handlers.results.ListItemIdentifiersResult;
-import org.dspace.xoai.dataprovider.model.ItemIdentifier;
-import org.dspace.xoai.dataprovider.repository.RepositoryConfiguration;
-import org.dspace.xoai.model.oaipmh.DeletedRecord;
-import org.dspace.xoai.model.oaipmh.Granularity;
-import org.dspace.xoai.model.oaipmh.OAIPMH;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.apache.hc.core5.http.ContentType;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -30,6 +34,8 @@ import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SortDefinition;
+import org.edu_sharing.spring.ApplicationContextFactory;
+import org.edu_sharing.util.CheckedFunction;
 import org.edu_sharing.xoai.EduDataHandler;
 import org.edu_sharing.xoai.EduItem;
 import org.edu_sharing.xoai.EduItemIdentifier;
@@ -39,151 +45,170 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class OaiServlet extends HttpServlet{
-    private static final int MAX_ITEMS_PER_PAGE = 300;
-    private static Logger logger = Logger.getLogger(OaiServlet.class);
+@Slf4j
+public class OaiServlet extends HttpServlet {
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
-            Config config = LightbendConfigLoader.get().getConfig("exporter.oai.identify");
-            if(!LightbendConfigLoader.get().getBoolean("exporter.oai.enabled")) {
+            OaiSettings settings = ApplicationContextFactory.getApplicationContext().getBean(OaiSettings.class);
+            OaiIdentifier identifier = settings.getIdentify();
+
+            if (!settings.isEnabled()) {
                 resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
-            int itemsPerPage =  LightbendConfigLoader.get().getInt("exporter.oai.itemsPerPage");
+            int itemsPerPage = settings.getItemsPerPage();
             //oai/provider?verb=GetRecord&metadataPrefix=lom&identifier=3410648a-465e-47ff-87fe-706b89cecd65
-            RepositoryConfiguration configuration = new RepositoryConfiguration().
-                    withMaxListIdentifiers(itemsPerPage).withMaxListSets(itemsPerPage).
-                    withMaxListRecords(itemsPerPage).withMaxListSets(itemsPerPage).
-                    withAdminEmail(config.getString("adminEmail")).
-                    withBaseUrl(URLTool.getBaseUrl() + "/eduservlet/oai/provider").
-                    withGranularity(Granularity.valueOf(config.getString("granularity"))).
-                    withDeleteMethod(DeletedRecord.fromValue(config.getString("delete"))).
-                    withEarliestDate(ISODateTimeFormat.dateTimeNoMillis().parseDateTime(config.getString("earliestDate")).toDate()).
-                    withRepositoryName(config.hasPath("name") ? config.getString("name") : ApplicationInfoList.getHomeRepository().getAppCaption()).
-                    withDescription(config.getString("description"));
+            RepositoryConfiguration configuration = new RepositoryConfiguration.RepositoryConfigurationBuilder()
+                    .withMaxListIdentifiers(itemsPerPage).withMaxListSets(itemsPerPage)
+                    .withMaxListRecords(itemsPerPage).withMaxListSets(itemsPerPage)
+                    .withAdminEmail(identifier.getAdminEmail())
+                    .withBaseUrl(URLTool.getBaseUrl() + "/eduservlet/oai/provider")
+                    .withGranularity(Granularity.valueOf(identifier.getGranularity()))
+                    .withDeleteMethod(DeletedRecord.fromValue(identifier.getDelete()))
+                    .withEarliestDate(ISODateTimeFormat.dateTimeNoMillis().parseDateTime(identifier.getEarliestDate()).toDate().toInstant())
+                    .withRepositoryName(identifier.getName() != null ? identifier.getName() : ApplicationInfoList.getHomeRepository().getAppCaption())
+                    .withDescription(identifier.getDescription())
+                    .build();
 
             EduOai oai = new EduOai(configuration,
-                    LightbendConfigLoader.get().getString("exporter.oai.metadataPrefix"),
-                    new Handler());
-            Map<String, List<String>> request = mapRequest(req);
-            OAIPMH response = oai.handleRequest(request);
+                    settings.getMetadataPrefix(),
+                    new Handler(settings));
+            OAIPMH response = oai.handleRequest(req.getParameterMap());
+
+            // TODO anders!!!
             String responseXML = EduOai.responseToXML(response);
-            responseXML = OAIExporterFactory.getOAILOMExporter().postProcessResponse(request, responseXML);
-            resp.setHeader("Content-Type","application/xml");
+
+            // TODO anders!!!
+            responseXML = OAIExporterFactory.getOAILOMExporter().postProcessResponse(req.getParameterMap(), responseXML);
+
+            resp.setHeader("Content-Type", ContentType.APPLICATION_XML.getMimeType());
             resp.getOutputStream().write(responseXML.getBytes());
-        }
-        catch(Throwable t){
-            logger.warn(t.getMessage(),t);
-            resp.sendError(500,t.getMessage());
+        } catch (Throwable t) {
+            log.warn(t.getMessage(), t);
+            resp.sendError(500, t.getMessage());
         }
     }
 
-    private Map<String, List<String>> mapRequest(HttpServletRequest req) {
-        Map<String, List<String>> request=new HashMap<>();
-        for(Object r : req.getParameterMap().entrySet()){
-            Map.Entry<String,String[]> data= (Map.Entry<String, String[]>) r;
-            request.put(data.getKey(), Arrays.asList(data.getValue()));
-        }
-        return request;
-    }
-
-    private class Handler implements EduDataHandler {
+    private static class Handler implements EduDataHandler {
         private final ServiceRegistry serviceRegistry;
+        @org.jetbrains.annotations.NotNull
+        private final OaiSettings settings;
         private String identifierPrefix;
 
-        public Handler(){
+        public Handler(OaiSettings settings) {
+            this.settings = settings;
 
             ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
             serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-            identifierPrefix = LightbendConfigLoader.get().getString("exporter.oai.identiferPrefix");
-            if(identifierPrefix == null){
+            identifierPrefix = settings.getIdentiferPrefix();
+            if (identifierPrefix == null) {
                 identifierPrefix = "";
-            }
-        }
-        @Override
-        public ListItemIdentifiersResult getIdentifiers(int from, int length, String set) throws OAIException {
-            return getIdentifiersSolr(from, length,new HashMap<>(), set);
-        }
-
-        private ListItemIdentifiersResult getIdentifiersSolr(int from, int length,Map<String,String[]> searchCriterias, String set) throws OAIException{
-            try {
-                SearchToken token=new SearchToken();
-                token.setFrom(from);
-                token.setMaxResult(length);
-                SortDefinition sort=new SortDefinition();
-                sort.addSortDefinitionEntry(new SortDefinition.SortDefinitionEntry(CCConstants.CM_PROP_C_CREATED,true));
-                token.setSortDefinition(sort);
-                token.setContentType(SearchService.ContentType.FILES);
-                SearchResultNodeRef result = SearchServiceFactory.getLocalService().search(
-                        MetadataHelper.getMetadataset(ApplicationInfoList.getHomeRepository(), CCConstants.metadatasetdefault_id),
-                        (set == null || set.equals("default") ? "oai" : "oai_" + set),
-                        searchCriterias,
-                        token);
-                List<ItemIdentifier> refs = result.getData().stream().map((ref) -> new EduItemIdentifier(identifierPrefix + ref.getNodeId(),getDate(ref))).collect(Collectors.toList());
-                logger.info(result.getNodeCount());
-                int delivered=from+result.getData().size();
-                return new ListItemIdentifiersResult(delivered<result.getNodeCount(),refs,result.getNodeCount());
-            } catch (Throwable t) {
-                logger.warn(t.getMessage(),t);
-                throw new OAIException(new Exception(t));
             }
         }
 
         @Override
         public List<String> getSets() {
-            return LightbendConfigLoader.get().getStringList("exporter.oai.sets");
+            return settings.getSets();
         }
 
         @Override
-        public ListItemIdentifiersResult getIdentifiersFrom(int from, int length, Date date, String set) throws OAIException {
-            Map<String, String[]> criterias = new HashMap<>();
-            criterias.put("from",new String[]{convertDateSolr(date)});
-            return getIdentifiersSolr(from, length,criterias, set);
-        }
+        public ItemIdentifier getItemIdentifier(String identifier) throws IdDoesNotExistException {
+            if (!identifier.startsWith(identifierPrefix)) {
+                throw new IdDoesNotExistException("Invalid id, identifierPrefix does not match " + identifierPrefix);
+            }
 
-        private String convertDateSolr(Date date) {
-            return DateTimeFormatter.ISO_INSTANT.format(date.toInstant());
-    }
-
-        @Override
-        public ListItemIdentifiersResult getIdentifiersUntil(int from, int length, Date date, String set) throws OAIException {
-            Map<String, String[]> criterias = new HashMap<>();
-            criterias.put("until",new String[]{convertDateSolr(date)});
-            return getIdentifiersSolr(from, length,criterias, set);        }
-
-        @Override
-        public ListItemIdentifiersResult getIdentifiersFromUntil(int from, int length, Date fromDate, Date untilDate, String set) throws OAIException {
-            Map<String, String[]> criterias = new HashMap<>();
-            criterias.put("from",new String[]{convertDateSolr(fromDate)});
-            criterias.put("until",new String[]{convertDateSolr(untilDate)});
-            return getIdentifiersSolr(from, length, criterias, set);
-        }
-        private Date getDate(NodeRef ref) {
-            return (Date) serviceRegistry.getNodeService().getProperty(new org.alfresco.service.cmr.repository.NodeRef(ref.getStoreProtocol(),ref.getStoreId(),ref.getNodeId()),QName.createQName(CCConstants.CM_PROP_C_MODIFIED));
+            String nodeId = identifier.substring(identifierPrefix.length());
+            Instant date = ((Date) serviceRegistry.getNodeService().getProperty(new org.alfresco.service.cmr.repository.NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId), QName.createQName(CCConstants.CM_PROP_C_MODIFIED))).toInstant();
+            return new EduItemIdentifier(identifierPrefix, date);
         }
 
         @Override
-        public EduItem getItem(String id) throws IdDoesNotExistException, OAIException{
-            if(!id.startsWith(identifierPrefix)){
+        public Item getItem(String identifier, MetadataFormat format) throws HandlerException {
+            // TODO alles neu!
+            if (!identifier.startsWith(identifierPrefix)) {
                 throw new IdDoesNotExistException("Invalid id, identifierPrefix does not match " + identifierPrefix);
             }
             try {
-                ByteArrayOutputStream os=new ByteArrayOutputStream();
-                String nodeId = id.substring(identifierPrefix.length());
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                String nodeId = identifier.substring(identifierPrefix.length());
                 OAIExporterFactory.getOAILOMExporter().write(os, nodeId);
-                return new EduItem(id, os.toString());
-            }catch(InvalidNodeRefException e){
+                return new EduItem(identifier, os.toString());
+            } catch (InvalidNodeRefException e) {
                 throw new IdDoesNotExistException(e);
-            }catch(Throwable t){
-                throw new OAIException(new Exception(t));
+            } catch (Throwable t) {
+                throw new IdDoesNotExistException(new Exception(t));
             }
+        }
+
+        @Override
+        public ResultsPage<ItemIdentifier> getItemIdentifiers(List<ScopedFilter> filters, MetadataFormat metadataFormat, int maxResponseLength, ResumptionToken.Value resumptionToken) throws HandlerException {
+            ResultsPage<NodeRef> nodeRefResultsPage = searchFor(maxResponseLength, resumptionToken);
+            return resultsPage(nodeRefResultsPage, ref -> getItemIdentifier(identifierPrefix + ref.getNodeId()));
+        }
+
+        private <S, T> ResultsPage<T> resultsPage(ResultsPage<S> value, CheckedFunction<S, T, HandlerException> mapper) {
+            return new ResultsPage<>(
+                    value.getRequestTokenValue(),
+                    value.hasMore(),
+                    value.getList().stream().map(CheckedFunction.wrap(mapper)).collect(Collectors.toList()),
+                    value.getTotal());
+        }
+
+        @Override
+        public ResultsPage<Item> getItems(List<ScopedFilter> filters, MetadataFormat metadataFormat, int maxResponseLength, ResumptionToken.Value resumptionToken) throws HandlerException {
+            ResultsPage<NodeRef> nodeRefResultsPage = searchFor(maxResponseLength, resumptionToken);
+            return resultsPage(nodeRefResultsPage, ref -> getItem(ref.getNodeId(), metadataFormat));
+        }
+
+        private ResultsPage<NodeRef> searchFor(int maxResponseLength, ResumptionToken.Value resumptionToken) throws IdDoesNotExistException {
+            try {
+                Map<String, String[]> searchCriteria = new HashMap<>();
+                if (resumptionToken.hasFrom()) {
+                    searchCriteria.put("from", new String[]{convertDate(resumptionToken.getFrom())});
+                }
+
+                if (resumptionToken.hasUntil()) {
+                    searchCriteria.put("until", new String[]{convertDate(resumptionToken.getUntil())});
+                }
+
+                SearchToken token = new SearchToken();
+                token.setFrom((int) resumptionToken.getOffset());
+                token.setMaxResult(maxResponseLength);
+                SortDefinition sort = new SortDefinition();
+                sort.addSortDefinitionEntry(new SortDefinition.SortDefinitionEntry(CCConstants.CM_PROP_C_CREATED, true));
+                token.setSortDefinition(sort);
+                token.setContentType(SearchService.ContentType.FILES);
+                SearchResultNodeRef result = SearchServiceFactory.getLocalService().search(
+                        MetadataHelper.getMetadataset(ApplicationInfoList.getHomeRepository(), CCConstants.metadatasetdefault_id),
+                        (resumptionToken.hasSetSpec() || resumptionToken.getSetSpec().equals("default") ? "oai" : "oai_" + resumptionToken.getSetSpec()),
+                        searchCriteria,
+                        token);
+
+                log.info("{}", result.getNodeCount());
+
+                long delivered = resumptionToken.getOffset() + result.getData().size();
+                return new ResultsPage<>(resumptionToken, delivered < result.getNodeCount(), result.getData(), result.getNodeCount());
+            } catch (Throwable t) {
+                log.warn(t.getMessage(), t);
+                throw new IdDoesNotExistException(new Exception(t));
+            }
+        }
+
+        private String convertDate(Instant instant) {
+            return DateTimeFormatter.ISO_INSTANT.format(instant);
         }
     }
 }
