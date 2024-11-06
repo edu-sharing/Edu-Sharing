@@ -28,6 +28,7 @@ import org.edu_sharing.alfresco.RestrictedAccessException;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.nio.file.NoSuchFileException;
 import java.security.InvalidKeyException;
 
 import java.lang.reflect.UndeclaredThrowableException;
@@ -142,6 +143,7 @@ public class DAOException extends RuntimeException {
 		if (   t instanceof NoSuchPersonException
 			|| t instanceof InvalidStoreRefException
 			|| t instanceof FileNotFoundException
+			|| t instanceof NoSuchFileException
 			|| t instanceof InvalidNodeRefException) {
 			
 			return new DAOMissingException(t,nodeId); 
