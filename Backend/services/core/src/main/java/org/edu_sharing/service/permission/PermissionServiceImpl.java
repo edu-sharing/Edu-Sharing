@@ -964,7 +964,11 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
                         if (fieldQuery.length() > 0) {
                             fieldQuery.append(" OR ");
                         }
-                        fieldQuery.append("@cm\\:").append(field.getKey()).append(":").append("\"").append(token).append("\"^").append(field.getValue());
+                        fieldQuery.append("@cm\\:").append(field.getKey()).append(":").append("\"").append(token).append("\"");
+                        if(field.getValue() > 1) {
+                            fieldQuery.append(" OR ");
+                            fieldQuery.append("@cm\\:").append(field.getKey()).append(":").append("\"").append(StringUtils.strip(token, "*")).append("\"^").append(field.getValue());
+                        }
                     }
                     subQuery.append(subQuery.length() > 0 ? " AND " : "").append("(").append(fieldQuery).append(")");
                 }
@@ -1133,9 +1137,13 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
                         subQuery.append((furtherToken ? " AND( " : "("))
                                 .append("@cm\\:authorityDisplayName:")
-                                .append("\"").append(QueryParser.escape(token)).append("\"").
+                                .append("\"").append(QueryParser.escape(StringUtils.strip(token, "*"))).append("\"").
                                 // boost groups so that they'll appear before users
                                         append("^10 OR ")
+                                .append("@cm\\:authorityDisplayName:")
+                                .append("\"").append(QueryParser.escape(token)).append("\"").
+                                // boost groups so that they'll appear before users
+                                        append(" OR ")
                                 .append("@ccm\\:groupEmail:")
                                 .append("\"").append(QueryParser.escape(token)).append("\"");
                         // allow global admins to find groups based on authority name (e.g. default system groups)
