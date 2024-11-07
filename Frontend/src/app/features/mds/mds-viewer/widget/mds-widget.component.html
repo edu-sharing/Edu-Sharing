@@ -15,6 +15,7 @@
         class="widget-label"
         [attr.role]="headingLevel ? 'heading' : null"
         [attr.aria-level]="headingLevel"
+        *ngIf="widget.definition.caption"
       >
         {{ widget.definition.caption
         }}<span *ngIf="!headingLevel" class="cdk-visually-hidden">: </span>
@@ -39,6 +40,13 @@
           <div *ngIf="getBasicType() === 'date'">{{ formatDate() }}</div>
           <div *ngIf="getBasicType() === 'array'">
             <div class="array-entry" *ngFor="let v of value">{{ v }}</div>
+          </div>
+          <div *ngIf="getBasicType() === 'tree'">
+            <div class="tree-entry" *ngFor="let v of getRawValue()">
+              <ng-container
+                *ngTemplateOutlet="treeEntry; context: { path: getPath(v) }"
+              ></ng-container>
+            </div>
           </div>
           <div *ngIf="getBasicType() === 'vcard'">
             <div class="array-entry" *ngFor="let v of value">{{ v | vcardName }}</div>
@@ -73,3 +81,18 @@
   <div #editWrapper><div #edit></div></div>
   <!--<button *ngIf="!!editWrapper.innerText.trim()" mat-icon-button><i esIcon="save"></i></button>-->
 </div>
+<ng-template #treeEntry let-path="path">
+  <ng-container *ngFor="let t of path; let first = first">
+    <ng-container *ngIf="!first">
+      <span class="cdk-visually-hidden">{{ 'SUB_CATEGORY_ARIA' | translate }}</span>
+      <i esIcon="keyboard_arrow_right" [aria]="false"></i>
+    </ng-container>
+    <a
+      [routerLink]="'/' + ROUTER_PREFIX + 'search'"
+      [queryParams]="getSearchParams(t)"
+      *ngIf="widget.definition.isSearchable"
+      >{{ t.caption }}</a
+    >
+    <span *ngIf="!widget.definition.isSearchable">{{ t.caption }}</span>
+  </ng-container>
+</ng-template>
