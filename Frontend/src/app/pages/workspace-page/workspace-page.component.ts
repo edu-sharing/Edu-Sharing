@@ -445,6 +445,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
         }
         this.globalProgress = false;
         this.refresh();
+        this.treeComponent?.refresh();
     }
 
     private async initialize() {
