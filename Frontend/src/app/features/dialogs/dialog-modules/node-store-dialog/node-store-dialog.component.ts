@@ -22,6 +22,7 @@ import { RestConstants } from '../../../../core-module/rest/rest-constants';
 import { Toast } from '../../../../core-ui-module/toast';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { CardDialogUtilsService } from '../../card-dialog/card-dialog-utils.service';
+import { ElementType } from 'ngx-edu-sharing-ui';
 
 @Component({
     selector: 'es-search-node-store-dialog',
@@ -120,6 +121,12 @@ export class SearchNodeStoreDialogComponent implements OnInit, AfterViewInit, On
         const remove = new OptionItem('SEARCH.NODE_STORE.REMOVE_ITEM', 'delete', () => {
             this.deleteSelection();
         });
+        remove.elementType = [
+            ElementType.Node,
+            ElementType.NodeBlockedImport,
+            ElementType.NodePublishedCopy,
+            ElementType.SavedSearch,
+        ];
         remove.group = DefaultGroups.FileOperations;
         return [remove];
     }
