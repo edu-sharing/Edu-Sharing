@@ -141,11 +141,12 @@ public class RepositoryDao {
 		return null;
 	}
 	public String getLogo() {
-		if(this.appInfo.getLogo()!=null && !this.appInfo.getLogo().isEmpty())
+		if(this.appInfo.getLogo()!=null && !this.appInfo.getLogo().isEmpty()){
 			if(appInfo.getLogo().startsWith("http://") || appInfo.getLogo().startsWith("https://")) {
 				return appInfo.getLogo();
 			}
 			return URLTool.getBaseUrl()+"/"+this.appInfo.getLogo();
+		}
 		return null;
 	}
 	public boolean isHomeRepo() {
