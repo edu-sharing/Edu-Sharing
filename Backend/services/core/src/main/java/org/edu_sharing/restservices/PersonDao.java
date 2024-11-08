@@ -217,7 +217,7 @@ public class PersonDao {
 		newUserInfo.put(CCConstants.PROP_USER_LASTNAME, profile.getLastName());
 		newUserInfo.put(CCConstants.PROP_USER_EMAIL, profile.getEmail());
         newUserInfo.put(CCConstants.CM_PROP_PERSON_ABOUT, profile.getAbout());
-        newUserInfo.put(CCConstants.CM_PROP_PERSON_SKILLS, new ArrayList(Arrays.asList(profile.getSkills())));
+		newUserInfo.put(CCConstants.CM_PROP_PERSON_SKILLS, profile.getSkills() != null ? new ArrayList<>(Arrays.asList(profile.getSkills())) : null);
         newUserInfo.put(CCConstants.CM_PROP_PERSON_VCARD, profile.getVCard());
 		if(AuthorityServiceFactory.getLocalService().isGlobalAdmin()) {
 			newUserInfo.put(CCConstants.CM_PROP_PERSON_EDU_SCHOOL_PRIMARY_AFFILIATION, profile.getPrimaryAffiliation());
