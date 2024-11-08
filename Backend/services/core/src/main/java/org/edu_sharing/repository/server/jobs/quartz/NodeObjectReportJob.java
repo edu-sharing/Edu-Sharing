@@ -128,12 +128,11 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
     }
 
     private Void createStats() {
-        LocalDate now = LocalDate.now();
-        LocalDate to = now.minusDays(1);
-
+        LocalDate to = LocalDate.now();
         if (customDate != null) {
             to = customDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         }
+        to = to.minusDays(1);
 
         LocalDate from = to.withDayOfMonth(1);
         switch (type) {
@@ -195,30 +194,9 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
         StringBuilder sb = new StringBuilder(filename);
         if (appendDate) {
             sb.append("_");
-            switch (type) {
-                case Yearly:
-                    sb.append(from.format(DateTimeFormatter.ofPattern(("yyyy"))));
-                    if(to.getMonthValue() != 12 && to.getDayOfMonth() != to.lengthOfMonth()){
-                        sb.append("_interim");
-                    }
-                    break;
-                case Quarterly:
-                    sb.append(from.format(DateTimeFormatter.ofPattern(("yyyy"))));
-                    sb.append("-Q");
-                    sb.append(to.getMonthValue() / 3);
-                    if(to.getMonth().firstMonthOfQuarter().getValue() + 3 != to.getMonthValue() && to.getDayOfMonth() != to.lengthOfMonth()){
-                        sb.append("_interim");
-                    }
-                    break;
-                case Monthly:
-                    sb.append(from.format(DateTimeFormatter.ofPattern(("yyyy-MM"))));
-                    if(to.getDayOfMonth() != to.lengthOfMonth()){
-                        sb.append("_interim");
-                    }
-                    break;
-                default:
-                    throw new NotImplementedException(type.name());
-            }
+            sb.append(from.format(DateTimeFormatter.ofPattern(("yyMMdd"))));
+            sb.append("-");
+            sb.append(to.format(DateTimeFormatter.ofPattern(("yyMMdd"))));
         }
 
         sb.append(".csv");
