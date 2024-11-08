@@ -116,12 +116,17 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
 
     @Override
     public List<Context> getAvailableContext() throws Exception {
-        buildContextCache();
-        return contextCache.getKeys()
-                .stream()
-                .map(contextCache::get)
-                .filter(Objects::nonNull) //maybe gets null while we are iterating over
-                .collect(Collectors.toList());
+        return AuthenticationUtil.runAsSystem(() -> {
+            String eduSharingSystemFolderContext = userEnvironmentTool.getEdu_SharingContextFolder();
+            Map<String, Map<String, Object>> dynamicContextObjects = nodeService.getChildrenPropsByType(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, eduSharingSystemFolderContext, CCConstants.CCM_TYPE_CONTEXT);
+            return dynamicContextObjects
+                    .values()
+                    .stream()
+                    .map(x -> x.get(CCConstants.CCM_PROP_CONTEXT_CONFIG).toString())
+                    .map(CheckedFunction.wrap(x -> objectMapper.readValue(x, Context.class), null))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        });
     }
 
     private void buildContextCache() throws Exception {
