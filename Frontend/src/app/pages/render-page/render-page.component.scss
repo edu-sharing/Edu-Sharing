@@ -92,6 +92,10 @@ a:active {
     .edusharing_rendering_metadata_body .mds_license a:focus {
         @include setGlobalKeyboardFocus();
     }
+    es-mds-widget {
+        display: flex;
+        margin-bottom: -30px;
+    }
 }
 .topBar {
     background: #383838;

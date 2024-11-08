@@ -612,12 +612,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             options.push(openFolder);
          */
         const revokeNode = new OptionItem('OPTIONS.REVOKE', 'delete', async (object) => {
-            const dialogRef = await this.dialogs.openRevocationDialog({
-                node: this.getObjects(object, data)[0],
-            });
-            dialogRef.afterClosed().subscribe((result) => {
-                this.localEvents.nodesChanged.emit([result.node]);
-            });
+            await this.revokeNode(object, data);
         });
         revokeNode.constrains = [
             Constrain.Files,
@@ -1566,7 +1561,9 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             node: this.getObjects(object, data)[0],
         });
         dialogRef.afterClosed().subscribe((result) => {
-            this.localEvents.nodesChanged.emit([result.node]);
+            if (result) {
+                this.localEvents.nodesChanged.emit([result.node]);
+            }
         });
     }
 

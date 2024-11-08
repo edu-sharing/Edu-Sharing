@@ -91,7 +91,7 @@ public class IamApi  {
 	    					global==null ? true : global,
 	    					skipCount!=null ? skipCount : 0,
 	    	    			maxItems!=null ? maxItems : RestConstants.DEFAULT_MAX_ITEMS,
-	    					new SortDefinition(CCConstants.NAMESPACE_CM,sortProperties,sortAscending),
+	    					new SortDefinition(sortProperties,sortAscending),
 	    					filter
 	    			);
 

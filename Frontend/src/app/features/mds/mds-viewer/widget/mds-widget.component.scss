@@ -44,6 +44,30 @@
             }
         }
     }
+    &.widget-type-tree {
+        > div {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tree-entry {
+            display: inline-block;
+            > a {
+                color: var(--palette-primary-800);
+                text-decoration: none;
+            }
+            > * {
+                vertical-align: middle;
+            }
+            > i {
+                font-size: 18px;
+            }
+            border-radius: 5px;
+            padding: 5px 10px;
+            // max-width: 250px;
+            background-color: $cardLightBackground;
+        }
+    }
     &.widget-link {
         text-decoration: underline;
         cursor: pointer;
