@@ -46,6 +46,7 @@
   [displayType]="(state | async).displayType"
   (displayTypeChange)="setDisplayType($event)"
   [sort]="(state | async).sortConfig"
+  (sortChange)="updateSort($event)"
   [primaryInstance]="true"
   [initConfig]="{ actionbar, customOptions: addToCollectionMode.value?.customOptions}"
 >

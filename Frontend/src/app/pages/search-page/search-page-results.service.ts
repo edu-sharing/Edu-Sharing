@@ -42,6 +42,9 @@ import { SearchPageService, SearchRequestParams } from './search-page.service';
 import { RestConstants } from '../../core-module/rest/rest-constants';
 import { MdsWidgetType } from 'src/app/features/mds/types/types';
 import { RestSearchService } from 'src/app/core-module/core.module';
+import { ActivatedRoute } from '@angular/router';
+import { UserModifiableValuesService } from './user-modifiable-values';
+import { Sort } from '@angular/material/sort';
 
 export interface SearchPageResults {
     diffCount?: Observable<number>;
@@ -56,6 +59,10 @@ export interface SearchPageState {
 
 @Injectable()
 export class SearchPageResultsService implements SearchPageResults, OnDestroy {
+    readonly searchSort = this._userModifiableValues.createMapped<Sort>({
+        fromString: (v) => JSON.parse(v),
+        toString: (v) => JSON.stringify(v),
+    });
     readonly resultsDataSource = new NodeDataSourceRemote(this._injector);
     readonly totalResults = this.resultsDataSource.observeTotal();
     readonly collectionsDataSource = new NodeDataSourceRemote(this._injector);
@@ -81,6 +88,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         private _searchPage: SearchPageService,
         private _searchPageRestore: SearchPageRestoreService,
         private _translate: TranslateService,
+        private _route: ActivatedRoute,
+        private _userModifiableValues: UserModifiableValuesService,
     ) {
         this._registerPageRestore();
         this._registerSearchObservables();
@@ -183,6 +192,20 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         this.collectionsDataSource.isLoadingSubject.subscribe((isLoading) =>
             this.loadingCollections.next(!!isLoading),
         );
+        this.searchSort.registerQueryParameter('sort', this._route);
+        this.searchSort
+            .observeUserValue()
+            .pipe(first())
+            .subscribe((sort) => {
+                if (sort) {
+                    this.patchState({
+                        sortConfig: {
+                            ...this.state.value.sortConfig,
+                            ...sort,
+                        },
+                    });
+                }
+            });
     }
 
     private _registerColumnsAndSortConfig(): void {
@@ -209,7 +232,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         // Register sort.
         mds.pipe(map((mds) => MdsHelperService.getSortInfo(mds, 'search'))).subscribe(
             (sortInfo) => {
-                if (this.state.value.sortConfig === null) {
+                if (this.state.value.sortConfig === null || !this.state.value.sortConfig?.columns) {
                     this.patchState({
                         sortConfig: {
                             allowed: true,
