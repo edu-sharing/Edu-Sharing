@@ -22,8 +22,10 @@ import org.springframework.security.saml2.provider.service.registration.RelyingP
 import org.springframework.security.saml2.provider.service.web.authentication.logout.OpenSaml4LogoutRequestResolver;
 import org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestResolver;
 
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 
@@ -71,7 +73,7 @@ public class SecurityConfigurationSamlEncryption {
     private static Encrypter getEncrypter(X509Certificate certificate) {
         String dataAlgorithm = XMLCipherParameters.AES_256;
         String keyAlgorithm = XMLCipherParameters.RSA_1_5;
-        BasicCredential dataCredential = new BasicCredential(SECRET_KEY);
+        BasicCredential dataCredential = new BasicCredential(generateSecretKey());
         DataEncryptionParameters dataEncryptionParameters = new DataEncryptionParameters();
         dataEncryptionParameters.setEncryptionCredential(dataCredential);
         dataEncryptionParameters.setAlgorithm(dataAlgorithm);
@@ -85,7 +87,16 @@ public class SecurityConfigurationSamlEncryption {
         return encrypter;
     }
 
-    private static SecretKey SECRET_KEY = new SecretKeySpec(
-            Base64.getDecoder().decode("shOnwNMoCv88HKMEa91+FlYoD5RNvzMTAL5LGxZKIFk="), "AES");
+    private static SecretKey generateSecretKey() {
+        KeyGenerator keyGen = null;
+        try {
+            keyGen = KeyGenerator.getInstance("AES");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        keyGen.init(256);  // for AES-256
+        SecretKey secretKey = keyGen.generateKey();
+        return secretKey;
+    }
 
 }
