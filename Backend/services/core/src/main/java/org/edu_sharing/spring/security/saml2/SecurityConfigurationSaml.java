@@ -8,7 +8,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.repository.server.SecurityHeadersFilter;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
@@ -16,10 +15,10 @@ import org.edu_sharing.spring.security.basic.EduAuthSuccsessHandler;
 import org.edu_sharing.spring.security.basic.EduWebSecurityCustomizer;
 import org.edu_sharing.spring.security.basic.HeadersConfig;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -35,6 +34,7 @@ import org.springframework.security.saml2.provider.service.registration.InMemory
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
@@ -68,6 +68,9 @@ public class SecurityConfigurationSaml {
     Config config = LightbendConfigLoader.get();
 
     Logger logger = Logger.getLogger(SecurityConfigurationSaml.class);
+
+    @Autowired(required = false)
+    Saml2LogoutRequestResolver logoutRequestResolver;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -107,6 +110,10 @@ public class SecurityConfigurationSaml {
 
         CSRFConfig.config(http);
         HeadersConfig.config(http);
+
+        if(logoutRequestResolver != null){
+            http.saml2Logout(logout -> logout.logoutRequest(r -> r.logoutRequestResolver(logoutRequestResolver)));
+        }
 
         return http.build();
     }
