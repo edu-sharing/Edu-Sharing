@@ -157,7 +157,6 @@ export class MdsEditorWidgetFacetListComponent
     private registerFormControls(): void {
         // (Re-)create `formArray` on changed facet values.
         this.facetAggregationSubject.subscribe((facetValues) => {
-            console.log(this.widget.definition.id, facetValues, this.filter.value);
             if (!facetValues) {
                 // restore widget state
                 this.mdsEditorInstance
