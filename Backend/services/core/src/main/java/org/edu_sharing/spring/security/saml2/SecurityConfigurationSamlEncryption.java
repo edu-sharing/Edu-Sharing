@@ -7,11 +7,11 @@ import org.opensaml.saml.saml2.core.LogoutRequest;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.security.credential.BasicCredential;
-import org.opensaml.security.credential.Credential;
-import org.opensaml.security.credential.CredentialSupport;
+import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.xmlsec.encryption.support.DataEncryptionParameters;
 import org.opensaml.xmlsec.encryption.support.EncryptionException;
 import org.opensaml.xmlsec.encryption.support.KeyEncryptionParameters;
+import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.saml2.Saml2Exception;
@@ -24,10 +24,8 @@ import org.springframework.security.saml2.provider.service.web.authentication.lo
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 @ConditionalOnProperty(name = "security.sso.saml.encryptLogoutRequest", havingValue = "true")
 @Configuration
@@ -55,6 +53,7 @@ public class SecurityConfigurationSamlEncryption {
 
             EncryptedID encrypted = encrypted(nameId, credential);
             logoutRequest.setEncryptedID(encrypted);
+            logoutRequest.setNameID(null);
         });
         return logoutRequestResolver;
     }
@@ -70,20 +69,31 @@ public class SecurityConfigurationSamlEncryption {
         }
     }
 
-    private static Encrypter getEncrypter(X509Certificate certificate) {
+    private static Encrypter getEncrypter(X509Certificate certificate)  {
         String dataAlgorithm = XMLCipherParameters.AES_256;
-        String keyAlgorithm = XMLCipherParameters.RSA_1_5;
         BasicCredential dataCredential = new BasicCredential(generateSecretKey());
         DataEncryptionParameters dataEncryptionParameters = new DataEncryptionParameters();
         dataEncryptionParameters.setEncryptionCredential(dataCredential);
         dataEncryptionParameters.setAlgorithm(dataAlgorithm);
-        Credential credential = CredentialSupport.getSimpleCredential(certificate, null);
+
+        String keyAlgorithm = XMLCipherParameters.RSA_OAEP;
         KeyEncryptionParameters keyEncryptionParameters = new KeyEncryptionParameters();
-        keyEncryptionParameters.setEncryptionCredential(credential);
+        BasicX509Credential x509Credential = new BasicX509Credential(certificate);
+        keyEncryptionParameters.setEncryptionCredential(x509Credential);
         keyEncryptionParameters.setAlgorithm(keyAlgorithm);
+
+
+        X509KeyInfoGeneratorFactory factory = new X509KeyInfoGeneratorFactory();
+        factory.setEmitEntityIDAsKeyName(true);
+        factory.setEmitX509SubjectName(true);
+        factory.setEmitX509IssuerSerial(true);
+
+
+        keyEncryptionParameters.setKeyInfoGenerator(factory.newInstance());
+
         Encrypter encrypter = new Encrypter(dataEncryptionParameters, keyEncryptionParameters);
-        Encrypter.KeyPlacement keyPlacement = Encrypter.KeyPlacement.valueOf("PEER");
-        encrypter.setKeyPlacement(keyPlacement);
+        encrypter.setKeyPlacement(Encrypter.KeyPlacement.PEER);
+
         return encrypter;
     }
 
