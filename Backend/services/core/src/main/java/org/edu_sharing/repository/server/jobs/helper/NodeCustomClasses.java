@@ -41,7 +41,7 @@ public class NodeCustomClasses {
                     Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + thumbUrl + ": " + callback.getResult());
                 } else {
                     NodeServiceHelper.removeProperty(nodeRef, CCConstants.CCM_PROP_IO_THUMBNAILURL);
-                    Logger.getLogger(BulkEditNodesJob.class).info(nodeRef + " thumb imported: " + CCConstants.CCM_PROP_IO_THUMBNAILURL);
+                    Logger.getLogger(BulkEditNodesJob.class).info(nodeRef + " thumb imported: " + thumbUrl);
                 }
             } catch (Throwable t) {
                 Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + thumbUrl);
