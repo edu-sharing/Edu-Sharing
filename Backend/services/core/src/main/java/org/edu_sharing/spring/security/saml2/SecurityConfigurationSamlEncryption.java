@@ -44,7 +44,6 @@ public class SecurityConfigurationSamlEncryption {
 
             RelyingPartyRegistration.AssertingPartyDetails assertingPartyDetails = parameters.getRelyingPartyRegistration().getAssertingPartyDetails();
 
-
             Saml2X509Credential credential = (assertingPartyDetails.getEncryptionX509Credentials().size() > 0 )
                     //when a key descriptor <md:KeyDescriptor use="encryption"> is defined in idp metadata
                     ? assertingPartyDetails.getEncryptionX509Credentials().iterator().next()
@@ -59,8 +58,8 @@ public class SecurityConfigurationSamlEncryption {
     }
 
     static EncryptedID encrypted(NameID nameId, Saml2X509Credential credential) {
-        X509Certificate certificate = credential.getCertificate();
-        Encrypter encrypter = getEncrypter(certificate);
+
+        Encrypter encrypter = getEncrypter(credential);
         try {
             return encrypter.encrypt(nameId);
         }
@@ -69,7 +68,7 @@ public class SecurityConfigurationSamlEncryption {
         }
     }
 
-    private static Encrypter getEncrypter(X509Certificate certificate)  {
+    private static Encrypter getEncrypter(Saml2X509Credential credential)  {
         String dataAlgorithm = XMLCipherParameters.AES_256;
         BasicCredential dataCredential = new BasicCredential(generateSecretKey());
         DataEncryptionParameters dataEncryptionParameters = new DataEncryptionParameters();
@@ -78,21 +77,18 @@ public class SecurityConfigurationSamlEncryption {
 
         String keyAlgorithm = XMLCipherParameters.RSA_OAEP;
         KeyEncryptionParameters keyEncryptionParameters = new KeyEncryptionParameters();
-        BasicX509Credential x509Credential = new BasicX509Credential(certificate);
-        keyEncryptionParameters.setEncryptionCredential(x509Credential);
+        keyEncryptionParameters.setEncryptionCredential( new BasicX509Credential(credential.getCertificate()));
         keyEncryptionParameters.setAlgorithm(keyAlgorithm);
 
-
         X509KeyInfoGeneratorFactory factory = new X509KeyInfoGeneratorFactory();
-        factory.setEmitEntityIDAsKeyName(true);
+        factory.setEmitEntityIDAsKeyName(false);
         factory.setEmitX509SubjectName(true);
-        factory.setEmitX509IssuerSerial(true);
-
 
         keyEncryptionParameters.setKeyInfoGenerator(factory.newInstance());
+        dataEncryptionParameters.setKeyInfoGenerator(factory.newInstance());
 
-        Encrypter encrypter = new Encrypter(dataEncryptionParameters, keyEncryptionParameters);
-        encrypter.setKeyPlacement(Encrypter.KeyPlacement.PEER);
+        Encrypter encrypter = new Encrypter(dataEncryptionParameters,keyEncryptionParameters);
+        encrypter.setKeyPlacement(Encrypter.KeyPlacement.INLINE);
 
         return encrypter;
     }
