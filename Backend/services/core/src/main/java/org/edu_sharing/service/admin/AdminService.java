@@ -1,5 +1,20 @@
 package org.edu_sharing.service.admin;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.edu_sharing.repository.client.rpc.cache.CacheCluster;
+import org.edu_sharing.repository.client.rpc.cache.CacheInfo;
+import org.edu_sharing.repository.server.jobs.quartz.ImmediateJobListener;
+import org.edu_sharing.repository.server.jobs.quartz.JobDescription;
+import org.edu_sharing.repository.server.jobs.quartz.JobInfo;
+import org.edu_sharing.repository.server.tools.ApplicationInfo;
+import org.edu_sharing.repository.server.tools.PropertiesHelper;
+import org.edu_sharing.restservices.admin.v1.model.PluginStatus;
+import org.edu_sharing.service.admin.model.GlobalGroup;
+import org.edu_sharing.service.admin.model.RepositoryConfig;
+import org.edu_sharing.service.admin.model.ServerUpdateInfo;
+import org.edu_sharing.service.admin.model.ToolPermission;
+import org.edu_sharing.service.version.RepositoryVersionInfo;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -7,21 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.edu_sharing.repository.client.rpc.cache.CacheCluster;
-import org.edu_sharing.repository.client.rpc.cache.CacheInfo;
-import org.edu_sharing.repository.server.jobs.quartz.ImmediateJobListener;
-import org.edu_sharing.repository.server.jobs.quartz.JobDescription;
-import org.edu_sharing.repository.server.tools.ApplicationInfo;
-import org.edu_sharing.repository.server.tools.PropertiesHelper;
-import org.edu_sharing.restservices.admin.v1.model.PluginStatus;
-import org.edu_sharing.service.admin.model.GlobalGroup;
-import org.edu_sharing.repository.server.jobs.quartz.JobInfo;
-import org.edu_sharing.service.admin.model.RepositoryConfig;
-import org.edu_sharing.service.admin.model.ServerUpdateInfo;
-import org.edu_sharing.service.admin.model.ToolPermission;
-import org.edu_sharing.service.version.RepositoryVersionInfo;
 
 public interface AdminService {
 
@@ -81,7 +81,7 @@ public interface AdminService {
 
 	void updatePropertiesXML(String xmlFile,Map<String, String> properties) throws Exception;
 	
-	public void exportLom(String filterQuery,String targetDir, boolean subobjectHandler) throws Exception;
+	public void exportLom(String filterQuery, String targetDir, String format) throws Exception;
 
 	int getActiveSessions() throws Exception;
 

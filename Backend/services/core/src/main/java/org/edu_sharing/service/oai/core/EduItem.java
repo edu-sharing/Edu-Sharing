@@ -1,4 +1,4 @@
-package org.edu_sharing.xoai;
+package org.edu_sharing.service.oai.core;
 
 import io.gdcc.xoai.dataprovider.model.Item;
 import io.gdcc.xoai.dataprovider.model.Set;
@@ -13,9 +13,9 @@ public class EduItem implements Item {
     private final String identifier;
     private Metadata metadata;
 
-    public EduItem(String identifier,String lomMetadata) {
+    public EduItem(String identifier,String metadata) {
         this.identifier = identifier;
-        this.metadata=new Metadata(lomMetadata);
+        this.metadata=new Metadata(metadata);
     }
 
     @Override

@@ -14,7 +14,6 @@ public class OaiSettings {
     private OaiIdentifier identify;
     private String identiferPrefix;
     private int itemsPerPage;
-    private String metadataPrefix;
     private List<String> sets;
 }
 

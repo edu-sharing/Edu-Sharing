@@ -1,4 +1,4 @@
-package org.edu_sharing.repository.server.exporter;
+package org.edu_sharing.service.oai.legacy;
 
 import net.sourceforge.cardme.vcard.types.ExtendedType;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -23,15 +23,19 @@ import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.VCardConverter;
 import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.license.LicenseService;
+import org.edu_sharing.service.oai.formats.OaiLomHSOERMetadataFormatWriter;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-
+/**
+ * @deprecated please use {@link OaiLomHSOERMetadataFormatWriter}. This class is only used to compare the results of the new implementation
+ */
 // please refer to
 // https://dini-ag-kim.github.io/hs-oer-lom-profil/latest/
+@Deprecated(forRemoval = true, since = "9.1")
 public class OAILOMExporterHSOER extends OAILOMExporter {
 
     Logger logger = Logger.getLogger(OAILOMExporterHSOER.class);
@@ -187,7 +191,12 @@ public class OAILOMExporterHSOER extends OAILOMExporter {
         Iterable<String> lang = getMultivalue(CCConstants.LOM_PROP_GENERAL_LANGUAGE);
         if(lang != null) {
             long count = StreamSupport.stream(lang.spliterator(), false).count();
-            if (lang.iterator().hasNext() && !(count == 1 && lang.iterator().next().contentEquals("unknown"))) {
+            Iterator<String> iterator = lang.iterator();
+            if(!iterator.hasNext()){
+                return;
+            }
+            String value = iterator.next();
+            if (!(count == 1 && value != null && value.contentEquals("unknown"))) {
                 createAndAppendElement("language", general, QName.createQName(CCConstants.LOM_PROP_GENERAL_LANGUAGE));
             }
         }

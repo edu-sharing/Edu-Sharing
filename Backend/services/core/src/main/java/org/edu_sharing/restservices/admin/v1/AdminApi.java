@@ -1063,7 +1063,7 @@ public class AdminApi {
 	@GET
 	@Path("/export/lom")
 
-	@Operation(summary = "Export Nodes with LOM Metadata Format", description = "Export Nodes with LOM Metadata Format.")
+	@Operation(summary = "Export Nodes with given Metadata Format", description = "Export Nodes with LOM Metadata Format.")
 
 	@ApiResponses(value = { @ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Void.class))),
 			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -1074,10 +1074,10 @@ public class AdminApi {
 	public Response exportLOM(
 			@Parameter(description = "filterQuery", required = true) @QueryParam("filterQuery") String filterQuery,
 			@Parameter(description = "targetDir", required = true) @QueryParam("targetDir") String targetDir,
-			@Parameter(description = "subObjectHandler", required = true) @QueryParam("subObjectHandler") Boolean subObjectHandler,
+			@Parameter(description = "targetDir", required = true) @QueryParam("format") String format,
 			@Context HttpServletRequest req) {
 		try {
-			AdminServiceFactory.getInstance().exportLom(filterQuery, targetDir, subObjectHandler);
+			AdminServiceFactory.getInstance().exportLom(filterQuery, targetDir, format);
 			return Response.ok().build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);

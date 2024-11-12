@@ -34,7 +34,6 @@ import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.rpc.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
@@ -47,7 +46,6 @@ import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.collection.CollectionServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.notification.NotificationServiceFactoryUtility;
-import org.edu_sharing.service.oai.OAIExporterService;
 import org.edu_sharing.service.share.ShareService;
 import org.edu_sharing.service.share.ShareServiceImpl;
 import org.edu_sharing.service.toolpermission.ToolPermissionService;
@@ -57,8 +55,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.*;
 import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -261,43 +259,6 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         if (nodeService.hasAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_COLLECTION))) {
             CollectionServiceFactory.getCollectionService(appInfo.getAppId()).updateScope(nodeRef, aces);
         }
-
-
-        OAIExporterService service = new OAIExporterService();
-        if (service.available()) {
-            boolean publishToOAI = false;
-
-            List<String> licenseList = (List<String>) serviceRegistry.getNodeService().getProperty(new NodeRef(MCAlfrescoAPIClient.storeRef, nodeId), QName.createQName(CCConstants.CCM_PROP_IO_COMMONLICENSE_KEY));
-
-            if (licenseList != null) {
-                for (String license : licenseList) {
-                    if (license != null && license.startsWith("CC_")) {
-                        for (ACE ace : acesToAdd) {
-                            if (ace.getAuthorityType().equals(AuthorityType.EVERYONE.toString())) {
-                                publishToOAI = true;
-                            }
-                        }
-
-                        for (ACE ace : acesToUpdate) {
-                            if (ace.getAuthorityType().equals(AuthorityType.EVERYONE.toString())) {
-                                publishToOAI = true;
-                            }
-                        }
-
-                        for (ACE ace : acesNotChanged) {
-                            if (ace.getAuthorityType().equals(AuthorityType.EVERYONE.toString())) {
-                                publishToOAI = true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (publishToOAI) {
-                service.export(nodeId);
-            }
-        }
-
-
     }
 
     @Override

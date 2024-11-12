@@ -1,4 +1,4 @@
-package org.edu_sharing.xoai;
+package org.edu_sharing.service.oai.core;
 
 import io.gdcc.xoai.dataprovider.model.ItemIdentifier;
 import io.gdcc.xoai.dataprovider.model.Set;
