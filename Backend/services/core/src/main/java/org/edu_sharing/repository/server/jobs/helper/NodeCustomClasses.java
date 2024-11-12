@@ -32,19 +32,19 @@ public class NodeCustomClasses {
                             NodeServiceFactory.getLocalService().writeContent(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeRef.getId(), is,
                                     "image/jpeg", null, CCConstants.CCM_PROP_IO_USERDEFINED_PREVIEW);
                         } catch (Exception e) {
-                            Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + thumbUrl);
+                            Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + nodeRef + " " + thumbUrl);
                         }
                     }
                 };
                 new HttpQueryTool().queryStream(thumbUrl, callback);
                 if (callback.getResult() != null) {
-                    Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + thumbUrl + ": " + callback.getResult());
+                    Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + nodeRef + " " + thumbUrl + ": " + callback.getResult());
                 } else {
                     NodeServiceHelper.removeProperty(nodeRef, CCConstants.CCM_PROP_IO_THUMBNAILURL);
                     Logger.getLogger(BulkEditNodesJob.class).info(nodeRef + " thumb imported: " + thumbUrl);
                 }
             } catch (Throwable t) {
-                Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + thumbUrl);
+                Logger.getLogger(BulkEditNodesJob.class).warn("Thumb fetching failed for " + nodeRef + " " + thumbUrl);
             }
         }
     }
