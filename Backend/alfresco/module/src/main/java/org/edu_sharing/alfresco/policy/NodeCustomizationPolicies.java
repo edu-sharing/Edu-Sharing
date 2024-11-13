@@ -252,7 +252,9 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
 							   Map<NodeRef,NodeRef> copyMap) {
 		// add/override the previous node context
 		copyMap.forEach((source,dest)-> {
-			addCurrentContext(dest);
+			if(nodeService.exists(dest)) {
+				addCurrentContext(dest);
+			}
 		});
 	}
 
