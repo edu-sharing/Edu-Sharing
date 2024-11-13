@@ -38,10 +38,13 @@ public class OnCopyTinymcePolicy implements OnCopyCompletePolicy {
 			Map<NodeRef, NodeRef> copyMap) {
 
 		for (Map.Entry<NodeRef, NodeRef> copyMapEntry : copyMap.entrySet()) {
-			String editoryType = (String) nodeService.getProperty(copyMapEntry.getValue(),
+			if(!nodeService.exists(copyMapEntry.getValue())) {
+				continue;
+			}
+			String editorType = (String) nodeService.getProperty(copyMapEntry.getValue(),
 					QName.createQName(CCConstants.CCM_PROP_EDITOR_TYPE));
 
-			if ("tinymce".equals(editoryType)) {
+			if ("tinymce".equals(editorType)) {
 				if (versionService.getVersionHistory(copyMapEntry.getValue()) == null) {
 					Map<String, Serializable> transFormedProps = transformQNameKeyToString(
 							nodeService.getProperties(copyMapEntry.getValue()));
