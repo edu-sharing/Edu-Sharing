@@ -8,7 +8,7 @@ import {
     SearchService,
 } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import {
     debounceTime,
     distinctUntilChanged,
@@ -96,6 +96,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         this._registerColumnsAndSortConfig();
         this._registerLoadingProgress();
         this._registerResultDiffCount();
+        this._registerDefaultSort();
     }
 
     ngOnDestroy(): void {
@@ -127,6 +128,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 this._searchPage.searchFilters.observeValue(),
                 // .pipe(tap((value) => console.log('searchFilters changed', value))),
                 this._searchPage.searchString.observeValue(),
+                this.state,
                 // .pipe(tap((value) => console.log('searchString changed', value))),
             ])
             .pipe(
@@ -154,12 +156,13 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 ),
                 tap(() => this.loadingParams.next(false)),
                 map(
-                    ([repository, metadataSet, searchFilters, searchString]) =>
+                    ([repository, metadataSet, searchFilters, searchString, state]) =>
                         new SearchRequestParams(
                             repository,
                             metadataSet,
                             searchFilters,
                             searchString,
+                            state.sortConfig,
                         ),
                 ),
                 distinctUntilChanged((x, y) => x.equals(y)),
@@ -168,8 +171,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         const collectionRequestParams: Observable<SearchRequestParams> = searchRequestParams.pipe(
             // Omit searchFilters.
             map(
-                ({ repository, metadataSet, searchString }) =>
-                    new SearchRequestParams(repository, metadataSet, {}, searchString),
+                ({ repository, metadataSet, searchString, sort }) =>
+                    new SearchRequestParams(repository, metadataSet, {}, searchString, sort),
             ),
             distinctUntilChanged((x, y) => x.equals(y)),
         );
@@ -252,6 +255,37 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
             },
         );
     }
+    /**
+     * switches the default sort based on a present search string or not
+     */
+    private _registerDefaultSort() {
+        combineLatest([
+            this._searchPage.searchString
+                .observeValue()
+                .pipe(distinctUntilChanged((a, b) => (a == null ? b == null : b != null))),
+            combineLatest([
+                this._searchPage.activeMetadataSet.observeValue().pipe(filter((mds) => !!mds)),
+                this._searchPage.activeRepository.observeValue(),
+            ]).pipe(
+                switchMap(([metadataSet, repository]) =>
+                    this._mds.getMetadataSet({ repository, metadataSet }),
+                ),
+            ),
+        ])
+            .pipe(filter(([_, mds]) => !!mds.sorts.find((s) => s.id === 'search')?.defaultSearch))
+            .subscribe(([searchString, mds]) => {
+                const sorts = mds.sorts.find((s) => s.id === 'search');
+                const state = searchString ? sorts.defaultSearch : sorts.default;
+                console.log(searchString, mds, state);
+                this.patchState({
+                    sortConfig: {
+                        ...this.state.value.sortConfig,
+                        active: state.sortBy,
+                        direction: state.sortAscending ? 'asc' : 'desc',
+                    },
+                });
+            });
+    }
     patchState(data: Partial<SearchPageState>) {
         this.state.next({ ...this.state.value, ...data });
     }
@@ -274,8 +308,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                     },
                     maxItems: request.range.endIndex - request.range.startIndex,
                     skipCount: request.range.startIndex,
-                    sortAscending: request.sort ? [request.sort.direction === 'asc'] : null,
-                    sortProperties: request.sort ? [request.sort.active] : null,
+                    sortAscending: params.sort ? [params.sort.direction === 'asc'] : null,
+                    sortProperties: params.sort ? [params.sort.active] : null,
                     contentType: 'FILES',
                     repository: params.repository,
                     metadataset: params.metadataSet,

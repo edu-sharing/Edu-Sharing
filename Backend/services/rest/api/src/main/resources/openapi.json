@@ -2720,6 +2720,9 @@
           "default": {
             "$ref": "#/components/schemas/MdsSortDefault"
           },
+          "defaultSearch": {
+            "$ref": "#/components/schemas/MdsSortDefault"
+          },
           "id": {
             "type": "string"
           }
