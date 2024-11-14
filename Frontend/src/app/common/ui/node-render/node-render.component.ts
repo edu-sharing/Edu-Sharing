@@ -671,20 +671,25 @@ export class NodeRenderComponent implements EventListener, OnInit, OnDestroy, Af
 
     private getSequence(onFinish: () => void) {
         if (this._node.aspects.indexOf(RestConstants.CCM_ASPECT_IO_CHILDOBJECT) != -1) {
-            this.nodeApi.getNodeMetadata(this._node.parent.id).subscribe((data) => {
-                this.sequenceParent = data.node;
-                this.nodeApi
-                    .getNodeChildobjects(this.sequenceParent.ref.id, this.sequenceParent.ref.repo)
-                    .subscribe((data: NodeList) => {
-                        if (data.nodes.length > 0) {
-                            this.sequence = data;
-                        } else {
-                            this.sequence = null;
-                        }
-                        setTimeout(() => this.setScrollparameters(), 100);
-                        onFinish();
-                    });
-            });
+            this.nodeApi
+                .getNodeMetadata(this._node.parent.id, [RestConstants.ALL], this._node.parent.repo)
+                .subscribe((data) => {
+                    this.sequenceParent = data.node;
+                    this.nodeApi
+                        .getNodeChildobjects(
+                            this.sequenceParent.ref.id,
+                            this.sequenceParent.ref.repo,
+                        )
+                        .subscribe((data: NodeList) => {
+                            if (data.nodes.length > 0) {
+                                this.sequence = data;
+                            } else {
+                                this.sequence = null;
+                            }
+                            setTimeout(() => this.setScrollparameters(), 100);
+                            onFinish();
+                        });
+                });
         } else {
             this.sequenceParent = this._node;
             this.nodeApi
