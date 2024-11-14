@@ -34,7 +34,6 @@ import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.rpc.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
@@ -57,8 +56,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.*;
 import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -584,23 +583,25 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
      * @return
      */
     String getAdminAuthority(NodeRef nodeRef) {
-        String authorityAdministrator = null;
-        if (isSharedNode(nodeRef.getId())) {
-            Set<AccessPermission> allSetPermissions = serviceRegistry.getPermissionService()
-                    .getAllSetPermissions(nodeRef);
-            for (AccessPermission ap : allSetPermissions) {
-                NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(ap.getAuthority());
-                if (authorityNodeRef != null) {
-                    String groupType = (String) nodeService.getProperty(authorityNodeRef,
-                            QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
-                    if (CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
-                            && ap.getPermission().equals(PermissionService.COORDINATOR)) {
-                        authorityAdministrator = ap.getAuthority();
+        return AuthenticationUtil.runAsSystem(() -> {
+            String authorityAdministrator = null;
+            if (isSharedNode(nodeRef.getId())) {
+                Set<AccessPermission> allSetPermissions = serviceRegistry.getPermissionService()
+                        .getAllSetPermissions(nodeRef);
+                for (AccessPermission ap : allSetPermissions) {
+                    NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(ap.getAuthority());
+                    if (authorityNodeRef != null) {
+                        String groupType = (String) nodeService.getProperty(authorityNodeRef,
+                                QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
+                        if (CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
+                                && ap.getPermission().equals(PermissionService.COORDINATOR)) {
+                            authorityAdministrator = ap.getAuthority();
+                        }
                     }
                 }
             }
-        }
-        return authorityAdministrator;
+            return authorityAdministrator;
+        });
     }
 
     private boolean containslocalPerm(List<ACE> aces, String eduAuthority, String eduPermission) {
@@ -874,6 +875,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             log.info("setInheritParentPermissions " + inheritPermission);
             permissionsService.setInheritParentPermissions(nodeRef, inheritPermission);
         }
+
 
         String adminAuthority = getAdminAuthority(nodeRef);
 
