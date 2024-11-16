@@ -1,6 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { EventEmitter, Injectable, signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Node } from 'ngx-edu-sharing-api';
 import {
     ClickSource,
     FetchEvent,
@@ -231,7 +232,7 @@ export class NodeEntriesService<T extends NodeEntriesDataType> {
         }
         // Wait for the menu to reflect changed options.
         setTimeout(() => {
-            dropdown.callbackObject = node;
+            dropdown.callbackObjects = this.selection.selected as unknown as Node[];
             dropdown.ngOnChanges();
             if (dropdown.canShowDropdown()) {
                 if (onDone) {

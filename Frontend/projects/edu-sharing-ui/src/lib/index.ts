@@ -52,6 +52,7 @@ export * from './services/accessibility.service';
 export * from './services/app-container.service';
 export * from './services/local-events.service';
 export * from './services/node-helper.service';
+export * from './services/node-entries.service';
 export * from './services/nodes-drag-drop.service';
 export * from './services/options-helper-data.service';
 export * from './services/repo-url.service';

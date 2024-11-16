@@ -1,11 +1,11 @@
 <div class="sub-tree-wrapper">
-  <es-dropdown #dropdown></es-dropdown>
+  <es-dropdown #dropdown [options]="entriesService.options?.[Target.ListDropdown]"></es-dropdown>
   <button
     #dropdownTrigger="matMenuTrigger"
     mat-button
     class="dropdown-dummy cdk-visually-hidden"
-    [style.left]="dropdownLeft"
-    [style.top]="dropdownTop"
+    [style.left.px]="dropdownLeft"
+    [style.top.px]="dropdownTop"
     tabindex="-1"
     aria-hidden="true"
     [matMenuTriggerFor]="dropdown.menu"

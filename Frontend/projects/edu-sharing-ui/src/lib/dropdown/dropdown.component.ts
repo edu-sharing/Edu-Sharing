@@ -4,6 +4,7 @@ import { OptionItem } from '../types/option-item';
 import { Helper } from '../util/helper';
 import { UIService } from '../services/ui.service';
 import { BehaviorSubject } from 'rxjs';
+import { Node } from 'ngx-edu-sharing-api';
 
 /**
  * The dropdown is one base component of the action bar (showing more actions),
@@ -23,11 +24,11 @@ export class DropdownComponent implements OnChanges {
     options$ = new BehaviorSubject<OptionItem[]>([]);
 
     /**
-     * The object that should be returned via the option's callback.
+     * The objects that should be returned via the option's callback.
      *
      * Can be null
      */
-    @Input() callbackObject: any;
+    @Input() callbackObjects: Node[];
 
     /**
      * Should disabled ("greyed out") options be shown or hidden?
@@ -45,10 +46,10 @@ export class DropdownComponent implements OnChanges {
     constructor(private ui: UIService) {}
 
     ngOnChanges(changes?: SimpleChanges): void {
-        if (changes == null || changes?.options || changes?.callbackObject) {
+        if (changes == null || changes?.options || changes?.callbackObjects) {
             this.options$.next(this.ui.filterValidOptions(Helper.deepCopyArray(this.options)));
-            if (this.callbackObject) {
-                this.ui.updateOptionEnabledState(this.options$, this.callbackObject);
+            if (this.callbackObjects) {
+                this.ui.updateOptionEnabledState(this.options$, this.callbackObjects);
             }
         }
     }
@@ -57,7 +58,7 @@ export class DropdownComponent implements OnChanges {
         if (!option.isEnabled) {
             return;
         }
-        setTimeout(() => option.callback(this.callbackObject));
+        setTimeout(() => option.callback(null, this.callbackObjects));
     }
 
     isNewGroup(i: number) {

@@ -35,14 +35,14 @@ export class OptionButtonComponent implements OnChanges {
 
     async optionIsValid(optionItem: OptionItem, node: Node): Promise<boolean> {
         if (optionItem.enabledCallback) {
-            return await optionItem.enabledCallback(node);
+            return await optionItem.enabledCallback([node]);
         }
         return optionItem.isEnabled;
     }
 
     private async optionIsShown(optionItem: OptionItem, node: Node): Promise<boolean> {
         if (optionItem.showCallback) {
-            return optionItem.showCallback(node);
+            return optionItem.showCallback([node]);
         }
         return true;
     }
