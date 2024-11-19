@@ -1,11 +1,14 @@
 package org.edu_sharing.metadataset.v2;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MetadataSort implements Serializable {
-	public class MetadataSortDefault implements Serializable {
+	public static class MetadataSortDefault implements Serializable {
 		private String sortBy;
 		private boolean sortAscending;
 
@@ -27,7 +30,14 @@ public class MetadataSort implements Serializable {
 	}
 	private String id;
 	private String mode;
+	@JsonPropertyDescription("Default sort state (for both with and without a search string)")
+	@Getter
+	@Setter
 	private MetadataSortDefault defaultValue=new MetadataSortDefault();
+	@JsonPropertyDescription("Default sort state only when searching (when unset, defaultValue is used)")
+	@Getter
+	@Setter
+	private MetadataSortDefault defaultValueSearch=null;
 	private List<MetadataSortColumn> columns;
 
 	public String getId() {
@@ -51,14 +61,6 @@ public class MetadataSort implements Serializable {
 	}
 	public void setColumns(List<MetadataSortColumn> columns) {
 		this.columns = columns;
-	}
-
-	public MetadataSortDefault getDefaultValue() {
-		return defaultValue;
-	}
-
-	public void setDefaultValue(MetadataSortDefault defaultValue) {
-		this.defaultValue = defaultValue;
 	}
 
 	@Override

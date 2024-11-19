@@ -949,6 +949,21 @@ public class MetadataReader {
                         }
                     }
                 }
+                if (name.equals("defaultSearch")) {
+                    NodeList list3 = data.getChildNodes();
+                    for (int k = 0; k < list3.getLength(); k++) {
+                        if(sort.getDefaultValueSearch() == null) {
+                            sort.setDefaultValueSearch(new MetadataSort.MetadataSortDefault());
+                        }
+                        Node data2 = list3.item(k);
+                        if (data2.getNodeName().equals("sortBy")) {
+                            sort.getDefaultValueSearch().setSortBy(data2.getTextContent());
+                        }
+                        if (data2.getNodeName().equals("sortAscending")) {
+                            sort.getDefaultValueSearch().setSortAscending(Boolean.parseBoolean(data2.getTextContent()));
+                        }
+                    }
+                }
                 if (name.equals("columns")) {
                     List<MetadataSortColumn> columns = getMetadataSortColumns(data);
                     sort.setColumns(columns);

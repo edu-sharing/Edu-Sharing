@@ -33,7 +33,10 @@ public class MdsSort {
 		}
 	}
 	private String id;
+	@JsonProperty(value = "default")
 	private MdsSortDefault defaultValue;
+	@JsonProperty("defaultSearch")
+	private MdsSortDefault defaultValueSearch;
 	private List<MdsSortColumn> columns;
 
 	public MdsSort(){}
@@ -43,6 +46,11 @@ public class MdsSort {
 			this.defaultValue=new MdsSortDefault();
 			this.defaultValue.setSortBy(sort.getDefaultValue().getSortBy());
 			this.defaultValue.setSortAscending(sort.getDefaultValue().isSortAscending());
+		}
+		if(sort.getDefaultValueSearch()!=null){
+			this.defaultValueSearch=new MdsSortDefault();
+			this.defaultValueSearch.setSortBy(sort.getDefaultValueSearch().getSortBy());
+			this.defaultValueSearch.setSortAscending(sort.getDefaultValueSearch().isSortAscending());
 		}
 		if(sort.getColumns()!=null){
 			columns=new ArrayList<>();
@@ -66,15 +74,6 @@ public class MdsSort {
 	}
 	public void setColumns(List<MdsSortColumn> columns) {
 		this.columns = columns;
-	}
-
-	@JsonProperty("default")
-	public MdsSortDefault getDefaultValue() {
-		return defaultValue;
-	}
-
-	public void setDefaultValue(MdsSortDefault defaultValue) {
-		this.defaultValue = defaultValue;
 	}
 }
 

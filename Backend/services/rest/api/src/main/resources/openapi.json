@@ -2720,6 +2720,9 @@
           "default": {
             "$ref": "#/components/schemas/MdsSortDefault"
           },
+          "defaultSearch": {
+            "$ref": "#/components/schemas/MdsSortDefault"
+          },
           "id": {
             "type": "string"
           }
@@ -16602,6 +16605,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "resolve the organization(s) this group is part of? disabling will slightly improve performance and should considered for bulk calls",
+            "in": "query",
+            "name": "resolveOrganizations",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -16700,6 +16711,15 @@
             "name": "parent",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "description": "returnResult, if true the created group object will be returned.",
+            "in": "query",
+            "name": "returnResult",
+            "schema": {
+              "default": true,
+              "type": "boolean"
             }
           }
         ],

@@ -33,6 +33,7 @@ import { NavigationScheduler } from './navigation-scheduler';
 import { SearchPageResults } from './search-page-results.service';
 import { UserModifiableValuesService } from './user-modifiable-values';
 import { Widget } from '../../features/mds/mds-editor/mds-editor-instance.service';
+import { Sort } from '@angular/material/sort';
 
 export class SearchRequestParams {
     constructor(
@@ -40,6 +41,7 @@ export class SearchRequestParams {
         public readonly metadataSet: string,
         public readonly searchFilters: { [key: string]: string[] },
         public readonly searchString: string,
+        public readonly sort: Sort,
     ) {}
 
     equals(other: SearchRequestParams) {

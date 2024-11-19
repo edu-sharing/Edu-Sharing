@@ -53,6 +53,7 @@ import {
 } from 'ngx-edu-sharing-api';
 import { DialogsService } from '../features/dialogs/dialogs.service';
 import { DialogButton } from '../util/dialog-button';
+import { isArray } from 'lodash';
 
 export interface ConfigEntry {
     name: string;
@@ -684,8 +685,14 @@ export class NodeHelperService extends NodeHelperServiceBase {
         }
         return prop;
     }
-    static getActionbarNodes<T>(nodes: T[], node: T): T[] {
-        return node ? [node] : nodes && nodes.length ? nodes : null;
+    static getActionbarNodes<T>(listNodes: T[], externalNode: T | T[]): T[] {
+        return externalNode
+            ? isArray(externalNode)
+                ? externalNode
+                : [externalNode]
+            : listNodes && listNodes.length
+            ? listNodes
+            : null;
     }
 
     referenceOriginalExists(node: Node | CollectionReference) {

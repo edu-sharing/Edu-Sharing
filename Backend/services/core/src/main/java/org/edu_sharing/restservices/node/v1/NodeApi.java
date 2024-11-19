@@ -2286,8 +2286,9 @@ public class NodeApi  {
 	    	try {
 			
 		    	RepositoryDao repoDao = RepositoryDao.getRepository(repository);
-		    	NodeDao nodeDao = NodeDao.getNode(repoDao, node);
-		    	nodeDao.setProperty(
+		    	NodeDao.setProperty(
+						repoDao,
+						node,
 						property,
 						value == null || value.size() != 1? (Serializable) value : value.get(0),
 						keepModifiedDate != null && keepModifiedDate

@@ -17,9 +17,11 @@ import {
     DropdownComponent,
     DropSource,
     LocalEventsService,
+    NodeEntriesService,
     OptionItem,
     OptionsHelperDataService,
     Scope,
+    Target,
     UIAnimation,
 } from 'ngx-edu-sharing-ui';
 import {
@@ -31,6 +33,7 @@ import {
 } from '../../../core-module/core.module';
 import { Helper } from '../../../core-module/rest/helper';
 import { canDropOnNode } from '../workspace-utils';
+import { Event } from 'typedoc';
 
 @Component({
     selector: 'es-workspace-sub-tree',
@@ -40,15 +43,16 @@ import { canDropOnNode } from '../workspace-utils';
         trigger('openOverlay', UIAnimation.openOverlay(UIAnimation.ANIMATION_TIME_FAST)),
         trigger('open', UIAnimation.openOverlay()),
     ],
-    providers: [OptionsHelperDataService],
+    providers: [OptionsHelperDataService, NodeEntriesService],
 })
 export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
+    readonly Target = Target;
     private static MAX_FOLDER_COUNT = 100;
 
     @ViewChild('dropdown') dropdown: DropdownComponent;
     @ViewChild('dropdownTrigger') dropdownTrigger: MatMenuTrigger;
-    dropdownLeft: string;
-    dropdownTop: string;
+    dropdownLeft: number;
+    dropdownTop: number;
 
     private _currentPath: string[] = [];
     /** Parent hierarchy of the currently selected node. */
@@ -91,6 +95,7 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
     constructor(
         private nodeApi: RestNodeService,
         private optionsService: OptionsHelperDataService,
+        public entriesService: NodeEntriesService<Node>,
         private localEvents: LocalEventsService,
         public ui: UIService,
     ) {}
@@ -129,7 +134,7 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
 
     optionIsShown(optionItem: OptionItem, node: Node) {
         if (optionItem.showCallback) {
-            return optionItem.showCallback(node);
+            return optionItem.showCallback([node]);
         }
         return true;
     }
@@ -140,6 +145,7 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
             .getChildren(this._node, [RestConstants.FILTER_FOLDERS], {
                 offset: this._nodes.length,
                 count: RestConstants.COUNT_UNLIMITED,
+                propertyFilter: [RestConstants.ALL],
             })
             .subscribe((data: NodeList) => {
                 this.loadingMore = false;
@@ -148,10 +154,12 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
             });
     }
 
-    contextMenu(event: any, node: Node) {
+    async contextMenu(event: MouseEvent, node: Node) {
         event.preventDefault();
         event.stopPropagation();
-
+        if (event instanceof MouseEvent) {
+            ({ clientX: this.dropdownLeft, clientY: this.dropdownTop } = event);
+        }
         this.showDropdown(event, node);
     }
 
@@ -159,18 +167,22 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
         this.onUpdateOptions.emit(event);
     }
 
-    private showDropdown(event: any, node: Node) {
+    private async showDropdown(event: MouseEvent, node: Node) {
         //if(this._options==null || this._options.length<1)
         //  return;
-        this.dropdownLeft = event.clientX + 'px';
-        this.dropdownTop = event.clientY + 'px';
         this.optionsService.setData({
-            activeObjects: [node],
             scope: Scope.WorkspaceTree,
+            allObjects: this._nodes,
+            activeObjects: [node],
         });
-        this.optionsService.initComponents(null, null, this.dropdown);
-        this.optionsService.refreshComponents();
-        this.dropdownTrigger.openMenu();
+        this.entriesService.options = {
+            [Target.ListDropdown]: await this.optionsService.getAvailableOptions(
+                Target.ListDropdown,
+            ),
+        };
+        this.entriesService.openDropdown(this.dropdown, node, () =>
+            this.dropdownTrigger.openMenu(),
+        );
     }
 
     dropToParent(event: any) {
@@ -211,8 +223,9 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
         this.nodeApi
             .getChildren(this._node, [RestConstants.FILTER_FOLDERS], {
                 count: WorkspaceSubTreeComponent.MAX_FOLDER_COUNT,
+                propertyFilter: [RestConstants.ALL],
             })
-            .subscribe((data: NodeList) => {
+            .subscribe(async (data: NodeList) => {
                 this._nodes = data.nodes;
                 this.moreItems = data.pagination.total - data.pagination.count;
                 this.loadingStates = Helper.initArray(this._nodes.length, true);
