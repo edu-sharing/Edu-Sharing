@@ -17,6 +17,13 @@ export class LicenseDetailsComponent implements OnChanges {
         [RestConstants.LOM_PROP_RIGHTS_DESCRIPTION]: 'lom.rights.description',
     };
 
+    /**
+     * display mode
+     * full: show all details including icon, link, and so one
+     * minimal: show only name and description
+     * minimalUrl: like minimal but with license url
+     */
+    @Input() displayMode: 'full' | 'minimal' | 'minimalUrl' = 'full';
     @Input() nodes: Node[];
     @Input() properties: Values;
     type: string;
@@ -36,7 +43,7 @@ export class LicenseDetailsComponent implements OnChanges {
     ) {}
     ngOnChanges(changes: SimpleChanges) {
         // Set the `draggable` attribute when this directive is active.
-        if (changes.nodes?.currentValue) {
+        if (changes.nodes?.currentValue || changes.properties?.currentValue) {
             this.readLicense();
         }
     }

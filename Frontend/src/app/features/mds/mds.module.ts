@@ -93,6 +93,7 @@ import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
     ],
     imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule],
     exports: [
+        LicenseDetailsComponent,
         MdsEditorWidgetAuthorComponent,
         MdsEditorWrapperComponent,
         MdsViewerComponent,
