@@ -41,6 +41,7 @@ export * from './pipes/format-date.pipe';
 export * from './pipes/node-icon.pipe';
 export * from './pipes/node-image-size.pipe';
 export * from './pipes/node-image.pipe';
+export * from './pipes/node-license.pipe';
 export * from './pipes/node-person-name.pipe';
 export * from './pipes/node-title.pipe';
 export * from './pipes/vcard-name.pipe';
