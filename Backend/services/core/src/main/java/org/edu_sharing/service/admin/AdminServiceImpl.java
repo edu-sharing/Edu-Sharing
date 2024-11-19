@@ -1154,7 +1154,7 @@ public class AdminServiceImpl implements AdminService {
                     result.put(renderingVersionInfo.repository,renderingVersionInfo);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.warn(e.getMessage(), e);
             }
             return result;
         } catch (IOException e) {
