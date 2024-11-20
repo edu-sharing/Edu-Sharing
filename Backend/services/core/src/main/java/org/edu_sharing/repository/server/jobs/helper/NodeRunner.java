@@ -1,11 +1,14 @@
 package org.edu_sharing.repository.server.jobs.helper;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.server.importer.OAIPMHLOMImporter;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
@@ -31,37 +34,51 @@ import java.util.stream.Stream;
 /**
  * This is a class that will do a task for all nodes with a given type (or all) in a given folder
  */
+
+@Slf4j
 public class NodeRunner {
 
-    Logger logger = Logger.getLogger(NodeRunner.class);
-
-    private NodeService nodeService = NodeServiceFactory.getLocalService();
-
+    private final NodeService nodeService = NodeServiceFactory.getLocalService();
+    private final ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
+    private final ServiceRegistry serviceRegistry = applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY, ServiceRegistry.class);
+    private final BehaviourFilter policyBehaviourFilter = applicationContext.getBean("policyBehaviourFilter", BehaviourFilter.class);
     /**
      * The task that will be called for each node
      */
+    @Setter
+    @Getter
     private Consumer<NodeRef> task;
 
     /**
      * A filter (optional) which should return true for all nodes where the task should actually be processed for
      */
+    @Setter
+    @Getter
     private Predicate<? super NodeRef> filter;
 
     /**
      * The start folder, defaults to company home
      */
+    @Setter
+    @Getter
     private String startFolder=nodeService.getCompanyHome();
 
+    @Getter
+    @Setter
     private StoreRef startFolderStore = StoreRef.STORE_REF_WORKSPACE_SPACESSTORE;
 
     /**
      * The types of nodes that should be processed (or null for all)
      */
+    @Setter
+    @Getter
     private List<String> types;
 
     /**
      * run as alfresco system user
      */
+    @Setter
+    @Getter
     private boolean runAsSystem = false;
 
     /**
@@ -69,6 +86,8 @@ public class NodeRunner {
      * Note: Currently, only the task is threaded, not previous filter actions
      * The thread pool uses the same Thread Size as the @OAIPMHLOMImporter
      */
+    @Setter
+    @Getter
     private boolean threaded = true;
 
     /**
@@ -76,99 +95,49 @@ public class NodeRunner {
      * (Enabling this will disable the behaviour filters while running)
      * Required transaction to be set to Local or Global
      */
+    @Getter
+    @Setter
     private boolean keepModifiedDate;
 
     /**
      * Shall a transaction be spawned for the task
      * This WILL NOT WORK in conjunction with threaded=true
      */
+    @Getter
+    @Setter
     private TransactionMode transaction=TransactionMode.None;
 
     /**
      * How to recurse across elements
      * Default will only recurse into sub-folders, but not sub-elements (e.g. childobjects)
      */
+    @Setter
+    @Getter
     private RecurseMode recurseMode = RecurseMode.Folders;
 
     /**
      * shall the cache for each processed node be invalidated/cleared?
      */
+    @Setter
+    @Getter
     private boolean invalidateCache = true;
 
-
-    private ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
-    ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-    private BehaviourFilter policyBehaviourFilter = (BehaviourFilter) applicationContext.getBean("policyBehaviourFilter");
-
+    @Getter
+    @Setter
     private String lucene = null;
+
+    @Getter
+    @Setter
     private StoreRef luceneStore = StoreRef.STORE_REF_WORKSPACE_SPACESSTORE;
     /**
      * custom nodes list to iterate over
      */
+    @Setter
+    @Getter
     private Collection<NodeRef> nodesList;
 
     public NodeRunner() {
 	}
-    
-    public Consumer<NodeRef> getTask() {
-        return task;
-    }
-
-    public void setTask(Consumer<NodeRef> task) {
-        this.task = task;
-    }
-
-    public Predicate<? super NodeRef> getFilter() {
-        return filter;
-    }
-
-    public void setFilter(Predicate<? super NodeRef> filter) {
-        this.filter = filter;
-    }
-
-    public String getStartFolder() {
-        return startFolder;
-    }
-
-    public void setStartFolder(String startFolder) {
-        this.startFolder = startFolder;
-    }
-
-    public List<String> getTypes() {
-        return types;
-    }
-
-    public void setTypes(List<String> types) {
-        this.types = types;
-    }
-
-    public boolean isThreaded() {
-        return threaded;
-    }
-
-    public void setThreaded(boolean threaded) {
-        this.threaded = threaded;
-    }
-
-    public boolean isRunAsSystem() {
-        return runAsSystem;
-    }
-
-    public void setRunAsSystem(boolean runAsSystem) {
-        this.runAsSystem = runAsSystem;
-    }
-
-    public boolean isInvalidateCache() {
-        return invalidateCache;
-    }
-
-    public void setInvalidateCache(boolean invalidateCache) {
-        this.invalidateCache = invalidateCache;
-    }
-
-    public void setLucene(String lucene) {
-        this.lucene = lucene;
-    }
 
     /**
      * runs the job for each node
@@ -184,7 +153,7 @@ public class NodeRunner {
             try {
                 userTransaction.begin();
             } catch (NotSupportedException|SystemException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
         try {
@@ -192,13 +161,13 @@ public class NodeRunner {
 
             if(nodesList != null) {
                 nodes = new ArrayList<>(nodesList);
-            } else if(lucene == null || lucene.trim().equals("")) {
+            } else if(StringUtils.isBlank(lucene)) {
                 if (runAsSystem)
                     nodes = AuthenticationUtil.runAsSystem(() -> nodeService.getChildrenRecursive(startFolderStore, startFolder, types, recurseMode));
                 else
                     nodes = nodeService.getChildrenRecursive(startFolderStore, startFolder, types, recurseMode);
             }else{
-                logger.info("collection nodes by lucene:"+lucene);
+                log.info("collection nodes by lucene: {}", lucene);
                 if (runAsSystem)
                     nodes = AuthenticationUtil.runAsSystem(() -> new NodeCollectorLucene(lucene, luceneStore).getNodes());
                 else
@@ -220,7 +189,7 @@ public class NodeRunner {
                     try {
                         userTransactionLocal.begin();
                     } catch (NotSupportedException|SystemException e) {
-                        logger.error(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                     }
                 }
 
@@ -233,23 +202,23 @@ public class NodeRunner {
                 else {
                     runTask(ref);
                 }
-                if(transaction.equals(TransactionMode.Local)){
+                if(transaction.equals(TransactionMode.Local) && userTransactionLocal != null) {
                     try {
                         userTransactionLocal.commit();
                     } catch (Exception e) {
-                        logger.error(e.getMessage(),e);
+                        log.error(e.getMessage(),e);
                         try {
                             userTransactionLocal.rollback();
                         } catch (SystemException e1) {
-                            logger.error(e1.getMessage(),e1);
+                            log.error(e1.getMessage(),e1);
                         }
                     }
                 }
             };
 
-            logger.info("before distinct:" + nodes.size());
+            log.info("before distinct: {}", nodes.size());
             nodes = nodes.stream().distinct().collect(Collectors.toList());
-            logger.info("after distinct:" + nodes.size());
+            log.info("after distinct: {}", nodes.size());
 
             Stream<NodeRef> filteredStream = nodes.stream().filter(callFilter);
             if (threaded) {
@@ -273,15 +242,15 @@ public class NodeRunner {
             return nodes.size();
         }
         finally{
-            if(transaction.equals(TransactionMode.Global)){
+            if(transaction.equals(TransactionMode.Global) && userTransaction != null){
                 try {
                     userTransaction.commit();
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    log.error(e.getMessage(),e);
                     try {
                         userTransaction.rollback();
                     } catch (SystemException e1) {
-                        logger.error(e1.getMessage(),e1);
+                        log.error(e1.getMessage(),e1);
                     }
                 }
             }
@@ -291,7 +260,7 @@ public class NodeRunner {
 
     private void runTask(NodeRef ref) {
         if(ref == null){
-            logger.error("nodeRef is null");
+            log.error("nodeRef is null");
             return;
         }
         try {
@@ -308,57 +277,10 @@ public class NodeRunner {
                 new RepositoryCache().remove(ref.getId());
             }
         }finally {
-            if(keepModifiedDate || (!keepModifiedDate && !transaction.equals(TransactionMode.None))) policyBehaviourFilter.enableBehaviour(ref);
+            if(keepModifiedDate || !transaction.equals(TransactionMode.None)) policyBehaviourFilter.enableBehaviour(ref);
         }
     }
 
-    public void setKeepModifiedDate(boolean keepModifiedDate) {
-        this.keepModifiedDate = keepModifiedDate;
-    }
-
-    public boolean isKeepModifiedDate() {
-        return keepModifiedDate;
-    }
-
-    public TransactionMode isTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(TransactionMode transaction) {
-        this.transaction = transaction;
-    }
-
-    public RecurseMode getRecurseMode() {
-        return recurseMode;
-    }
-
-    public void setRecurseMode(RecurseMode recurseMode) {
-        this.recurseMode = recurseMode;
-    }
-
-    public void setLuceneStore(StoreRef luceneStore) {
-        this.luceneStore = luceneStore;
-    }
-
-    public StoreRef getLuceneStore() {
-        return luceneStore;
-    }
-
-    public Collection<NodeRef> getNodesList() {
-        return nodesList;
-    }
-
-    public void setNodesList(Collection<NodeRef> nodesList) {
-        this.nodesList = nodesList;
-    }
-
-    public void setStartFolderStore(StoreRef startFolderStore) {
-        this.startFolderStore = startFolderStore;
-    }
-
-    public StoreRef getStartFolderStore() {
-        return startFolderStore;
-    }
 
     public enum TransactionMode{
         None, // no transactions

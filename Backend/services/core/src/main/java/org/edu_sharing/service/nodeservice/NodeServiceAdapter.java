@@ -8,6 +8,7 @@ import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.URLTool;
 import org.edu_sharing.repository.tools.URLHelper;
+import org.edu_sharing.restservices.node.v1.model.RevokeDetails;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
 import org.edu_sharing.service.permission.HandleParam;
 import org.edu_sharing.service.search.model.SortDefinition;
@@ -422,6 +423,11 @@ public class NodeServiceAdapter implements NodeService {
 
 	@Override
 	public void removeNodeForce(String storeProtocol, String storeId, String nodeId, boolean recycle) {
+
+	}
+
+	@Override
+	public void revokeNode(String storeProtocol, String storeId, String id, RevokeDetails details) throws Throwable {
 
 	}
 }

@@ -7,16 +7,26 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.action.RessourceInfoExecuter;
 import org.edu_sharing.alfresco.service.connector.Connector;
 import org.edu_sharing.alfresco.service.connector.ConnectorFileType;
 import org.edu_sharing.alfresco.service.connector.ConnectorService;
+import org.edu_sharing.alfresco.service.connector.SimpleConnector;
+import org.edu_sharing.metadataset.v2.tools.MetadataSearchHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.edu_sharing.repository.server.tools.HttpQueryTool;
 import org.edu_sharing.repository.server.tools.security.Encryption;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authentication.oauth2.TokenService;
@@ -32,21 +42,27 @@ import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.permission.PermissionService;
 import org.edu_sharing.service.permission.PermissionServiceFactory;
 import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public class ConnectorServlet extends HttpServlet  {
 
 	private static Logger logger = Logger.getLogger(ConnectorServlet.class);
-	
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String connectorId = req.getParameter("connectorId");
@@ -93,13 +109,17 @@ public class ConnectorServlet extends HttpServlet  {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,e.getMessage());
 			return;
 		}
-		
+
 		Connector connector = null;
 		if(connectorId != null) {
-			for(Connector con : ConnectorServiceFactory.getConnectorList().getConnectors()){
-				if(con.getId().equals(connectorId)){
-					connector = con;
-				}
+			connector = ConnectorServiceFactory.getConnectorList().getConnectors().stream().filter(c -> c.getId().equals(connectorId)).findAny().orElse(null);
+			Optional<SimpleConnector> simpleConnector = ConnectorServiceFactory.getConnectorList().getSimpleConnectors().stream().filter(c -> c.getId().equals(connectorId)).findAny();
+			if(simpleConnector.isPresent()) {
+				HashMap<String, Serializable> properties = handleSimpleConnector(convertParameters(req), simpleConnector.orElse(null), nodeRefOriginal);
+				NodeServiceFactory.getLocalService().updateNodeNative(nodeRefOriginal.getId(), properties);
+				resp.sendRedirect((String) properties.get(CCConstants.CCM_PROP_IO_WWWURL));
+				// @TODO: redirect resp to the generated element/uri
+				return;
 			}
 			if(connector == null){
 				logger.error("no valid connector");
@@ -204,6 +224,81 @@ public class ConnectorServlet extends HttpServlet  {
 
 
 
+	}
+
+	private Map<String, String[]> convertParameters(HttpServletRequest req) {
+		HashMap<String, String[]> converted = new HashMap<>();
+		IteratorUtils.toList(req.getParameterNames().asIterator()).forEach(key -> converted.put(key.toString(), req.getParameterValues(key.toString())));
+		return converted;
+	}
+
+	HashMap<String, Serializable> handleSimpleConnector(Map<String, String[]> requestParameters, SimpleConnector simpleConnector, NodeRef nodeRefOriginal) throws UnsupportedEncodingException {
+		RequestBuilder builder = null;
+		String url = replaceSimpleConnectorAttributes(requestParameters, simpleConnector.getApi().getUrl(), (data) -> URLEncoder.encode(StringUtils.join(data)));
+		if(simpleConnector.getApi().getMethod().equals(SimpleConnector.SimpleConnectorApi.Method.Post)) {
+			builder = RequestBuilder.post(url);
+			if(simpleConnector.getApi().getAuthentication() != null && simpleConnector.getApi().getAuthentication().getType() != null) {
+				RequestBuilder builderAuth = null;
+				SimpleConnector.SimpleConnectorAuthentication authentication = simpleConnector.getApi().getAuthentication();
+				if (SimpleConnector.SimpleConnectorApi.Method.Post.equals(authentication.getMethod())) {
+					builderAuth = RequestBuilder.post(authentication.getUrl());
+					if (SimpleConnector.SimpleConnectorApi.BodyType.Form.equals(authentication.getBodyType())) {
+						List<? extends NameValuePair> data = authentication.getBody().entrySet().stream().map((e) -> new BasicNameValuePair(e.getKey(), replaceSimpleConnectorAttributes(requestParameters, e.getValue().toString(), StringUtils::join))).collect(Collectors.toList());
+						builderAuth.setEntity(new UrlEncodedFormEntity(data));
+						builderAuth.setHeader("Content-Type", "application/x-www-form-urlencoded");
+					}
+					// builder.setHeader()
+				}
+				String auth = new HttpQueryTool().query(builderAuth);
+				try {
+					JSONObject authJson = new JSONObject(auth);
+					builder.setHeader("Authorization", "Bearer " + authJson.get("access_token"));
+				}catch(JSONException e) {
+					throw new IllegalArgumentException("Wrong json data received: " + auth, e);
+				}
+            }
+			if(simpleConnector.getApi().getBodyType() == null) {
+
+			} else if(simpleConnector.getApi().getBodyType().equals(SimpleConnector.SimpleConnectorApi.BodyType.Form)) {
+				List<? extends NameValuePair> data = simpleConnector.getApi().getBody().entrySet().stream()
+						.map((e) -> new BasicNameValuePair(e.getKey(), replaceSimpleConnectorAttributes(requestParameters, e.getValue().toString(), StringUtils::join)))
+						.filter(f -> StringUtils.isNotBlank(f.getValue()))
+						.collect(Collectors.toList());
+				builder.setEntity(new UrlEncodedFormEntity(data));
+				builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
+			}
+		}
+		JSONObject result = new JSONObject(new HttpQueryTool().query(builder));
+		HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
+		properties.put(CCConstants.CCM_PROP_CCRESSOURCETYPE, RessourceInfoExecuter.CCM_RESSOURCETYPE_CONNECTOR);
+		properties.put(CCConstants.CCM_PROP_CCRESSOURCESUBTYPE, simpleConnector.getId());
+		if(StringUtils.isNotEmpty(simpleConnector.getApi().getPostRequestHandler())) {
+			SimpleConnector.ConnectorRequest request = new SimpleConnector.ConnectorRequest(
+					requestParameters, simpleConnector, nodeRefOriginal
+			);
+            try {
+                properties.putAll(
+					((SimpleConnector.PostRequestHandler)Class.forName(simpleConnector.getApi().getPostRequestHandler()).getDeclaredConstructor().newInstance()).handleRequest(request, result)
+				);
+            } catch (Throwable t) {
+				throw new RuntimeException("Error for postRequestHandler", t);
+			}
+        }
+		return properties;
+	}
+
+	private interface Formatter {
+		String format(String[] value);
+	}
+	private String replaceSimpleConnectorAttributes(Map<String, String[]> requestParameters, String strToReplace, Formatter format) {
+        for (Map.Entry<String, String[]> parameter: requestParameters.entrySet()) {
+			strToReplace = strToReplace.replace("{{" + parameter.getKey() + "}}", format.format(parameter.getValue()));
+        }
+		// allow global variables that are also allowed for queries
+		strToReplace = MetadataSearchHelper.replaceCommonQueryVariables(strToReplace);
+		// replace other, unkown attributes with empty value
+		strToReplace = strToReplace.replaceAll("\\{\\{.*}}", "");
+		return strToReplace;
 	}
 
 	public void pushToConnector(JSONObject jsonObject, ApplicationInfo connectorAppInfo, HttpServletResponse resp) throws Exception{

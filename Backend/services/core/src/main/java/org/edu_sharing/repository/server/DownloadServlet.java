@@ -19,10 +19,7 @@ import org.edu_sharing.metadataset.v2.tools.MetadataTemplateRenderer;
 import org.edu_sharing.repository.client.rpc.Share;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.authentication.ContextManagementFilter;
-import org.edu_sharing.repository.server.tools.ApplicationInfo;
-import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.repository.server.tools.HttpQueryTool;
-import org.edu_sharing.repository.server.tools.URLTool;
+import org.edu_sharing.repository.server.tools.*;
 import org.edu_sharing.repository.server.tracking.TrackingTool;
 import org.edu_sharing.restservices.NodeDao;
 import org.edu_sharing.restservices.RepositoryDao;
@@ -94,9 +91,9 @@ public class DownloadServlet extends HttpServlet {
 					!NodeServiceHelper.downloadAllowed(nodeId) &&
 					!(
 							ContextManagementFilter.accessTool.get() != null &&
-							ApplicationInfo.TYPE_CONNECTOR.equals(ContextManagementFilter.accessTool.get().getApplicationInfo().getType())
+									ApplicationInfo.TYPE_CONNECTOR.equals(ContextManagementFilter.accessTool.get().getApplicationInfo().getType())
 					)
-					) {
+			) {
 				logger.info("Download forbidden for node " + nodeId);
 				throw new ErrorFilter.ErrorFilterException(HttpServletResponse.SC_FORBIDDEN);
 			}
@@ -133,7 +130,7 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	private void downloadNodeInternal(String nodeId, HttpServletResponse resp, Mode mode,
-									 String originalNodeId,
+									  String originalNodeId,
 									  String version, NodeService nodeService,
 									  NodeRef nodeRef, String name) throws Throwable {
 		OutputStream bufferOut = resp.getOutputStream();
@@ -304,8 +301,8 @@ public class DownloadServlet extends HttpServlet {
 		ZipOutputStream zos = new ZipOutputStream(bufferOut);
 		zos.setMethod( ZipOutputStream.DEFLATED );
 
-        List<String> errors=new ArrayList<>();
-        List<String> filenames=new ArrayList<>();
+		List<String> errors=new ArrayList<>();
+		List<String> filenames=new ArrayList<>();
 
 
 		try{
@@ -324,27 +321,27 @@ public class DownloadServlet extends HttpServlet {
 						}
 						String finalNodeId = nodeId;
 
-                        AuthenticationUtil.RunAsWork work= () ->{
+						AuthenticationUtil.RunAsWork work= () ->{
 							addNodeToZip(resp, finalNodeId, zos, nodeService, errors, filenames);
 							return null;
 						};
-                        if(isCollectionRef)
-                            AuthenticationUtil.runAsSystem(work);
-                        else
-                            work.doWork();
+						if(isCollectionRef)
+							AuthenticationUtil.runAsSystem(work);
+						else
+							work.doWork();
 					}catch(InsufficientPermissionException e){
 						logger.debug(e);
 						String filename = nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId,CCConstants.CM_NAME);
-						errors.add(filename+": Download not allowed");
+						errors.add(filename+": " + I18nServer.getTranslationDefaultResourcebundle("downloadServlet.downloadNotAllowed"));
 					}catch(Throwable t){
-                        logger.warn(t.getMessage(),t);
-                        throw t;
+						logger.warn(t.getMessage(),t);
+						throw t;
 					}
 				}
 				if(errors.size()>0){
 					ZipEntry entry = new ZipEntry("Info.txt");
 					zos.putNextEntry(entry);
-                    zos.write(StringUtils.join(errors,"\r\n").getBytes());
+					zos.write(StringUtils.join(errors,"\r\n").getBytes());
 				}
 				zos.close();
 				return true;
@@ -376,7 +373,7 @@ public class DownloadServlet extends HttpServlet {
 		String filename = nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), finalNodeId,CCConstants.CM_NAME);
 		String wwwurl = nodeService.getProperty(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), finalNodeId,CCConstants.CCM_PROP_IO_WWWURL);
 		if(wwwurl!=null){
-			errors.add( filename+": Is a link and can not be downloaded: " + wwwurl);
+			errors.add(filename+": " + I18nServer.getTranslationDefaultResourcebundle("downloadServlet.isLink") + "(" + wwwurl + ")");
 			return;
 		}
 		InputStream reader = null;
@@ -385,11 +382,11 @@ public class DownloadServlet extends HttpServlet {
 		} catch (Throwable t) {
 		}
 		if(reader==null){
-errors.add( filename+": Has no content" );
+			errors.add(filename+": " + I18nServer.getTranslationDefaultResourcebundle("downloadServlet.noContent"));
 			return;
-}
+		}
 		if(!NodeServiceHelper.downloadAllowed(finalNodeId)){
-			errors.add(filename+": Download not allowed");
+			errors.add(filename+": " + I18nServer.getTranslationDefaultResourcebundle("downloadServlet.downloadNotAllowed"));
 			return;
 		}
 		resp.setContentType("application/zip");

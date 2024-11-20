@@ -273,6 +273,13 @@
         ></i>
       </div>
       <div class="version-actions">
+        <div
+          *ngIf="isRevoked(v)"
+          class="revoked"
+          matTooltip="{{ 'WORKSPACE.SHARE.PUBLISH.REVOKED' | translate }}"
+        >
+          <i esIcon="history" [aria]="false"></i>
+        </div>
         <button
           mat-button
           color="primary"

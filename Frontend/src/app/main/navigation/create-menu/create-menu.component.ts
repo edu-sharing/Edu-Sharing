@@ -46,7 +46,10 @@ import { NodeHelperService } from '../../../services/node-helper.service';
 import { Toast } from '../../../services/toast';
 import { UIHelper } from '../../../core-ui-module/ui-helper';
 import { AddFolderDialogResult } from '../../../features/dialogs/dialog-modules/add-folder-dialog/add-folder-dialog-data';
-import { AddWithConnectorDialogResult } from '../../../features/dialogs/dialog-modules/add-with-connector-dialog/add-with-connector-dialog-data';
+import {
+    AddWithConnectorDialogData,
+    AddWithConnectorDialogResult,
+} from '../../../features/dialogs/dialog-modules/add-with-connector-dialog/add-with-connector-dialog-data';
 import { OK } from '../../../features/dialogs/dialog-modules/generic-dialog/generic-dialog-data';
 import { DialogsService } from '../../../features/dialogs/dialogs.service';
 import { PasteService } from '../../../services/paste.service';
@@ -137,7 +140,9 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             .observeConnectorList()
             .pipe(takeUntil(this.destroyed))
             .subscribe((list) => {
-                this.connectorList = this.connectors.filterConnectors(list?.connectors);
+                this.connectorList = this.connectors
+                    .filterConnectors(list?.connectors)
+                    .concat(this.connectors.filterConnectors(list?.simpleConnectors));
                 this.updateOptions();
             });
         this.connector.isLoggedIn(false).subscribe((login) => {
@@ -255,7 +260,10 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                         const option = new OptionItem(
                             'CONNECTOR.' + connector.id + '.NAME',
                             connector.icon,
-                            () => this.showCreateConnector(connector),
+                            () =>
+                                this.showCreateConnector({
+                                    connector,
+                                }),
                         );
                         option.elementType = [ElementType.Unknown];
                         option.group = DefaultGroups.CreateConnector;
@@ -412,7 +420,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
         }
     }
 
-    async showCreateConnector(connector: Connector, name?: string) {
+    async showCreateConnector(details: AddWithConnectorDialogData) {
         const user = await this.iamService.getCurrentUserAsync();
         if (
             user.person.quota.enabled &&
@@ -424,10 +432,10 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                 buttons: OK,
             });
         } else {
-            const dialogRef = await this.dialogs.openAddWithConnectorDialog({ connector, name });
+            const dialogRef = await this.dialogs.openAddWithConnectorDialog(details);
             dialogRef.afterClosed().subscribe((result) => {
                 if (result) {
-                    void this.createConnector(connector, result);
+                    void this.createConnector(details.connector, result);
                 }
             });
         }
@@ -464,7 +472,8 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     private editConnector(
         node: Node = null,
         type: Filetype = null,
-        win: any = null,
+        win: Window = null,
+        parameters: { [key in string]: string[] } = null,
         connectorType: Connector = null,
     ) {
         UIHelper.openConnector(
@@ -476,6 +485,8 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             type,
             win,
             connectorType,
+            true,
+            parameters,
         );
     }
 
@@ -498,7 +509,13 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             .createNode((await this.getParent()).ref.id, RestConstants.CCM_TYPE_IO, [], prop, false)
             .subscribe(
                 (data: NodeWrapper) => {
-                    this.editConnector(data.node, event.type as Filetype, win, connector);
+                    this.editConnector(
+                        data.node,
+                        event.type as Filetype,
+                        win,
+                        event.data,
+                        connector,
+                    );
                     this.onCreate.emit([data.node]);
                 },
                 (error: any) => {
@@ -507,7 +524,11 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                         this.nodeHelper.handleNodeError(event.name, error) ===
                         RestConstants.DUPLICATE_NODE_RESPONSE
                     ) {
-                        void this.showCreateConnector(connector, event.name);
+                        void this.showCreateConnector({
+                            connector,
+                            name: event.name,
+                            data: event.data,
+                        });
                     }
                 },
             );

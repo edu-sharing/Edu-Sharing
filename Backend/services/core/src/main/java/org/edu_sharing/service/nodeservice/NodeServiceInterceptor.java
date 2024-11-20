@@ -27,13 +27,14 @@ import org.edu_sharing.service.stream.StreamServiceFactory;
 import org.edu_sharing.service.stream.StreamServiceHelper;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.toolpermission.ToolPermissionHelper;
-import org.edu_sharing.spring.ApplicationContextFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 public class NodeServiceInterceptor implements MethodInterceptor {
     static ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
@@ -42,6 +43,7 @@ public class NodeServiceInterceptor implements MethodInterceptor {
     static Logger logger = Logger.getLogger(NodeServiceInterceptor.class);
 
     List<NodeServiceInterceptorPermissions> customizations;
+
 
     public void init(){
         
@@ -182,30 +184,30 @@ public class NodeServiceInterceptor implements MethodInterceptor {
     }
 
     /**
-     * returns true if the current user has access on the given node via usages, collections or other indirect permissions
+     * returns list of permissions the current user has access on the given node via usages, collections or other indirect permissions
      */
-    public static boolean hasReadAccess(String nodeId) {
+    public static List<String> getIndirectPermissions(String nodeId, List<String> permissions) {
         int i = 0;
         while (nodeId!=null) {
-            if (
-                    hasPermissions(nodeId, i)
-            ) {
-                return true;
+            List<String> result = getIndirectPermissions(nodeId, permissions, i);
+            if(!result.isEmpty()) {
+                return result;
             }
+
             // only one parent at the moment
             if(i++ >= 1) {
                 break;
             }
             nodeId = fetchParentId(nodeId);
         }
-        return false;
+        return Collections.emptyList();
     }
 
     private static Object runAsSystem(String nodeId,MethodInvocation invocation) throws Throwable {
         int i = 0;
         while(nodeId!=null) {
             if (
-                    hasPermissions(nodeId, i)
+                    getIndirectPermissions(nodeId, Collections.singletonList(CCConstants.PERMISSION_READ), i).size() == 1
             ) {
                 logger.debug("Node "+nodeId+" -> will run as system");
                 return AuthenticationUtil.runAsSystem(() -> {
@@ -237,10 +239,17 @@ public class NodeServiceInterceptor implements MethodInterceptor {
         });
     }
 
-    private static boolean hasPermissions(String nodeId, int recursionDepth) {
-        return (hasSignature(nodeId) || hasUsage(nodeId)) ||
+    private static List<String> getIndirectPermissions(String nodeId, List<String> permissions, int recursionDepth) {
+        if((hasSignature(nodeId) || hasUsage(nodeId)) ||
                 // direct permissions only valid for current node, NOT for parent!
-                (accessibleViaStream(nodeId) || accessableViaCustomization(nodeId, recursionDepth) || hasCollectionPermissions(nodeId) && recursionDepth == 0);
+                (accessibleViaStream(nodeId) || accessableViaCustomization(nodeId, recursionDepth))
+        ) {
+            return permissions.stream().filter(p -> CCConstants.getUsagePermissions().contains(p)).collect(Collectors.toList());
+        }
+        if(recursionDepth == 0) {
+            return hasCollectionPermissions(nodeId, permissions);
+        }
+        return Collections.emptyList();
     }
 
     private static boolean accessableViaCustomization(String nodeId, int recursionDepth) {
@@ -277,12 +286,12 @@ public class NodeServiceInterceptor implements MethodInterceptor {
         return false;
     }
 
-    public static boolean hasCollectionPermissions(String nodeId){
+    public static List<String> hasCollectionPermissions(String nodeId, List<String> permissions){
         long test = System.currentTimeMillis();
         Provider providerByApp = ProviderHelper.getProviderByApp(ApplicationInfoList.getHomeRepository());
         if(!(providerByApp instanceof ElasticSearchProvider)){
             logger.debug("Skipping collection permission check cause no elastic provider present");
-            return false;
+            return Collections.emptyList();
         }
         if(
                 !Arrays.asList(
@@ -292,9 +301,9 @@ public class NodeServiceInterceptor implements MethodInterceptor {
                 ).contains(CallSourceHelper.getCallSource())
         ){
             logger.debug("Skipping collection permission check for call source " + CallSourceHelper.getCallSource());
-            return false;
+            return Collections.emptyList();
         }
-        boolean result = ((SearchServiceElastic)providerByApp.getSearchService()).isAllowedToRead(nodeId);
+        List<String> result = ((SearchServiceElastic)providerByApp.getSearchService()).hasPermissions(nodeId, permissions);
         logger.debug("collection permission check took:"+(System.currentTimeMillis() - test) +"ms");
         return result;
     }

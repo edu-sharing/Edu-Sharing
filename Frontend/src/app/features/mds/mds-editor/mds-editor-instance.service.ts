@@ -82,6 +82,9 @@ export interface CompletionStatusEntry {
     total: number;
     fields?: CompletionStatusField[];
 }
+export interface MdsState {
+    widgets: { [key in string]: any };
+}
 
 export type Widget = InstanceType<typeof MdsEditorInstanceService.Widget>;
 
@@ -710,6 +713,7 @@ export class MdsEditorInstanceService implements OnDestroy {
         'new' | 'initializing' | 'failed' | 'complete'
     >('new');
     suggestionsSupported: boolean;
+    private state$ = new BehaviorSubject<MdsState>({ widgets: {} });
 
     constructor(
         private mdsEditorCommonService: MdsEditorCommonService,
@@ -1985,6 +1989,32 @@ export class MdsEditorInstanceService implements OnDestroy {
             suggestionWidget.push(suggestionCopy);
         }
         console.log(this.suggestions);
+    }
+
+    /**
+     * observe the current mds state
+     * this state is supposed to be saved & restored by the widgets
+     * in case a navigation occurs
+     */
+    observeState(): BehaviorSubject<MdsState> {
+        return this.state$;
+    }
+    resetState(state: MdsState) {
+        this.state$.next(state);
+    }
+
+    observeWidgetState(widget: string): Observable<any> {
+        return this.state$.pipe(map((s) => s.widgets[widget], distinctUntilChanged()));
+    }
+
+    /**
+     * let this widget store state data that can be restored vai observeWidgetState
+     * after a navigation was done
+     * currently used for the search page
+     */
+    putWidgetState(widget: string, data: any) {
+        this.state$.value.widgets[widget] = Helper.deepCopy(data);
+        this.state$.next(this.state$.value);
     }
 }
 

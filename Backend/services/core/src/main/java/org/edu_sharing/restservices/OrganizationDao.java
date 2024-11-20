@@ -1,30 +1,23 @@
 package org.edu_sharing.restservices;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.edu_sharing.alfresco.authentication.HttpContext;
 import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
-import org.edu_sharing.restservices.organization.v1.model.GroupSignupDetails;
-import org.edu_sharing.restservices.shared.Authority;
-import org.edu_sharing.restservices.shared.GroupProfile;
-import org.edu_sharing.restservices.shared.NodeRef;
-import org.edu_sharing.restservices.shared.Organization;
+import org.edu_sharing.restservices.shared.*;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
-import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.organization.OrganizationService;
 import org.edu_sharing.service.organization.OrganizationServiceFactory;
-import org.edu_sharing.service.organization.GroupSignupMethod;
 import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.spring.ApplicationContextFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class OrganizationDao {
@@ -168,10 +161,11 @@ public class OrganizationDao {
     	data.setAuthorityType(Authority.Type.GROUP);
     	data.setGroupName(groupName);
     	data.setAdministrationAccess(hasAdministrationAccess());
-    	data.setSignupMethod(GroupDao.getSignupMethod(ref));
 
     	try {
-			data.setProfile(GroupDao.getGroup(repoDao, authorityName).asGroup().getProfile());
+			Group group = GroupDao.getGroup(repoDao, authorityName).asGroup();
+			data.setSignupMethod(group.getSignupMethod());
+			data.setProfile(group.getProfile());
 		}catch(Throwable t){
     		throw new RuntimeException("Error getting profile for organization "+authorityName,t);
 		}

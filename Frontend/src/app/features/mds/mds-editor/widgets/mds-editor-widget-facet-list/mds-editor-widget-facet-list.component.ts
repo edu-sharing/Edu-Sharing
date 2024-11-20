@@ -74,9 +74,9 @@ export class MdsEditorWidgetFacetListComponent
             .subscribe(() => {});
     }
 
-    ngOnInit(): void {
-        this.values = this.widget.getInitialValues().jointValues;
+    async ngOnInit() {
         this.registerFacetValuesSubject();
+        this.values = (await this.widget.getInitalValuesAsync())?.jointValues || [];
         this.registerFormControls();
 
         this.widget.setValueExternal.subscribe((values) => {
@@ -136,7 +136,7 @@ export class MdsEditorWidgetFacetListComponent
                         const originalData = data.values;
                         data.values = data.values.slice(0, this.MAX_FACET_INITIAL_COUNT);
                         // add previously selected facets
-                        this.values.forEach((v) => {
+                        this.values?.forEach((v) => {
                             if (
                                 !data.values.find((d) => d.value === v) &&
                                 originalData.find((d) => d.value === v)
@@ -157,28 +157,37 @@ export class MdsEditorWidgetFacetListComponent
     private registerFormControls(): void {
         // (Re-)create `formArray` on changed facet values.
         this.facetAggregationSubject.subscribe((facetValues) => {
-            // console.log(this.widget.definition.id, facetValues, this.filter.value);
-            if (facetValues) {
-                this.facetValues = facetValues.values;
-                if (this.widget.definition.allowempty === false) {
-                    this.facetValues = this.facetValues.filter((f) => !!f.value);
-                }
-                this.formArray = this.generateFormArray(facetValues.values);
-                this.updateFilteredValues();
-
-                // expand collapsed field if a value is active/selected
-                if (
-                    this.containerRef?.expandedState$.value === 'collapsed' &&
-                    this.values?.length
-                ) {
-                    this.containerRef.expandedState$.next('expanded');
-                }
+            if (!facetValues) {
+                // restore widget state
+                this.mdsEditorInstance
+                    .observeWidgetState(this.widget.definition.id)
+                    .pipe(first())
+                    .subscribe((data) => this.updateFacet(data?.facetValues));
             } else {
-                this.formArray = null;
-                this.facetValues = null;
-                this.facetValuesFiltered = null;
+                this.mdsEditorInstance.putWidgetState(this.widget.definition.id, { facetValues });
+                this.updateFacet(facetValues);
             }
         });
+    }
+
+    private updateFacet(facetValues: FacetAggregation) {
+        if (facetValues) {
+            this.facetValues = facetValues.values;
+            if (this.widget.definition.allowempty === false) {
+                this.facetValues = this.facetValues.filter((f) => !!f.value);
+            }
+            this.formArray = this.generateFormArray(facetValues.values);
+            this.updateFilteredValues();
+
+            // expand collapsed field if a value is active/selected
+            if (this.containerRef?.expandedState$.value === 'collapsed' && this.values?.length) {
+                this.containerRef.expandedState$.next('expanded');
+            }
+        } else {
+            this.formArray = null;
+            this.facetValues = null;
+            this.facetValuesFiltered = null;
+        }
     }
 
     private generateFormArray(facetValues: FacetValue[]): UntypedFormArray {

@@ -308,7 +308,8 @@
         <div class="quota">
           <mat-form-field>
             <mat-label>{{ 'USER.sizeQuota' | translate }}</mat-label>
-            <input matInput name="sizeQuota" [(ngModel)]="edit.profile.sizeQuota" required />
+            <input matInput name="sizeQuota" [(ngModel)]="edit.profile.sizeQuota" />
+            <mat-hint>{{ 'PERMISSIONS.USER_QUOTA_HINT' | translate }}</mat-hint>
           </mat-form-field>
           <es-user-quota *ngIf="editId && edit.quota.enabled" [quota]="edit.quota"></es-user-quota>
         </div>

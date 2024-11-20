@@ -1,11 +1,11 @@
 <mat-form-field>
   <mat-label>{{ 'WORKSPACE.SHARE.TIMEBASED.DATE_LABEL' | translate }}</mat-label>
   <input
+    #dateInput
     matInput
     [matDatepicker]="picker"
     [min]="toDate(from)"
     [max]="toDate(to)"
-    [value]="toDate(dateTime)"
     (dateChange)="updateDate($event)"
   />
   <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>

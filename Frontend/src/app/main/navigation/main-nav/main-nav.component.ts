@@ -229,11 +229,11 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
             this.canOpen = false;
         }
         if (queryParams.connector) {
-            this.topBar.createMenu?.showCreateConnector(
-                this.topBar.createMenu?.connectorList?.filter(
+            this.topBar.createMenu?.showCreateConnector({
+                connector: this.topBar.createMenu?.connectorList?.filter(
                     (c) => c.id === queryParams.connector,
                 )[0],
-            );
+            });
         }
         if (queryParams.nodeStore === 'true') {
             this.openNodeStore();

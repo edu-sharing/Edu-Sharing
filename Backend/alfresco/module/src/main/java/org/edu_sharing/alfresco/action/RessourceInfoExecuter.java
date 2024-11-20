@@ -60,6 +60,8 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 	public static final String CCM_PROP_IO_RESOURCESUBTYPE = "{http://www.campuscontent.de/model/1.0}ccresourcesubtype";
 	public static final String CCM_RESSOURCETYPE_MOODLE = "moodle";
 	public static final String CCM_RESSOURCETYPE_H5P = "h5p";
+	// simple connector elements
+	public static final String CCM_RESSOURCETYPE_CONNECTOR = "connector";
 	public static final String CCM_RESSOURCETYPE_GEOGEBRA = "geogebra";
 	public static final String CCM_RESSOURCETYPE_SERLO = "serlo";
 	public static final String CCM_RESSOURCETYPE_EDUHTML = "eduhtml";

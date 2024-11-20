@@ -31,7 +31,7 @@ public class SearchServiceInterceptor implements MethodInterceptor{
 				
 				if(NodeServiceInterceptor.getEduSharingScope() == null){
 					// since alfresco 7.4, ISNULL does not match when the aspect is not present at all
-					query = "(("+query+") AND ISNULL:\"ccm:eduscopename\") OR (("+query+") AND NOT ASPECT:\"ccm:eduscope\")";
+					query = "(("+query+") AND ISNULL:\"ccm:eduscopename\") OR (("+query+") AND ISUNSET:\"ccm:eduscopename\") OR (("+query+") AND NOT ASPECT:\"ccm:eduscope\")";
 					
 				}else{
 					query = "("+query+") AND @ccm\\:eduscopename:" + NodeServiceInterceptor.getEduSharingScope();

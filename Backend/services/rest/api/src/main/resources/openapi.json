@@ -1078,6 +1078,9 @@
           "id": {
             "type": "string"
           },
+          "mdsGroup": {
+            "type": "string"
+          },
           "onlyDesktop": {
             "type": "boolean"
           },
@@ -1129,6 +1132,12 @@
       "ConnectorList": {
         "properties": {
           "connectors": {
+            "items": {
+              "$ref": "#/components/schemas/Connector"
+            },
+            "type": "array"
+          },
+          "simpleConnectors": {
             "items": {
               "$ref": "#/components/schemas/Connector"
             },
@@ -1733,6 +1742,12 @@
       },
       "GroupProfile": {
         "properties": {
+          "customAttributes": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "type": "object"
+          },
           "displayName": {
             "type": "string"
           },
@@ -2705,6 +2720,9 @@
           "default": {
             "$ref": "#/components/schemas/MdsSortDefault"
           },
+          "defaultSearch": {
+            "$ref": "#/components/schemas/MdsSortDefault"
+          },
           "id": {
             "type": "string"
           }
@@ -3208,6 +3226,12 @@
             },
             "type": "array"
           },
+          "accessEffective": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "aspects": {
             "items": {
               "type": "string"
@@ -3341,6 +3365,12 @@
       "NodeCollectionProposalCount": {
         "properties": {
           "access": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "accessEffective": {
             "items": {
               "type": "string"
             },
@@ -4524,6 +4554,12 @@
       },
       "Profile": {
         "properties": {
+          "customAttributes": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "type": "object"
+          },
           "displayName": {
             "type": "string"
           },
@@ -4968,6 +5004,14 @@
         "required": [
           "results"
         ],
+        "type": "object"
+      },
+      "RevokeDetails": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "SearchParameters": {
@@ -16561,6 +16605,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "resolve the organization(s) this group is part of? disabling will slightly improve performance and should considered for bulk calls",
+            "in": "query",
+            "name": "resolveOrganizations",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -16659,6 +16711,15 @@
             "name": "parent",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "description": "returnResult, if true the created group object will be returned.",
+            "in": "query",
+            "name": "returnResult",
+            "schema": {
+              "default": true,
+              "type": "boolean"
             }
           }
         ],
@@ -27739,7 +27800,7 @@
     },
     "/node/v1/nodes/{repository}/{node}/permissions/raw": {
       "get": {
-        "description": "Get all permission of node (not grouped).",
+        "description": "Get all permission of node (not grouped, requires admin).",
         "operationId": "getRawPermission",
         "parameters": [
           {
@@ -27824,7 +27885,7 @@
             "description": "Fatal error occured."
           }
         },
-        "summary": "Get all permission of node (not grouped).",
+        "summary": "Get all permission of node (not grouped, requires admin).",
         "tags": [
           "NODE v1"
         ]
@@ -28564,6 +28625,110 @@
         ]
       }
     },
+    "/node/v1/nodes/{repository}/{node}/publish/revoke": {
+      "delete": {
+        "description": "Revoke a previously published copy. The content of this copy will be irrevocable removed, only the metadata will remain",
+        "operationId": "revokeCopy",
+        "parameters": [
+          {
+            "description": "ID of repository (or \"-home-\" for home repository)",
+            "in": "path",
+            "name": "repository",
+            "required": true,
+            "schema": {
+              "default": "-home-",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of node",
+            "in": "path",
+            "name": "node",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeDetails"
+              }
+            }
+          },
+          "description": "ID of node",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Node"
+                }
+              }
+            },
+            "description": "OK."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Preconditions are not present."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authorization failed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Session user has insufficient rights to perform this operation."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Ressources are not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occured."
+          }
+        },
+        "summary": "Revoke published copy",
+        "tags": [
+          "NODE v1"
+        ]
+      }
+    },
     "/node/v1/nodes/{repository}/{node}/report": {
       "post": {
         "description": "Report a node to notify the admin about an issue)",
@@ -28585,6 +28750,18 @@
             "name": "node",
             "required": true,
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the mode of reporting (reporting or feedback)",
+            "in": "query",
+            "name": "mode",
+            "schema": {
+              "enum": [
+                "ReportProblem",
+                "Feedback"
+              ],
               "type": "string"
             }
           },

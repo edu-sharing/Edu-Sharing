@@ -1,5 +1,5 @@
 import { trigger } from '@angular/animations';
-import { Component, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { UIAnimation } from '../util/ui-animation';
 import { UIConstants } from '../util/ui-constants';
@@ -7,7 +7,6 @@ import { OptionItem } from '../types/option-item';
 import { UIService } from '../services/ui.service';
 import { Helper } from '../util/helper';
 import { TooltipPosition } from '@angular/material/tooltip';
-import { OptionsHelperDataService } from '../services/options-helper-data.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({

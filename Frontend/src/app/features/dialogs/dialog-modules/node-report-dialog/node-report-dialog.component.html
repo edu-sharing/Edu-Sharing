@@ -1,9 +1,10 @@
 <form #formElement (ngSubmit)="report()" [formGroup]="form">
-  <h2>{{ 'NODE_REPORT.REPORT_INFO' | translate : { name: (data.node | nodeTitle) } }}</h2>
+  <h2>{{ data.mode + '.REPORT_INFO' | translate : { name: (data.node | nodeTitle) } }}</h2>
   <div class="report">
     <mat-radio-group
       formControlName="reason"
       name="reason"
+      *ngIf="data.showOptions"
       [attr.aria-label]="'NODE_REPORT.REASON' | translate"
     >
       <mat-radio-button
@@ -14,11 +15,11 @@
       >
     </mat-radio-group>
     <mat-error *ngIf="shouldShowError('reason')" id="node-report-reason-error">
-      {{ 'NODE_REPORT.REASON_REQUIRED' | translate }}
+      {{ data.mode + '.REASON_REQUIRED' | translate }}
     </mat-error>
   </div>
-  <mat-form-field floatLabel="always">
-    <mat-label>{{ 'NODE_REPORT.COMMENT' | translate }}</mat-label>
+  <mat-form-field floatLabel="always" class="comment">
+    <mat-label>{{ data.mode + '.COMMENT' | translate }}</mat-label>
     <textarea
       matInput
       cdkTextareaAutosize
@@ -26,22 +27,25 @@
       cdkAutosizeMaxRows="5"
       name="comment"
       formControlName="comment"
-      placeholder="{{ 'NODE_REPORT.COMMENT_PLACEHOLDER' | translate }}"
+      placeholder="{{ data.mode + '.COMMENT_PLACEHOLDER' | translate }}"
       autofocus
     ></textarea>
+    <mat-error *ngIf="shouldShowError('comment')" id="node-report-comment-error">
+      {{ data.mode + '.COMMENT_REQUIRED' | translate }}
+    </mat-error>
   </mat-form-field>
   <mat-form-field floatLabel="always">
-    <mat-label>{{ 'NODE_REPORT.EMAIL' | translate }}</mat-label>
+    <mat-label>{{ data.mode + '.EMAIL' | translate }}</mat-label>
     <input
       matInput
       type="email"
       name="reportMail"
       name="email"
       formControlName="email"
-      placeholder="{{ 'NODE_REPORT.EMAIL_PLACEHOLDER' | translate }}"
+      placeholder="{{ data.mode + '.EMAIL_PLACEHOLDER' | translate }}"
     />
     <mat-error>
-      {{ 'NODE_REPORT.EMAIL_REQUIRED' | translate }}
+      {{ data.mode + '.EMAIL_REQUIRED' | translate }}
     </mat-error>
   </mat-form-field>
 </form>

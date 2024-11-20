@@ -1,4 +1,4 @@
-<form>
+<form *ngIf="!connector.mdsGroup">
   <mat-form-field>
     <mat-label>{{ 'CONNECTOR.' + connector.id + '.PLACEHOLDER' | translate }}</mat-label>
     <input matInput type="text" #input [(ngModel)]="name" name="filename" autofocus />
@@ -20,6 +20,13 @@
     </mat-select>
   </mat-form-field>
 </form>
-<div class="name" *ngIf="name.trim()">
+<es-mds-editor-wrapper
+  *ngIf="connector.mdsGroup"
+  editorMode="form"
+  [groupId]="connector.mdsGroup"
+  [currentValues]="data.data || {}"
+  [embedded]="true"
+></es-mds-editor-wrapper>
+<div class="name" *ngIf="name.trim() && !connector.mdsGroup">
   {{ 'CONNECTOR.' + connector.id + '.FILENAME' | translate }}: {{ name }}.{{ getType().filetype }}
 </div>

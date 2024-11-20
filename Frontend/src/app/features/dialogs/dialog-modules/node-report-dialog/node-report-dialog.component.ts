@@ -23,11 +23,18 @@ import { Toast } from '../../../../services/toast';
 import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
-import { AuthenticationService, UserService } from 'ngx-edu-sharing-api';
+import {
+    AuthenticationService,
+    HOME_REPOSITORY,
+    NodeServiceUnwrapped,
+    UserService,
+} from 'ngx-edu-sharing-api';
 import { forkJoin } from 'rxjs';
 
 export interface NodeReportDialogData {
     node: Node;
+    mode: 'NODE_REPORT' | 'REVOKE_FEEDBACK';
+    showOptions: boolean;
 }
 
 @Component({
@@ -42,11 +49,10 @@ export interface NodeReportDialogData {
 })
 export class NodeReportDialogComponent implements OnInit {
     readonly reasons = ['UNAVAILABLE', 'INAPPROPRIATE_CONTENT', 'INVALID_METADATA', 'OTHER'];
-
     @ViewChild('formElement') formRef: ElementRef<HTMLFormElement>;
 
     readonly form = new UntypedFormGroup({
-        reason: new UntypedFormControl('', Validators.required),
+        reason: new UntypedFormControl(''),
         comment: new UntypedFormControl(''),
         email: new UntypedFormControl('', [Validators.email, Validators.required]),
     });
@@ -58,9 +64,17 @@ export class NodeReportDialogComponent implements OnInit {
         private userService: UserService,
         private translate: TranslateService,
         private toast: Toast,
-        private nodeApi: RestNodeService,
+        private nodeApi: NodeServiceUnwrapped,
         private cdr: ChangeDetectorRef,
-    ) {}
+    ) {
+        this.form.get('comment').clearValidators();
+        this.form.get('reason').clearValidators();
+        if (!data.showOptions) {
+            this.form.get('comment').addValidators(Validators.required);
+        } else {
+            this.form.get('reason').addValidators(Validators.required);
+        }
+    }
 
     ngOnInit(): void {
         this.dialogRef.patchConfig({
@@ -103,16 +117,17 @@ export class NodeReportDialogComponent implements OnInit {
             const value = this.form.getRawValue();
             this.setLoading(true);
             this.nodeApi
-                .reportNode(
-                    this.data.node.ref.id,
-                    this.getReasonAsString(value.reason),
-                    value.email,
-                    value.comment,
-                    this.data.node.ref.repo,
-                )
+                .reportNode({
+                    repository: HOME_REPOSITORY,
+                    node: this.data.node.ref.id,
+                    mode: this.data.mode === 'REVOKE_FEEDBACK' ? 'Feedback' : 'ReportProblem',
+                    reason: this.getReasonAsString(value.reason),
+                    userEmail: value.email,
+                    userComment: value.comment,
+                })
                 .subscribe(
                     () => {
-                        this.toast.toast('NODE_REPORT.DONE');
+                        this.toast.toast(this.data.mode + '.DONE');
                         this.dialogRef.close();
                     },
                     (error: any) => {

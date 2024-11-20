@@ -8,6 +8,8 @@ import org.passay.*;
 import org.passay.PasswordValidator;
 import org.passay.dictionary.ArrayWordList;
 import org.passay.dictionary.WordListDictionary;
+import org.passay.dictionary.sort.QuickSort;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -17,15 +19,12 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
 
     public static final String PASSWORD_POLICY_VIOLATION = "PasswordPolicyViolation";
 
-    //    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    private final PasswordPolicySettings settings;
+    private final BeanFactory beanFactory;
 
     @Autowired
-    public PasswordConstraintValidator(PasswordPolicySettings settings) {
-        this.settings = settings;
+    public PasswordConstraintValidator(BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
-
-
 
     @Override
     public void initialize(ValidPassword constraintAnnotation) {
@@ -34,18 +33,26 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext constraintValidatorContext) {
+        if(StringUtils.isBlank(password)) {
+            return true;
+        }
+
+        PasswordPolicySettings settings = beanFactory.getBean(PasswordPolicySettings.class);
         List<Rule> rules = new ArrayList<>(List.of(
                 new LengthRule(settings.getMinLength(), settings.getMaxLength()),
                 new CharacterRule(EnglishCharacterData.UpperCase, settings.getNumberOfLowerCaseCharacters()),
                 new CharacterRule(EnglishCharacterData.LowerCase, settings.getNumberOfUpperCaseCharacters()),
 //                new CharacterRule(GermanCharacterData.UpperCase, 1), // has lib internal issues
 //                new CharacterRule(GermanCharacterData.LowerCase, 1), // has lib  internal issues
-                new CharacterRule(EnglishCharacterData.Digit, settings.getNumberOfDigitCharacters()),
-                new CharacterRule(EnglishCharacterData.Special, settings.getNumberOfSpecialCharacters()),
-                new DictionarySubstringRule(new WordListDictionary(new ArrayWordList(settings.getIllegalSubstrings().toArray(new String[0])))),
-                new DictionaryRule(new WordListDictionary(new ArrayWordList(settings.getIllegalPasswords().toArray(new String[0])))),
+                new DictionarySubstringRule(new WordListDictionary(new ArrayWordList(settings.getIllegalSubstrings().toArray(new String[0]), true, new QuickSort()))),
+                new DictionaryRule(new WordListDictionary(new ArrayWordList(settings.getIllegalPasswords().toArray(new String[0]), true,new QuickSort()))),
                 new WhitespaceRule()));
-
+        if(settings.getNumberOfDigitCharacters() > 0) {
+            rules.add(new CharacterRule(EnglishCharacterData.Digit, settings.getNumberOfDigitCharacters()));
+        }
+        if(settings.getNumberOfSpecialCharacters() > 0) {
+            rules.add(new CharacterRule(EnglishCharacterData.Special, settings.getNumberOfSpecialCharacters()));
+        }
         if(settings.getMaxLengthOfAlphabeticSequence() >= 0) {
             rules.add(new IllegalSequenceRule(EnglishSequenceData.Alphabetical, settings.getMaxLengthOfAlphabeticSequence(), false));
 //            rules.add(new IllegalSequenceRule(GermanSequenceData.Alphabetical, 5, false)); // has lib internal issues

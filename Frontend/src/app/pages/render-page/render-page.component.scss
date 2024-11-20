@@ -92,6 +92,10 @@ a:active {
     .edusharing_rendering_metadata_body .mds_license a:focus {
         @include setGlobalKeyboardFocus();
     }
+    es-mds-widget {
+        display: flex;
+        margin-bottom: -30px;
+    }
 }
 .topBar {
     background: #383838;
@@ -307,6 +311,48 @@ es-imprint-privacy {
     width: 100%;
     // leave space for scroll to top
     padding: 10px 0 45px 0;
+}
+:host ::ng-deep {
+    .revoked es-info-message {
+        .message-container {
+            white-space: pre-line;
+        }
+    }
+}
+.revoked {
+    max-width: 700px;
+    margin: auto;
+    padding: 30px 20px;
+    > * {
+        text-align: center;
+        justify-content: center;
+        color: $textMain;
+    }
+    .details-message {
+        display: flex;
+        margin-bottom: 30px;
+    }
+    .details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        label {
+            font-size: $fontSizeSmall;
+            color: $textLight;
+        }
+        .reason {
+            > span {
+                white-space: pre-line;
+            }
+        }
+        > div {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+    .actions {
+        padding-top: 30px;
+    }
 }
 
 @media (pointer: coarse) {

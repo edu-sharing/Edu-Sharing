@@ -473,13 +473,7 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 		username = properties.getProperty(KEY_USERNAME);
 		
 		password = properties.getProperty(KEY_PASSWORD);
-		
-		
-		
-		guest_username = properties.getProperty("guest_username");
-		
-		guest_password = properties.getProperty("guest_password");
-		
+
 		logo = properties.getProperty(KEY_LOGO);
 		
 		icon = properties.getProperty(KEY_ICON);

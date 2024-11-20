@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     Component,
     EventEmitter,
     Input,
@@ -6,10 +7,13 @@ import {
     OnInit,
     Output,
     SimpleChanges,
+    ViewChild,
 } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatInput } from '@angular/material/input';
+import { Toast } from 'ngx-edu-sharing-ui';
 
 @Component({
     selector: 'es-share-dialog-choose-date',
@@ -17,12 +21,15 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
     styleUrls: ['choose-date.component.scss'],
 })
 export class ShareDialogChooseDateComponent implements OnInit, OnChanges {
+    @ViewChild(MatDatepicker) matDatepicker: MatDatepicker<any>;
+    @ViewChild(MatInput) matInput: MatInput;
     @Input() dateTime: number;
     @Input() from?: number;
     @Input() to?: number;
     @Output() dateTimeChange = new EventEmitter<number>();
 
     timeControl = new FormControl('', [Validators.pattern(/\d\d:\d\d/)]);
+    constructor(private toast: Toast) {}
     toDate(value: number) {
         return value ? new Date(value) : null;
     }
@@ -38,13 +45,31 @@ export class ShareDialogChooseDateComponent implements OnInit, OnChanges {
         });
     }
     ngOnChanges(changes: SimpleChanges): void {
+        if (this.from) {
+            const date = new Date(this.from);
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            this.from = date.getTime();
+        }
         this.timeControl.setValue(
             new DatePipe('en').transform(this.toDate(this.dateTime), 'HH:mm'),
         );
+        setTimeout(() => (this.matInput.value = this.toDate(this.dateTime)));
     }
 
     updateDate(event: MatDatepickerInputEvent<Date, any>) {
         const currentDate = new Date(this.dateTime);
+        if (
+            !event.value ||
+            (this.from && event.value?.getTime() < this.from) ||
+            (this.to && event.value?.getTime() > this.to)
+        ) {
+            this.toast.error(null, 'WORKSPACE.SHARE.TIMEBASED.INVALID_DATE');
+            this.matInput.value = this.toDate(this.dateTime);
+            return;
+        }
         // keep the hour + minutes so only update the yy-mm-dd
         currentDate.setFullYear(event.value.getFullYear());
         currentDate.setMonth(event.value.getMonth());

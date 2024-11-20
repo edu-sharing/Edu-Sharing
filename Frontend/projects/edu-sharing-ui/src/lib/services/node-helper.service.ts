@@ -264,4 +264,19 @@ export class NodeHelperService {
         data.queryParams.redirectFromSSO = null;
         return data.queryParams;
     }
+
+    /**
+     * Returns true if this node is a copy of another node, just used as a publish target.
+     */
+    isNodePublishedCopy(o: Node): boolean {
+        return !!o.properties?.[RestConstants.CCM_PROP_PUBLISHED_ORIGINAL]?.[0];
+    }
+
+    /**
+     * returns true if this is a revoked node
+     * (published copy that has been revoked)
+     */
+    isNodeRevoked(node: Node) {
+        return node?.aspects?.includes(RestConstants.CCM_ASPECT_REVOKED);
+    }
 }

@@ -13,12 +13,12 @@
 		<helpMenuOptions>
 			<key>ONLINE_HELP</key>
 			<icon>help_outline</icon>
-			<url>https://edu-sharing-documentation.scrollhelp.site/de/edu-sharing-documentation/:version/?l=de</url>
+			<url>https://docs.edu-sharing.com/de/edu-sharing-documentation/:version/?l=de</url>
 		</helpMenuOptions>
 		<helpMenuOptions>
 			<key>WHATS_NEW</key>
 			<icon>lightbulb_outline</icon>
-			<url>https://edu-sharing-documentation.scrollhelp.site/de/edu-sharing-documentation/:version/was-ist-neu-in-edu-sharing</url>
+			<url>https://docs.edu-sharing.com/de/edu-sharing-documentation/:version/was-ist-neu-in-edu-sharing</url>
 		</helpMenuOptions>
 	</values>
 	<contexts>

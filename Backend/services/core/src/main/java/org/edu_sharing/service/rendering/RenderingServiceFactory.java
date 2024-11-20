@@ -12,7 +12,6 @@ public class RenderingServiceFactory {
 		ApplicationInfo appInfo = (appId == null) ? ApplicationInfoList.getHomeRepository() : ApplicationInfoList.getRepositoryInfoById(appId);
 		if(!ProviderHelper.hasProvider(appInfo)) {
 			RenderingService service = (RenderingService) ApplicationContextFactory.getApplicationContext().getBean("renderingService");
-			service.setAppId(appId);
 			return service;
 		} else {
 			return ProviderHelper.getProviderByApp(appInfo).getRenderingService();
@@ -20,7 +19,6 @@ public class RenderingServiceFactory {
 	}
 	public static RenderingService getLocalService(){
 		RenderingService service = (RenderingService) ApplicationContextFactory.getApplicationContext().getBean("renderingService");
-		service.setAppId(ApplicationInfoList.getHomeRepository().getAppId());
 		return service;
 	}
 }

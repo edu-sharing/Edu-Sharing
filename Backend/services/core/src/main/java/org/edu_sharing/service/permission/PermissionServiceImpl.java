@@ -9,6 +9,7 @@ import org.alfresco.repo.search.impl.solr.SolrJSONResultSet;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.impl.acegi.FilteringResultSet;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -33,7 +34,6 @@ import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.rpc.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
@@ -56,8 +56,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.*;
 import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -86,8 +86,9 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
     AuthorityService authorityService = serviceRegistry.getAuthorityService();
     BehaviourFilter policyBehaviourFilter = (BehaviourFilter) applicationContext.getBean("policyBehaviourFilter");
     MCAlfrescoAPIClient repoClient = new MCAlfrescoAPIClient();
-	private GuestService guestService = applicationContext.getBean(GuestService.class);
+    private GuestService guestService = applicationContext.getBean(GuestService.class);
     private PermissionService permissionService;
+    private final RetryingTransactionHelper retryingTransactionHelper = serviceRegistry.getRetryingTransactionHelper();
 
     public PermissionServiceImpl(
             ToolPermissionService toolPermissionService,
@@ -167,7 +168,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             }
 
             // flag to remove expired aces from acesNew
-            if(ace.getTo() != null && ace.getTo() <= now){
+            if (ace.getTo() != null && ace.getTo() <= now) {
                 remove = true;
             }
 
@@ -195,7 +196,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         }
 
         for (ACE aceOld : acesOld) {
-            if(!aceOld.isInherited() && activeTimedAces.stream().anyMatch(x-> Objects.equals(x.getPermission(), aceOld.getPermission()) && Objects.equals(x.getAuthority(), aceOld.getAuthority()))){
+            if (!aceOld.isInherited() && activeTimedAces.stream().anyMatch(x -> Objects.equals(x.getPermission(), aceOld.getPermission()) && Objects.equals(x.getAuthority(), aceOld.getAuthority()))) {
                 continue;
             }
 
@@ -252,7 +253,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         }
 
         if (createNotify) {
-            createNotifyObject(nodeId, new AuthenticationToolAPI().getCurrentUser(),
+            createNotifyObject(nodeId, AuthenticationUtil.getFullyAuthenticatedUser(),
                     CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_CHANGE);
         }
 
@@ -299,10 +300,65 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
     }
 
     @Override
+    public void updateTimedPermissions() {
+        List<TimedPermission> permissionsToAdd = timedPermissionMapper.findAllByFromAfterAndNotActivated(new Date());
+        List<TimedPermission> permissionsToRemove = timedPermissionMapper.findAllByToBefore(new Date());
+
+        for (TimedPermission timedPermission : permissionsToAdd) {
+            retryingTransactionHelper.doInTransaction(() ->
+                    AuthenticationUtil.runAs(() -> {
+                        NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, timedPermission.getNode_id());
+
+                        try {
+                            if (!nodeService.exists(nodeRef)) {
+                                timedPermissionMapper.delete(timedPermission);
+                                return null;
+                            }
+                            addPermissions(timedPermission.getNode_id(),
+                                    Map.of(timedPermission.getAuthority(), new String[]{timedPermission.getPermission()}), false, null, false, timedPermission.getUser());
+                            if (timedPermission.getTo() == null) {
+                                timedPermissionMapper.delete(timedPermission);
+                            } else {
+                                timedPermission.setActivated(true);
+                                timedPermissionMapper.save(timedPermission);
+                            }
+                        } catch (Throwable e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        return null;
+                    }, timedPermission.getUser()));
+        }
+
+        for (TimedPermission timedPermission : permissionsToRemove) {
+            retryingTransactionHelper.doInTransaction(() ->
+                    AuthenticationUtil.runAs(() -> {
+                        try {
+                            NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, timedPermission.getNode_id());
+                            if (nodeService.exists(nodeRef)) {
+                                permissionService.deletePermission(
+                                        nodeRef,
+                                        timedPermission.getAuthority(),
+                                        timedPermission.getPermission());
+                                createNotifyObject(timedPermission.getNode_id(), timedPermission.getUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_CHANGE);
+                            }
+                            timedPermissionMapper.delete(timedPermission);
+                        } catch (Throwable e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        return null;
+                    }, timedPermission.getUser()));
+        }
+    }
+
+    @Override
     public void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions,
                                String _mailText, Boolean _sendMail, Boolean _sendCopy) throws Throwable {
+        String user = AuthenticationUtil.getFullyAuthenticatedUser();
+        addPermissions(_nodeId, _authPerm, _inheritPermissions, _mailText, _sendMail, user);
+    }
 
-        String user = new AuthenticationToolAPI().getCurrentUser();
+    private void addPermissions(String _nodeId, Map<String, String[]> _authPerm, Boolean _inheritPermissions, String _mailText, Boolean _sendMail, String user) throws Throwable {
+
         for (String authority : _authPerm.keySet()) {
             String[] permissions = _authPerm.get(authority);
             setPermissions(_nodeId, authority, permissions, _inheritPermissions);
@@ -317,7 +373,12 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             if (AuthorityType.GROUP.equals(authorityType)) {
                 addToRecent(authorityService.getAuthorityNodeRef(authority));
             }
+        }
 
+        createNotifyObject(_nodeId, user, CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+
+        for (String authority : _authPerm.keySet()) {
+            String[] permissions = _authPerm.get(authority);
             if (_sendMail) {
                 String nodeType = eduNodeService.getType(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
                 Map<String, Object> props = eduNodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), _nodeId);
@@ -326,11 +387,6 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
                         .notifyPermissionChanged(user, authority, _nodeId, nodeType, aspects, props, permissions, _mailText);
             }
         }
-
-        org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory
-                .getPermissionService(ApplicationInfoList.getHomeRepository().getAppId());
-
-        permissionService.createNotifyObject(_nodeId, user, CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
     }
 
 
@@ -531,23 +587,25 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
      * @return
      */
     String getAdminAuthority(NodeRef nodeRef) {
-        String authorityAdministrator = null;
-        if (isSharedNode(nodeRef.getId())) {
-            Set<AccessPermission> allSetPermissions = serviceRegistry.getPermissionService()
-                    .getAllSetPermissions(nodeRef);
-            for (AccessPermission ap : allSetPermissions) {
-                NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(ap.getAuthority());
-                if (authorityNodeRef != null) {
-                    String groupType = (String) nodeService.getProperty(authorityNodeRef,
-                            QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
-                    if (CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
-                            && ap.getPermission().equals(PermissionService.COORDINATOR)) {
-                        authorityAdministrator = ap.getAuthority();
+        return AuthenticationUtil.runAsSystem(() -> {
+            String authorityAdministrator = null;
+            if (isSharedNode(nodeRef.getId())) {
+                Set<AccessPermission> allSetPermissions = serviceRegistry.getPermissionService()
+                        .getAllSetPermissions(nodeRef);
+                for (AccessPermission ap : allSetPermissions) {
+                    NodeRef authorityNodeRef = authorityService.getAuthorityNodeRef(ap.getAuthority());
+                    if (authorityNodeRef != null) {
+                        String groupType = (String) nodeService.getProperty(authorityNodeRef,
+                                QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
+                        if (CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(groupType)
+                                && ap.getPermission().equals(PermissionService.COORDINATOR)) {
+                            authorityAdministrator = ap.getAuthority();
+                        }
                     }
                 }
             }
-        }
-        return authorityAdministrator;
+            return authorityAdministrator;
+        });
     }
 
     private boolean containslocalPerm(List<ACE> aces, String eduAuthority, String eduPermission) {
@@ -672,7 +730,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             }
 
             // flag to remove expired aces from acesNew
-            if(ace.getTo() != null && ace.getTo() <= now){
+            if (ace.getTo() != null && ace.getTo() <= now) {
                 remove = true;
             }
 
@@ -771,7 +829,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
                         if (!isGlobalAdmin && ace.getAuthority().equals(fullyAuthenticatedUser)) {
                             String owner = ownableService.getOwner(nodeRef);
-                            if (!fullyAuthenticatedUser.equals(owner)){
+                            if (!fullyAuthenticatedUser.equals(owner)) {
                                 log.warn("user should not uninvite himself");
                                 continue;
                             }
@@ -803,6 +861,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         permission.setAuthority(ace.getAuthority());
         permission.setPermission(ace.getPermission());
         permission.setActivated(activated);
+        permission.setUser(AuthenticationUtil.getFullyAuthenticatedUser());
         return permission;
     }
 
@@ -820,6 +879,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             log.info("setInheritParentPermissions " + inheritPermission);
             permissionsService.setInheritParentPermissions(nodeRef, inheritPermission);
         }
+
 
         String adminAuthority = getAdminAuthority(nodeRef);
 
@@ -910,7 +970,11 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
                         if (fieldQuery.length() > 0) {
                             fieldQuery.append(" OR ");
                         }
-                        fieldQuery.append("@cm\\:").append(field.getKey()).append(":").append("\"").append(token).append("\"^").append(field.getValue());
+                        fieldQuery.append("@cm\\:").append(field.getKey()).append(":").append("\"").append(token).append("\"");
+                        if (field.getValue() > 1) {
+                            fieldQuery.append(" OR ");
+                            fieldQuery.append("@cm\\:").append(field.getKey()).append(":").append("\"").append(StringUtils.strip(token, "*")).append("\"^").append(field.getValue());
+                        }
                     }
                     subQuery.append(subQuery.length() > 0 ? " AND " : "").append("(").append(fieldQuery).append(")");
                 }
@@ -1029,8 +1093,8 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
     }
 
     private void filterGuestAuthority(StringBuffer searchQuery) {
-		for(String guest : guestService.getAllGuestAuthorities()){
-			searchQuery.append(" AND NOT @cm\\:userName:\""+ QueryParser.escape(guest)+"\"");
+        for (String guest : guestService.getAllGuestAuthorities()) {
+            searchQuery.append(" AND NOT @cm\\:userName:\"" + QueryParser.escape(guest) + "\"");
         }
     }
 
@@ -1079,9 +1143,13 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
                         subQuery.append((furtherToken ? " AND( " : "("))
                                 .append("@cm\\:authorityDisplayName:")
-                                .append("\"").append(QueryParser.escape(token)).append("\"").
+                                .append("\"").append(QueryParser.escape(StringUtils.strip(token, "*"))).append("\"").
                                 // boost groups so that they'll appear before users
                                         append("^10 OR ")
+                                .append("@cm\\:authorityDisplayName:")
+                                .append("\"").append(QueryParser.escape(token)).append("\"").
+                                // boost groups so that they'll appear before users
+                                        append(" OR ")
                                 .append("@ccm\\:groupEmail:")
                                 .append("\"").append(QueryParser.escape(token)).append("\"");
                         // allow global admins to find groups based on authority name (e.g. default system groups)
@@ -1108,7 +1176,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
             }
 
             if (!token.isEmpty()) {
-                subQuery.append("=@cm:authorityDisplayName:").append("\"").append(token).append("\"");
+                subQuery.append(LightbendConfigLoader.get().getString("repository.search.groups.nonFuzzyField")).append(":\"").append(token).append("\"");
             }
 
             // if not fuzzy and no value for email return empty result
@@ -1571,7 +1639,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
     @Override
     public Map<String, Boolean> hasAllPermissions(String storeProtocol, String storeId, String nodeId,
                                                   String[] permissions) {
-		boolean guest = guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser());
+        boolean guest = guestService.isGuestUser(AuthenticationUtil.getFullyAuthenticatedUser());
         PermissionService permissionService = serviceRegistry.getPermissionService();
         Map<String, Boolean> result = new HashMap<>();
         NodeRef nodeRef = new NodeRef(new StoreRef(storeProtocol, storeId), nodeId);
@@ -1714,7 +1782,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
 
     private boolean isAdminOrSystem() {
-        return Arrays.asList(AuthenticationUtil.SYSTEM_USER_NAME, ApplicationInfoList.getHomeRepository().getUsername()).contains(AuthenticationUtil.getFullyAuthenticatedUser()) || AuthenticationUtil.isRunAsUserTheSystemUser();
+        return Arrays.asList(AuthenticationUtil.SYSTEM_USER_NAME, ApplicationInfoList.getHomeRepository().getUsername()).contains(AuthenticationUtil.getFullyAuthenticatedUser()) || AuthenticationUtil.isRunAsUserTheSystemUser() || AuthorityServiceHelper.isAdmin();
     }
 
     @Override

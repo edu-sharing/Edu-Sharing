@@ -7,10 +7,7 @@ import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.tools.URLHelper;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MimeTypesV2 {
 
@@ -45,14 +42,14 @@ public class MimeTypesV2 {
 		return preferredFormat;
 	}
 
-	public static List<String> WORD=Arrays.asList(new String[]{	
+	public static List<String> WORD=Arrays.asList(new String[]{
 			"application/msword",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.template",
 			"application/vnd.ms-word.document.macroEnabled.12",
 			"application/vnd.ms-word.template.macroEnabled.12"
-			});
-	public static List<String> EXCEL=Arrays.asList(new String[]{	
+	});
+	public static List<String> EXCEL=Arrays.asList(new String[]{
 			"application/msexcel",
 			"application/vnd.ms-excel",
 			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -60,8 +57,8 @@ public class MimeTypesV2 {
 			"application/vnd.ms-excel.sheet.macroEnabled.12",
 			"application/vnd.ms-excel.addin.macroEnabled.12",
 			"application/vnd.ms-excel.sheet.binary.macroEnabled.12"
-			});
-	public static List<String> POWERPOINT=Arrays.asList(new String[]{	
+	});
+	public static List<String> POWERPOINT=Arrays.asList(new String[]{
 			"application/mspowerpoint",
 			"application/vnd.ms-powerpoint",
 			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -71,21 +68,21 @@ public class MimeTypesV2 {
 			"application/vnd.ms-powerpoint.presentation.macroEnabled.12",
 			"application/vnd.ms-powerpoint.template.macroEnabled.12",
 			"application/vnd.ms-powerpoint.slideshow.macroEnabled.12"
-			});
-	public static List<String> COMPRESSED=Arrays.asList(new String[]{	
+	});
+	public static List<String> COMPRESSED=Arrays.asList(new String[]{
 			"application/zip",
 			"application/x-zip-compressed",
 			"application/x-tar",
 			"application/x-ustar",
 			"application/x-rar-compressed",
 			"application/java-archive"
-			});
-	public static List<String> SCRIPT=Arrays.asList(new String[]{	
+	});
+	public static List<String> SCRIPT=Arrays.asList(new String[]{
 			"application/x-c",
 			"text/css",
 			"text/html",
 			"text/x-java-source"
-			});
+	});
 	public MimeTypesV2() {
 		this(ApplicationInfoList.getHomeRepository());
 	}
@@ -99,7 +96,7 @@ public class MimeTypesV2 {
 		if(theme == null){
 			theme = CCConstants.THEME_DEFAULT_ID;
 		}
-		
+
 	}
 	public static boolean isDirectory(Map<String,Object> properties, String nodeType){
 		if(Arrays.asList(CCConstants.CCM_TYPE_MAP, CCConstants.CM_TYPE_FOLDER, CCConstants.SYS_STORE_ROOT).contains(CCConstants.getValidGlobalName(nodeType))) {
@@ -110,9 +107,9 @@ public class MimeTypesV2 {
 		// old behaviour for McAlfrescoApiClient
 		String type=(String) properties.get(CCConstants.NODETYPE);
 		if(type == null) return false;
-		return type.equals(CCConstants.CCM_TYPE_MAP) 
-			|| type.equals(CCConstants.CM_TYPE_FOLDER)
-			|| type.equals(CCConstants.SYS_STORE_ROOT);
+		return type.equals(CCConstants.CCM_TYPE_MAP)
+				|| type.equals(CCConstants.CM_TYPE_FOLDER)
+				|| type.equals(CCConstants.SYS_STORE_ROOT);
 	}
 	public static boolean isCollection(List<String> aspects, Map<String, Object> properties){
 		if(aspects!=null && aspects.contains(CCConstants.CCM_ASPECT_COLLECTION)){
@@ -209,11 +206,13 @@ public class MimeTypesV2 {
 			return "folder";
 		}
 		if(properties != null) {
-			if(RessourceInfoExecuter.CCM_RESSOURCETYPE_GEOGEBRA.equals(properties.get(RessourceInfoExecuter.CCM_PROP_IO_RESSOURCETYPE))) {
+			String ccressourcetype = (String) properties.get(CCConstants.CCM_PROP_CCRESSOURCETYPE);
+			if(RessourceInfoExecuter.CCM_RESSOURCETYPE_GEOGEBRA.equals(ccressourcetype)) {
 				return "file-geogebra";
-			}
-			if(RessourceInfoExecuter.CCM_RESSOURCETYPE_SERLO.equals(properties.get(RessourceInfoExecuter.CCM_PROP_IO_RESSOURCETYPE))) {
+			} else if(RessourceInfoExecuter.CCM_RESSOURCETYPE_SERLO.equals(ccressourcetype)) {
 				return "file-serlo";
+			} else if(RessourceInfoExecuter.CCM_RESSOURCETYPE_CONNECTOR.equals(ccressourcetype) && properties.get(CCConstants.CCM_PROP_CCRESSOURCESUBTYPE) != null) {
+				return "file-" + properties.get(CCConstants.CCM_PROP_CCRESSOURCESUBTYPE).toString().trim().toLowerCase();
 			}
 		}
 		if(isLtiDefinition(aspects))
@@ -238,86 +237,86 @@ public class MimeTypesV2 {
 		return getTypeFromMimetype(mimetype,null,"file");
 	}
 	private static String getTypeFromMimetype(String mimetype,Map<String,Object> properties,String fallback) {
-	if(mimetype==null)
-		return fallback;
+		if(mimetype==null)
+			return fallback;
 
-	if(WORD.contains(mimetype))
-		return "file-word";
-	if(EXCEL.contains(mimetype))
-		return "file-excel";
-	if(POWERPOINT.contains(mimetype))
-		return "file-powerpoint";
-	if(COMPRESSED.contains(mimetype)){
-		if(properties!=null) {
-		String ccressourcetype=(String) properties.get(CCConstants.CCM_PROP_CCRESSOURCETYPE);
-		String ccressourcesubtype=(String) properties.get(CCConstants.CCM_PROP_CCRESSOURCESUBTYPE);
-			if("imsqti".equals(ccressourcetype))
-				return "file-qti";
-			if(RessourceInfoExecuter.CCM_RESSOURCETYPE_H5P.equals(ccressourcetype))
-				return "file-h5p";
-			if(RessourceInfoExecuter.CCM_RESSOURCETYPE_EDUHTML.equals(ccressourcetype)){
-				if("webgl".equals(ccressourcesubtype)) {
-					return "file-webgl";
+		if(WORD.contains(mimetype))
+			return "file-word";
+		if(EXCEL.contains(mimetype))
+			return "file-excel";
+		if(POWERPOINT.contains(mimetype))
+			return "file-powerpoint";
+		if(COMPRESSED.contains(mimetype)){
+			if(properties!=null) {
+				String ccressourcetype=(String) properties.get(CCConstants.CCM_PROP_CCRESSOURCETYPE);
+				String ccressourcesubtype=(String) properties.get(CCConstants.CCM_PROP_CCRESSOURCESUBTYPE);
+				if("imsqti".equals(ccressourcetype))
+					return "file-qti";
+				if(RessourceInfoExecuter.CCM_RESSOURCETYPE_H5P.equals(ccressourcetype))
+					return "file-h5p";
+				if(RessourceInfoExecuter.CCM_RESSOURCETYPE_EDUHTML.equals(ccressourcetype)){
+					if("webgl".equals(ccressourcesubtype)) {
+						return "file-webgl";
+					}
 				}
 			}
+			return "file-zip";
 		}
-		return "file-zip";
-	}
-	if(SCRIPT.contains(mimetype))
-		return "file-script";
+		if(SCRIPT.contains(mimetype))
+			return "file-script";
 
-	if(mimetype.equals("application/vnd.oasis.opendocument.text"))
-		return "file-odt";
-	if(mimetype.equals("application/vnd.oasis.opendocument.spreadsheet"))
-		return "file-ods";
-	if(mimetype.equals("application/vnd.oasis.opendocument.presentation"))
-		return "file-odp";
-	if(mimetype.equals("text/xml"))
-		return "file-xml";
-	if(mimetype.equals("application/pdf"))
-		return "file-pdf";
-	if(mimetype.equals("imsqti"))
-		return "file-qti";
-	if(mimetype.equals("moodle") || mimetype.equals("application/vnd.moodle.backup"))
-		return "file-moodle";
-	if(mimetype.equals("scorm") || mimetype.equals("ADL SCORM"))
-		return "file-scorm";
-	
-	if(mimetype.startsWith("image"))
-		return "file-image";
-	if(mimetype.startsWith("audio"))
-		return "file-audio";
-	if(mimetype.startsWith("video"))
-		return "file-video";
-	if(mimetype.equals("text/csv"))
+		if(mimetype.equals("application/vnd.oasis.opendocument.text"))
+			return "file-odt";
+		if(mimetype.equals("application/vnd.oasis.opendocument.spreadsheet"))
+			return "file-ods";
+		if(mimetype.equals("application/vnd.oasis.opendocument.presentation"))
+			return "file-odp";
+		if(mimetype.equals("text/xml"))
+			return "file-xml";
+		if(mimetype.equals("application/pdf"))
+			return "file-pdf";
+		if(mimetype.equals("imsqti"))
+			return "file-qti";
+		if(mimetype.equals("moodle") || mimetype.equals("application/vnd.moodle.backup"))
+			return "file-moodle";
+		if(mimetype.equals("scorm") || mimetype.equals("ADL SCORM"))
+			return "file-scorm";
+
+		if(mimetype.startsWith("image"))
+			return "file-image";
+		if(mimetype.startsWith("audio"))
+			return "file-audio";
+		if(mimetype.startsWith("video"))
+			return "file-video";
+		if(mimetype.equals("text/csv"))
 			return "file-csv";
-	if(mimetype.startsWith("text"))
-		return "file-txt";
-	
-	return fallback;
+		if(mimetype.startsWith("text"))
+			return "file-txt";
+
+		return fallback;
 	}
-private static boolean isLtiDefinition(List<String> aspects) {
+	private static boolean isLtiDefinition(List<String> aspects) {
 		if(aspects==null)
 			return false;
 		return aspects.contains(CCConstants.CCM_ASPECT_TOOL_DEFINITION);
 	}
-private static boolean isSavedSearch(String type) {
-	return CCConstants.CCM_TYPE_SAVED_SEARCH.equals(type);
-}
-private static boolean isLtiInstance(String nodeType) {
-	return CCConstants.CCM_TYPE_TOOL_INSTANCE.equals(nodeType);
-}
+	private static boolean isSavedSearch(String type) {
+		return CCConstants.CCM_TYPE_SAVED_SEARCH.equals(type);
+	}
+	private static boolean isLtiInstance(String nodeType) {
+		return CCConstants.CCM_TYPE_TOOL_INSTANCE.equals(nodeType);
+	}
 
-private static boolean isLTI13ToolObject(List<String> aspects){
-	if(aspects==null)
-		return false;
-	return aspects.contains(CCConstants.CCM_ASPECT_LTITOOL_NODE);
-}
-private static boolean isLtiObject(List<String> aspects) {
-	if(aspects==null)
-		return false;
-	return aspects.contains(CCConstants.CCM_ASPECT_TOOL_OBJECT);
-}
+	private static boolean isLTI13ToolObject(List<String> aspects){
+		if(aspects==null)
+			return false;
+		return aspects.contains(CCConstants.CCM_ASPECT_LTITOOL_NODE);
+	}
+	private static boolean isLtiObject(List<String> aspects) {
+		if(aspects==null)
+			return false;
+		return aspects.contains(CCConstants.CCM_ASPECT_TOOL_OBJECT);
+	}
 	public static Map<String, String> getLrtMimeMap() {
 
 		if (lrtMimeMap == null) {
@@ -336,8 +335,8 @@ private static boolean isLtiObject(List<String> aspects) {
 		}
 		return lrtMimeMap;
 	}
-public static Map<String, String> getExtensionMimeMap() {
-		
+	public static Map<String, String> getExtensionMimeMap() {
+
 		if(extensionMimeMap == null){
 			extensionMimeMap = new HashMap<>();
 			extensionMimeMap.put("jpg", "image/jpeg");
@@ -350,7 +349,7 @@ public static Map<String, String> getExtensionMimeMap() {
 			extensionMimeMap.put("psd", "image/photoshop");
 			extensionMimeMap.put("xcf", "image/xcf");
 			extensionMimeMap.put("pcx", "image/pcx");
-			
+
 			extensionMimeMap.put("avi", "video/x-msvideo");
 			extensionMimeMap.put("mov", "video/mpeg");
 			extensionMimeMap.put("flv", "video/x-flash");
@@ -360,7 +359,7 @@ public static Map<String, String> getExtensionMimeMap() {
 			//extensionMimeMap.put("mp4", "video/mp4v-es");
 			extensionMimeMap.put("mp4", "video/mp4");
 			extensionMimeMap.put("3gp", "video/3gpp");
-			
+
 			extensionMimeMap.put("wav", "audio/wav");
 			extensionMimeMap.put("mp3", "audio/mpeg");
 			extensionMimeMap.put("mid", "audio/mid");
@@ -370,7 +369,7 @@ public static Map<String, String> getExtensionMimeMap() {
 			extensionMimeMap.put("vox", "audio/voxware");
 			extensionMimeMap.put("wma", "audio/x-ms-wma");
 			extensionMimeMap.put("ram", "audio/x-pn-realaudio");
-			
+
 			extensionMimeMap.put("odt", "application/vnd.oasis.opendocument.text");
 			extensionMimeMap.put("ott", "application/vnd.oasis.opendocument.text-template");
 			extensionMimeMap.put("oth", "application/vnd.oasis.opendocument.text-web");
@@ -385,13 +384,13 @@ public static Map<String, String> getExtensionMimeMap() {
 			extensionMimeMap.put("odf", "application/vnd.oasis.opendocument.formula");
 			extensionMimeMap.put("odb", "application/vnd.oasis.opendocument.database");
 			extensionMimeMap.put("odi", "application/vnd.oasis.opendocument.image");
-			
-			
+
+
 			extensionMimeMap.put("ppt","application/vnd.ms-powerpoint");
 			extensionMimeMap.put("ppz","application/vnd.ms-powerpoint");
 			extensionMimeMap.put("pps","application/vnd.ms-powerpoint");
 			extensionMimeMap.put("pot","application/vnd.ms-powerpoint");
-			
+
 			//docx
 			extensionMimeMap.put("doc","application/msword");
 			extensionMimeMap.put("docm","application/vnd.ms-word.document.macroEnabled.12");
@@ -406,34 +405,34 @@ public static Map<String, String> getExtensionMimeMap() {
 			extensionMimeMap.put("xlsm","application/vnd.ms-excel.sheet.macroEnabled.12");
 			extensionMimeMap.put("xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			extensionMimeMap.put("xps ","application/vnd.ms-xpsdocument");
-			
-			
+
+
 			extensionMimeMap.put("dot","application/msword");
-			
+
 			extensionMimeMap.put("xls", "application/vnd.ms-excel");
-										 
-			extensionMimeMap.put("txt", "text/plain");	
-			
+
+			extensionMimeMap.put("txt", "text/plain");
+
 			extensionMimeMap.put("properties", "text/plain");
-			
+
 			extensionMimeMap.put("pdf","application/pdf");
-			
+
 			extensionMimeMap.put("zip","application/zip");
-			
+
 			extensionMimeMap.put("mbz","application/zip");
-			
+
 			extensionMimeMap.put("epub","application/epub+zip");
-			
-			
+
+
 			extensionMimeMap.put("xml","text/xml");
-			
-						
+
+
 			//apple iworks
 			extensionMimeMap.put("pages","application/vnd.apple.pages");
 			extensionMimeMap.put("keynote","application/vnd.apple.keynote");
 			extensionMimeMap.put("numbers","vnd.apple.numbers");
-			
-					   
+
+
 		}
 		return extensionMimeMap;
 	}
@@ -446,7 +445,7 @@ public static Map<String, String> getExtensionMimeMap() {
 		if(isDirectory(properties, nodeType))
 			return MIME_DIRECTORY;
 		String mimeType=(String) properties.get(CCConstants.LOM_PROP_TECHNICAL_FORMAT);
-		
+
 		if(mimeType==null && properties.containsKey((CCConstants.CM_NAME))){
 			String[] name=((String) properties.get(CCConstants.CM_NAME)).split("\\.");
 			mimeType = getExtensionMimeMap().get(name[name.length-1].toLowerCase());
@@ -457,5 +456,5 @@ public static Map<String, String> getExtensionMimeMap() {
 		}
 		return mimeType;
 	}
-	
+
 }

@@ -8,7 +8,6 @@ export abstract class OptionsHelperService {
     abstract refreshComponents(
         components: OptionsHelperComponents,
         data: OptionData,
-        refreshListOptions: boolean,
     ): Promise<void>;
 
     abstract getAvailableOptions(

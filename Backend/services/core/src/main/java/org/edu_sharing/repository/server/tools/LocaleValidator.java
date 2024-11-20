@@ -13,6 +13,10 @@ public class LocaleValidator {
 		//set the locale
 	   
 	    if(locale != null){
+			if(locale.equals("none") ){
+				return true;
+			}
+
 	    	 if(locale.matches("[a-z][a-z]_[A-Z][A-Z]")) {
 				 // if the locale requested is found in config -> allow it
 				 return Arrays.stream(ConfigServiceFactory.getSupportedLanguages()).

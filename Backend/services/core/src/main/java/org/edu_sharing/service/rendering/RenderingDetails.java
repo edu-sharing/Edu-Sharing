@@ -10,7 +10,6 @@ import org.edu_sharing.restservices.NodeDao;
 public class RenderingDetails {
     @NonNull
     String details;
-    @NonNull
     RenderingServiceData renderingServiceData;
     RenderingException exception;
 }

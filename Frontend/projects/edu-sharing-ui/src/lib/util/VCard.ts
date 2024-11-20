@@ -168,7 +168,7 @@ export class VCard {
         const string =
             (this.title ?? '') + ' ' + (this.givenname ?? '') + ' ' + (this.surname ?? '');
         if (string.trim() === '') {
-            return this.org || '';
+            return this.org || this.get('FN') || '';
         }
         return string;
     }

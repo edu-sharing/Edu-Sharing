@@ -7,9 +7,6 @@ set -eu
 my_admin_pass="${REPOSITORY_SERVICE_ADMIN_PASS:-admin}"
 my_admin_pass_md4="$(printf '%s' "$my_admin_pass" | iconv -t utf16le | openssl md4 -provider legacy | awk '{ print $2 }')"
 
-my_guest_user="${REPOSITORY_SERVICE_GUEST_USER:-}"
-my_guest_pass="${REPOSITORY_SERVICE_GUEST_PASS:-}"
-
 my_bind="${REPOSITORY_SERVICE_BIND:-"0.0.0.0"}"
 
 my_prot_external="${REPOSITORY_SERVICE_PROT_EXTERNAL:-http}"
@@ -104,7 +101,6 @@ repository_database_jdbc="jdbc:${repository_database_prot}://${repository_databa
 repository_search_solr_host="${REPOSITORY_SEARCH_SOLR_HOST:-repository-search-solr}"
 repository_search_solr_port="${REPOSITORY_SEARCH_SOLR_PORT:-8080}"
 
-repository_transform_enabled="${REPOSITORY_TRANSFORM_ENABLED:-"true"}"
 repository_transform_host="${REPOSITORY_TRANSFORM_HOST:-}"
 repository_transform_port="${REPOSITORY_TRANSFORM_PORT:-}"
 repository_transform_aio_host="${REPOSITORY_TRANSFORM_AIO_HOST:-}"
@@ -380,8 +376,10 @@ grep -q '^[#]*\s*alfresco-pdf-renderer\.root=' "${alfProps}" || echo "alfresco-p
 sed -i -r 's|^[#]*\s*alfresco-pdf-renderer\.exe=.*|alfresco-pdf-renderer.exe=${alfresco-pdf-renderer.root}/alfresco-pdf-renderer|' "${alfProps}"
 grep -q '^[#]*\s*alfresco-pdf-renderer\.exe=' "${alfProps}" || echo 'alfresco-pdf-renderer.exe=${alfresco-pdf-renderer.root}/alfresco-pdf-renderer' >>"${alfProps}"
 
-sed -i -r 's|^[#]*\s*ooo\.enabled=.*|ooo.enabled='"${repository_transform_enabled}"'|' "${alfProps}"
-grep -q '^[#]*\s*ooo\.enabled=' "${alfProps}" || echo "ooo.enabled=${repository_transform_enabled}" >>"${alfProps}"
+sed -i -r 's|^[#]*\s*local\.transform\.pipeline\.config\.dir=.*|local.transform.pipeline.config.dir='"$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines|" "${alfProps}"
+grep -q '^[#]*\s*local\.transform\.pipeline\.config\.dir=' "${alfProps}" || echo "local.transform.pipeline.config.dir=$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines" >>"${alfProps}"
+# fix: Error reading /opt/alfresco/tomcat/shared/classes/config/defaults/transform/pipelines/.gitkeep
+rm -f "$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines/.gitkeep"
 
 sed -i -r 's|^[#]*\s*ooo\.exe=.*|ooo.exe=|' "${alfProps}"
 grep -q '^[#]*\s*ooo\.exe=' "${alfProps}" || echo "ooo.exe=" >>"${alfProps}"
@@ -475,30 +473,6 @@ xmlstarlet ed -L \
     -s '/properties' -t elem -n "entry" -v "${my_home_custom_html_headers}" \
     --var entry '$prev' \
     -i '$entry' -t attr -n "key" -v "custom_html_headers" \
-    ${homeProp}
-}
-
-xmlstarlet ed -L \
-  -d '/properties/entry[@key="guest_username"]' \
-  ${homeProp}
-
-[[ -n "${my_guest_user}" ]] && {
-  xmlstarlet ed -L \
-    -s '/properties' -t elem -n "entry" -v "${my_guest_user}" \
-    --var entry '$prev' \
-    -i '$entry' -t attr -n "key" -v "guest_username" \
-    ${homeProp}
-}
-
-xmlstarlet ed -L \
-  -d '/properties/entry[@key="guest_password"]' \
-  ${homeProp}
-
-[[ -n "${my_guest_pass}" ]] && {
-  xmlstarlet ed -L \
-    -s '/properties' -t elem -n "entry" -v "${my_guest_pass}" \
-    --var entry '$prev' \
-    -i '$entry' -t attr -n "key" -v "guest_password" \
     ${homeProp}
 }
 

@@ -863,6 +863,7 @@
         </property>
     </bean>
     <bean id="eduAuthorityServiceInterceptor" class="org.edu_sharing.alfresco.interceptors.AuthorityServiceGuestInterceptor">
+      <property name="guestService" ref="guestService"/>
     </bean>
 
 

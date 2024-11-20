@@ -5,6 +5,7 @@ import org.alfresco.service.cmr.repository.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.rpc.User;
+import org.edu_sharing.restservices.node.v1.model.RevokeDetails;
 import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.service.nodeservice.model.GetPreviewResult;
 import org.edu_sharing.service.permission.HandleMode;
@@ -230,4 +231,12 @@ public interface NodeService {
 	 * @return
 	 */
     NodeRef getOriginalNode(String nodeId);
+
+	/**
+	 * revoke a published copy
+	 *
+	 * @param id
+	 * @param details
+	 */
+    void revokeNode(String storeProtocol, String storeId, String id, RevokeDetails details) throws Throwable;
 }

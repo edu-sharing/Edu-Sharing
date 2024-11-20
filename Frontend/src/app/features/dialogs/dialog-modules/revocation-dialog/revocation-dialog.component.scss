@@ -1,0 +1,13 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    mat-form-field {
+        width: 100%;
+
+        textarea {
+            width: 100%;
+            min-height: 8em;
+        }
+    }
+}

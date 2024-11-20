@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface NotificationService {
+    enum NotifyMode {
+        ReportProblem,
+        Feedback,
+    }
     @Getter
     @Setter
     @AllArgsConstructor
@@ -37,7 +41,7 @@ public interface NotificationService {
         List<String> getReceivers(NodeContext context);
     }
 
-    void notifyNodeIssue(String nodeId, String reason, String nodeType, List<String> aspects, Map<String, Object> properties, String userEmail, String userComment) throws Throwable;
+    void notifyNodeIssue(String nodeId, NotifyMode mode, String reason, String nodeType, List<String> aspects, Map<String, Object> properties, String userEmail, String userComment) throws Throwable;
 
     void notifyWorkflowChanged(String nodeId, String nodeType, List<String> aspects, Map<String, Object> nodeProperties, String receiver, String comment, String status);
 

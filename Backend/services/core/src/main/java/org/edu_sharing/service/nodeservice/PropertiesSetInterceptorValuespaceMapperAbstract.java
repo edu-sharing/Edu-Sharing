@@ -12,16 +12,16 @@ import java.util.stream.Collectors;
  */
 public class PropertiesSetInterceptorValuespaceMapperAbstract implements PropertiesSetInterceptor{
     private final boolean reverseMapping;
-    private String sourceProperty;
-    private String targetProperty;
+    protected String sourceProperty;
+    protected String targetProperty;
     private boolean clearSourceProperty;
     private MigrateMetadataValuespaceJob.Mode mode;
     private final List<MetadataKey.MetadataKeyRelated.Relation> relations;
 
 
-    private MetadataWidget sourceWidget;
-    private MetadataWidget targetWidget;
-    private Map<MetadataKey.MetadataKeyRelated.Relation,Map<String, Collection<MetadataKey.MetadataKeyRelated>>> relationCache;
+    protected MetadataWidget sourceWidget;
+    protected MetadataWidget targetWidget;
+    protected Map<MetadataKey.MetadataKeyRelated.Relation,Map<String, Collection<MetadataKey.MetadataKeyRelated>>> relationCache;
     /**
      * Init this Interceptor with the given property information
      * @param sourceProperty the source property to read the data from

@@ -134,7 +134,7 @@ public class SortDefinition implements Serializable {
 			if(sortDefintionEntry.getProperty().equalsIgnoreCase("score")) {
 				builder.sort(sort->sort.score(score->score.order(sortOrder)));
 			} else if(sortDefintionEntry.getProperty().equalsIgnoreCase("tree")) {
-				builder.sort(sort->sort.script(script -> script.script(s->s.inline(il->il.source("doc['fullpath'].value + '/' + doc['nodeRef.id'].value")))));
+				builder.sort(sort->sort.script(script -> script.script(s->s.source("doc['fullpath'].value + '/' + doc['nodeRef.id'].value"))));
 			}else if(ALLOWED_SORT_MAIN_PROPERTIES.contains(sortDefintionEntry.getProperty())) {
 				builder.sort(sort->sort.field(field->field.field(sortDefintionEntry.getProperty()).order(sortOrder)));
 			}else {

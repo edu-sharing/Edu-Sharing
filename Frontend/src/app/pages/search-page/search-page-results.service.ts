@@ -8,7 +8,7 @@ import {
     SearchService,
 } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import {
     debounceTime,
     distinctUntilChanged,
@@ -42,6 +42,9 @@ import { SearchPageService, SearchRequestParams } from './search-page.service';
 import { RestConstants } from '../../core-module/rest/rest-constants';
 import { MdsWidgetType } from 'src/app/features/mds/types/types';
 import { RestSearchService } from 'src/app/core-module/core.module';
+import { ActivatedRoute } from '@angular/router';
+import { UserModifiableValuesService } from './user-modifiable-values';
+import { Sort } from '@angular/material/sort';
 
 export interface SearchPageResults {
     diffCount?: Observable<number>;
@@ -56,6 +59,10 @@ export interface SearchPageState {
 
 @Injectable()
 export class SearchPageResultsService implements SearchPageResults, OnDestroy {
+    readonly searchSort = this._userModifiableValues.createMapped<Sort>({
+        fromString: (v) => JSON.parse(v),
+        toString: (v) => JSON.stringify(v),
+    });
     readonly resultsDataSource = new NodeDataSourceRemote(this._injector);
     readonly totalResults = this.resultsDataSource.observeTotal();
     readonly collectionsDataSource = new NodeDataSourceRemote(this._injector);
@@ -81,12 +88,15 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         private _searchPage: SearchPageService,
         private _searchPageRestore: SearchPageRestoreService,
         private _translate: TranslateService,
+        private _route: ActivatedRoute,
+        private _userModifiableValues: UserModifiableValuesService,
     ) {
         this._registerPageRestore();
         this._registerSearchObservables();
         this._registerColumnsAndSortConfig();
         this._registerLoadingProgress();
         this._registerResultDiffCount();
+        this._registerDefaultSort();
     }
 
     ngOnDestroy(): void {
@@ -118,6 +128,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 this._searchPage.searchFilters.observeValue(),
                 // .pipe(tap((value) => console.log('searchFilters changed', value))),
                 this._searchPage.searchString.observeValue(),
+                this.state,
                 // .pipe(tap((value) => console.log('searchString changed', value))),
             ])
             .pipe(
@@ -145,12 +156,13 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 ),
                 tap(() => this.loadingParams.next(false)),
                 map(
-                    ([repository, metadataSet, searchFilters, searchString]) =>
+                    ([repository, metadataSet, searchFilters, searchString, state]) =>
                         new SearchRequestParams(
                             repository,
                             metadataSet,
                             searchFilters,
                             searchString,
+                            state.sortConfig,
                         ),
                 ),
                 distinctUntilChanged((x, y) => x.equals(y)),
@@ -159,8 +171,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         const collectionRequestParams: Observable<SearchRequestParams> = searchRequestParams.pipe(
             // Omit searchFilters.
             map(
-                ({ repository, metadataSet, searchString }) =>
-                    new SearchRequestParams(repository, metadataSet, {}, searchString),
+                ({ repository, metadataSet, searchString, sort }) =>
+                    new SearchRequestParams(repository, metadataSet, {}, searchString, sort),
             ),
             distinctUntilChanged((x, y) => x.equals(y)),
         );
@@ -183,6 +195,20 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         this.collectionsDataSource.isLoadingSubject.subscribe((isLoading) =>
             this.loadingCollections.next(!!isLoading),
         );
+        this.searchSort.registerQueryParameter('sort', this._route);
+        this.searchSort
+            .observeUserValue()
+            .pipe(first())
+            .subscribe((sort) => {
+                if (sort) {
+                    this.patchState({
+                        sortConfig: {
+                            ...this.state.value.sortConfig,
+                            ...sort,
+                        },
+                    });
+                }
+            });
     }
 
     private _registerColumnsAndSortConfig(): void {
@@ -209,7 +235,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         // Register sort.
         mds.pipe(map((mds) => MdsHelperService.getSortInfo(mds, 'search'))).subscribe(
             (sortInfo) => {
-                if (this.state.value.sortConfig === null) {
+                if (this.state.value.sortConfig === null || !this.state.value.sortConfig?.columns) {
                     this.patchState({
                         sortConfig: {
                             allowed: true,
@@ -228,6 +254,37 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 }
             },
         );
+    }
+    /**
+     * switches the default sort based on a present search string or not
+     */
+    private _registerDefaultSort() {
+        combineLatest([
+            this._searchPage.searchString
+                .observeValue()
+                .pipe(distinctUntilChanged((a, b) => (a == null ? b == null : b != null))),
+            combineLatest([
+                this._searchPage.activeMetadataSet.observeValue().pipe(filter((mds) => !!mds)),
+                this._searchPage.activeRepository.observeValue(),
+            ]).pipe(
+                switchMap(([metadataSet, repository]) =>
+                    this._mds.getMetadataSet({ repository, metadataSet }),
+                ),
+            ),
+        ])
+            .pipe(filter(([_, mds]) => !!mds.sorts.find((s) => s.id === 'search')?.defaultSearch))
+            .subscribe(([searchString, mds]) => {
+                const sorts = mds.sorts.find((s) => s.id === 'search');
+                const state = searchString ? sorts.defaultSearch : sorts.default;
+                console.log(searchString, mds, state);
+                this.patchState({
+                    sortConfig: {
+                        ...this.state.value.sortConfig,
+                        active: state.sortBy,
+                        direction: state.sortAscending ? 'asc' : 'desc',
+                    },
+                });
+            });
     }
     patchState(data: Partial<SearchPageState>) {
         this.state.next({ ...this.state.value, ...data });
@@ -251,8 +308,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                     },
                     maxItems: request.range.endIndex - request.range.startIndex,
                     skipCount: request.range.startIndex,
-                    sortAscending: request.sort ? [request.sort.direction === 'asc'] : null,
-                    sortProperties: request.sort ? [request.sort.active] : null,
+                    sortAscending: params.sort ? [params.sort.direction === 'asc'] : null,
+                    sortProperties: params.sort ? [params.sort.active] : null,
                     contentType: 'FILES',
                     repository: params.repository,
                     metadataset: params.metadataSet,

@@ -1,0 +1,9 @@
+<es-info-message
+  *ngIf="!edit"
+  mode="warning"
+  message="{{ 'WORKSPACE.REVOCATION.DETAILS' | translate }}"
+></es-info-message>
+<mat-form-field>
+  <mat-label>{{ 'WORKSPACE.REVOCATION.REASON' | translate }}</mat-label>
+  <textarea [formControl]="reasonControl" matInput></textarea>
+</mat-form-field>

@@ -96,6 +96,7 @@ import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-e
     ],
     imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule, EduSharingUiModule],
     exports: [
+        LicenseDetailsComponent,
         MdsEditorWidgetAuthorComponent,
         MdsEditorWidgetCollectionsComponent,
         MdsEditorWrapperComponent,

@@ -3,9 +3,11 @@ package org.edu_sharing.restservices;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,6 +27,7 @@ import org.edu_sharing.restservices.shared.Group;
 import org.edu_sharing.restservices.shared.GroupProfile;
 import org.edu_sharing.service.authority.AuthorityService;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
+import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.notification.NotificationService;
 import org.edu_sharing.service.notification.NotificationServiceFactoryUtility;
@@ -34,8 +37,11 @@ import org.edu_sharing.service.search.SearchServiceFactory;
 import org.springframework.context.ApplicationContext;
 import org.edu_sharing.service.toolpermission.ToolPermissionHelper;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.alfresco.service.cmr.security.PermissionService.GROUP_PREFIX;
 
 public class GroupDao {
 
@@ -58,24 +64,34 @@ public class GroupDao {
         }
     }
 
-    public static GroupDao createGroup(RepositoryDao repoDao, String groupName, GroupProfile profile, String parentGroup) throws DAOException {
+    public static String createGroup(RepositoryDao repoDao, String groupName, GroupProfile profile, String parentGroup) throws DAOException {
         try {
             AuthorityService authorityService = AuthorityServiceFactory.getAuthorityService(repoDao.getApplicationInfo().getAppId());
             String result = authorityService.createGroup(groupName, profile.getDisplayName(), parentGroup);
-            GroupDao groupDao = GroupDao.getGroup(repoDao, result);
             if (result != null) {
                 // permission check was done already, so run as system to allow org admin to set properties
                 AuthenticationUtil.runAsSystem(() -> {
-                    groupDao.setGroupEmail(profile);
-                    groupDao.setGroupType(profile);
-                    groupDao.setScopeType(profile);
+                    applyProfile(result.startsWith(GROUP_PREFIX) ? result : GROUP_PREFIX + result, profile);
                     return null;
                 });
             }
-            // reload data after it was changed
-            return GroupDao.getGroup(repoDao, result);
+            return result;
         } catch (Exception e) {
             throw DAOException.mapping(e);
+        }
+    }
+
+    static void applyProfile(String authorityName, GroupProfile profile) {
+        ApplicationContext alfApplicationContext = AlfAppContextGate.getApplicationContext();
+        ServiceRegistry serviceRegistry = (ServiceRegistry) alfApplicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        NodeService nodeService = serviceRegistry.getNodeService();
+
+        NodeRef authorityRef = AuthorityServiceHelper.getAuthorityNodeRef(authorityName);
+        setGroupEmail(nodeService, authorityRef, profile);
+        setGroupType(nodeService, authorityRef, profile);
+        setScopeType(nodeService, authorityRef, profile);
+        if(profile.getCustomAttributes() != null && !profile.getCustomAttributes().isEmpty()) {
+            AuthorityServiceFactory.getLocalService().setCustomAttributes(authorityName, profile.getCustomAttributes());
         }
     }
 
@@ -130,13 +146,13 @@ public class GroupDao {
             this.repoDao = repoDao;
 
             this.authorityName =
-                    groupName.startsWith(PermissionService.GROUP_PREFIX)
+                    groupName.startsWith(GROUP_PREFIX)
                             ? groupName
-                            : PermissionService.GROUP_PREFIX + groupName;
+                            : GROUP_PREFIX + groupName;
 
             this.groupName =
-                    groupName.startsWith(PermissionService.GROUP_PREFIX)
-                            ? groupName.substring(PermissionService.GROUP_PREFIX.length())
+                    groupName.startsWith(GROUP_PREFIX)
+                            ? groupName.substring(GROUP_PREFIX.length())
                             : groupName;
 
             this.displayName = ((MCAlfrescoAPIClient) baseClient).getGroupDisplayName(this.groupName);
@@ -173,9 +189,7 @@ public class GroupDao {
                 @Override
                 public Void doWork() throws Exception {
                     ((MCAlfrescoAPIClient) repoDao.getBaseClient()).createOrUpdateGroup(groupName, profile.getDisplayName());
-                    setGroupType(profile);
-                    setGroupEmail(profile);
-                    setScopeType(profile);
+                    applyProfile(authorityName, profile);
 
                     // rename admin group
                     renameSubGroup(profile, org.edu_sharing.alfresco.service.AuthorityService.ADMINISTRATORS_GROUP, org.edu_sharing.alfresco.service.AuthorityService.ADMINISTRATORS_GROUP_DISPLAY_POSTFIX);
@@ -204,7 +218,7 @@ public class GroupDao {
     }
 
     private void renameSubGroup(GroupProfile profile, String subgroup, String postfix) {
-        String authorityName = PermissionService.GROUP_PREFIX + org.edu_sharing.alfresco.service.AuthorityService.getGroupName(
+        String authorityName = GROUP_PREFIX + org.edu_sharing.alfresco.service.AuthorityService.getGroupName(
                 subgroup, groupName);
         if (authorityService.authorityExists(authorityName)) {
             String newDisplayName = profile.getDisplayName() + postfix;
@@ -214,23 +228,23 @@ public class GroupDao {
         }
     }
 
-    protected void setGroupType(GroupProfile profile) {
+    static protected void setGroupType(NodeService nodeService, NodeRef authorityRef, GroupProfile profile) {
         if (profile.getGroupType() != null) {
-            authorityService.addAuthorityAspect(PermissionService.GROUP_PREFIX + groupName, CCConstants.CCM_ASPECT_GROUPEXTENSION);
+            nodeService.addAspect(authorityRef, QName.createQName(CCConstants.CCM_ASPECT_GROUPEXTENSION), new HashMap<>());
         }
-        authorityService.setAuthorityProperty(PermissionService.GROUP_PREFIX + groupName, CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE, profile.getGroupType());
+        NodeServiceHelper.setProperty(authorityRef, CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE, profile.getGroupType(), true);
     }
 
-    protected void setGroupEmail(GroupProfile profile) {
-        authorityService.setAuthorityProperty(PermissionService.GROUP_PREFIX + groupName, CCConstants.CCM_PROP_GROUPEXTENSION_GROUPEMAIL, profile.getGroupEmail());
+    static protected void setGroupEmail(NodeService nodeService, NodeRef authorityRef, GroupProfile profile) {
+        nodeService.setProperty(authorityRef, QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPEMAIL), profile.getGroupEmail());
 
     }
 
-    protected void setScopeType(GroupProfile profile) {
+    static protected void setScopeType(NodeService nodeService, NodeRef authorityRef, GroupProfile profile) {
         if (profile.getScopeType() != null) {
-            authorityService.addAuthorityAspect(PermissionService.GROUP_PREFIX + groupName, CCConstants.CCM_ASPECT_SCOPE);
+            nodeService.addAspect(authorityRef, QName.createQName(CCConstants.CCM_ASPECT_SCOPE), new HashMap<>());
         }
-        authorityService.setAuthorityProperty(PermissionService.GROUP_PREFIX + groupName, CCConstants.CCM_PROP_SCOPE_TYPE, profile.getScopeType());
+        nodeService.setProperty(authorityRef, QName.createQName(CCConstants.CCM_PROP_SCOPE_TYPE), profile.getScopeType());
     }
 
     public void delete() throws DAOException {
@@ -240,7 +254,7 @@ public class GroupDao {
             AuthenticationUtil.runAsSystem(new RunAsWork<Void>() {
                 @Override
                 public Void doWork() throws Exception {
-                    authorityService.deleteAuthority(PermissionService.GROUP_PREFIX + groupName);
+                    authorityService.deleteAuthority(GROUP_PREFIX + groupName);
                     return null;
                 }
             });
@@ -323,16 +337,21 @@ public class GroupDao {
         profile.setGroupType(getGroupType());
         profile.setScopeType(getScopeType());
         profile.setGroupEmail(getGoupEmail());
+        profile.setCustomAttributes(getCustomAttributes());
         data.setProfile(profile);
         data.setProperties(getProperties());
         data.setAspects(getAspects());
-        data.setSignupMethod(getSignupMethod(ref));
+        data.setSignupMethod(getSignupMethod(properties));
 
         return data;
     }
 
-    public static GroupSignupMethod getSignupMethod(NodeRef ref) {
-        String method = NodeServiceHelper.getProperty(ref, CCConstants.CCM_PROP_GROUP_SIGNUP_METHOD);
+    private Map<String, Serializable> getCustomAttributes() {
+        return authorityService.getCustomAttributes(authorityName);
+    }
+
+    public static GroupSignupMethod getSignupMethod(Map<String, Object> properties) {
+        String method = (String) properties.get(CCConstants.CCM_PROP_GROUP_SIGNUP_METHOD);
         if (method == null) {
             return null;
         }
@@ -415,7 +434,7 @@ public class GroupDao {
         try {
             ToolPermissionHelper.throwIfToolpermissionMissing(CCConstants.CCM_VALUE_TOOLPERMISSION_SIGNUP_GROUP);
             return AuthenticationUtil.runAsSystem(() -> {
-                GroupSignupMethod method = getSignupMethod(ref);
+                GroupSignupMethod method = getSignupMethod(properties);
                 boolean addMember = false;
                 NodeRef userRef = authorityService.getAuthorityNodeRef(AuthenticationUtil.getFullyAuthenticatedUser());
 

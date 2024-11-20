@@ -35,6 +35,7 @@ import org.edu_sharing.service.editlock.EditLockServiceFactory;
 import org.edu_sharing.service.editlock.LockedException;
 import org.edu_sharing.service.nodeservice.AssocInfo;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
+import org.edu_sharing.service.notification.NotificationService;
 import org.edu_sharing.service.permission.HandleMode;
 import org.edu_sharing.service.permission.HandleParam;
 import org.edu_sharing.service.repoproxy.RepoProxy;
@@ -144,17 +145,18 @@ public class NodeApi  {
 		    })
 
 	    public Response reportNode(
-	    	@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
-	    	@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
-	    	@Parameter(description = "the reason for the report",required=true ) @QueryParam("reason") String reason,
-	    	@Parameter(description = "mail of reporting user",required=true ) @QueryParam("userEmail") String userEmail,
-	    	@Parameter(description = "additional user comment",required=false ) @QueryParam("userComment") String userComment,
-			@Context HttpServletRequest req) {
+			  @Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
+			  @Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
+			  @Parameter(description = "the mode of reporting (reporting or feedback)",required=false ) @QueryParam("mode")NotificationService.NotifyMode mode,
+			  @Parameter(description = "the reason for the report",required=true ) @QueryParam("reason") String reason,
+			  @Parameter(description = "mail of reporting user",required=true ) @QueryParam("userEmail") String userEmail,
+			  @Parameter(description = "additional user comment",required=false ) @QueryParam("userComment") String userComment,
+			  @Context HttpServletRequest req) {
 	    	
 	    	try {
 		    	RepositoryDao repoDao = RepositoryDao.getRepository(repository);
 		    	NodeDao nodeDao = NodeDao.getNode(repoDao, node);
-		    	nodeDao.reportNode(reason,userEmail,userComment);
+		    	nodeDao.reportNode(mode == null ? NotificationService.NotifyMode.ReportProblem : mode, reason,userEmail,userComment);
 		    	
 		    	return Response.status(Response.Status.OK).build();
 		
@@ -237,6 +239,37 @@ public class NodeApi  {
 
 			return Response.status(Response.Status.OK).entity(response).build();
 
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+
+	}
+	@DELETE
+	@Path("/nodes/{repository}/{node}/publish/revoke")
+
+	@Operation(summary = "Revoke published copy", description = "Revoke a previously published copy. The content of this copy will be irrevocable removed, only the metadata will remain")
+
+	@ApiResponses(
+			value = {
+					@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Node.class))),
+					@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+			})
+
+	public Response revokeCopy(
+			@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
+			@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
+			@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) RevokeDetails details,
+			@Context HttpServletRequest req) {
+
+		try {
+			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
+			NodeDao nodeDao = NodeDao.getNode(repoDao, node, Filter.createShowAllFilter());
+			NodeDao response = nodeDao.revokeNode(details);
+			return Response.status(Response.Status.OK).entity(response.asNode()).build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);
 		}
@@ -1600,30 +1633,9 @@ public class NodeApi  {
 	    	
 	    	return Response.status(Response.Status.OK).entity(response).build();
 
-    	} catch (DAOValidationException t) {
-    		
-    		logger.warn(t.getMessage(), t);
-    		return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(t)).build();
-    		
-    	} catch (DAOSecurityException t) {
-    		
-    		logger.warn(t.getMessage(), t);
-    		return Response.status(Response.Status.FORBIDDEN).entity(new ErrorResponse(t)).build();
-    		
-    	} catch (DAOMissingException t) {
-    		
-    		logger.warn(t.getMessage(), t);
-    		return Response.status(Response.Status.NOT_FOUND).entity(new ErrorResponse(t)).build();
-    		
-    	}catch(DAOVirusDetectedException t){
-			logger.warn(t.getMessage(),t);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorResponse(t)).build();
-		} catch (Throwable t) {
-    		
-    		logger.error(t.getMessage(), t);
-    		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorResponse(t)).build();
-    	}
-
+    	} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
     }
     
     @POST
@@ -2274,8 +2286,9 @@ public class NodeApi  {
 	    	try {
 			
 		    	RepositoryDao repoDao = RepositoryDao.getRepository(repository);
-		    	NodeDao nodeDao = NodeDao.getNode(repoDao, node);
-		    	nodeDao.setProperty(
+		    	NodeDao.setProperty(
+						repoDao,
+						node,
 						property,
 						value == null || value.size() != 1? (Serializable) value : value.get(0),
 						keepModifiedDate != null && keepModifiedDate

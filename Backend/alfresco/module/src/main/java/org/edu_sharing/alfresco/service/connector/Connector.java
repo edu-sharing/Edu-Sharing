@@ -5,7 +5,7 @@ import com.typesafe.config.Optional;
 import java.io.Serializable;
 import java.util.List;
 
-public class Connector  implements Serializable {
+public class Connector implements Serializable {
 	
 	private String id;
 

@@ -45,13 +45,17 @@ public class NotificationServiceImpl implements NotificationService {
     private final Optional<NotificationService.NodeIssueMapping> customNodeIssueMapping;
 
     @Override
-    public void notifyNodeIssue(String nodeId, String reason, String nodeType, List<String> aspects, Map<String, Object> properties, String userEmail, String userComment) throws Throwable {
+    public void notifyNodeIssue(String nodeId, NotifyMode mode, String reason, String nodeType, List<String> aspects, Map<String, Object> properties, String userEmail, String userComment) throws Throwable {
         log.info(String.format("send notifyNodeIssue: nodeId: %s, reason: %s, userComment: %s", nodeId, reason, userComment));
         String currentLocale = new AuthenticationToolAPI().getCurrentLocale();
         NodeContext nodeContext = new NodeContext(nodeId, aspects, properties);
-        String templateId = (customNodeIssueMapping.isPresent()) ? customNodeIssueMapping.get().getTemplateId(nodeContext) : "nodeIssue";
-        String subject=MailTemplate.getSubject("nodeIssue", currentLocale);
-        String content=MailTemplate.getContent("nodeIssue", currentLocale, true);
+        String defaultTemplate = "nodeIssue";
+        if(NotifyMode.Feedback.equals(mode)) {
+            defaultTemplate = "nodeIssueFeedback";
+        }
+        String templateId = (customNodeIssueMapping.isPresent()) ? customNodeIssueMapping.get().getTemplateId(nodeContext) : defaultTemplate;
+        String subject=MailTemplate.getSubject(templateId, currentLocale);
+        String content=MailTemplate.getContent(templateId, currentLocale, true);
         Map<String, String> replace = new HashMap<>();
         replace.put("reporterEmail", userEmail.trim());
         replace.put("userComment", userComment);

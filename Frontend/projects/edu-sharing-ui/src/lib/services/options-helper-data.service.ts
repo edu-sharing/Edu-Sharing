@@ -22,9 +22,9 @@ type DeleteEvent = {
     error: boolean;
 };
 export interface OptionsHelperComponents {
-    actionbar: ActionbarComponent;
-    dropdown: DropdownComponent;
-    list: ListEventInterface<NodeEntriesDataType>;
+    actionbar?: ActionbarComponent;
+    dropdown?: DropdownComponent;
+    list?: ListEventInterface<NodeEntriesDataType>;
 }
 
 export interface OptionData {
@@ -101,7 +101,7 @@ export class OptionsHelperDataService implements OnDestroy {
         this.data = this.optionsHelperService.wrapOptionCallbacks(data);
     }
 
-    async refreshComponents(refreshListOptions = true) {
+    async refreshComponents() {
         if (this.data == null) {
             console.warn('options helper refresh called but no data previously bound');
             return;
@@ -111,11 +111,7 @@ export class OptionsHelperDataService implements OnDestroy {
             return;
         }
         this.globalOptions = await this.getAvailableOptions(Target.Actionbar);
-        await this.optionsHelperService?.refreshComponents(
-            this.components,
-            this.data,
-            refreshListOptions,
-        );
+        await this.optionsHelperService?.refreshComponents(this.components, this.data);
     }
 
     getAvailableOptions(target: Target, objects: Node[] = null) {

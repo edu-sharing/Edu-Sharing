@@ -64,7 +64,7 @@ export class NodeEntriesCardComponent<T extends Node> implements OnChanges, OnIn
     optionsOnCard() {
         const options = this.entriesService.options?.[Target.List];
         const always = options?.filter((o) => o.showAlways);
-        if (always?.some((o) => o.showCallback(this.node))) {
+        if (always?.some((o) => o.showCallback([this.node]))) {
             return always;
         }
         // we do NOT show any additional actions
@@ -87,20 +87,7 @@ export class NodeEntriesCardComponent<T extends Node> implements OnChanges, OnIn
                 event.target as HTMLElement
             ).getBoundingClientRect());
         }
-        if (!this.entriesService.selection.selected.includes(this.node)) {
-            this.entriesService.selection.clear();
-            this.entriesService.selection.select(this.node);
-        }
-        // Wait for the menu to reflect changed options.
-        setTimeout(() => {
-            this.dropdown.callbackObject = node;
-            this.dropdown.ngOnChanges();
-            if (this.dropdown.canShowDropdown()) {
-                this.menuTrigger.openMenu();
-            } else {
-                this.toast.toast('NO_AVAILABLE_OPTIONS');
-            }
-        });
+        this.entriesService.openDropdown(this.dropdown, node, () => this.menuTrigger.openMenu());
     }
 
     getVisibleColumns() {
@@ -108,11 +95,7 @@ export class NodeEntriesCardComponent<T extends Node> implements OnChanges, OnIn
     }
 
     async openMenu(node: T) {
-        this.entriesService.selection.clear();
-        this.entriesService.selection.select(node);
-        this.entriesService.selection.clickSource = ClickSource.Dropdown;
-        await this.applicationRef.tick();
-        this.dropdown.menu.focusFirstItem();
+        this.entriesService.openDropdown(this.dropdown, node);
     }
 
     async ngOnInit() {

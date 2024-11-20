@@ -13,6 +13,8 @@ import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
+import org.edu_sharing.restservices.CollectionDao;
+import org.edu_sharing.service.authority.AuthorityServiceFactory;
 import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.search.SearchService;
 import org.edu_sharing.service.search.SearchServiceElastic;
@@ -74,15 +76,15 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
                 .from(skipCount)
                 .source(src->src.fetch(true))
                 .trackTotalHits(t->t.enabled(true))
-                .scriptFields("proposals", sf->sf.script(src->src.inline(il->il
+                .scriptFields("proposals", sf->sf.script(src->src
                         .lang("painless")
-                        .source("Map m = new HashMap();for(def proposal: params._source.children) { if(proposal['type'] == 'ccm:collection_proposal') {def value = proposal['properties']['ccm:collection_proposal_status']; if(m.containsKey(value)) { m.put(value, m.get(value) + 1); } else { m.put(value, 1); } } } return m;"))))
+                        .source("Map m = new HashMap();for(def proposal: params._source.children) { if(proposal['type'] == 'ccm:collection_proposal') {def value = proposal['properties']['ccm:collection_proposal_status']; if(m.containsKey(value)) { m.put(value, m.get(value) + 1); } else { m.put(value, 1); } } } return m;")))
                 .query(q -> q.scriptScore(ssq -> ssq
                         .minScore(1f)
-                        .script(scr->scr.inline(il->il
+                        .script(scr->scr
                                 .lang("painless")
                                 .source("if(!params._source.containsKey('children')) return 0; for(def proposal: params._source.children) { if(proposal['type'] == 'ccm:collection_proposal' && proposal.containsKey('properties') && proposal['properties'].containsKey('ccm:collection_proposal_status') && proposal['properties']['ccm:collection_proposal_status'] == params.status) return 1; } return 0;")
-                                .params("status", JsonData.of(status))))
+                                .params("status", JsonData.of(status)))
                         .query(iq -> iq.bool(b -> b
                                 .must(m -> m.match(match -> match.field("nodeRef.storeRef.protocol").query("workspace")))
                                 .must(m -> m.match(match -> match.field("type").query(CCConstants.getValidLocalName(CCConstants.CCM_TYPE_MAP))))
@@ -139,6 +141,12 @@ public class CollectionServiceElastic extends CollectionServiceImpl {
         token.setSortDefinition(sortDefinition);
         token.setFrom(skipCount);
         token.setMaxResult(maxItems);
+        if(CollectionDao.SearchScope.valueOf(scope).equals(CollectionDao.SearchScope.EDU_GROUPS)) {
+            ArrayList<String> authorities = new ArrayList<>(serviceRegistry.getAuthorityService().getAuthorities());
+            authorities.add(serviceRegistry.getAuthenticationService().getCurrentUserName());
+            authorities.remove(CCConstants.AUTHORITY_GROUP_EVERYONE);
+            token.setAuthorityScope(authorities);
+        }
         SearchResultNodeRef nodeRefs = SearchServiceFactory.getLocalService().search(mds, queryId, Collections.emptyMap(), token);
         for (org.edu_sharing.service.model.NodeRef nodeRef : nodeRefs.getData()) {
             if (isSubCollection(nodeRef)) {

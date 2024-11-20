@@ -53,6 +53,7 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ISO9075;
 import org.alfresco.util.Pair;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.alfresco.HasPermissionsWork;
@@ -871,6 +872,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
         contentUrl = URLTool.addOAuthAccessToken(contentUrl);
         propsCopy.put(CCConstants.CONTENTURL, contentUrl);
+        String[] aspects = getAspects(nodeRef);
 
         // external URL
         if (isSubOfContent) {
@@ -884,7 +886,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             );
             boolean hasContentOrDownloadableUrl =
                     propsCopy.get(CCConstants.ALFRESCO_MIMETYPE) != null ||
-                            propsCopy.get(CCConstants.LOM_PROP_TECHNICAL_LOCATION) != null;
+                            propsCopy.get(CCConstants.LOM_PROP_TECHNICAL_LOCATION) != null && !ArrayUtils.contains(aspects, CCConstants.CCM_ASPECT_REVOKED);
             if (!isLink && hasContentOrDownloadableUrl && downloadAllowed) {
                 propsCopy.put(CCConstants.DOWNLOADURL, URLTool.getDownloadServletUrl(nodeRef.getId(), null, true));
             }
@@ -978,7 +980,6 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         // performance must be done in getPropertiesCached)
         // but we need to set the ticket when it's an alfresco generated preview
         // logger.info("setting Preview");
-        String[] aspects = getAspects(nodeRef);
         if (nodeType.equals(CCConstants.CCM_TYPE_IO)) {
             String renderServiceUrlPreview = URLTool.getRenderServiceURL(nodeRef.getId(), true);
             if (renderServiceUrlPreview == null) {

@@ -6,6 +6,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
@@ -181,7 +182,7 @@ public class PreviewServlet extends HttpServlet {
 
 					validateScope(req, props);
 					// we need to check permissions and allow or deny access by using the READ_PREVIEW permission
-					validatePermissions(storeRef,inNodeId);
+					validatePermissions(storeRef, nodeId);
 
 					if (!nodeType.equals(CCConstants.CCM_TYPE_IO)
 							&& !nodeType.equals(CCConstants.CCM_TYPE_MAP)
@@ -306,7 +307,8 @@ public class PreviewServlet extends HttpServlet {
 
 
 
-		} catch (org.alfresco.repo.security.permissions.AccessDeniedException | RestrictedAccessException e) {
+		} catch (org.alfresco.repo.security.permissions.AccessDeniedException | RestrictedAccessException |
+				 AuthenticationCredentialsNotFoundException e) {
 			logger.debug(e.getMessage(),e);
 			resp.sendRedirect(mime.getNoPermissionsPreview());
 			return;
@@ -631,7 +633,7 @@ public class PreviewServlet extends HttpServlet {
 				ContentReader reader = serviceRegistry.getContentService().getReader(nodeRef,
 						QName.createQName(contentProp));
 
-				if(reader == null){
+				if(reader == null || reader.getSize() == 0){
 					return false;
 				}
 

@@ -52,9 +52,13 @@ public class AuthorityServiceImpl implements AuthorityService {
 	PermissionService permissionService = serviceRegistry.getPermissionService();
     org.edu_sharing.alfresco.service.AuthorityService eduAuthorityService = (org.edu_sharing.alfresco.service.AuthorityService)alfApplicationContext.getBean("eduAuthorityService");
 	GuestService guestService = alfApplicationContext.getBean(GuestService.class);
+	Optional<CustomAuthorityAttributesMapping> customAuthorityAttributesMapping;
 
+	public AuthorityServiceImpl(Optional<CustomAuthorityAttributesMapping> customAuthorityAttributesMapping) {
+		this.customAuthorityAttributesMapping = customAuthorityAttributesMapping;
+	}
 
-    /**
+	/**
 	 * Returns a property for a certain authority (it will fetch the coressponding node and load the property)
 	 * @param authority
 	 * @param property
@@ -693,6 +697,24 @@ public EduGroup getEduGroup(String authority){
 			return first.orElse(null);
 		});
 	}
+	@Override
+	public Map<String, Serializable> getCustomAttributes(String authorityName) {
+		if(customAuthorityAttributesMapping.isPresent()) {
+			return customAuthorityAttributesMapping.get().onGetAuthorityAttributes(authorityName);
+		} else {
+			logger.debug("No customAuthorityAttributesMapping, will fetch nothing");
+			return null;
+		}
+	}
+	@Override
+	public void setCustomAttributes(String authorityName, Map<String, Serializable> customAttributes) {
+		if(customAuthorityAttributesMapping.isPresent()) {
+			customAuthorityAttributesMapping.get().onSetAuthorityAttributes(authorityName, customAttributes);
+		} else {
+			logger.debug("No customAuthorityAttributesMapping, will map nothing");
+		}
+	}
+
 	public void createProxyUser(){
 		PersonService personService = serviceRegistry.getPersonService();
 

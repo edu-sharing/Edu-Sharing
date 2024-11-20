@@ -81,7 +81,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SearchServiceElastic extends SearchServiceImpl {
-    public static final String WORKSPACE_INDEX = "workspace_9.0";
+    public static final String WORKSPACE_INDEX = "workspace_9.1";
     static RestClient restClient;
     static ElasticsearchClient client;
 
@@ -210,6 +210,17 @@ public class SearchServiceElastic extends SearchServiceImpl {
         }
         return audienceQueryBuilder;
     }
+    public BoolQuery.Builder getCollectionPermissionsQuery(BoolQuery.Builder builder) {
+        if (AuthorityServiceHelper.isAdmin() || AuthenticationUtil.isRunAsUserTheSystemUser()) {
+            return new BoolQuery.Builder().must(q -> q.matchAll(all -> all));
+        }
+
+        String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
+        CollectionPermissionQueries collectionPermissionQueries = getCollectionPermissionQueries(user);
+        return new BoolQuery.Builder().minimumShouldMatch("1")
+                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissionQueries.collectionPermissions))))
+                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissionQueries.proposalPermissions))));
+    }
 
     public BoolQuery.Builder getReadPermissionsQuery(BoolQuery.Builder builder) {
         if (AuthorityServiceHelper.isAdmin() || AuthenticationUtil.isRunAsUserTheSystemUser()) {
@@ -220,14 +231,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
 
         //enhance to collection permissions
         // @TODO: FIX after DESP-840
-        BoolQuery collectionPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.read")
-                .should(s -> s.match(m -> m.field("collections.owner").query(user)))
-                .build();
-
-        BoolQuery proposalPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.Coordinator", getUserAuthorities().stream().filter(a -> !a.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)).collect(Collectors.toSet()))
-                .should(s -> s.match(m -> m.field("collections.owner").query(user)))
-                .must(must -> must.match(match -> match.field("collections.relation.type").query("ccm:collection_proposal")))
-                .build();
+        CollectionPermissionQueries collectionPermissionQueries = getCollectionPermissionQueries(user);
 
 
         return getPermissionsQuery(builder, "permissions.read")
@@ -240,8 +244,8 @@ public class SearchServiceElastic extends SearchServiceImpl {
                                         .mustNot(m -> m.term(t -> t.field("properties.ccm:restricted_access.keyword").value(true)))
                                         .must(m -> m.bool(subPermission -> subPermission
                                                 .minimumShouldMatch("1")
-                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissions))))
-                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(proposalPermissions))))
+                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissionQueries.collectionPermissions))))
+                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissionQueries.proposalPermissions))))
                                         )))
                                 ).should(bs -> bs.bool(bb -> bb
                                         // restricted access is "true" BUT "ReadAll" is given -> so behave like it would be false
@@ -249,11 +253,35 @@ public class SearchServiceElastic extends SearchServiceImpl {
                                         .must(m -> m.term(t -> t.field("properties.ccm:restricted_access_permissions.keyword").value(CCConstants.PERMISSION_READ_ALL)))
                                         .must(m -> m.bool(subPermission -> subPermission
                                                 .minimumShouldMatch("1")
-                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissions))))
-                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(proposalPermissions))))
+                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissionQueries.collectionPermissions))))
+                                                .should(q -> q.nested(nested->nested.path("collections").query(nq->nq.bool(collectionPermissionQueries.proposalPermissions))))
                                         )))
                                 )
                         ));
+    }
+
+    @NotNull
+    private CollectionPermissionQueries getCollectionPermissionQueries(String user) {
+        BoolQuery collectionPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.read")
+                .should(s -> s.match(m -> m.field("collections.owner").query(user)))
+                .build();
+
+        BoolQuery proposalPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.Coordinator", getUserAuthorities().stream().filter(a -> !a.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)).collect(Collectors.toSet()))
+                .should(s -> s.match(m -> m.field("collections.owner").query(user)))
+                .must(must -> must.match(match -> match.field("collections.relation.type").query("ccm:collection_proposal")))
+                .build();
+        CollectionPermissionQueries result = new CollectionPermissionQueries(collectionPermissions, proposalPermissions);
+        return result;
+    }
+
+    private static class CollectionPermissionQueries {
+        public final BoolQuery collectionPermissions;
+        public final BoolQuery proposalPermissions;
+
+        public CollectionPermissionQueries(BoolQuery collectionPermissions, BoolQuery proposalPermissions) {
+            this.collectionPermissions = collectionPermissions;
+            this.proposalPermissions = proposalPermissions;
+        }
     }
 
     public SearchResultNodeRef searchFacets(MetadataSet mds, String query, Map<String, String[]> criterias, SearchToken searchToken) throws Throwable {
@@ -475,8 +503,13 @@ public class SearchServiceElastic extends SearchServiceImpl {
             logger.info("Query " + query + " is not defined within dsl language, switching to lucene...");
             return super.search(mds, query, criterias, searchToken);
         }
-
-        Set<String> authorities = getUserAuthorities();
+        Set<String> authorities;
+        if(searchToken.getAuthorityScope() != null && !searchToken.getAuthorityScope().isEmpty()) {
+            logger.debug("Searching elastic with authority scope: " + StringUtils.join(searchToken.getAuthorityScope()));
+            authorities = new HashSet<>(searchToken.getAuthorityScope());
+        } else {
+            authorities = getUserAuthorities();
+        }
         String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
 
 
@@ -742,9 +775,9 @@ public class SearchServiceElastic extends SearchServiceImpl {
         return authorities;
     }
 
-    public boolean isAllowedToRead(String nodeId) {
-        boolean result = hasReadPermissionOnNode(nodeId);
-        if (result) return true;
+    public List<String> hasPermissions(String nodeId, List<String> permissions) {
+        List<String> result = hasCollectionPermissionsOnNode(nodeId, permissions);
+        if (!result.isEmpty()) return result;
 
 //        BoolQueryBuilder checkIsChildObjectQuery = QueryBuilders.boolQuery()
 //                .must(QueryBuilders.termQuery("properties.sys:node-uuid", nodeId))
@@ -765,42 +798,58 @@ public class SearchServiceElastic extends SearchServiceImpl {
                                             .must(must -> must.term(term -> term.field("aspects").value("ccm:io_childobject"))))), Map.class);
 
             if (searchResult.hits().total().value() == 0) {
-                return false;
+                return Collections.emptyList();
             }
 
             Map source = searchResult.hits().hits().get(0).source();
             if (source == null) {
-                return false;
+                return Collections.emptyList();
             }
 
             Map parentRef = (Map) source.get("parentRef");
             String parentId = (String) parentRef.get("id");
-            return hasReadPermissionOnNode(parentId);
+            return hasCollectionPermissionsOnNode(parentId, permissions);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            return false;
+            return Collections.emptyList();
         }
     }
 
-    private boolean hasReadPermissionOnNode(String nodeId) {
+    /**
+     * returns true if the user has the given permission on the node via indirect access inside a collection
+     * @return
+     */
+    private List<String> hasCollectionPermissionsOnNode(String nodeId, List<String> permissions) {
         try {
             checkClient();
+            // fetch the node
             SearchResponse<Map> searchResult = client
                     .withTransportOptions(this::getRequestOptions)
                     .search(request->request
                             .index(WORKSPACE_INDEX)
-                            .size(0)
-                            .trackTotalHits(t->t.enabled(true))
+                            .size(1)
+                            .trackTotalHits(t->t.count(2))
                             .query(query->query
                                     .bool(bool->bool
-                                            .must(must -> must.bool(this::getReadPermissionsQuery))
+                                            .must(must -> must.bool(this::getCollectionPermissionsQuery))
                                             .must(must -> must.term(term->term.field("properties.sys:node-uuid").value(nodeId))))), Map.class);
-            return searchResult.hits().total().value() != 0;
+            if(searchResult.hits().total().value() == 1) {
+                // check & handle restricted access
+                Map data = (Map) searchResult.hits().hits().get(0).source().get("properties");
+                String restrictedAccess = (String) data.get(CCConstants.getValidLocalName(CCConstants.CCM_PROP_RESTRICTED_ACCESS));
+                List<String> restrictedAccessPermissions = (List<String>) data.get(CCConstants.getValidLocalName(CCConstants.CCM_PROP_RESTRICTED_ACCESS_PERMISSIONS));
+                return PermissionServiceHelper.getEffectivePermissions(
+                        restrictedAccessPermissions,
+                        Boolean.parseBoolean(restrictedAccess)
+                ).stream().filter(permissions::contains).collect(Collectors.toList());
+            } else {
+                logger.warn("Permission query matched more than one node " + nodeId + " " + StringUtils.join(permissions));
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
-        return false;
+        return Collections.emptyList();
     }
 
     public NodeRef transformSearchHit(boolean isAdmin, Set<String> authorities, String user, Map hit, boolean resolveCollections) {

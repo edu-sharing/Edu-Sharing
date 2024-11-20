@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class RenderingServiceNotSupported implements RenderingService{
 
-	public RenderingServiceNotSupported(String appId){
+	public RenderingServiceNotSupported(){
 	}
 	
 	@Override
-	public RenderingDetails getDetails(String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
+	public RenderingDetails getDetails(String appId, String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
 		throw new NotImplementedException();
 	}
 
@@ -32,9 +32,4 @@ public class RenderingServiceNotSupported implements RenderingService{
 		return false;
 	}
 
-
-	@Override
-	public void setAppId(String appId) {
-
-	}
 }

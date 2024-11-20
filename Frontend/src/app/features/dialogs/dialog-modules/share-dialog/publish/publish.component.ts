@@ -132,11 +132,14 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
             this.initHasStarted = true;
             // refresh already for providing initial state
             this.refresh();
-            this.node = (
-                await this.legacyNodeService
-                    .getNodeMetadata(this.node.ref.id, [RestConstants.ALL])
-                    .toPromise()
-            ).node;
+
+            if (this.node.ref?.id) {
+                this.node = (
+                    await this.legacyNodeService
+                        .getNodeMetadata(this.node.ref.id, [RestConstants.ALL])
+                        .toPromise()
+                ).node;
+            }
             this.refresh();
             this.onInitCompleted.emit();
             this.onInitCompleted.complete();
@@ -222,7 +225,9 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
             copy: this.shareModeCopy,
             direct: this.shareModeDirect,
         };
-        this.mdsService.initWithNodes([this.node]);
+        if (this.node.ref?.id) {
+            this.mdsService.initWithNodes([this.node]);
+        }
         this.updatePublishedVersions();
     }
 
@@ -472,6 +477,10 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
             return true;
         }
         return false;
+    }
+
+    isRevoked(v: PublishedNode) {
+        return this.nodeHelper.isNodeRevoked(v);
     }
 }
 export enum ShareMode {

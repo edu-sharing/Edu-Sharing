@@ -5,6 +5,6 @@
     "assets/**"
   ],
   "lib": {
-    "entryFile": "src/module.ts"
+    "entryFile": "src/public-api.ts"
   }
 }

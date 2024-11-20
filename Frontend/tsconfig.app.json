@@ -1,10 +1,19 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    // Prevent relative imports outside the `src` directory. Here instead of `tsconfig.json` to not
-    // confuse VS Code in `projects` folder.
-    "rootDir": "src",
-    "types": ["jquery"]
+    "types": ["jquery"],
+    "paths": {
+      "ngx-edu-sharing-api": [
+        "dist/edu-sharing-api/edu-sharing-api",
+        "dist/edu-sharing-api"
+      ],
+      "ngx-edu-sharing-ui": [
+        "projects/edu-sharing-ui/src/lib"
+      ],
+      "ngx-edu-sharing-ui/*": [
+        "projects/edu-sharing-ui/src/lib/*"
+      ]
+    }
   },
   "files": [
     "src/main.ts",

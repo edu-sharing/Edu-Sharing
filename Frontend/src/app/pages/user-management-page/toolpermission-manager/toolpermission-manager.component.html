@@ -82,7 +82,8 @@
               <div *ngIf="changing.indexOf(key) != -1"><es-spinner-small></es-spinner-small></div>
               <div
                 *ngIf="changing.indexOf(key) == -1"
-                [title]="isImplicit(key) ? getImplicitDetail(key) : ''"
+                [matTooltip]="isImplicit(key) ? getImplicitDetail(key) : ''"
+                matTooltipClass="toolpermission-tooltip"
               >
                 <div class="text">
                   {{ 'PERMISSIONS.TOOLPERMISSIONS.STATUS_' + getEffective(key) | translate }}

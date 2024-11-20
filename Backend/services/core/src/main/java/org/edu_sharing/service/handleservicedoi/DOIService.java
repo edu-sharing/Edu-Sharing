@@ -17,6 +17,7 @@ import org.edu_sharing.service.handleservicedoi.model.DOI;
 import org.edu_sharing.service.handleservicedoi.model.Data;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.VCardConverter;
+import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -100,10 +101,14 @@ public class DOIService implements HandleService {
     public String update(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception {
         logger.debug("Updating DOI: " + handleId);
         DOI doi = mapForPublishing(nodeId, properties);
+        return updateDOIWithMetadata(handleId, doi);
+    }
+
+    private String updateDOIWithMetadata(String handleId, DOI doi) throws DOIServiceException {
         HttpEntity<DOI> entity = new HttpEntity<>(doi,getHttpHeaders());
-        ResponseEntity<DOI> doiResponseEntity = template.exchange(baseUrl+"/dois/"+handleId, HttpMethod.PUT, entity, DOI.class);
+        ResponseEntity<DOI> doiResponseEntity = template.exchange(baseUrl+"/dois/"+ handleId, HttpMethod.PUT, entity, DOI.class);
         try {
-            logger.info("Create doi:" + new Gson().toJson(doi));
+            logger.info("updateDOIWithMetadata:" + new Gson().toJson(doi));
         }catch(Throwable ignored) {}
         if(!doiResponseEntity.getStatusCode().is2xxSuccessful()){
             throw new DOIServiceException("update id:" + handleId + " failed. api returned: " + doiResponseEntity.getStatusCode());
@@ -111,6 +116,23 @@ public class DOIService implements HandleService {
         return doiResponseEntity.getBody().getData().getId();
     }
 
+    /**
+     * update the state of the given node
+     * if this node does not have a doi attached, this method will do nothing
+     * see https://support.datacite.org/docs/updating-metadata-with-the-rest-api#changing-the-doi-state
+     */
+    @Override
+    public boolean updateState(String nodeId, String eventState) throws Exception {
+        String handleId = (String) NodeServiceHelper.getPropertyNative(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId), CCConstants.CCM_PROP_PUBLISHED_DOI_ID);
+        if(handleId == null) {
+            logger.info("Node "+ nodeId+ " has no doi, will not update state");
+            return false;
+        }
+        DOI doi = getDOI(handleId);
+        doi.getData().getAttributes().setState(eventState);
+        updateDOIWithMetadata(handleId, doi);
+        return true;
+    }
     @Override
     public String delete(String handleId, String nodeId) throws Exception {
         //only works for drafts

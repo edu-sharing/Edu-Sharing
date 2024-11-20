@@ -61,22 +61,19 @@ public class RenderingServiceImpl implements RenderingService{
 	private final PermissionService permissionService;
 	private final GuestService guestService;
 	ApplicationInfo appInfo;
-	
+
 	Map<String,String> authInfo;
-	
 
-	AuthenticationTool authTool;
-	
-	Logger logger = Logger.getLogger(RenderingServiceImpl.class);
 
-	@Override
-	public void setAppId(String appId) {
+	static Logger logger = Logger.getLogger(RenderingServiceImpl.class);
+	private ApplicationInfo setAppId(String appId) {
 
 		try{
-			this.appInfo = ApplicationInfoList.getRepositoryInfoById(appId);
-			this.authTool = RepoFactory.getAuthenticationToolInstance(appId);
+			ApplicationInfo appInfo = ApplicationInfoList.getRepositoryInfoById(appId);
+			AuthenticationTool authTool = RepoFactory.getAuthenticationToolInstance(appId);
 
 			//fix for running in runas user mode
+			HashMap<String, String> authInfo;
 			if((AuthenticationUtil.isRunAsUserTheSystemUser()
 					|| "admin".equals(AuthenticationUtil.getRunAsUser()))
 					|| Context.getCurrentInstance().getCurrentInstance() == null
@@ -85,10 +82,10 @@ public class RenderingServiceImpl implements RenderingService{
 				this.authInfo = new HashMap<>();
 				this.authInfo.put(CCConstants.AUTH_USERNAME, AuthenticationUtil.getRunAsUser());
 			}else {
-				this.authInfo = this.authTool.validateAuthentication(Context.getCurrentInstance().getCurrentInstance().getRequest().getSession());
+				authTool.validateAuthentication(Context.getCurrentInstance().getCurrentInstance().getRequest().getSession());
 			}
 
-
+			return appInfo;
 		}catch(Throwable e){
 			throw new RuntimeException(e);
 		}
@@ -101,14 +98,13 @@ public class RenderingServiceImpl implements RenderingService{
 	}
 
 	@Override
-	public RenderingDetails getDetails(String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
-
+	public RenderingDetails getDetails(String appId, String nodeId,String nodeVersion,String displayMode,Map<String,String> parameters) throws InsufficientPermissionException, Exception{
+		ApplicationInfo appInfo = setAppId(appId);
 		if(!this.permissionService.hasPermission(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeId,CCConstants.PERMISSION_READ)){
 			throw new InsufficientPermissionException("no read permission");
 		}
 		String renderingServiceUrl = "";
 		try {
-			ApplicationInfo appInfo = ApplicationInfoList.getRepositoryInfoById(this.appInfo.getAppId());
 			// switch to home repo if the defined app is "local" (secondary home repo)
 			if(appInfo.getRepositoryType().equals(ApplicationInfo.REPOSITORY_TYPE_LOCAL)){
 				appInfo = ApplicationInfoList.getHomeRepository();
@@ -121,11 +117,13 @@ public class RenderingServiceImpl implements RenderingService{
 			options.displayMode = displayMode;
 			options.parameters = parameters;
 			RenderingServiceData data = getData(appInfo, nodeId, nodeVersion, AuthenticationUtil.getFullyAuthenticatedUser(), options);
-            return new RenderingDetails(getDetails(renderingServiceUrl, data), data);
+			RenderingDetails details = new RenderingDetails(getDetails(renderingServiceUrl, data));
+			details.setRenderingServiceData(data);
+			return details;
 		}catch(Throwable t) {
 			logger.warn(t.getMessage(),t);
 			RenderingException exception = new RenderingException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), RenderingException.I18N.unknown, t);
-			RenderingDetails details = new RenderingDetails(RenderingErrorServlet.errorToHTML(null, exception), null);
+			RenderingDetails details = new RenderingDetails(RenderingErrorServlet.errorToHTML(null, exception));
 			details.setException(exception);
 			return details;
 			/*
@@ -184,7 +182,7 @@ public class RenderingServiceImpl implements RenderingService{
 		if(appInfo.ishomeNode()) {
 			data.setEditors(getAvailableEditors(nodeId, nodeVersion, user));
 		}
-		RepositoryDao repoDao = RepositoryDao.getRepository(this.appInfo.getAppId());
+		RepositoryDao repoDao = RepositoryDao.getRepository(appInfo.getAppId());
 		NodeDao nodeDao = NodeDao.getNodeWithVersion(repoDao, nodeId, nodeVersion);
 
 		// child object: inherit all props from parent

@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.edu_sharing.repository.client.tools.CCConstants;
 
@@ -88,13 +89,17 @@ public class Context {
 
             @Override
             public Map<String, String> getX3Headers() {
-                return Collections.list(request.getHeaderNames()).stream()
-                        .filter(this::isX3Header)
-                        .collect(Collectors.toMap(
-                                k -> k,
-                                request::getHeader
-                        ));
-
+                try {
+                    return Collections.list(request.getHeaderNames()).stream()
+                            .filter(this::isX3Header)
+                            .collect(Collectors.toMap(
+                                    k -> k,
+                                    request::getHeader
+                            ));
+                } catch (Throwable t) {
+                    Logger.getLogger(Context.class).warn("Unexpected error while fetching x3 headers", t);
+                    return Collections.emptyMap();
+                }
             }
         };
 
@@ -122,16 +127,16 @@ public class Context {
     }
 
     public HttpServletResponse getResponse() {
-		return response;
-	}
-    
+        return response;
+    }
+
     public String getSessionAttribute(String key){
-    	String sessionAtt = null;
-    	if(this.getRequest() != null 
-    			&& this.getRequest().getSession() != null){
-    		sessionAtt = (String)this.getRequest().getSession().getAttribute(key);
-		}
-    	return sessionAtt;
+        String sessionAtt = null;
+        if(this.getRequest() != null
+                && this.getRequest().getSession() != null){
+            sessionAtt = (String)this.getRequest().getSession().getAttribute(key);
+        }
+        return sessionAtt;
     }
 
     public String getSessionId(){
@@ -141,17 +146,17 @@ public class Context {
         }
         return null;
     }
-    
+
     public String getLocale(){
-    	return getSessionAttribute(CCConstants.AUTH_LOCALE);
+        return getSessionAttribute(CCConstants.AUTH_LOCALE);
     }
-    
+
     public String getAuthType(){
-    	return getSessionAttribute(CCConstants.AUTH_TYPE);
+        return getSessionAttribute(CCConstants.AUTH_TYPE);
     }
-    
+
     public String getAccessToken(){
-    	return getSessionAttribute(CCConstants.AUTH_ACCESS_TOKEN);
+        return getSessionAttribute(CCConstants.AUTH_ACCESS_TOKEN);
     }
 
     public interface B3 {

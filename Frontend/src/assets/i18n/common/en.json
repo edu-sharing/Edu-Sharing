@@ -332,6 +332,17 @@
     "CREATED": "Link was created and saved in folder \"{{folder}}\"",
     "CREATED_LINK": "show"
   },
+  "REVOKE_FEEDBACK": {
+    "TITLE": "Contact editorial team",
+    "REPORT_INFO": "Contact editorial team regarding \"{{name}}\"",
+    "COMMENT": "Give feedback, i.e. for usage of the material",
+    "COMMENT_REQUIRED": "Please enter your details",
+    "COMMENT_PLACEHOLDER": "Provide details...",
+    "DONE": "Thanks for your feedback.",
+    "EMAIL": "your e-mail-address",
+    "EMAIL_PLACEHOLDER": "somebody@example.net",
+    "EMAIL_REQUIRED": "Please provide a valid e-mail address."
+  },
   "NODE_REPORT": {
     "TITLE": "Report problem",
     "REPORT": "report",
@@ -413,6 +424,7 @@
     "tool_object": "LTI tool",
     "file-csv": "CSV file",
     "file-serlo": "Serlo file",
+    "file-curriculum": "kanban board",
     "file-geogebra": "Geogebra file"
   },
   "PERMISSION_TYPE": {
@@ -636,7 +648,8 @@
     "NODE_REPORT": "Report problem",
     "ADD_NODE_STORE": "Add to memo list",
     "DELETE": "Delete",
-    "UNPUBLISH": "Unpublish",
+    "REVOKE": "Revoke object",
+    "EDIT_REVOCATION": "Revocation Details",
     "UNBLOCK_IMPORT": "Reactivate",
     "REMOVE_REF": "Remove from collection",
     "CUT": "Cut",
@@ -804,6 +817,14 @@
   "VIDEO_CONTROLS": {
     "HEADING": "Select a clip for saving to a collection",
     "SAVED": "Saved changes"
+  },
+  "RENDERING": {
+    "REVOKED": {
+      "DETAILS": "The publisher or editorial team has revoked this object. Only the metadata are available.\n\nCheck the reason below for more details",
+      "DATE": "Date of revocation",
+      "REASON": "Reason for revocation",
+      "FEEDBACK": "Contact editorial team"
+    }
   },
   "TOAST": {
     "NODE_LOCKED": "The document is currently used by an other user and can not be opened",

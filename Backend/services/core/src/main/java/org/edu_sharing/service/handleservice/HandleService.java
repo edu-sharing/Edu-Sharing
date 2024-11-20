@@ -3,6 +3,7 @@ package org.edu_sharing.service.handleservice;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.namespace.QName;
 import org.edu_sharing.repository.tools.URLHelper;
+import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -18,6 +19,11 @@ public interface HandleService {
     public String create(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception;
 
     public String update(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception;
+
+    default boolean updateState(String nodeId, String eventState) throws Exception {
+        Logger.getLogger(HandleService.class).debug("update state is not implemented for this service");
+        return false;
+    }
 
     public String delete(String handleId, String nodeId) throws Exception;
 

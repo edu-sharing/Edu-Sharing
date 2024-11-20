@@ -488,6 +488,34 @@
       <caption>virtual_user_files</caption>
       <type>checkbox</type>
     </widget>
+    <widget>
+      <id>curriculum_title</id>
+      <required>mandatory</required>
+      <caption>Pinnwand-Titel</caption>
+      <type>text</type>
+    </widget>
+    <widget>
+      <id>curriculum_description</id>
+      <caption>Pinnwand-Beschreibung</caption>
+      <type>textarea</type>
+    </widget>
+    <widget>
+      <id>curriculum_color</id>
+      <caption>Pinnwand-Farbe</caption>
+      <defaultvalue>#888888</defaultvalue>
+      <type>color</type>
+    </widget>
+    <widget>
+      <id>curriculum_editable</id>
+      <caption>Zugriffsrechte</caption>
+      <bottomCaption>Welche Zugriffsrechte sollen Personen auf das Kanban erhalten, für die dieses Objekt in edu-sharing freigegeben wird. (Dieser Wert kann später im Curriculum für das Objekt geändert werden)</bottomCaption>
+      <defaultvalue>read</defaultvalue>
+      <type>singleoption</type>
+      <values>
+        <entry cap="nur Leserechte">read</entry>
+        <entry cap="Lese- und Bearbeitungsrechte">write</entry>
+      </values>
+    </widget>
   </widgets>
   <templates>
     <template>
@@ -823,8 +851,24 @@
 				<virtual:user_files>
 				]]></html>
     </template>
+    <template>
+      <id>connector_curriculum</id>
+      <html><![CDATA[
+				<curriculum_title>
+				<curriculum_description>
+				<curriculum_color>
+				<curriculum_editable>
+				]]></html>
+    </template>
   </templates>
   <groups>
+    <group>
+      <id>connector_curriculum</id>
+      <rendering>angular</rendering>
+      <views>
+        <view>connector_curriculum</view>
+      </views>
+    </group>
     <group>
       <id>io</id>
       <rendering>angular</rendering>
@@ -1285,7 +1329,6 @@
           {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
         ],
         "must_not":[
-          {"match":{"permissions.Read":"GROUP_EVERYONE"}},
           {"match":{"properties.cm:owner.keyword":"${authority}"}},
           {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
           {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
@@ -1453,6 +1496,7 @@
         "must_not":[
         {"term":{"aspects":"ccm:metadataPresettingTemplate"}},
         {"term":{"aspects":"ccm:io_childobject"}},
+        {"term":{"aspects":"ccm:revoked"}},
         {"wildcard":{"properties.cm:name.keyword":"._*"}},
         {"term":{"aspects":"ccm:collection_io_reference"}},
         {"wildcard":{"properties.cm:name.keyword":".DS_Store*"}},

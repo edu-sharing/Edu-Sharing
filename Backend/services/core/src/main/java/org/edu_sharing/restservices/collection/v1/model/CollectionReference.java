@@ -25,13 +25,7 @@ public class CollectionReference extends Node {
 	 */
 	@JsonProperty
 	private List<String> accessOriginal;
-	/**
-	 * the effective access
-	 * this is combined between (possible) inherited permissions due to the collection as well as the permissions on the original
-	 * please use this field to check access
-	 */
-	@JsonProperty
-	private Collection<String> accessEffective;
+
 	@JsonProperty
 	private boolean originalRestrictedAccess;
 

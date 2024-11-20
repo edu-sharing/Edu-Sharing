@@ -101,4 +101,13 @@ public interface AuthorityService {
 	 * Node: there is no sorting so you need to make sure that exactly only ONE group of this type exists
 	 */
 	String getSubgroupByType(String parentGroup, String groupType);
+
+	Map<String, Serializable> getCustomAttributes(String authorityName);
+
+	/**
+	 * handle custom attributes
+	 * @param authorityName
+	 * @param customAttributes
+	 */
+	void setCustomAttributes(String authorityName, Map<String, Serializable> customAttributes);
 }

@@ -30,7 +30,7 @@ export class CalendarComponent {
     }
     constructor(private translate: TranslateService, private _adapter: DateAdapter<any>) {
         this.translate.currentLang;
-        this._adapter.setLocale(this.translate.currentLang);
+        this._adapter.setLocale(this.translate.currentLang.split('-')[0]);
     }
     getFormatted() {
         if (this.date) {

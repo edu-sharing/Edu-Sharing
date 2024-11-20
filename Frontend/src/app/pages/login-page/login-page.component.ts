@@ -38,7 +38,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('passwordInput') passwordInput: InputPasswordComponent;
     @ViewChild('usernameInput') usernameInput: ElementRef;
 
-    buttons: DialogButton[];
+    buttons: DialogButton[] = [];
     caption = 'LOGIN.TITLE';
     config: any = {};
     currentProvider: any;
@@ -211,7 +211,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
         );
     }
 
-    checkConditions() {
+    checkConditions(event: Event) {
         this.disabled = !this.username || this.currentProvider; // || !this.password;
         this.updateButtons();
     }
@@ -356,20 +356,27 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
         );
     }
 
-    private updateButtons(): any {
-        this.buttons = [];
+    private updateButtons() {
         if (this.showProviders) {
             return;
         }
+        const register = new DialogButton('LOGIN.REGISTER_TEXT', { color: 'standard' }, () =>
+            this.register(),
+        );
         if (this.canRegister()) {
-            this.buttons.push(
-                new DialogButton('LOGIN.REGISTER_TEXT', { color: 'standard' }, () =>
-                    this.register(),
-                ),
-            );
+            if (!this.buttons.find((b) => b.label === register.label)) {
+                this.buttons.splice(0, 0, register);
+            }
+        } else {
+            this.buttons.splice(this.buttons.findIndex((b) => b.label === register.label));
         }
-        const login = new DialogButton('LOGIN.LOGIN', { color: 'primary' }, () => this.login());
+        let login = new DialogButton('LOGIN.LOGIN', { color: 'primary' }, () => this.login());
+        const loginFound = this.buttons.find((b) => b.label === login.label);
+        if (!loginFound) {
+            this.buttons.push(login);
+        } else {
+            login = loginFound;
+        }
         login.disabled = this.disabled;
-        this.buttons.push(login);
     }
 }

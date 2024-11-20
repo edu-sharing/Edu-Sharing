@@ -16,7 +16,7 @@ public class RenderingDao {
 	
 	public RenderingDetails getDetails(String nodeId, String nodeVersion, String displayMode, Map<String,String> parameters) throws DAOException{
 		try{
-			return repoDao.getRenderingServiceClient().getDetails(nodeId,nodeVersion,
+			return repoDao.getRenderingServiceClient().getDetails(repoDao.getId(), nodeId,nodeVersion,
 					displayMode==null || displayMode.isEmpty() ? RenderingTool.DISPLAY_DYNAMIC : displayMode,
 					parameters);
 		}catch(Throwable t){

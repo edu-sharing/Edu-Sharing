@@ -8,12 +8,8 @@
   <div
     class="card-collection-image-container"
     [class.card-collection-icon-container]="!hasNonIconPreview()"
-    style="width: 100%"
   >
-    <div
-      *ngIf="!hasNonIconPreview()"
-      style="width: 250px; height: 200px; margin-left: auto; margin-right: auto"
-    >
+    <div *ngIf="!hasNonIconPreview()" class="card-collection-image-icon-wrapper">
       <div class="card-image-icon-container">
         <div
           class="card-image-icon-circle"
@@ -61,11 +57,7 @@
         [dropdownPosition]="'right'"
       ></es-actionbar>
     </div>
-    <h1
-      esTitle
-      class="collection-new-preview-headline collections-header-texttop"
-      style="overflow: hidden"
-    >
+    <h1 esTitle class="collection-new-preview-headline collections-header-texttop">
       {{ collection?.title }}
     </h1>
 
@@ -123,15 +115,24 @@
         {{ 'COLLECTIONS.PERMISSIONS' | translate }}
       </h2>
       <div class="collection-permissions collection-content">
-        <div *ngFor="let permission of permissions">
-          <ng-container *ngIf="permission.authority.authorityType !== 'EVERYONE'">
-            <es-user-avatar [user]="permission" size="xsmall"></es-user-avatar>
-            <span>{{
-              (permission.authority.authorityType === 'GROUP' ? permission.group : permission.user)
-                | authorityName
-            }}</span>
+        <ng-container *ngFor="let permission of permissions">
+          <ng-container
+            *ngIf="
+              permission.authority.authorityType !== 'EVERYONE' &&
+              permission.authority.authorityName !== 'System'
+            "
+          >
+            <div>
+              <es-user-avatar [user]="permission" size="xsmall"></es-user-avatar>
+              <span>{{
+                (permission.authority.authorityType === 'GROUP'
+                  ? permission.group
+                  : permission.user
+                ) | authorityName
+              }}</span>
+            </div>
           </ng-container>
-        </div>
+        </ng-container>
       </div>
       <ng-container *ngIf="stats">
         <h2 class="collection-stats collection-label">

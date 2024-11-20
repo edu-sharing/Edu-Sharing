@@ -13,15 +13,19 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
+    ActionbarComponent,
     ColorHelper,
     DefaultGroups,
+    ElementType,
     InteractionType,
     ListItem,
     NodeDataSource,
     NodeEntriesDisplayType,
     NodeEntriesWrapperComponent,
     OptionItem,
+    OptionsHelperDataService,
     PreferredColor,
+    Scope,
     TranslationsService,
     UIConstants,
 } from 'ngx-edu-sharing-ui';
@@ -66,6 +70,7 @@ import { Values } from '../../../features/mds/types/types';
 import { DialogsService } from '../../../features/dialogs/dialogs.service';
 import { ShareDialogResult } from '../../../features/dialogs/dialog-modules/share-dialog/share-dialog-data';
 import { ExtendedAcl } from '../../../features/dialogs/dialog-modules/share-dialog/share-dialog.component';
+import { OptionsHelperService } from '../../../services/options-helper.service';
 
 type Step = 'NEW' | 'GENERAL' | 'METADATA' | 'PERMISSIONS' | 'SETTINGS' | 'EDITORIAL_GROUPS';
 
@@ -74,10 +79,12 @@ type Step = 'NEW' | 'GENERAL' | 'METADATA' | 'PERMISSIONS' | 'SETTINGS' | 'EDITO
     selector: 'es-collection-new',
     templateUrl: 'collection-new.component.html',
     styleUrls: ['collection-new.component.scss'],
+    providers: [OptionsHelperService, OptionsHelperDataService],
 })
 export class CollectionNewComponent implements EventListener, OnInit, OnDestroy {
     @ViewChild('mds') mds: MdsEditorWrapperComponent;
     @ViewChild('organizations') organizationsRef: NodeEntriesWrapperComponent<Group>;
+    @ViewChild('imageActionbar') imageActionbar: ActionbarComponent;
     readonly InteractionType = InteractionType;
     readonly NodeEntriesDisplayType = NodeEntriesDisplayType;
     public hasCustomScope: boolean;
@@ -145,7 +152,6 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
     authorFreetext = false;
     authorFreetextAllowed = false;
     mdsSet: string;
-    imageOptions: OptionItem[];
     imageWindow: Window;
     editorialGroupsSelected: Group[] = [];
 
@@ -235,6 +241,8 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         private sanitizer: DomSanitizer,
         private configLegacy: ConfigurationService,
         private configService: ConfigService,
+        private optionsHelper: OptionsHelperService,
+        private optionsHelperDataService: OptionsHelperDataService,
         private ref: ApplicationRef,
         private translations: TranslationsService,
         private translationService: TranslateService,
@@ -943,6 +951,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                 this.goToNextStep(),
             ),
         ];
+        setTimeout(() => this.updateImageOptions());
     }
 
     switchToAuthorFreetext() {
@@ -969,8 +978,8 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         this.currentCollection.collection.authorFreetext = null;
     }
 
-    updateImageOptions() {
-        this.imageOptions = [
+    async updateImageOptions() {
+        const imageOptions = [
             new OptionItem('COLLECTIONS.NEW.IMAGE.SEARCH', 'search', () => {
                 this.imageWindow = UIHelper.openSearchWithReurl(
                     this.platformLocation,
@@ -991,16 +1000,28 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                 this.imageFileRef.nativeElement.click(),
             ),
         ];
-        this.imageOptions[0].group = DefaultGroups.Edit;
-        this.imageOptions[1].group = DefaultGroups.Edit;
+        imageOptions[0].group = DefaultGroups.Edit;
+        imageOptions[1].group = DefaultGroups.Edit;
         if (
             this.imageData ||
             (this.currentCollection.preview && !this.currentCollection.preview.isIcon)
         ) {
-            this.imageOptions.push(
+            imageOptions.push(
                 new OptionItem('COLLECTIONS.NEW.IMAGE.DELETE', 'delete', () => this.deleteImage()),
             );
-            this.imageOptions[2].group = DefaultGroups.Delete;
+            imageOptions[2].group = DefaultGroups.Delete;
         }
+        this.optionsHelperDataService.initComponents(this.imageActionbar);
+        this.optionsHelperDataService.setData({
+            scope: Scope.CollectionsCollection,
+            customOptions: {
+                useDefaultOptions: false,
+                addOptions: imageOptions.map((i) => {
+                    i.elementType = [ElementType.Unknown];
+                    return i;
+                }),
+            },
+        });
+        await this.optionsHelperDataService.refreshComponents();
     }
 }

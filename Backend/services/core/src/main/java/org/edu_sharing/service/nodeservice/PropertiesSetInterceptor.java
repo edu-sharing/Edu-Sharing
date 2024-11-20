@@ -13,4 +13,21 @@ public interface PropertiesSetInterceptor {
      * You can add or remove data in the returned set
      */
     Map<String, Object> beforeSetProperties(PropertiesGetInterceptor.PropertiesContext context);
+    default SetInterceptorTiming getInterceptorTiming() {
+        return SetInterceptorTiming.BeforeAlfrescoInterceptors;
+    }
+
+    enum SetInterceptorTiming {
+        /**
+         * run this interceptor before the alfresco interceptors are running
+         * Note: This interceptors will not have aspects present when a node is in creation state!
+         */
+        BeforeAlfrescoInterceptors,
+        /**
+         * run this interceptor after the alfresco interecptors ran
+         * Note: This type is more expensive since it needs to re-fetch properties from alfresco
+         */
+        AfterAlfrescoInterceptors,
+    }
+
 }

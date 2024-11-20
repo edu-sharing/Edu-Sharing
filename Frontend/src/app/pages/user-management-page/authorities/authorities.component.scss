@@ -118,6 +118,11 @@
         mat-form-field {
             width: 100%;
         }
+
+        es-user-quota {
+            display: flex;
+            padding-top: 10px;
+        }
         .folder-path {
             display: flex;
             flex-direction: column;
@@ -158,7 +163,7 @@
     color: $primary;
 }
 
-$addToWidth: 400px;
+$addToWidth: 450px;
 .list {
     overflow-y: auto;
     position: fixed;
@@ -171,11 +176,6 @@ $addToWidth: 400px;
     mat-form-field {
         width: 100%;
     }
-}
-.listEmbedded {
-    top: 270px;
-    height: calc(100% - 330px);
-    width: $addToWidth;
 }
 .formEmbedded {
     width: $addToWidth;
@@ -193,8 +193,8 @@ label.search {
     position: fixed;
     right: 0;
     width: $addToWidth;
-    top: calc(115px + var(--mainnavHeight));
-    height: calc(100% - 115px - var(--mainnavHeight));
+    top: calc(105px + var(--mainnavHeight));
+    height: calc(100% - 105px - var(--mainnavHeight));
     z-index: 2;
     padding-bottom: 20px;
     background-color: #fff;
@@ -207,7 +207,27 @@ label.search {
 }
 .addToList {
     height: calc(100% - 37px);
-    overflow-y: auto;
+    // overflow-y: auto;
+    ::ng-deep es-permissions-authorities {
+        height: calc(100% - 7px);
+        display: flex;
+        flex-direction: column;
+        .topFrame {
+            display: none;
+        }
+        .searchEmbedded {
+            .mat-mdc-form-field-subscript-wrapper {
+                display: none;
+            }
+        }
+        .list {
+            position: relative;
+            top: 0;
+            height: auto;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+    }
 }
 #groupType {
     margin-bottom: 20px;

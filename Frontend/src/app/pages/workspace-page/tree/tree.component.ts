@@ -1,13 +1,23 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Node } from '../../../core-module/core.module';
-import { CanDrop, DragData, DropSource, NodeRoot, OptionItem } from 'ngx-edu-sharing-ui';
+import {
+    CanDrop,
+    DragData,
+    DropSource,
+    NodeRoot,
+    OptionItem,
+    OptionsHelperDataService,
+    Scope,
+} from 'ngx-edu-sharing-ui';
 import { WorkspacePageComponent } from '../workspace-page.component';
 import { WorkspaceSubTreeComponent } from '../sub-tree/sub-tree.component';
+import { NodeEntriesService } from 'ngx-edu-sharing-ui/services/node-entries.service';
 
 @Component({
     selector: 'es-workspace-tree',
     templateUrl: 'tree.component.html',
     styleUrls: ['tree.component.scss'],
+    providers: [NodeEntriesService, OptionsHelperDataService],
 })
 export class WorkspaceTreeComponent {
     @Input() root: NodeRoot;
@@ -37,7 +47,12 @@ export class WorkspaceTreeComponent {
 
     currentPath: string[] = [];
 
-    constructor() {}
+    constructor(private optionsHelperDataService: OptionsHelperDataService) {
+        this.optionsHelperDataService.setData({
+            scope: Scope.WorkspaceTree,
+        });
+        this.optionsHelperDataService.initComponents();
+    }
 
     canDropOnRecycle = (dragData: DragData<'RECYCLE'>): CanDrop => {
         return { accept: dragData.action === 'move' };

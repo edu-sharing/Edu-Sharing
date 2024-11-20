@@ -7,10 +7,7 @@ import org.alfresco.repo.search.impl.solr.ESSearchParameters;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.AssociationRef;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -629,9 +626,6 @@ public class CollectionServiceImpl implements CollectionService {
 
     public Map<String, Object> asProps(Collection collection) {
         Map<String, Object> props = new HashMap<>();
-        if (collection.getNodeId() != null) {
-            props.put(CCConstants.SYS_PROP_NODE_UID, collection.getNodeId());
-        }
         props.put(CCConstants.CM_PROP_TITLE, collection.getTitle());
         props.put(CCConstants.CM_NAME, NodeServiceHelper.cleanupCmName(collection.getTitle()));
         props.put(CCConstants.CM_PROP_DESCRIPTION, collection.getDescription());
@@ -846,10 +840,16 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     protected boolean isSubCollection(org.edu_sharing.service.model.NodeRef nodeRef) {
-        return AuthenticationUtil.runAsSystem(() -> {
-            NodeRef parent = NodeServiceHelper.getPrimaryParent(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeRef.getNodeId()));
-            return NodeServiceHelper.hasAspect(parent, CCConstants.CCM_ASPECT_COLLECTION);
-        });
+        try {
+            return AuthenticationUtil.runAsSystem(() -> {
+                NodeRef parent = NodeServiceHelper.getPrimaryParent(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeRef.getNodeId()));
+                return NodeServiceHelper.hasAspect(parent, CCConstants.CCM_ASPECT_COLLECTION);
+            });
+        } catch(InvalidNodeRefException e) {
+            // node from elastic index might already deleted, ignore to prevent full fail of query
+            logger.info("isSubCollection failed", e);
+            return true;
+        }
     }
 
     @Override

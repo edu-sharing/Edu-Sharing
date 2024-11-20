@@ -7,6 +7,7 @@ import { debounceTime, delay, filter, map, switchMap } from 'rxjs/operators';
 import { NodeDataSourceRemote, NodeDataSourceRemoteState } from './node-data-source-remote';
 import { notNull } from 'ngx-edu-sharing-ui';
 import { SearchPageState } from './search-page-results.service';
+import { MdsState } from '../../features/mds/mds-editor/mds-editor-instance.service';
 
 class RestoreEntry {
     /**
@@ -20,6 +21,7 @@ class RestoreEntry {
     searchState: SearchPageState = null;
     scrollPosition: [number, number] | null = null;
     dataSourceStates: { [key: string]: NodeDataSourceRemoteState } = {};
+    mdsState: MdsState;
 }
 
 @Injectable({
@@ -38,6 +40,11 @@ export class SearchPageRestoreService {
 
     registerSearchState(state: BehaviorSubject<SearchPageState>): void {
         state.subscribe((s) => (this._getEntryOrCreate().searchState = s));
+    }
+    registerMdsState(state: BehaviorSubject<MdsState>): void {
+        state.subscribe((s) => {
+            this._getEntryOrCreate().mdsState = s;
+        });
     }
     registerDataSource(key: string, dataSource: NodeDataSourceRemote): void {
         dataSource

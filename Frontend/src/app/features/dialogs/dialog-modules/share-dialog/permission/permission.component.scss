@@ -134,13 +134,22 @@
 .timebased-overlay {
     @include materialShadowLarge();
     background-color: #fff;
-    padding: 10px 10px 10px 20px;
+    padding: $cardPadding;
     display: flex;
     align-items: flex-start;
     gap: 20px;
     .content {
         display: flex;
         flex-direction: column;
+        .actions {
+            padding-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            button {
+                font-weight: bold;
+            }
+        }
     }
     .close {
         display: flex;

@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { GenericAuthority, Group, User } from 'ngx-edu-sharing-api';
+import { GenericAuthority, Group, User, GroupProfile, UserProfileEdit } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     Constrain,
@@ -106,7 +106,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
         elementType?: ElementType[];
         folderPath?: Node[];
         group?: DefaultGroups;
-        profile: any;
+        profile: GroupProfile | UserProfileEdit | any;
         quota?: any;
         priority?: number;
     };
@@ -349,6 +349,10 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
     }
 
     private search() {
+        if (this._searchQuery) {
+            this.sortConfig.active = 'score';
+            this.sortConfig.direction = 'desc';
+        }
         this.refresh();
     }
     public changeSort(event: ListSortConfig) {
@@ -756,6 +760,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                 }
                 return;
             }
+            delete (this.edit.profile as GroupProfile).customAttributes;
             this.iam.editGroup(this.editId, this.edit.profile).subscribe(
                 async () => {
                     this.edit = null;
@@ -771,11 +776,11 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
             if (this.edit.profile?.vcard) {
                 editStore.profile.vcard = this.edit.profile.vcard.copy();
             }
-            const password = this.editDetails.password?.trim() || null;
+            const password = this.editDetails?.password?.trim() || null;
             editStore.profile.sizeQuota *= 1024 * 1024;
             // we allow fully empty password since this means the backend will not create an authentication
             // useful for system managed users like i.e. guests
-            if (this.passwordRef.passwordStrength === 'weak') {
+            if (this.passwordRef?.passwordStrength === 'weak' && password) {
                 this.toast.error(null, 'PERMISSIONS.ERROR_PASSWORD_TO_WEAK');
                 this.toast.closeProgressSpinner();
                 return;
@@ -926,7 +931,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
         } else if (this._mode == 'USER') {
             this.iam.getUser(list[0].authorityName).subscribe((user) => {
                 this.edit = user.person;
-                this.edit.profile.sizeQuota = user.person.quota.sizeQuota / 1024 / 1024;
+                this.edit.profile.sizeQuota = user.person.quota.sizeQuota / 1024 / 1024 || '';
                 this.editId = this.edit.authorityName;
                 this.primaryAffiliationList = this.edit.profile.primaryAffiliation
                     ? this.PRIMARY_AFFILIATIONS.indexOf(this.edit.profile.primaryAffiliation) != -1
@@ -1393,7 +1398,7 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
             );
     }
     private savePersonPassword() {
-        if (!this.newPassword || this.passwordRef.passwordStrength === 'weak') {
+        if (!this.newPassword || this.passwordRef?.passwordStrength === 'weak') {
             this.toast.error(null, 'PERMISSIONS.ERROR_PASSWORD_TO_WEAK');
             return;
         }

@@ -7,6 +7,7 @@ import java.util.Date;
 @Data
 public class TimedPermission {
     private String node_id;
+    private String user;
     private String permission;
     private String authority;
     private Date from;

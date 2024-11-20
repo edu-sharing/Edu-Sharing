@@ -838,6 +838,9 @@ public class CCConstants {
 
 	public final static String CCM_PROP_IO_PUBLISHED_DATE = "{http://www.campuscontent.de/model/1.0}published_date";
 
+	public final static String CCM_PROP_IO_REVOKED_DATE = "{http://www.campuscontent.de/model/1.0}revoked_date";
+	public final static String CCM_PROP_IO_REVOKED_REASON = "{http://www.campuscontent.de/model/1.0}revoked_reason";
+
 	public final static String CCM_PROP_IO_PUBLISHED_MODE = "{http://www.campuscontent.de/model/1.0}published_mode";
 
 	public final static String CCM_PROP_IO_PUBLISHED_ORIGINAL = "{http://www.campuscontent.de/model/1.0}published_original";
@@ -846,6 +849,7 @@ public class CCConstants {
 	 * published
 	 */
 	public final static String CCM_ASPECT_PUBLISHED = "{http://www.campuscontent.de/model/1.0}published";
+	public final static String CCM_ASPECT_REVOKED = "{http://www.campuscontent.de/model/1.0}revoked";
 
 	public final static String CCM_PROP_PUBLISHED_DATE = "{http://www.campuscontent.de/model/1.0}published_date";
 
@@ -2018,6 +2022,8 @@ public class CCConstants {
 				usagePermissions.add(PERMISSION_READ_PREVIEW);
 				usagePermissions.add(PERMISSION_READ_ALL);
 				usagePermissions.add(PERMISSION_CONSUMER);
+				usagePermissions.add(PERMISSION_DOWNLOAD_CONTENT);
+				usagePermissions.add(PERMISSION_EMBED);
 				usagePermissions.add(PERMISSION_COMMENT);
 				usagePermissions.add(PERMISSION_RATE);
 				usagePermissions.add(PERMISSION_RATE_READ);
@@ -2228,7 +2234,20 @@ public class CCConstants {
 	public static final String EDU_SHARING_GLOBAL_GROUPS = "EDU_SHARING_GLOBAL_GROUPS";
 
 	public static final String ADMINISTRATORS_GROUP_TYPE = "ORG_ADMINISTRATORS";
-	
+
+	/**
+	 * group type representing a school class
+	 */
+	public static final String GROUP_TYPE_CLASS = "CLASS";
+	/**
+	 * group type representing a working group (arbeitsgruppe)
+	 */
+	public static final String GROUP_TYPE_WORKING_GROUP = "WORKING_GROUP";
+	/**
+	 * group type representing a lesson group (unterricht)
+	 */
+	public static final String GROUP_TYPE_LESSON = "LESSON";
+
 	public static final String EDITORIAL_GROUP_TYPE = "EDITORIAL";
 	public static final String COLLECTIONTYPE_DEFAULT = "default";
 	public static final String COLLECTIONTYPE_EDITORIAL = "EDITORIAL";

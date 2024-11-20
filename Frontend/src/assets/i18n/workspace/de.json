@@ -106,6 +106,12 @@
     "CHOOSE_LOCATION_TITLE": "Speicherort",
     "CHOOSE_LOCATION_DESCRIPTION": "Einen Ordner für die Ablage wählen",
     "TREE_MORE_ITEMS": "+ {{count}} weitere Ordner",
+    "REVOCATION": {
+      "TITLE": "Veröffentlichung zurückziehen",
+      "REASON": "Begründung angeben",
+      "REVOKE": "Objekt zurückziehen",
+      "DETAILS": "Hierdurch wird die Veröffentlichung dieses Elements aufgehoben. Es verbleibt lediglich eine Hinweis-Seite mit den Metadaten. Sollte das Element Serien-Elemente besitzen, werden diese ebenfalls entfernt. Bitte beachten Sie, dass dieser Vorgang nicht rückgängig gemacht werden kann."
+    },
     "SHARE": {
       "TITLE": "Freigaben verwalten",
       "NO_PERMISSIONS": "Noch keine expliziten Berechtigungen an diesem Element",
@@ -180,7 +186,8 @@
         "FROM_CHECKBOX": "Start-Zeitpunkt festlegen",
         "TO_CHECKBOX": "End-Zeitpunkt festlegen",
         "DATE_LABEL": "Datum",
-        "TIME_LABEL": "Uhrzeit"
+        "TIME_LABEL": "Uhrzeit",
+        "INVALID_DATE": "Ungültiges Datum"
       },
       "PUBLISH": {
         "OPEN_VERSION": "Version anzeigen",
@@ -213,6 +220,7 @@
         "NO_PUBLISH_COPY_PERMISSION": "Sie besitzen keine Berechtigung, eine Kopie zu veröffentlichen",
         "VERSION_COMMENT": "Versionskommentar",
         "VERSION_NUMBER": "Versionsnummer",
+        "REVOKED": "Diese Veröffentlichung wurde zurückgezogen",
         "VERSION_DATE": "Zeitpunkt der Veröffentlichung",
         "VERSION_DATE_ABSOLUTE": "Veröffentlicht am",
         "DOI_DISTINCT": "Neuen Handle erzeugen",
@@ -445,6 +453,9 @@
     "DRAG_DROP_COPY": "Kopieren",
     "DRAG_DROP_MOVE": "Verschieben",
     "FEATURE_NOT_IMPLEMENTED": "Die Funktion ist derzeit leider noch nicht verfügbar",
+    "SAFE_CONFIRM_DOWNLOAD_TITLE": "Hinweis",
+    "SAFE_CONFIRM_DOWNLOAD_CHECKBOX": "In dieser Sitzung nicht erneut anzeigen",
+    "SAFE_CONFIRM_DOWNLOAD_MESSAGE": "Bitte beachten Sie, dass lokal gespeicherte Dateien aus dem Datensafe wieder gelöscht werden sollten. Wir empfehlen die Synchronisation mit eigenen Cloudservices zusätzlich zu deaktivieren.",
     "LICENSE": {
       "TITLE": "Lizenz festlegen",
       "TYPE": "Lizenz wählen",

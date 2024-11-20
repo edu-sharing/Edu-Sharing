@@ -54,9 +54,7 @@ public abstract class Provider {
         return new AuthenticationToolAPI(appId);
     }
     public RenderingService getRenderingService(){
-        RenderingService service = (RenderingService) ApplicationContextFactory.getApplicationContext().getBean("renderingService");
-        service.setAppId(appId);
-        return service;
+        return RenderingServiceFactory.getLocalService();
     }
     public CollectionService getCollectionService(){
         return CollectionServiceImpl.build(appId);

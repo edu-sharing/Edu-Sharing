@@ -418,6 +418,17 @@
     "CREATED": "Der Link wurde angelegt und im Ordner \"{{folder}}\" gespeichert",
     "CREATED_LINK": "anzeigen"
   },
+  "REVOKE_FEEDBACK": {
+    "TITLE": "Redaktion kontaktieren",
+    "REPORT_INFO": "Redaktion bezüglich \"{{name}}\" kontaktieren",
+    "COMMENT": "Geben Sie Feedback, z.B. zur Verwendung oder Nutzung dieses Materials",
+    "COMMENT_REQUIRED": "Bitte geben Sie ein Kommentar/Details ein",
+    "COMMENT_PLACEHOLDER": "Details angeben...",
+    "DONE": "Vielen Dank für Ihr Feedback.",
+    "EMAIL": "Ihre E-Mail-Adresse",
+    "EMAIL_PLACEHOLDER": "jemand@beispiel.de",
+    "EMAIL_REQUIRED": "Bitte eine gültige E-Mail-Adresse angeben"
+  },
   "NODE_REPORT": {
     "TITLE": "Problem melden",
     "REPORT": "Melden",
@@ -493,6 +504,7 @@
     "file-h5p": "H5P-Datei",
     "file-geogebra": "Geogebra-Datei",
     "file-serlo": "Serlo-Datei",
+    "file-curriculum": "Kanban-Board",
     "file-pdf": "PDF-Datei",
     "link": "Website",
     "folder": "Ordner",
@@ -668,7 +680,8 @@
     "NODE_REPORT": "Problem melden",
     "ADD_NODE_STORE": "Auf Merkliste",
     "DELETE": "Löschen",
-    "UNPUBLISH": "Veröffentlichung aufheben",
+    "REVOKE": "Objekt zurückziehen",
+    "EDIT_REVOCATION": "Begründung bearbeiten",
     "UNBLOCK_IMPORT": "Reaktivieren",
     "REMOVE_REF": "Aus Sammlung entfernen",
     "CUT": "Ausschneiden",
@@ -844,6 +857,14 @@
   "VIDEO_CONTROLS": {
     "HEADING": "Einen Ausschnitt zum Speichern in einer Sammlung festlegen",
     "SAVED": "Änderungen wurden gespeichert."
+  },
+  "RENDERING": {
+    "REVOKED": {
+      "DETAILS": "Der Herausgebende bzw. die Redaktion hat dieses Objekt zurückgezogen. Es sind nur noch die Metadaten des ursprünglichen Elements verfügbar.\n\nWeitere Details finden Sie in der Begründung unten.",
+      "DATE": "Datum der Löschung",
+      "REASON": "Begründung der Löschung",
+      "FEEDBACK": "Redaktion kontaktieren"
+    }
   },
   "TOAST": {
     "NODE_LOCKED": "Das gewünschte Dokument wird aktuell von einer anderen Person verwendet und kann deshalb nicht geöffnet werden",

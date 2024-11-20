@@ -103,10 +103,23 @@ es-info-message {
                 border: 2px dashed $warningMedium;
             }
             .version-actions {
+                display: flex;
+                align-items: center;
+                gap: 5px;
                 align-self: center;
-                > button {
+                > button,
+                > div {
                     height: 40px;
-                    margin: 5px;
+                }
+                > div {
+                    cursor: default;
+                    user-select: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .revoked {
+                    color: darken($warningMedium, 10%);
                 }
             }
         }

@@ -12,6 +12,7 @@ import { Values } from '../../features/mds/types/types';
 import { notNull } from 'ngx-edu-sharing-ui';
 import { GlobalSearchPageServiceInternal } from './global-search-page.service';
 import { SearchPageService } from './search-page.service';
+import { SearchPageRestoreService } from './search-page-restore.service';
 
 @Component({
     selector: 'es-search-page-filter-bar',
@@ -46,6 +47,7 @@ export class SearchPageFilterBarComponent implements OnInit, OnDestroy {
         private ngZone: NgZone,
         private searchPage: SearchPageService,
         private searchService: SearchService,
+        private searchPageRestoreService: SearchPageRestoreService,
         private translate: TranslateService,
     ) {}
 
@@ -203,6 +205,14 @@ export class SearchPageFilterBarComponent implements OnInit, OnDestroy {
             .getNeededFacets()
             .pipe(takeUntil(this.destroyed))
             .subscribe((neededFacets) => this.searchPage.facetsToFetch.next(neededFacets));
+        if (this.searchPageRestoreService.getRestoreEntry()?.mdsState) {
+            this.mdsEditor.mdsEditorInstance.resetState(
+                this.searchPageRestoreService.getRestoreEntry()?.mdsState,
+            );
+        }
+        this.searchPageRestoreService.registerMdsState(
+            this.mdsEditor.mdsEditorInstance.observeState(),
+        );
     }
 
     // TODO: Provide this functionality in mds editor.

@@ -494,9 +494,10 @@ export class UIHelper {
         toast: Toast,
         node: Node,
         type: Filetype = null,
-        win: any = null,
+        win: Window = null,
         connectorType: Connector = null,
         newWindow = true,
+        parameters: { [key in string]: string[] } = {},
     ) {
         if (connectorType == null) {
             connectorType = connector.connectorSupportsEdit(node);
@@ -527,7 +528,7 @@ export class UIHelper {
                             if (win) win.close();
                             return;
                         }
-                        connector.generateToolUrl(connectorType, type, node).subscribe(
+                        connector.generateToolUrl(connectorType, type, node, parameters).subscribe(
                             (url: string) => {
                                 if (win) {
                                     win.location.href = url;

@@ -5,6 +5,7 @@ import net.sourceforge.cardme.engine.VCardEngine;
 import net.sourceforge.cardme.vcard.VCard;
 import net.sourceforge.cardme.vcard.types.ExtendedType;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -435,8 +436,9 @@ public class MetadataTemplateRenderer {
 
 	private boolean renderMaterialFeedback(MetadataWidget widget, StringBuffer widgetHtml) {
 		boolean empty=true;
-		String parent = NodeServiceFactory.getLocalService().getPrimaryParent(nodeRef.getId());
-		if(parent!=null){
+		try {
+			String parent = NodeServiceFactory.getLocalService().getPrimaryParent(nodeRef.getId());
+			if (parent != null) {
 			/* check that
 				- the parent is of type collection
 				- the user has the toolpermission TOOLPERMISSION_COLLECTION_FEEDBACK
@@ -444,34 +446,37 @@ public class MetadataTemplateRenderer {
 				- the user has the PERMISSION_FEEDBACK permission
 				- the user is not administrator (PERMISSION_DELETE) of the collection
 			 */
-			logger.info(ToolPermissionServiceFactory.getInstance().hasToolPermission(CCConstants.CCM_VALUE_TOOLPERMISSION_MATERIAL_FEEDBACK)+" "+PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),parent,CCConstants.PERMISSION_FEEDBACK)
-					+" "+PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),parent,CCConstants.PERMISSION_DELETE));
-			if(
-					ToolPermissionServiceFactory.getInstance().hasToolPermission(CCConstants.CCM_VALUE_TOOLPERMISSION_MATERIAL_FEEDBACK) &&
-							PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeRef.getId(),CCConstants.PERMISSION_FEEDBACK) &&
-							!PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE,StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(),nodeRef.getId(),CCConstants.PERMISSION_DELETE)
-			){
-				try {
-					widgetHtml.
-							append("<div class=\"mdsValue\">").
-							append("<a href=\"").
-							append(URLHelper.getNgRenderNodeUrl(nodeRef.getId(), null)).
-							append("?action=OPTIONS.MATERIAL_FEEDBACK&feedbackClose=true\"").
-							append(" data-es-auth-required=\"true\"").
-							append(" data-es-action=\"OPTIONS.MATERIAL_FEEDBACK\"");
-					if(widget.getLink()!=null){
-						widgetHtml.append(" target=\"").append(widget.getLink()).append("\"");
+				logger.info(ToolPermissionServiceFactory.getInstance().hasToolPermission(CCConstants.CCM_VALUE_TOOLPERMISSION_MATERIAL_FEEDBACK) + " " + PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), parent, CCConstants.PERMISSION_FEEDBACK)
+						+ " " + PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), parent, CCConstants.PERMISSION_DELETE));
+				if (
+						ToolPermissionServiceFactory.getInstance().hasToolPermission(CCConstants.CCM_VALUE_TOOLPERMISSION_MATERIAL_FEEDBACK) &&
+								PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeRef.getId(), CCConstants.PERMISSION_FEEDBACK) &&
+								!PermissionServiceFactory.getLocalService().hasPermission(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeRef.getId(), CCConstants.PERMISSION_DELETE)
+				) {
+					try {
+						widgetHtml.
+								append("<div class=\"mdsValue\">").
+								append("<a href=\"").
+								append(URLHelper.getNgRenderNodeUrl(nodeRef.getId(), null)).
+								append("?action=OPTIONS.MATERIAL_FEEDBACK&feedbackClose=true\"").
+								append(" data-es-auth-required=\"true\"").
+								append(" data-es-action=\"OPTIONS.MATERIAL_FEEDBACK\"");
+						if (widget.getLink() != null) {
+							widgetHtml.append(" target=\"").append(widget.getLink()).append("\"");
+						}
+						widgetHtml.append(">");
+						if (widget.getIcon() != null) {
+							widgetHtml.append(insertIcon(widget.getIcon()));
+						}
+						widgetHtml.append(MetadataHelper.getTranslation("material_feedback_button")).append("</a></div>");
+						empty = false;
+					} catch (Exception e) {
+						logger.warn(e.getMessage(), e);
 					}
-					widgetHtml.append(">");
-					if(widget.getIcon()!=null){
-						widgetHtml.append(insertIcon(widget.getIcon()));
-					}
-					widgetHtml.append(MetadataHelper.getTranslation("material_feedback_button")).append("</a></div>");
-					empty=false;
-				} catch (Exception e) {
-					logger.warn(e.getMessage(),e);
 				}
 			}
+		}catch(InvalidNodeRefException e) {
+			logger.debug(e);
 		}
 		return empty;
 	}

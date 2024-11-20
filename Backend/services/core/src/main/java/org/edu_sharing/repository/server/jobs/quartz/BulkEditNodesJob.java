@@ -43,8 +43,7 @@ import org.edu_sharing.repository.server.jobs.quartz.annotation.JobFieldDescript
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
 import org.edu_sharing.restservices.shared.Node;
-import org.edu_sharing.service.nodeservice.NodeServiceHelper;
-import org.edu_sharing.service.nodeservice.RecurseMode;
+import org.edu_sharing.service.nodeservice.*;
 import org.edu_sharing.service.util.CSVTool;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -54,10 +53,7 @@ import java.io.BufferedReader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -108,6 +104,7 @@ public class BulkEditNodesJob extends AbstractJob{
 
 	@JobFieldDescription(description = "use versionStore. default is \"false\". overwrites archive param.")
 	private String versionStore;
+	private PropertiesSetInterceptor setInterceptor;
 
 	private enum Mode{
 		@JobFieldDescription(description = "Replace a property with a fixed string")
@@ -121,6 +118,8 @@ public class BulkEditNodesJob extends AbstractJob{
 		@JobFieldDescription(description = "Remove the property. Use with searchtoken: one value must be equal, than the property is removed. When no search token is given, the property will be removed on every node")
 		Remove,
 		@JobFieldDescription(description = "Remove the property. Use with searchtoken: if a found value is equal, than it is removed, but other values will stay stored (useful for multivalue fields).")
+		SetInterceptor,
+		@JobFieldDescription(description = "Run a SetInterceptor for all nodes (provide the class name of the interceptor in the \"customClass\" attribute). The interceptor must be of type \"PropertiesSetInterceptor\"")
 		RemoveSingle,
 		@JobFieldDescription(description = "Remove Duplicates in multivalue properties.")
 		RemoveDuplicates,
@@ -144,7 +143,7 @@ public class BulkEditNodesJob extends AbstractJob{
 		}
 
 
-		if(!mode.equals(Mode.Custom)) {
+		if(!Arrays.asList(Mode.Custom, Mode.SetInterceptor).contains(mode)) {
 			property = prepareParam(context, "property", true);
 			property = CCConstants.getValidGlobalName(property);
 		}
@@ -207,6 +206,14 @@ public class BulkEditNodesJob extends AbstractJob{
 
 		NodeRunner runner = new NodeRunner();
 
+		if (mode.equals(Mode.SetInterceptor)) {
+			customClass = prepareParam(context, "customClass", true);
+			try {
+				setInterceptor = (PropertiesSetInterceptor)Class.forName(customClass).getDeclaredConstructor().newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		if (mode.equals(Mode.Custom)) {
 			customClass = prepareParam(context, "customClass", true);
 			Class clazz = null;
@@ -327,6 +334,20 @@ public class BulkEditNodesJob extends AbstractJob{
 						}
 					}
 
+				}  else if(mode.equals(Mode.SetInterceptor)){
+					HashMap<String, Object> properties = nodeService.getProperties(nodeRef).entrySet().stream().collect(
+							HashMap::new,
+							(m, entry) -> m.put(entry.getKey().toString(), entry.getValue()),
+							HashMap::putAll
+					);
+					Map<String, Object> propertiesMapped = setInterceptor.beforeSetProperties(PropertiesInterceptorFactory.getPropertiesContext(
+							nodeRef,
+							properties,
+							nodeService.getAspects(nodeRef).stream().map(QName::toString).collect(Collectors.toList()),
+							null,
+							null
+					));
+					nodeService.setProperties(nodeRef,  NodeServiceImpl.convertToFinalProperties(nodeRef, propertiesMapped));
 				} else {
 					throw new IllegalArgumentException("Mode " + mode + " is currently not supported");
 				}

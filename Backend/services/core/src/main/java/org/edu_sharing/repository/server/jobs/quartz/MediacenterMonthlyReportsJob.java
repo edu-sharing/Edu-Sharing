@@ -41,10 +41,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -60,6 +57,12 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
         TrackingMediacenterData,
         @JobFieldDescription(description = "Use the current licensed node data. Elements not licensed anymore will not be visible. Elements accessed from users assigned to more than one MZ are counted as well (legacy)")
         AlfrescoPermissionData
+    }
+
+    private enum ReportType {
+        Monthly,
+        Yearly,
+        Quarterly,
     }
 
     @JobFieldDescription(description = "Mode to use for processing")
@@ -94,6 +97,9 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
 
     @JobFieldDescription(description = "When set to true, the job will generate a yearly report as well (only on 1st January)")
     private boolean generateYearly = false;
+
+    @JobFieldDescription(description = "When set to true, the job will generate a quarterly report as well (only on 1st of January, April, July and October)")
+    private boolean generateQuarterly = false;
 
     @JobFieldDescription(description = "use a custom date (month) to run the job for. Note: The job will run the month BEFORE the given date!", sampleValue = "YYYY-MM-DD")
     private Date customDate = null;
@@ -134,13 +140,10 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             if (customDate != null) {
                 localDate = customDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             }
-            LocalDate from;
-            // January -> Dec. previous year
-            if (localDate.getMonthValue() == 1) {
-                from = LocalDate.of(localDate.getYear() - 1, 12, 1);
-            } else {
-                from = LocalDate.of(localDate.getYear(), localDate.getMonthValue() - 1, 1);
-            }
+
+            LocalDate lastMonth = localDate.minusMonths(1);
+            LocalDate from = lastMonth.withDayOfMonth(1);
+
             YearMonth month = YearMonth.from(from);
             LocalDate to = month.atEndOfMonth();
 
@@ -151,12 +154,21 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
                 logger.info("Building stats for mediacenter " + mediacenter);
                 Date startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
                 Date endDate = Date.from(to.atTime(23, 59).toInstant(ZoneOffset.UTC));
-                generateReportByTimeRange(mediacenter, startDate, endDate);
-                generateSchoolReportByTimeRange(mediacenter, startDate, endDate);
+                generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
+                generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
+
                 if (generateYearly && localDate.getMonthValue() == 1) {
-                    from = LocalDate.of(localDate.getYear() - 1, 1, 1);
+                    from = localDate.minusYears(1).withDayOfMonth(1);
                     startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
-                    generateReportByTimeRange(mediacenter, startDate, endDate);
+                    generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Yearly);
+                }
+
+                if (generateQuarterly && List.of(1, 4, 7, 10).contains(localDate.getMonthValue())) {
+                    from = lastMonth.withMonth(lastMonth.getMonth().firstMonthOfQuarter().getValue())
+                            .withDayOfMonth(1);
+
+                    startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
+                    generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Quarterly);
                 }
             }
         } catch (Throwable t) {
@@ -165,7 +177,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
         return null;
     }
 
-    private void generateSchoolReportByTimeRange(String mediacenter, Date startDate, Date endDate) throws Throwable {
+    private void generateSchoolReportByTimeRange(String mediacenter, Date startDate, Date endDate, ReportType reportType) throws Throwable {
         if (mode.equals(ReportMode.TrackingMediacenterData)) {
             Map<org.alfresco.service.cmr.repository.NodeRef, StatisticEntry> dataNodes = trackingService.getListNodeDataByMediacenter(
                     mediacenter,
@@ -218,7 +230,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
                 }
                 return resultArray.toArray(new String[0]);
             }).collect(Collectors.toList());
-            String nodeId = generateCSVNode(mediacenter, "nach-Schulen", startDate, endDate);
+            String nodeId = generateCSVNode(mediacenter, "nach-Schulen", startDate, endDate, reportType);
             try {
                 writeCSVFileInternal(nodeId, header, csvList);
             } catch (Throwable t) {
@@ -233,7 +245,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
     TrackingService trackingService = TrackingServiceFactory.getTrackingService();
     MediacenterService mediacenterService = MediacenterServiceFactory.getLocalService();
 
-    private void generateReportByTimeRange(String mediacenter, Date startDate, Date endDate) throws Throwable {
+    private void generateReportByTimeRange(String mediacenter, Date startDate, Date endDate, ReportType reportType) throws Throwable {
         TrackingService trackingService = TrackingServiceFactory.getTrackingService();
         Map<org.alfresco.service.cmr.repository.NodeRef, StatisticEntry> data = null;
         if (mode.equals(ReportMode.AlfrescoPermissionData)) {
@@ -266,7 +278,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             }
             data = filterNonMediacenterMedia(data);
         }
-        String nodeId = generateCSVNode(mediacenter, "nach-Medien", startDate, endDate);
+        String nodeId = generateCSVNode(mediacenter, "nach-Medien", startDate, endDate, reportType);
         try {
             writeCSVFile(data, nodeId);
         } catch (Throwable t) {
@@ -275,10 +287,10 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
         }
     }
 
-    private String generateCSVNode(String mediacenter, String csvPostfix, Date startDate, Date endDate) throws Throwable {
+    private String generateCSVNode(String mediacenter, String csvPostfix, Date startDate, Date endDate, ReportType reportType) throws Throwable {
         String baseFolder = new UserEnvironmentTool().getEdu_SharingMediacenterFolder();
         MediacenterService mediacenterService = MediacenterServiceFactory.getLocalService();
-        String filename = getFilename(mediacenter, csvPostfix, startDate, endDate);
+        String filename = getFilename(mediacenter, csvPostfix, startDate, endDate, reportType);
         String parent = NodeTool.createOrGetNodeByName(baseFolder, new String[]{mediacenter});
         PermissionServiceFactory.getLocalService().setPermission(parent, mediacenterService.getMediacenterAdminGroup(mediacenter), CCConstants.PERMISSION_CONSUMER);
         if (delete) {
@@ -294,9 +306,30 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
     }
 
     @NotNull
-    private static String getFilename(String mediacenter, String postfix, Date startDate, Date endDate) {
-        return startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern((startDate.getMonth() == endDate.getMonth() ? "yyyy-MM" : "yyyy"))) + "_" +
-                NodeServiceHelper.getPropertyNative(AuthorityServiceHelper.getAuthorityNodeRef(mediacenter), CCConstants.CCM_PROP_MEDIACENTER_ID) + "_" + postfix + ".csv";
+    private static String getFilename(String mediacenter, String postfix, Date startDate, Date endDate, ReportType reportType) {
+        StringBuilder sb = new StringBuilder();
+        switch (reportType) {
+
+            case Yearly:
+                sb.append(startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(("yyyy"))));
+                break;
+
+            case Quarterly:
+                sb.append(startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(("yyyy"))));
+                sb.append("-Q");
+                sb.append(endDate.getMonth()/3);
+                break;
+
+            default:
+                sb.append(startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(("yyyy-MM"))));
+                break;
+        }
+        sb.append("_");
+        sb.append(NodeServiceHelper.getPropertyNative(AuthorityServiceHelper.getAuthorityNodeRef(mediacenter), CCConstants.CCM_PROP_MEDIACENTER_ID));
+        sb.append("_");
+        sb.append(postfix);
+        sb.append(".csv");
+        return sb.toString();
     }
 
     private Map<org.alfresco.service.cmr.repository.NodeRef, StatisticEntry> filterNonMediacenterMedia(Map<org.alfresco.service.cmr.repository.NodeRef, StatisticEntry> data) {
@@ -336,7 +369,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             Set<String> values = data.values().stream()
                     .map(d -> STAT_FIELDS.stream()
                             .map(event -> d.getGroups().getOrDefault(event, Collections.emptyMap()))
-                            .map(x->x.getOrDefault(field, Collections.emptyMap()))
+                            .map(x -> x.getOrDefault(field, Collections.emptyMap()))
                             .map(Map::keySet)
                             .collect(Collectors.toSet()))
                     .flatMap(Set::stream)

@@ -2,11 +2,12 @@ import { trigger } from '@angular/animations';
 import { Location, PlatformLocation } from '@angular/common';
 import {
     AfterViewInit,
-    ChangeDetectorRef,
     Component,
+    ComponentFactoryResolver,
     ElementRef,
     EventEmitter,
     HostListener,
+    Injector,
     Input,
     NgZone,
     OnDestroy,
@@ -65,7 +66,6 @@ import {
     RestToolService,
     UIService,
 } from '../../core-module/core.module';
-import { MdsHelper } from '../../core-module/rest/mds-helper';
 import { UIHelper } from '../../core-ui-module/ui-helper';
 import { LoadingScreenService } from '../../main/loading-screen/loading-screen.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
@@ -78,16 +78,27 @@ import { BreadcrumbsService } from '../../shared/components/breadcrumbs/breadcru
 import { CardComponent } from '../../shared/components/card/card.component';
 import { RenderHelperService } from './render-helper.service';
 import { CardDialogService } from '../../features/dialogs/card-dialog/card-dialog.service';
+import { DialogsService } from '../../features/dialogs/dialogs.service';
+import { MdsWidgetComponent } from '../../features/mds/mds-viewer/widget/mds-widget.component';
+import { MdsEditorInstanceService } from '../../features/mds/mds-editor/mds-editor-instance.service';
+import { ViewInstanceService } from '../../features/mds/mds-editor/mds-editor-view/view-instance.service';
+
 @Component({
     selector: 'es-render-page',
     templateUrl: 'render-page.component.html',
     styleUrls: ['render-page.component.scss'],
-    providers: [OptionsHelperDataService, RenderHelperService],
+    providers: [
+        OptionsHelperDataService,
+        RenderHelperService,
+        MdsEditorInstanceService,
+        ViewInstanceService,
+    ],
     animations: [trigger('fadeFast', UIAnimation.fade(UIAnimation.ANIMATION_TIME_FAST))],
 })
 export class RenderPageComponent implements EventListener, OnInit, OnDestroy, AfterViewInit {
     readonly DisplayType = NodeEntriesDisplayType;
     readonly InteractionType = InteractionType;
+    specialTemplate: 'revoked' | null;
     @Input() set node(node: Node | string) {
         const id = (node as Node).ref ? (node as Node).ref.id : (node as string);
         jQuery('#nodeRenderContent').html('');
@@ -101,6 +112,8 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         private nodeHelper: NodeHelperService,
         private renderHelper: RenderHelperService,
         private location: Location,
+        private mdsEditorInstanceService: MdsEditorInstanceService,
+        private viewInstanceService: ViewInstanceService,
         private connector: RestConnectorService,
         private connectors: RestConnectorsService,
         private iam: RestIamService,
@@ -108,9 +121,12 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         private nodeApi: RestNodeService,
         private searchApi: RestSearchService,
         private toolService: RestToolService,
+        private injector: Injector,
         private cardServcie: CardService,
-        viewContainerRef: ViewContainerRef,
+        private viewContainerRef: ViewContainerRef,
+        private componentFactoryResolver: ComponentFactoryResolver,
         private cardDialogService: CardDialogService,
+        private dialogsService: DialogsService,
         private frame: FrameEventsService,
         private toast: Toast,
         private configLegacy: ConfigurationService,
@@ -135,7 +151,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
             },
         };
         this.frame.addListener(this, this.destroyed$);
-        this.renderHelper.setViewContainerRef(viewContainerRef);
+        this.renderHelper.setViewContainerRef(this.viewContainerRef);
 
         this.translations.waitForInit().subscribe(() => {
             this.banner = ConfigurationHelper.getBanner(this.configService);
@@ -450,6 +466,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
             showDownloadAdvice: !this.isOpenable,
         };
         this._node = null;
+        this.specialTemplate = null;
         this.isBuildingPage = true;
         // we only fetching versions for the primary parent (child objects don't have versions)
         this.nodeApi
@@ -465,19 +482,25 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                         console.error(data);
                         this.toast.error(null, 'RENDERSERVICE_API_ERROR');
                     } else {
-                        this._node = data.node;
-                        this._fromHomeRepository = await this.networkService
-                            .isFromHomeRepository(this._node)
-                            .pipe(first())
-                            .toPromise();
-                        if (this._fromHomeRepository) {
-                            this.nodeApi
-                                .getNodeParents(this._nodeId)
-                                .subscribe((nodes) =>
-                                    this.breadcrumbsService.setNodePath(nodes.nodes.reverse()),
-                                );
+                        try {
+                            this._node = data.node;
+                            this._fromHomeRepository = await this.networkService
+                                .isFromHomeRepository(this._node)
+                                .pipe(first())
+                                .toPromise();
+                            if (this._fromHomeRepository) {
+                                this.nodeApi
+                                    .getNodeParents(this._nodeId)
+                                    .subscribe((nodes) =>
+                                        this.breadcrumbsService.setNodePath(nodes.nodes.reverse()),
+                                    );
+                            }
+                            this.isOpenable =
+                                this.connectors.connectorSupportsEdit(this._node) != null;
+                        } catch (e) {
+                            console.error('error post-processing rendering node', data.node, e);
+                            this.toast.error(e);
                         }
-                        this.isOpenable = this.connectors.connectorSupportsEdit(this._node) != null;
                         this.mds.pipe(filter((set) => !!set)).subscribe((set) => {
                             this.similarNodeColumns = MdsHelperService.getColumns(
                                 this.translate,
@@ -492,10 +515,11 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                                 repository: this.repository,
                                 metadataSet: this.getMdsId(),
                             })
-                            .subscribe((mds) => {
+                            .subscribe((mds: MdsDefinition) => {
                                 this.mds.next(mds);
                             });
                         const finish = () => {
+                            this.isLoading = false;
                             const nodeRenderContent = jQuery('#nodeRenderContent');
                             nodeRenderContent.html(data.detailsSnippet);
                             this.moveInnerStyleToHead(nodeRenderContent);
@@ -505,7 +529,14 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                             this.loadNode();
                             this.loadSimilarNodes();
                             this.linkSearchableWidgets();
-                            this.isLoading = false;
+                            this.specialTemplate = null;
+                            if (this.nodeHelper.isNodeRevoked(this._node)) {
+                                this.specialTemplate = 'revoked';
+                                const element = document.getElementsByClassName(
+                                    'edusharing_rendering_content_wrapper',
+                                )?.[0];
+                                element.parentElement?.removeChild(element);
+                            }
                         };
                         this.getSequence(() => {
                             finish();
@@ -743,48 +774,43 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         });
     }
 
-    private linkSearchableWidgets() {
+    private async linkSearchableWidgets() {
         try {
-            this.mds.value?.widgets
-                .filter((w: any) => w.isSearchable)
-                .forEach((w: any) => {
+            this.viewInstanceService.treeDisplay = 'path';
+            await this.mdsEditorInstanceService.initWithNodes([this._node]);
+            this.mdsEditorInstanceService.widgets.value
+                .filter((w) => w.definition.isSearchable)
+                .forEach((w) => {
                     try {
                         const values = document.querySelectorAll(
                             "#edusharing_rendering_metadata [data-widget-id='" +
-                                w.id +
-                                "'] .mdsWidgetMultivalue .mdsValue",
+                                w.definition.id +
+                                "'] .mdsWidgetMultivalue",
                         );
                         values.forEach((v: HTMLElement) => {
-                            v.classList.add('clickable', 'mdsValueClickable');
-                            v.tabIndex = 0;
-                            const key = v.getAttribute('data-value-key');
-                            v.onclick = () => {
-                                this.navigateToSearch(w.id, key);
-                            };
-                            v.onkeyup = (k) => {
-                                if (k.key === 'Enter') {
-                                    this.navigateToSearch(w.id, key);
-                                }
-                            };
+                            const parent = v.parentElement;
+                            // we remove the caption since it is already present
+                            w.definition.caption = null;
+                            UIHelper.injectAngularComponent(
+                                this.componentFactoryResolver,
+                                this.viewContainerRef,
+                                MdsWidgetComponent,
+                                v,
+                                {
+                                    widget: w,
+                                },
+                                {},
+                                this.injector,
+                            );
                         });
-                    } catch (e) {}
+                    } catch (e) {
+                        console.warn(e);
+                    }
                 });
             // document.getElementsByClassName("edusharing_rendering_content_wrapper")[0].ge;
         } catch (e) {
             console.warn('Could not read the widget list from the metadataset', e);
         }
-    }
-
-    private navigateToSearch(id: any, value: string) {
-        UIHelper.getCommonParameters(this.route).subscribe((params) => {
-            const data: any = {};
-            data[id] = [value];
-            params.mds = this.getMdsId();
-            params.sidenav = true;
-            params.repo = this.repository;
-            params.filters = JSON.stringify(data);
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], { queryParams: params });
-        });
     }
 
     private getMdsId() {
@@ -861,5 +887,13 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         style.attr(styleAttr, '');
         jQuery(document.head).append(style);
         this.destroyed$.subscribe(() => style.remove());
+    }
+
+    reportRevokeFeedback() {
+        this.dialogsService.openNodeReportDialog({
+            node: this._node,
+            mode: 'REVOKE_FEEDBACK',
+            showOptions: false,
+        });
     }
 }

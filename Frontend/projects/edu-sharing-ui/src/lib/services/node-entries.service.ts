@@ -1,6 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { EventEmitter, Injectable, signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Node } from 'ngx-edu-sharing-api';
 import {
     ClickSource,
     FetchEvent,
@@ -25,6 +26,8 @@ import { ListItem } from '../types/list-item';
 import { UIService } from './ui.service';
 import { NodeDataSourceRemote } from '../node-entries/node-data-source-remote';
 import { delay, map } from 'rxjs/operators';
+import { DropdownComponent } from '../dropdown/dropdown.component';
+import { Toast } from './abstract/toast.service';
 
 /**
  Custom selection model which adds the click source of the selection.
@@ -140,7 +143,11 @@ export class NodeEntriesService<T extends NodeEntriesDataType> {
     disableInfiniteScroll: boolean;
     scrollGradientColor: WritableSignal<string> = signal('fff');
 
-    constructor(private uiService: UIService, private entriesGlobal: NodeEntriesGlobalService) {}
+    constructor(
+        private uiService: UIService,
+        private toast: Toast,
+        private entriesGlobal: NodeEntriesGlobalService,
+    ) {}
 
     onClicked({ event, ...data }: NodeClickEvent<T> & { event: MouseEvent }) {
         if (event.ctrlKey || event.metaKey) {
@@ -216,5 +223,24 @@ export class NodeEntriesService<T extends NodeEntriesDataType> {
                 this.selection.select(this.dataSource.getData()[i]);
             }
         }
+    }
+
+    openDropdown(dropdown: DropdownComponent, node: T, onDone: () => void = null) {
+        if (!this.selection.selected.includes(node)) {
+            this.selection.clear();
+            this.selection.select(node);
+        }
+        // Wait for the menu to reflect changed options.
+        setTimeout(() => {
+            dropdown.callbackObjects = this.selection.selected as unknown as Node[];
+            dropdown.ngOnChanges();
+            if (dropdown.canShowDropdown()) {
+                if (onDone) {
+                    onDone();
+                }
+            } else {
+                this.toast.toast('NO_AVAILABLE_OPTIONS');
+            }
+        });
     }
 }

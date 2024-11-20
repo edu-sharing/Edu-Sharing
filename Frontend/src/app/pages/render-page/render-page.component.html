@@ -49,6 +49,11 @@
 </div>
 <div>
   <div id="nodeRenderContentWrapper">
+    <div *ngIf="specialTemplate !== null" class="specialTemplate">
+      <ng-container *ngIf="specialTemplate === 'revoked'">
+        <ng-container *ngTemplateOutlet="revoked"></ng-container>
+      </ng-container>
+    </div>
     <div *ngIf="sequence" id="sequence" #sequencediv>
       <div
         class="wrapperouter clickable"
@@ -113,3 +118,29 @@
     <es-imprint-privacy [separator]="'/'"></es-imprint-privacy>
   </div>
 </div>
+<ng-template #revoked>
+  <div class="revoked">
+    <h1 class="mat-heading-1">{{ _node | nodeTitle }}</h1>
+    <es-info-message mode="warning" class="details-message">{{
+      'RENDERING.REVOKED.DETAILS' | translate
+    }}</es-info-message>
+    <div class="details">
+      <div class="date">
+        <label for="revoked-date">{{ 'RENDERING.REVOKED.DATE' | translate }}:</label
+        ><span
+          id="revoked-date"
+          >{{ _node.properties['ccm:revoked_date_LONG']?.[0] | formatDate:{relative: false, time: false} }}</span
+        >
+      </div>
+      <div class="reason">
+        <label for="revoked-reason">{{ 'RENDERING.REVOKED.REASON' | translate }}:</label
+        ><span id="revoked-reason">{{ _node.properties['ccm:revoked_reason']?.join('') }}</span>
+      </div>
+    </div>
+    <div class="actions">
+      <button mat-button color="primary" (click)="reportRevokeFeedback()">
+        <i esIcon="arrow_forward"></i>{{ 'RENDERING.REVOKED.FEEDBACK' | translate }}
+      </button>
+    </div>
+  </div>
+</ng-template>

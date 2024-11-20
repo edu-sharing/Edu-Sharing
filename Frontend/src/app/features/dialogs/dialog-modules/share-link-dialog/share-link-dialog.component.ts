@@ -13,6 +13,8 @@ import { UIHelper } from '../../../../core-ui-module/ui-helper';
 import { CARD_DIALOG_DATA } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { ShareLinkDialogData, ShareLinkDialogResult } from './share-link-dialog-data';
+import { BehaviorSubject } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
 
 @Component({
     selector: 'es-share-link-dialog',
@@ -20,6 +22,7 @@ import { ShareLinkDialogData, ShareLinkDialogResult } from './share-link-dialog-
     styleUrls: ['./share-link-dialog.component.scss'],
 })
 export class ShareLinkDialogComponent implements OnInit {
+    private loading$ = new BehaviorSubject<boolean>(false);
     constructor(
         @Inject(CARD_DIALOG_DATA) public data: ShareLinkDialogData,
         private dialogRef: CardDialogRef<ShareLinkDialogData, ShareLinkDialogResult>,
@@ -54,8 +57,14 @@ export class ShareLinkDialogComponent implements OnInit {
     currentShare: NodeShare = {} as NodeShare;
     private currentDate: number;
 
-    copyClipboard() {
+    async copyClipboard() {
         if (!this.enabled) return;
+        await this.loading$
+            .pipe(
+                filter((v) => !v),
+                first(),
+            )
+            .toPromise();
         try {
             UIHelper.copyToClipboard(this.currentShare.url);
             this.toast.toast('WORKSPACE.SHARE_LINK.COPIED_CLIPBOARD');
@@ -116,6 +125,7 @@ export class ShareLinkDialogComponent implements OnInit {
 
     private updateShare(date = this.currentDate) {
         this.currentShare.url = this.translate.instant('LOADING');
+        this.loading$.next(true);
         this.nodeService
             .updateNodeShare(
                 this._node.ref.id,
@@ -127,6 +137,7 @@ export class ShareLinkDialogComponent implements OnInit {
                 this.currentShare = data;
                 if (date == 0)
                     this.currentShare.url = this.translate.instant('WORKSPACE.SHARE_LINK.DISABLED');
+                this.loading$.next(false);
             });
     }
 

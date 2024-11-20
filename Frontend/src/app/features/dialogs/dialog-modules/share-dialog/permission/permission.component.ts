@@ -3,6 +3,7 @@ import { Ace, AuthenticationService } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../../../core-module/core.module';
 import { ExtendedAce } from '../share-dialog.component';
 import { TypeResult } from '../choose-type/choose-type.component';
+import { Helper } from 'ngx-edu-sharing-ui';
 
 @Component({
     selector: 'es-share-dialog-permission',
@@ -14,6 +15,7 @@ export class ShareDialogPermissionComponent implements OnInit {
     public invalidPermission = false;
     public isEveryone: boolean;
     permissionTimebased: boolean;
+    timebased: ExtendedAce;
 
     constructor(private authenticationService: AuthenticationService) {}
 
@@ -76,5 +78,16 @@ export class ShareDialogPermissionComponent implements OnInit {
 
     getDateTomorrow() {
         return new Date().getTime() + 1000 * 60 * 60 * 24;
+    }
+
+    openTimebased() {
+        this.timebased = Helper.deepCopy(this._permission);
+        this.timebasedOpen = true;
+    }
+
+    saveTimebased() {
+        this._permission.from = this.timebased.from;
+        this._permission.to = this.timebased.to;
+        this.timebasedOpen = false;
     }
 }

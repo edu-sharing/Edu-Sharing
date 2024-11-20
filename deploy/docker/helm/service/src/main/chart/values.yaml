@@ -277,12 +277,6 @@ config:
       ## @param config.database.pool.sql Set maximum connection sql
       sql: "SELECT 1"
 
-  guest:
-    ## @param config.guest.username Set guest username
-    username: ""
-    ## @param config.guest.password Set guest password
-    password: ""
-
   hazelcast:
     heartbeat:
       failuredetector:

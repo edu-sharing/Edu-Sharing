@@ -171,7 +171,7 @@ public class RenderingTool {
 					}
 					// @TODO: May we need to build up caches just for particular file types?
 					RenderingService service = RenderingServiceFactory.getLocalService();
-					return service.getDetails(nodeId, null, DISPLAY_PRERENDER, null);
+					return service.getDetails(ApplicationInfoList.getHomeRepository().getAppId(), nodeId, null, DISPLAY_PRERENDER, null);
 				} catch (Exception e) {
 					logger.warn("Error building rendering cache for node " + nodeId + ": " + e.getMessage(), e);
 					return e;

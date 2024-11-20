@@ -57,6 +57,7 @@ export class TranslationLoader implements TranslateLoader {
      */
     getTranslation(lang: string): Observable<Dictionary> {
         if (lang === 'none') {
+            this.configService.setLocale(LANGUAGES[lang], lang);
             return of({});
         }
         // backend can not handle sub-languages

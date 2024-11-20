@@ -104,9 +104,11 @@ public class NodeFrontpage {
         InputStream is = NodeFrontpage.class.getClassLoader().getResource("frontpage-ratings.properties").openStream();
         String sortingScript = IOUtils.toString(is, StandardCharsets.UTF_8.name());
 
-        Script sortingScriptInline = new Script.Builder().inline(
-                i -> i.lang("painless").source(sortingScript).params("fields", getFieldNames(config))
-        ).build();
+        Script sortingScriptInline = new Script.Builder().
+                lang("painless")
+                .source(sortingScript)
+                .params("fields", getFieldNames(config))
+                .build();
 
         SearchRequest searchRequest = SearchRequest.of(req->req
                 .index(WORKSPACE_INDEX)

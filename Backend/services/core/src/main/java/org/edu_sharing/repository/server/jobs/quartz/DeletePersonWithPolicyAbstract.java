@@ -66,10 +66,9 @@ public abstract class DeletePersonWithPolicyAbstract extends AbstractJob{
 						logger.info("Deleted person " + a + ", " +
 								new Gson().toJson(results.results.get(0))
 						);
-					} catch (DAOException e) {
-						throw new RuntimeException(e);
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
 					}
-
 				});
 
 			} catch (Exception e) {

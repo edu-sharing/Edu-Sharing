@@ -28,6 +28,8 @@ export class RestConstants {
     };
     public static CCM_ASPECT_COLLECTION = 'ccm:collection';
     public static CCM_ASPECT_IO_REFERENCE = 'ccm:collection_io_reference';
+    public static CCM_ASPECT_PUBLISHED = 'ccm:published';
+    public static CCM_ASPECT_REVOKED = 'ccm:revoked';
 
     public static TOOLPERMISSION_INVITE = 'TOOLPERMISSION_INVITE';
     public static TOOLPERMISSION_INVITE_TIMEBASED = 'TOOLPERMISSION_INVITE_TIMEBASED';
@@ -113,6 +115,8 @@ export class RestConstants {
     public static CCM_PROP_CCRESSOURCETYPE = 'ccm:ccressourcetype';
     public static CCM_PROP_CCRESSOURCESUBTYPE = 'ccm:ccresourcesubtype';
     public static CCM_PROP_CCRESSOURCEVERSION = 'ccm:ccressourceversion';
+    public static CCM_PROP_PUBLISHED_ORIGINAL = 'ccm:published_original';
+
     public static AUTHORITY_NAME = 'authorityName';
     public static AUTHORITY_DISPLAYNAME = 'displayName';
     public static AUTHORITY_GROUPTYPE = 'groupType';

@@ -8,6 +8,7 @@
 >
   <mat-checkbox
     *ngIf="formControl"
+    [class.mat-mdc-checkbox-indeterminate]="isIndeterminate"
     [(indeterminate)]="isIndeterminate"
     [formControl]="formControl"
     [aria-describedby]="container.descriptionId"

@@ -20,6 +20,7 @@ import java.util.List;
 public class MetadataKey extends MetadataTranslatable {
 
     @Getter
+    @Setter
     public static class MetadataKeyRelated extends MetadataKey {
         public enum Relation {
             exactMatch,
@@ -29,7 +30,11 @@ public class MetadataKey extends MetadataTranslatable {
             broadMatch,
         }
 
-        private final Relation relation;
+        private Relation relation;
+        /**
+         * optional target id of the valuespace/widget id it is targeting
+         */
+        private String target;
 
         public MetadataKeyRelated(Relation relation) {
             this.relation = relation;

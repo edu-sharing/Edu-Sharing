@@ -11,4 +11,10 @@ export class ViewInstanceService {
      * labels and values, that will be read out by screen readers.
      */
     headingLevel: number | null = null;
+    /**
+     * how to display tree entries
+     * flat (only display the last entry)
+     * full (display the full tree path)
+     */
+    treeDisplay: 'flat' | 'path' = 'flat';
 }

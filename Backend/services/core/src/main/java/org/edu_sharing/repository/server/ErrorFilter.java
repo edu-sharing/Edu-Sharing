@@ -101,7 +101,10 @@ public class ErrorFilter implements Filter {
 					Logger.getLogger(ErrorFilter.class).error(t.getMessage(), t);
 				}
 			}
-			resp.reset();
+			String accept = req.getHeader("accept");
+			if (! (accept!=null && accept.toLowerCase().contains("text/html"))) {
+				resp.reset();
+			}
 			ErrorResponse response = new ErrorResponse();
 			response.setError(statusCode + "");
 			if (Logger.getLogger(ErrorFilter.class).getEffectiveLevel().toInt() <= Level.INFO_INT) {
@@ -110,9 +113,9 @@ public class ErrorFilter implements Filter {
 				response.setMessage("LogLevel is > INFO");
 			}
 			resp.setStatus(statusCode);
-			String accept = req.getHeader("accept");
 			if (accept!=null && accept.toLowerCase().contains("text/html")) {
-				resp.getWriter().print("<script>window.location.href=\"" + URLTool.getNgErrorUrl(statusCode + "") + "\";</script>");
+				resp.setContentType("text/html");
+				resp.getWriter().print("<head><script nonce=\"" + SecurityHeadersFilter.ngCspNonce.get() + "\">window.location.href=\"" + URLTool.getNgErrorUrl(statusCode + "") + "\";</script></head>");
 			} else if(accept!=null && accept.toLowerCase().contains("application/json")) {
 				resp.setHeader("Content-Type", "application/json");
 				resp.getWriter().print(new Gson().toJson(response));

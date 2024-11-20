@@ -292,7 +292,16 @@ export class MainMenuEntriesService {
                         params[key] = currentParams[key];
                     }
                 }
-                this.router.navigate([UIConstants.ROUTER_PREFIX + target.path], {
+                const sourceParams = target.path.split('?');
+                const path = sourceParams.splice(0, 1);
+                sourceParams
+                    ?.join('?')
+                    .split('&')
+                    .forEach((p) => {
+                        const split = p.split('=');
+                        params[split[0]] = split[1];
+                    });
+                this.router.navigate([UIConstants.ROUTER_PREFIX + path], {
                     queryParams: params,
                 });
                 break;

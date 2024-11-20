@@ -28,7 +28,6 @@ import org.edu_sharing.repository.client.rpc.Share;
 import org.edu_sharing.repository.client.rpc.User;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
 import org.edu_sharing.repository.server.tools.*;
@@ -37,13 +36,11 @@ import org.edu_sharing.repository.server.tools.security.JwtTokenUtil;
 import org.edu_sharing.restservices.collection.v1.model.Collection;
 import org.edu_sharing.restservices.collection.v1.model.CollectionReference;
 import org.edu_sharing.restservices.collection.v1.model.CollectionRelationReference;
-import org.edu_sharing.restservices.node.v1.model.NodeEntries;
-import org.edu_sharing.restservices.node.v1.model.NodeShare;
-import org.edu_sharing.restservices.node.v1.model.NotifyEntry;
-import org.edu_sharing.restservices.node.v1.model.WorkflowHistory;
+import org.edu_sharing.restservices.node.v1.model.*;
 import org.edu_sharing.restservices.shared.NodeRef;
 import org.edu_sharing.restservices.shared.*;
 import org.edu_sharing.restservices.shared.NodeSearch.Facet;
+import org.edu_sharing.restservices.shared.SearchResult;
 import org.edu_sharing.restservices.shared.NodeSearch.Facet.Value;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityService;
@@ -248,6 +245,15 @@ public class NodeDao {
 
             return changeProperties(props);
         } catch (Throwable t) {
+            throw DAOException.mapping(t);
+        }
+    }
+
+    public NodeDao revokeNode(RevokeDetails details) {
+        try {
+            NodeServiceFactory.getLocalService().revokeNode(storeProtocol, storeId, getId(), details);
+            return getNode(repoDao, getId(), filter);
+        } catch(Throwable t) {
             throw DAOException.mapping(t);
         }
     }
@@ -1094,7 +1100,7 @@ public class NodeDao {
 
         try {
             org.alfresco.service.cmr.repository.NodeRef newNode = nodeService.copyNode(sourceId, nodeId, withChildren);
-            permissionService.createNotifyObject(newNode.getId(), new AuthenticationToolAPI().getCurrentUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+            permissionService.createNotifyObject(newNode.getId(),AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
             return new NodeDao(repoDao, newNode.getId(), Filter.createShowAllFilter());
 
         } catch (Throwable t) {
@@ -1437,16 +1443,8 @@ public class NodeDao {
         if (reference.getAccessOriginal() != null) {
             result.addAll(reference.getAccessOriginal());
         }
-        if (reference.isOriginalRestrictedAccess()) {
-            if (restrictedPermissions != null) {
-                result.addAll(restrictedPermissions.stream()
-                        .map(PermissionServiceHelper::getAllIncludingPermissions)
-                        .flatMap(java.util.Collection::stream)
-                        .collect(Collectors.toSet()));
-            }
-        } else {
-            result.addAll(CCConstants.getUsagePermissions());
-        }
+        boolean restrictedAccess = reference.isOriginalRestrictedAccess();
+        result.addAll(PermissionServiceHelper.getEffectivePermissions(restrictedPermissions, restrictedAccess));
         return result;
     }
 
@@ -1486,7 +1484,14 @@ public class NodeDao {
         data.setProperties(getProperties());
 
         data.setAccess(access);
-
+        // set access effective for original elements only
+        if (!(data instanceof CollectionReference) && Objects.equals(CallSourceHelper.CallSource.Render, CallSourceHelper.getCallSource())) {
+            java.util.Collection<String> permissions = org.edu_sharing.service.nodeservice.NodeServiceInterceptor.getIndirectPermissions(getId(), List.of(DAO_PERMISSIONS));
+            // since it's an original: we join the permissions with the original ones
+            permissions = new HashSet<>(permissions);
+            permissions.addAll(access);
+            data.setAccessEffective(permissions);
+        }
         data.setPublic(isPublic);
 
         data.setMimetype(getMimetype());
@@ -2071,8 +2076,8 @@ public class NodeDao {
         //if(isLink())
         //	return null;
 
-        // no download url if user can not access the content
-        if (!access.contains(CCConstants.PERMISSION_READ_ALL))
+        // no download url if user can not access the content anyways
+        if (!access.contains(CCConstants.PERMISSION_READ_ALL) || !access.contains(CCConstants.PERMISSION_DOWNLOAD_CONTENT))
             return null;
         return (String) nodeProps.get(CCConstants.DOWNLOADURL);
     }
@@ -2598,13 +2603,13 @@ public class NodeDao {
         return refs.stream().map(ref -> new NodeRef(repoDao, ref.getNodeId())).collect(Collectors.toList());
     }
 
-    public void reportNode(String reason, String userEmail, String userComment) throws DAOException {
+    public void reportNode(NotificationService.NotifyMode mode, String reason, String userEmail, String userComment) throws DAOException {
         try {
             String type = nodeService.getType(nodeId);
             Map<String, Object> properties = nodeService.getProperties(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId);
             List<String> aspects = Arrays.asList(nodeService.getAspects(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId));
             NotificationServiceFactoryUtility.getLocalService()
-                    .notifyNodeIssue(nodeId, reason, type, aspects, properties, userEmail, userComment);
+                    .notifyNodeIssue(nodeId, mode, reason, type, aspects, properties, userEmail, userComment);
         } catch (Throwable t) {
             throw DAOException.mapping(t);
         }
@@ -2700,22 +2705,23 @@ public class NodeDao {
         nodeService.setOwner(this.getId(), username);
     }
 
-    public void setProperty(String property, Serializable value, boolean keepModifiedDate) {
+    public static void setProperty(RepositoryDao repoDao, String nodeId, String property, Serializable value, boolean keepModifiedDate) {
+        NodeService nodeService = NodeServiceFactory.getNodeService(repoDao.getId());
         if (keepModifiedDate) {
             nodeService.keepModifiedDate(
-                    StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(),
-                    () -> setPropertyInternal(property, value)
+                    StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId,
+                    () -> setPropertyInternal(nodeService, nodeId, property, value)
             );
         } else {
-            setPropertyInternal(property, value);
+            setPropertyInternal(nodeService, nodeId, property, value);
         }
     }
 
-    private void setPropertyInternal(String property, Serializable value) {
+    private static void setPropertyInternal(NodeService nodeService, String nodeId, String property, Serializable value) {
         if (value == null) {
-            nodeService.removeProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(), property);
+            nodeService.removeProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId, property);
         } else {
-            nodeService.setProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(), property, value, false);
+            nodeService.setProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId, property, value, false);
         }
     }
 
@@ -2726,7 +2732,7 @@ public class NodeDao {
             RunAsWork<NodeDao> work = () -> {
                 try {
                     org.alfresco.service.cmr.repository.NodeRef newNode = nodeService.copyNode(source[0], nodeId, false);
-                    permissionService.createNotifyObject(newNode.getId(), new AuthenticationToolAPI().getCurrentUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+                    permissionService.createNotifyObject(newNode.getId(),AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
                     nodeService.addAspect(newNode.getId(), CCConstants.CCM_ASPECT_FORKED);
                     nodeService.setProperty(newNode.getStoreRef().getProtocol(), newNode.getStoreRef().getIdentifier(), newNode.getId(), CCConstants.CCM_PROP_FORKED_ORIGIN,
                             new org.alfresco.service.cmr.repository.NodeRef(storeProtocol, storeId, source[0]), false);

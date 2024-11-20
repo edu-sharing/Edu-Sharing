@@ -67,6 +67,7 @@ import { forkJoinWithErrors } from '../util/rxjs/forkJoinWithErrors';
 import { ConfigOptionItem, NodeHelperService } from './node-helper.service';
 import { Toast } from './toast';
 import { UIHelper } from '../core-ui-module/ui-helper';
+import { GlobalOptionsService } from './global-options.service';
 
 @Injectable()
 export class OptionsHelperService extends OptionsHelperServiceAbstract implements OnDestroy {
@@ -92,6 +93,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         private bridge: BridgeService,
         private collectionService: RestCollectionService,
         private configService: ConfigurationService,
+        private globalOptionsService: GlobalOptionsService,
         private connector: RestConnectorService,
         private connectors: RestConnectorsService,
         private dialogs: DialogsService,
@@ -212,11 +214,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
     /**
      * refresh all bound components with available menu options
      */
-    async refreshComponents(
-        components: OptionsHelperComponents,
-        data: OptionData,
-        refreshListOptions: boolean,
-    ) {
+    async refreshComponents(components: OptionsHelperComponents, data: OptionData) {
         if (data == null) {
             // console.info('options helper refresh called but no data previously bound');
             return;
@@ -455,7 +453,9 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             ) {
                 return ElementType.NodeProposal;
             } else {
-                if (this.nodeHelper.isNodePublishedCopy(object)) {
+                if (this.nodeHelper.isNodeRevoked(object)) {
+                    return ElementType.NodeRevoked;
+                } else if (this.nodeHelper.isNodePublishedCopy(object)) {
                     return ElementType.NodePublishedCopy;
                 } else if (
                     object.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true'
@@ -560,6 +560,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         debugNode.elementType = [
             ElementType.Node,
             ElementType.NodePublishedCopy,
+            ElementType.NodeRevoked,
             ElementType.NodeBlockedImport,
             ElementType.Group,
             ElementType.Person,
@@ -610,6 +611,33 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             });
             options.push(openFolder);
          */
+        const revokeNode = new OptionItem('OPTIONS.REVOKE', 'delete', async (object) => {
+            await this.revokeNode(object, data);
+        });
+        revokeNode.constrains = [
+            Constrain.Files,
+            Constrain.NoBulk,
+            Constrain.HomeRepository,
+            Constrain.User,
+        ];
+        revokeNode.scopes = [Scope.Render];
+        revokeNode.elementType = [ElementType.NodePublishedCopy];
+        revokeNode.group = DefaultGroups.Delete;
+        revokeNode.priority = 10;
+
+        const editRevocation = new OptionItem('OPTIONS.EDIT_REVOCATION', 'edit', async (object) => {
+            await this.revokeNode(object, data);
+        });
+        editRevocation.constrains = [
+            Constrain.Files,
+            Constrain.NoBulk,
+            Constrain.HomeRepository,
+            Constrain.User,
+        ];
+        editRevocation.scopes = [Scope.Render];
+        editRevocation.elementType = [ElementType.NodeRevoked];
+        editRevocation.group = DefaultGroups.Edit;
+        editRevocation.priority = 10;
 
         const openOriginalNode = new OptionItem(
             'OPTIONS.OPEN_ORIGINAL_NODE',
@@ -649,7 +677,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             }
             return false;
         };
-        openOriginalNode.elementType = [ElementType.NodePublishedCopy];
+        openOriginalNode.elementType = [ElementType.NodePublishedCopy, ElementType.NodeRevoked];
         openOriginalNode.group = DefaultGroups.View;
         openOriginalNode.priority = 13;
 
@@ -971,48 +999,8 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             }
             return isAllowed;
          */
-        const downloadNode = new OptionItem('OPTIONS.DOWNLOAD', 'cloud_download', (object) =>
-            this.nodeHelper.downloadNodes(this.getObjects(object, data)),
-        );
-        downloadNode.elementType = OptionsHelperService.DownloadElementTypes;
-        downloadNode.constrains = [Constrain.Files];
-        downloadNode.group = DefaultGroups.View;
-        // downloadNode.key = 'D';
-        downloadNode.priority = 40;
-        downloadNode.customEnabledCallback = async (nodes) => {
-            if (!nodes) {
-                return false;
-            }
-
-            if (
-                nodes.some((n) =>
-                    n.properties?.[RestConstants.CCM_PROP_EDUSCOPENAME]?.includes(
-                        RestConstants.SAFE_SCOPE,
-                    ),
-                )
-            ) {
-                downloadNode.name = 'OPTIONS.DOWNLOAD_SAFE';
-            } else {
-                downloadNode.name = 'OPTIONS.DOWNLOAD';
-            }
-            for (const item of nodes) {
-                // if at least one is allowed -> allow download (download servlet will later filter invalid files)
-                if (
-                    item.downloadUrl != null &&
-                    item.properties &&
-                    (!item.properties[RestConstants.CCM_PROP_IO_WWWURL] ||
-                        !RestNetworkService.isFromHomeRepo(item)) &&
-                    this.nodeHelper.referenceOriginalExists(item)
-                ) {
-                    // bulk upload is not supported for remote nodes
-                    if (!RestNetworkService.isFromHomeRepo(item) && nodes.length !== 1) {
-                        continue;
-                    }
-                    return true;
-                }
-            }
-            return false;
-        };
+        const downloadNode = this.getDownloadOption(data, false);
+        const downloadNodeSafe = this.getDownloadOption(data, true);
         const downloadMetadataNode = new OptionItem(
             'OPTIONS.DOWNLOAD_METADATA',
             'format_align_left',
@@ -1226,20 +1214,6 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         unblockNode.group = DefaultGroups.Edit;
         unblockNode.priority = 10;
 
-        const unpublishNode = new OptionItem('OPTIONS.UNPUBLISH', 'cloud_off', (object) => {
-            void this.dialogs.openDeleteNodesDialog({ nodes: this.getObjects(object, data) });
-        });
-        unpublishNode.elementType = [ElementType.NodePublishedCopy];
-        unpublishNode.constrains = [
-            Constrain.HomeRepository,
-            Constrain.NoCollectionReference,
-            Constrain.User,
-        ];
-        unpublishNode.permissions = [RestConstants.PERMISSION_DELETE];
-        unpublishNode.permissionsMode = HideMode.Hide;
-        unpublishNode.group = DefaultGroups.Delete;
-        unpublishNode.priority = 10;
-
         const removeNodeRef = new OptionItem(
             'OPTIONS.REMOVE_REF',
             'remove_circle_outline',
@@ -1268,7 +1242,11 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(report);
          */
         const reportNode = new OptionItem('OPTIONS.NODE_REPORT', 'flag', (node) =>
-            this.dialogs.openNodeReportDialog({ node: this.getObjects(node, data)[0] }),
+            this.dialogs.openNodeReportDialog({
+                node: this.getObjects(node, data)[0],
+                mode: 'NODE_REPORT',
+                showOptions: true,
+            }),
         );
         reportNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         reportNode.constrains = [Constrain.Files, Constrain.NoBulk, Constrain.HomeRepository];
@@ -1481,6 +1459,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(debugNode);
         options.push(acceptProposal);
         options.push(declineProposal);
+        options.push(editRevocation);
         options.push(openOriginalNode);
         options.push(openParentNode);
         options.push(openNode);
@@ -1504,6 +1483,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(contributorNode);
         options.push(workflowNode);
         options.push(downloadNode);
+        options.push(downloadNodeSafe);
         options.push(downloadMetadataNode);
         options.push(qrCodeNode);
         options.push(relationNode);
@@ -1514,7 +1494,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(pasteNodes);
         options.push(pasteNodeIntoFolder);
         options.push(deleteNode);
-        options.push(unpublishNode);
+        options.push(revokeNode);
         options.push(unblockNode);
         options.push(removeNodeRef);
         options.push(reportNode);
@@ -1524,7 +1504,67 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         if (data?.postPrepareOptions) {
             data.postPrepareOptions(options, objects);
         }
+        if (this.globalOptionsService.postPrepareOptions) {
+            this.globalOptionsService.postPrepareOptions(options, objects);
+        }
         return options;
+    }
+
+    private getDownloadOption(data: OptionData, safe = false) {
+        const downloadNode = new OptionItem(
+            'OPTIONS.DOWNLOAD' + (safe ? '_SAFE' : ''),
+            'cloud_download',
+            (object) => this.nodeHelper.downloadNodes(this.getObjects(object, data)),
+        );
+        downloadNode.elementType = OptionsHelperService.DownloadElementTypes;
+        downloadNode.constrains = [Constrain.Files];
+        downloadNode.group = DefaultGroups.View;
+        // downloadNode.key = 'D';
+        downloadNode.priority = 40;
+        downloadNode.customShowCallback = async (nodes) => {
+            return (
+                nodes.some((n) =>
+                    n.properties?.[RestConstants.CCM_PROP_EDUSCOPENAME]?.includes(
+                        RestConstants.SAFE_SCOPE,
+                    ),
+                ) === safe
+            );
+        };
+        downloadNode.customEnabledCallback = async (nodes) => {
+            if (!nodes) {
+                return false;
+            }
+
+            for (const item of nodes) {
+                // if at least one is allowed -> allow download (download servlet will later filter invalid files)
+                if (
+                    item.downloadUrl != null &&
+                    item.properties &&
+                    (!item.properties[RestConstants.CCM_PROP_IO_WWWURL] ||
+                        !RestNetworkService.isFromHomeRepo(item)) &&
+                    this.nodeHelper.referenceOriginalExists(item)
+                ) {
+                    // bulk upload is not supported for remote nodes
+                    if (!RestNetworkService.isFromHomeRepo(item) && nodes.length !== 1) {
+                        continue;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        };
+        return downloadNode;
+    }
+
+    private async revokeNode(object: any, data: OptionData) {
+        const dialogRef = await this.dialogs.openRevocationDialog({
+            node: this.getObjects(object, data)[0],
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.localEvents.nodesChanged.emit([result.node]);
+            }
+        });
     }
 
     private async editConnector(

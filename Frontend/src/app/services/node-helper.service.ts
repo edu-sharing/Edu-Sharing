@@ -1,5 +1,5 @@
 import { TranslateService } from '@ngx-translate/core';
-import { forkJoin, Observable, Observer } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import {
@@ -31,7 +31,6 @@ import {
     AuthorityProfile,
     CollectionReference,
     DeepLinkResponse,
-    Permission,
     Repository,
     User,
 } from '../core-module/rest/data-object';
@@ -39,18 +38,22 @@ import { RestConstants } from '../core-module/rest/rest-constants';
 import { RestHelper } from '../core-module/rest/rest-helper';
 import { RestConnectorService } from '../core-module/rest/services/rest-connector.service';
 import { UniversalNode } from '../core-module/rest/definitions';
-import { SessionStorageService } from '../core-module/rest/services/session-storage.service';
+import { SessionStorageService, Store } from '../core-module/rest/services/session-storage.service';
 import { map } from 'rxjs/operators';
 import { RestNodeService } from '../core-module/rest/services/rest-node.service';
 import {
     Ace,
     ApiHelpersService,
+    AuthenticationService,
     ConfigService,
     HOME_REPOSITORY,
     NetworkService,
     Node,
     TrackingV1Service,
 } from 'ngx-edu-sharing-api';
+import { DialogsService } from '../features/dialogs/dialogs.service';
+import { DialogButton } from '../util/dialog-button';
+import { isArray } from 'lodash';
 
 export interface ConfigEntry {
     name: string;
@@ -90,7 +93,9 @@ export class NodeHelperService extends NodeHelperServiceBase {
         repoUrlService: RepoUrlService,
         @Optional() @Inject(ASSETS_BASE_PATH) assetsBasePath: string,
         private componentFactoryResolver: ComponentFactoryResolver,
+        private authenticationService: AuthenticationService,
         private config: ConfigService,
+        private dialogsService: DialogsService,
         private rest: RestConnectorService,
         private bridge: BridgeService,
         private http: HttpClient,
@@ -127,15 +132,20 @@ export class NodeHelperService extends NodeHelperServiceBase {
         if (nodes == null) return true;
         for (const node of nodes) {
             let currentMode = mode;
-            // if this is not a collection ref -> force local mode
+            // if no access effective present and not a collection ref. use the local data
             if (
-                node.aspects &&
-                node.aspects.indexOf(RestConstants.CCM_ASPECT_IO_REFERENCE) === -1
+                !node.aspects?.includes(RestConstants.CCM_ASPECT_IO_REFERENCE) &&
+                !node.accessEffective?.length
             ) {
                 currentMode = NodesRightMode.Local;
             }
             if (currentMode === NodesRightMode.Effective) {
-                if (node.accessOriginal && node.accessOriginal.indexOf(right) !== -1) {
+                if (!node.aspects?.includes(RestConstants.CCM_ASPECT_IO_REFERENCE)) {
+                    if (node.accessEffective && node.accessEffective.indexOf(right) !== -1) {
+                        continue;
+                    }
+                }
+                if (node.accessEffective && node.accessEffective.indexOf(right) !== -1) {
                     continue;
                 }
                 if (RestConstants.IMPLICIT_COLLECTION_PERMISSIONS.indexOf(right) === -1) {
@@ -487,9 +497,49 @@ export class NodeHelperService extends NodeHelperServiceBase {
 
     /**
      * Download one or multiple nodes
-     * @param node
      */
-    async downloadNodes(nodes: Node[], fileName = 'download.zip') {
+    async downloadNodes(nodes: Node[], fileName = 'download.zip', confirmed = false) {
+        const safe = nodes.some((n) =>
+            n.properties?.[RestConstants.CCM_PROP_EDUSCOPENAME]?.includes(RestConstants.SAFE_SCOPE),
+        );
+        if (
+            safe &&
+            !confirmed &&
+            !(await this.sessionStorage
+                .get(
+                    SessionStorageService.KEY_WORKSPACE_SAFE_DOWNLOAD_CONFIRM,
+                    false,
+                    Store.Session,
+                )
+                .toPromise())
+        ) {
+            const buttons = [
+                new DialogButton('CANCEL', DialogButton.TYPE_CANCEL, null),
+                new DialogButton('DOWNLOAD', DialogButton.TYPE_PRIMARY, null),
+            ];
+            const dialog = await this.dialogsService.openCheckboxConfirmDialog({
+                nodes,
+                buttons,
+                title: 'WORKSPACE.SAFE_CONFIRM_DOWNLOAD_TITLE',
+                label: 'WORKSPACE.SAFE_CONFIRM_DOWNLOAD_CHECKBOX',
+                message: 'WORKSPACE.SAFE_CONFIRM_DOWNLOAD_MESSAGE',
+            });
+            buttons[0].callback = () => dialog.close();
+            buttons[1].callback = () => {
+                if (dialog.config.data.state) {
+                    this.sessionStorage
+                        .set(
+                            SessionStorageService.KEY_WORKSPACE_SAFE_DOWNLOAD_CONFIRM,
+                            true,
+                            Store.Session,
+                        )
+                        .then(() => {});
+                }
+                this.downloadNodes(nodes, fileName, true);
+                dialog.close();
+            };
+            return;
+        }
         if (nodes.length === 1) return await this.downloadNode(nodes[0]);
 
         const nodesString = RestHelper.getNodeIds(nodes).join(',');
@@ -622,7 +672,7 @@ export class NodeHelperService extends NodeHelperServiceBase {
     }
 
     propertiesFromConnector(event: any) {
-        const name = event.name + '.' + event.type.filetype;
+        const name = event.name + (event.type.filetype ? '.' + event.type.filetype : '');
         const prop = RestHelper.createNameProperty(name);
         prop[RestConstants.LOM_PROP_TECHNICAL_FORMAT] = [event.type.mimetype];
         if (event.type.mimetype == 'application/zip') {
@@ -635,8 +685,14 @@ export class NodeHelperService extends NodeHelperServiceBase {
         }
         return prop;
     }
-    static getActionbarNodes<T>(nodes: T[], node: T): T[] {
-        return node ? [node] : nodes && nodes.length ? nodes : null;
+    static getActionbarNodes<T>(listNodes: T[], externalNode: T | T[]): T[] {
+        return externalNode
+            ? isArray(externalNode)
+                ? externalNode
+                : [externalNode]
+            : listNodes && listNodes.length
+            ? listNodes
+            : null;
     }
 
     referenceOriginalExists(node: Node | CollectionReference) {
@@ -710,13 +766,6 @@ export class NodeHelperService extends NodeHelperServiceBase {
             return 'http://' + link;
         }
         return link;
-    }
-
-    /**
-     * Returns true if this node is a copy of another node, just used as a publish target.
-     */
-    isNodePublishedCopy(o: Node): boolean {
-        return !!o.properties?.[RestConstants.CCM_PROP_PUBLISHED_ORIGINAL]?.[0];
     }
 
     /**

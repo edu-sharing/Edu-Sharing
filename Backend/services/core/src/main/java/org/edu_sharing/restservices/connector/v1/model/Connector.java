@@ -4,18 +4,22 @@ package org.edu_sharing.restservices.connector.v1.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
+import lombok.Getter;
+import lombok.Setter;;
 
 @Schema(description = "")
 public class Connector {
 	private String id;
 	private String icon;
 	private boolean showNew;
-	private String url;
 	private String[] parameters;
 	private ConnectorFileType[] filetypes;
 	private boolean onlyDesktop;
 	private boolean hasViewMode;
+	@Getter
+	@Setter
+	@JsonProperty
+	private String mdsGroup;
 
 	@JsonProperty("icon")
 	public String getIcon() {

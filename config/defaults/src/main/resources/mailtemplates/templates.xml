@@ -254,6 +254,20 @@
 		]]>
 		</message>
 	</template>
+	<template name="nodeIssueFeedback">
+		<subject>{{reporterEmail}} gave feedback</subject>
+		<message><![CDATA[
+			<h1>Hello!</h1>
+			<h2>{{reporterEmail}} has given feedback to material \"{{name}}\" ({{id}}).</h2>
+			{{if userComment}}additional information provided by the user:<br>
+				{{userComment}}
+				<br><br><br>
+			{{endif}}
+			<div class="center"><a class="btn" href="{{link}}">Link to the material in question</a></div>
+			<br><br>
+		]]>
+		</message>
+	</template>
 	<template name="userStatusChanged">
 		<subject>The status of your account has changed</subject>
 		<message><![CDATA[

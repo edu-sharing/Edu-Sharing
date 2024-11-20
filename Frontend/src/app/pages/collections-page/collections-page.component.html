@@ -83,11 +83,7 @@
     ></es-collection-info-bar>
     <!-- <div *ngIf="isLoading" class="collection-loading"><es-spinner-small></es-spinner-small></div> -->
     <div class="collections-right">
-      <section
-        *ngIf="isLoading || !isReady"
-        class="collections-loading-div"
-        style="padding-top: 24px; text-align: center"
-      >
+      <section *ngIf="isLoading || !isReady" class="collections-loading-div">
         <es-spinner></es-spinner>
       </section>
       <h1 *ngIf="isRootLevelCollection()" esTitle class="cdk-visually-hidden">

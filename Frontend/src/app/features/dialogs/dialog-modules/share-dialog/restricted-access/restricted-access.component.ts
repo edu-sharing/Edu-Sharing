@@ -12,19 +12,15 @@ export class ShareDialogRestrictedAccessComponent implements OnInit, OnChanges {
     constructor(private nodeService: NodeService) {}
     ngOnChanges(changes: SimpleChanges): void {
         this.restrictedAccess =
-            this.node.properties[RestConstants.CCM_PROP_RESTRICTED_ACCESS]?.[0] || false;
+            this.node.properties[RestConstants.CCM_PROP_RESTRICTED_ACCESS]?.[0] === 'true' || false;
         this.restrictedAccessPermissions = {};
         const permissions =
             this.node.properties[RestConstants.CCM_PROP_RESTRICTED_ACCESS_PERMISSIONS] || [];
         this.RESTRICTED_ACCESS_PERMISSIONS.forEach((perm) => {
             this.restrictedAccessPermissions[perm] = permissions.includes(perm);
         });
-        // remove print option if not a pdf file
-        if (this.node.mediatype !== 'file-pdf') {
-            delete this.restrictedAccessPermissions['Print'];
-        }
     }
-    readonly RESTRICTED_ACCESS_PERMISSIONS = ['ReadAll', 'DownloadContent', 'Print'];
+    readonly RESTRICTED_ACCESS_PERMISSIONS = ['ReadAll', 'DownloadContent'];
     @Input() node: Node;
     restrictedAccess: boolean;
     restrictedAccessPermissions: { [key in string]: boolean };

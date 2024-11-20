@@ -30,6 +30,7 @@
     "MENU_EXCLUDE": "Exclude",
     "MENU_REMOVE_MEMBERSHIP": "Remove from group(s)",
     "MENU_STATUS": "Set status",
+    "USER_QUOTA_HINT": "If no value is set no restriction will apply",
     "ORG_HOME_FOLDER_LABEL": "Location of Org-Folder",
     "ORG_HOME_FOLDER_MAIN": "System",
     "SEARCH_GROUP": "Search for groups...",
@@ -97,7 +98,10 @@
       "MEDIA_CENTER": "media center",
       "MEDIA_CENTER_PROXY": "proxy group (media center)",
       "MEDIACENTER_ADMINISTRATORS": "administrators (media center)",
-      "ORG_ADMINISTRATORS": "administrators"
+      "ORG_ADMINISTRATORS": "administrators",
+      "CLASS": "class",
+      "WORKING_GROUP": "working group",
+      "LESSON": "lesson"
     },
     "SCOPE_TYPE": {
       "null": "Local / Default visibility",
@@ -119,7 +123,7 @@
       "RESULT": "status",
       "INHERIT": "Inherited from a group or global authorization",
       "INHERIT_UNKNOWN": "Condition is unknown. Save the permissions to see the inherited state.",
-      "INHERIT_DETAIL": "The rights are inherited via the following group memberships: {{memberships}}",
+      "INHERIT_DETAIL": "The rights are inherited via the following group memberships:\n{{memberships}}",
       "STATUS_ALLOWED": "allowed",
       "STATUS_DENIED": "prohibited",
       "STATUS_UNDEFINED": "not set\n(prohibited)",

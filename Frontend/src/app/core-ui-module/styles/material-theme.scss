@@ -351,13 +351,15 @@ body {
         .mdc-checkbox__background {
             border-color: $primaryLight !important;
         }
-        &.mat-mdc-checkbox-checked {
+        &.mat-mdc-checkbox-checked,
+        &.mat-mdc-checkbox-indeterminate {
             .mdc-checkbox__background {
                 background-color: $primaryLight !important;
             }
         }
     }
-    &.mat-mdc-checkbox-checked {
+    &.mat-mdc-checkbox-checked,
+    &.mat-mdc-checkbox-indeterminate {
         .mdc-checkbox__background {
             background-color: $primary !important;
             .mdc-checkbox__checkmark,

@@ -45,6 +45,7 @@ import { Toast } from '../../services/abstract/toast.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { NodeDataSourceRemote } from '../node-data-source-remote';
 import { TranslationsService } from '../../translations/translations.service';
+import { NodeHelperService } from '../../services/node-helper.service';
 
 @Component({
     selector: 'es-node-entries-table',
@@ -90,6 +91,7 @@ export class NodeEntriesTableComponent<T extends NodeEntriesDataType>
         private applicationRef: ApplicationRef,
         private toast: Toast,
         private translations: TranslationsService,
+        private nodeHelperService: NodeHelperService,
         private changeDetectorRef: ChangeDetectorRef,
         public ui: UIService,
         private ngZone: NgZone,
@@ -136,12 +138,13 @@ export class NodeEntriesTableComponent<T extends NodeEntriesDataType>
     }
 
     onRowContextMenu({ event, node }: { event: MouseEvent | Event; node: T }) {
-        if (!this.entriesService.selection.selected.includes(node)) {
-            this.entriesService.selection.clear();
-            this.entriesService.selection.select(node);
-        }
         event.stopPropagation();
         event.preventDefault();
+        if (!this.dropdown) {
+            // Call `preventDefault()` even when there is no menu, so we can use `cdkDrag` with a
+            // start delay without being interrupted by the standard long-tap action.
+            return;
+        }
         if (event instanceof MouseEvent) {
             ({ clientX: this.dropdownLeft, clientY: this.dropdownTop } = event);
         } else {
@@ -149,16 +152,7 @@ export class NodeEntriesTableComponent<T extends NodeEntriesDataType>
                 event.target as HTMLElement
             ).getBoundingClientRect());
         }
-        // Wait for the menu to reflect changed options.
-        setTimeout(() => {
-            this.dropdown.callbackObject = node;
-            this.dropdown.ngOnChanges();
-            if (this.dropdown.canShowDropdown()) {
-                this.menuTrigger.openMenu();
-            } else {
-                this.toast.toast('NO_AVAILABLE_OPTIONS');
-            }
-        });
+        this.entriesService.openDropdown(this.dropdown, node, () => this.menuTrigger.openMenu());
     }
 
     private updateSort(): void {
@@ -332,14 +326,13 @@ export class NodeEntriesTableComponent<T extends NodeEntriesDataType>
     }
 
     async openMenu(node: T) {
-        this.entriesService.selection.clear();
-        this.entriesService.selection.select(node);
-        this.entriesService.selection.clickSource = ClickSource.Dropdown;
-        await this.applicationRef.tick();
-        this.dropdown.menu.focusFirstItem();
+        this.entriesService.openDropdown(this.dropdown, node);
     }
 
     isBlocked(node: Node) {
-        return node.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true';
+        return (
+            node.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true' ||
+            this.nodeHelperService.isNodeRevoked(node)
+        );
     }
 }

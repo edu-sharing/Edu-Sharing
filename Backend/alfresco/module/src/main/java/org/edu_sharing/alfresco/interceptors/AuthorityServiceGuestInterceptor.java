@@ -1,16 +1,17 @@
 package org.edu_sharing.alfresco.interceptors;
 
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.alfresco.service.guest.GuestService;
 
+@Slf4j
 public class AuthorityServiceGuestInterceptor implements MethodInterceptor {
 
-    public static final String REPOSITORY_GUEST_USERNAME = "repository.guest.username";
-    Logger logger = Logger.getLogger(AuthorityServiceGuestInterceptor.class);
 
-
+    @Setter
+    private GuestService guestService;
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
@@ -19,18 +20,12 @@ public class AuthorityServiceGuestInterceptor implements MethodInterceptor {
             return methodInvocation.proceed();
         }
 
-
-        if(LightbendConfigLoader.get().hasPath(REPOSITORY_GUEST_USERNAME)) {
-            return methodInvocation.proceed();
-        }
-
         String childName = (String)methodInvocation.getArguments()[1];
-        String guestUsername = LightbendConfigLoader.get().getString(REPOSITORY_GUEST_USERNAME);
-        if(childName == null || !childName.equals(guestUsername)) {
+        if(childName == null || !guestService.isGuestUser(childName)) {
             return methodInvocation.proceed();
         }
 
-        logger.error("someone tried to add "+guestUsername+" to a group. this is not allowed");
+        log.error("someone tried to add the guest user {} to a group. this is not allowed", childName);
         return null;
 
     }

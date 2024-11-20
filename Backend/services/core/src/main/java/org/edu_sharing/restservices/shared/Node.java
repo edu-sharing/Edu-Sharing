@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 ;
+import lombok.Getter;
+import lombok.Setter;
 import org.edu_sharing.restservices.collection.v1.model.Collection;
 import org.edu_sharing.service.model.NodeRefImpl;
 import org.edu_sharing.service.rating.RatingDetails;
@@ -29,6 +31,15 @@ public class Node implements Serializable {
 	private Date modifiedAt = null;
 	private Person modifiedBy = null;
 	private List<String> access = null;
+	/**
+	 * the effective access
+	 * this is the effective access, i.e. if this element is used in a collection, it will get more permissions
+	 * please use this field to check access
+	 */
+	@JsonProperty
+	@Getter
+	@Setter
+	private java.util.Collection<String> accessEffective;
 	private String downloadUrl = null;
 	private Map<String,String[]> properties = null;
 	private String mimetype = null;

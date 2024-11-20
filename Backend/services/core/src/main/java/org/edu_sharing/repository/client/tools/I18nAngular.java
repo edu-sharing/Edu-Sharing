@@ -10,11 +10,14 @@ import org.json.JSONObject;
 
 import jakarta.servlet.ServletContext;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class to load language data from the angular i18n files (json)
  */
 public class I18nAngular {
+    private static Map<String,String> I18N_CACHE = new HashMap<>();
     public static final String GENDER_SEPARATOR = "*";
     public static Logger logger=Logger.getLogger(I18nAngular.class);
     public static String getTranslationAngular(String scope,String key){
@@ -54,9 +57,16 @@ public class I18nAngular {
      */
     private static String getTranslationAngular(String scope,String key,String language){
         try {
+            String cache = I18N_CACHE.get(language + ":" + key);
+            if(cache != null) {
+                return cache;
+            }
             String override=getTranslationFromOverride(key,language);
-            if(override!=null)
-                return replaceGenderSeperator(override);
+            if(override!=null) {
+                override = replaceGenderSeperator(override);
+                I18N_CACHE.put(language + ":" + key, override);
+                return override;
+            }
             // Using global instance singe it only is used for file reading
             ServletContext servletContext = Context.getGlobalContext();
             if(servletContext == null) {
@@ -75,7 +85,9 @@ public class I18nAngular {
                 object=object.getJSONObject(list[i]);
             }
             String result = object.getString(list[list.length-1]);
-            return replaceGenderSeperator(result);
+            result = replaceGenderSeperator(result);
+            I18N_CACHE.put(language + ":" + key, result);
+            return result;
         } catch (Exception e) {
             if(language.startsWith("de-")) {
                 return getTranslationAngular(scope, key, "de");

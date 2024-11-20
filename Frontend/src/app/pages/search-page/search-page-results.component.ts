@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
     ActionbarComponent,
+    ListSortConfig,
     NodeEntriesDisplayType,
     Scope,
     TemporaryStorageService,
@@ -90,5 +91,12 @@ export class SearchPageResultsComponent implements OnInit, OnDestroy {
 
     setDisplayType(displayType: NodeEntriesDisplayType) {
         this.results.patchState({ displayType });
+    }
+
+    updateSort(sort: ListSortConfig) {
+        this.results.searchSort.setUserValue({
+            active: sort.active,
+            direction: sort.direction,
+        });
     }
 }

@@ -15,7 +15,7 @@
     <div class="permission" [class.readOnly]="!isEditable">
       <button
         mat-icon-button
-        (click)="timebasedOpen = !timebasedOpen"
+        (click)="openTimebased()"
         [class.timebased-active]="_permission.from || _permission.to"
         [disabled]="inherit"
         matTooltip="{{
@@ -54,38 +54,46 @@
           <div class="timebased-overlay">
             <div class="content">
               <mat-checkbox
-                [ngModel]="!!_permission.from"
+                [ngModel]="!!timebased.from"
                 (ngModelChange)="
-                  $event ? (_permission.from = getDateTomorrow()) : (_permission.from = null)
+                  $event ? (timebased.from = getDateTomorrow()) : (timebased.from = null)
                 "
                 >{{ 'WORKSPACE.SHARE.TIMEBASED.FROM_CHECKBOX' | translate }}</mat-checkbox
               >
-              <div *ngIf="!!_permission.from">
+              <div *ngIf="!!timebased.from">
                 <es-share-dialog-choose-date
-                  [(dateTime)]="_permission.from"
+                  [(dateTime)]="timebased.from"
                   [from]="currentDate"
-                  [to]="_permission.to"
+                  [to]="timebased.to"
                 ></es-share-dialog-choose-date>
               </div>
               <mat-checkbox
-                [ngModel]="!!_permission.to"
+                [ngModel]="!!timebased.to"
                 (ngModelChange)="
-                  $event ? (_permission.to = getDateTomorrow()) : (_permission.to = null)
+                  $event ? (timebased.to = getDateTomorrow()) : (timebased.to = null)
                 "
                 >{{ 'WORKSPACE.SHARE.TIMEBASED.TO_CHECKBOX' | translate }}</mat-checkbox
               >
-              <div *ngIf="!!_permission.to">
+              <div *ngIf="!!timebased.to">
                 <es-share-dialog-choose-date
-                  [(dateTime)]="_permission.to"
-                  [from]="_permission.from || currentDate"
+                  [(dateTime)]="timebased.to"
+                  [from]="timebased.from || currentDate"
                 ></es-share-dialog-choose-date>
               </div>
+              <div class="actions">
+                <button mat-button color="primary" (click)="timebasedOpen = null">
+                  {{ 'CANCEL' | translate }}
+                </button>
+                <button mat-flat-button color="primary" (click)="saveTimebased()">
+                  {{ 'SAVE' | translate }}
+                </button>
+              </div>
             </div>
-            <div class="close">
+            <!-- <div class="close">
               <button mat-icon-button (click)="timebasedOpen = false">
                 <i esIcon="close"></i>
               </button>
-            </div>
+            </div> -->
           </div>
         </ng-template>
       </button>

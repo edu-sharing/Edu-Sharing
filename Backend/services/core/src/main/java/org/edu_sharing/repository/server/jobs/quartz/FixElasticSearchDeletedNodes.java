@@ -206,7 +206,7 @@ public class FixElasticSearchDeletedNodes extends AbstractJobMapAnnotationParams
                 update(UpdateRequest.of(req->req
                         .index(SearchServiceElastic.WORKSPACE_INDEX)
                         .id(searchHit.id())
-                        .script(src->src.inline(il->il.lang("painless").source("ctx._source.remove(params.get('value'))").params(params)))));
+                        .script(src->src.lang("painless").source("ctx._source.remove(params.get('value'))").params(params))));
             }
         }else {
 

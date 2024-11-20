@@ -107,6 +107,12 @@
     "CHOOSE_LOCATION_TITLE": "Location",
     "CHOOSE_LOCATION_DESCRIPTION": "Choose a directory for storage",
     "TREE_MORE_ITEMS": "+ {{count}} more folders",
+    "REVOCATION": {
+      "TITLE": "Revoke object",
+      "REASON": "Reason for revocation",
+      "REVOKE": "Revoke",
+      "DETAILS": "This will unpublish the given element. Only a notice page with metadata will remain. In case this element is a series object, all children will be removed as well. Please note that this action can not be undone."
+    },
     "SHARE": {
       "TITLE": "Manage Sharing",
       "NO_PERMISSIONS": "No explicit permissions have been stipulated for this object yet.",
@@ -181,7 +187,8 @@
         "FROM_CHECKBOX": "Set start date",
         "TO_CHECKBOX": "Set end date",
         "DATE_LABEL": "Date",
-        "TIME_LABEL": "Time"
+        "TIME_LABEL": "Time",
+        "INVALID_DATE": "Invalid date"
       },
       "PUBLISH": {
         "OPEN_VERSION": "Show version",
@@ -214,6 +221,7 @@
         "NO_PUBLISH_COPY_PERMISSION": "You do not have permission to publish a copy.",
         "VERSION_COMMENT": "Version comment",
         "VERSION_NUMBER": "Version number",
+        "REVOKED": "This publication has been revoked",
         "VERSION_DATE": "Date of publication",
         "VERSION_DATE_ABSOLUTE": "Publicated",
         "DOI_DISTINCT": "Create new handle",
@@ -447,6 +455,9 @@
     "DRAG_DROP_COPY": "copy",
     "DRAG_DROP_MOVE": "move",
     "FEATURE_NOT_IMPLEMENTED": "This feature is currently not available",
+    "SAFE_CONFIRM_DOWNLOAD_TITLE": "Notice",
+    "SAFE_CONFIRM_DOWNLOAD_CHECKBOX": "Don't show again in this session",
+    "SAFE_CONFIRM_DOWNLOAD_MESSAGE": "Please note that locally stored files fron the data safe should be deleted afterwards. We also recommend to disable any synchronisations with cloud services.",
     "LICENSE": {
       "TITLE": "Define license",
       "TYPE": "Choose license",
@@ -505,6 +516,13 @@
       "PERMISSIONS": "You don't have sufficient permissions to create elements in the current folder.",
       "VIRTUAL": "You're inside a folder where inserting elements is not possible.",
       "GENERAL": "Navigate to a different folder and create your elements there."
+    },
+    "COPY_MOVE": {
+      "TITLE": "Move/copy element(s)",
+      "MESSAGE_SINGLE": "Do you want to move/copy \"{{element}}\" from \"{{source}}\" to \"{{target}}\"?",
+      "MESSAGE_MULTIPLE": "Do you want to move/copy {{count}} elements from \"{{source}}\" to \"{{target}}\"?",
+      "MOVE": "Move",
+      "COPY": "Copy"
     },
     "TOAST": {
       "FOLDER_ADDED": "Folder added",

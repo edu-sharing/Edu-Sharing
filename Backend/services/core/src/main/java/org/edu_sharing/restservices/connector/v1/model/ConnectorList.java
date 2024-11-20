@@ -2,29 +2,21 @@ package org.edu_sharing.restservices.connector.v1.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+
+;
+
+@Getter
+@Setter
 @Schema(description = "")
 public class ConnectorList {
-	private String url;
-	
-	private Connector[] connectors;
-	
-	@JsonProperty("connectors")
-	public Connector[] getConnectors() {
-		return connectors;
-	}
-	public void setConnectors(Connector[] connectors) {
-		this.connectors = connectors;
-	}
 	@JsonProperty("url")
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
+	private String url;
+	@JsonProperty("connectors")
+	private List<Connector> connectors;
+	private List<Connector> simpleConnectors;
 }

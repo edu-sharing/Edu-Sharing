@@ -14,10 +14,10 @@ public class ConnectorFileType implements Serializable {
 
 	@Optional private String editorType;
 
-	
-	private String mimetype;
-	
-	private String filetype;
+
+	@Optional private String mimetype;
+
+	@Optional private String filetype;
 
 	@Optional private boolean createable=true;
 

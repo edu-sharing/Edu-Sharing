@@ -131,7 +131,7 @@ public class StreamServiceElasticsearchImpl implements StreamService {
 		if(status!=null) {
 			main.mustNot(mustNot->mustNot.nested(nested->nested.path("audience").query(q->q.bool(exclude.build())).scoreMode(ChildScoreMode.None)));
 		}
-				
+
 		return main;
 	}
 
@@ -196,10 +196,10 @@ public class StreamServiceElasticsearchImpl implements StreamService {
 		);
 
 		client.update(req->req
-				.index(INDEX_NAME)
-				.id(id)
-						.script(scp->scp.inline(il->il.source(script).params("audience", JsonData.of(audience))))
-				, Map.class);
+                        .index(INDEX_NAME)
+                        .id(id)
+						.script(scp->scp.source(script).params("audience", JsonData.of(audience)))
+                , Map.class);
 	}
 	@Override
 	public StreamSearchResult search(StreamSearchRequest request) throws Exception {

@@ -27,10 +27,10 @@ export class NodeEntriesCardSmallComponent<T extends Node> implements OnChanges 
     optionsOnCard() {
         const options = this.entriesService.options[Target.List];
         const always = options.filter((o) => o.showAlways);
-        if (always.some((o) => o.showCallback(this.node))) {
+        if (always.some((o) => o.showCallback([this.node]))) {
             return always;
         }
-        return options.filter((o) => o.showAsAction && o.showCallback(this.node)).slice(0, 3);
+        return options.filter((o) => o.showAsAction && o.showCallback([this.node])).slice(0, 3);
     }
 
     openContextmenu(event: MouseEvent | Event) {

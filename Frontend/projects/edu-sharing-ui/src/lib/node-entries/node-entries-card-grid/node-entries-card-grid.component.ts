@@ -31,6 +31,7 @@ import { UIService } from '../../services/ui.service';
 import { ListItemSort } from '../../types/list-item';
 import { DragData } from '../../types/drag-drop';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { NodeHelperService } from '../../services/node-helper.service';
 
 let displayedWarnings: string[] = [];
 
@@ -98,6 +99,7 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
         public entriesService: NodeEntriesService<T>,
         public entriesGlobalService: NodeEntriesGlobalService,
         public templatesService: NodeEntriesTemplatesService,
+        public nodeHelperService: NodeHelperService,
         public ui: UIService,
         private ngZone: NgZone,
     ) {
@@ -375,6 +377,9 @@ export class NodeEntriesCardGridComponent<T extends Node> implements OnInit, OnD
     }
 
     isBlocked(node: Node) {
-        return node.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true';
+        return (
+            node.properties?.[RestConstants.CCM_PROP_IMPORT_BLOCKED]?.[0] === 'true' ||
+            this.nodeHelperService.isNodeRevoked(node)
+        );
     }
 }
