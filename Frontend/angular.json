@@ -37,11 +37,6 @@
                 "glob": "**/*",
                 "input": "node_modules/tinymce-i18n/langs5",
                 "output": "/tinymce/langs/"
-              },
-              {
-                "glob": "**/*",
-                "input": "projects/rendering-service/dist/assets",
-                "output": "/assets/"
               }
             ],
             "styles": [

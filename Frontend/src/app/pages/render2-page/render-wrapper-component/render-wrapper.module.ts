@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
-import { RenderComponent, RenderingModule, RenderingServiceLibModule } from 'ngx-rendering-service';
+import { RenderComponent, RenderingServiceLibModule } from 'ngx-rendering-service-lib';
 import { RenderingServiceApiModule } from 'ngx-rendering-service-api';
 import { RenderWrapperComponent } from './render-wrapper.component';
-import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { MdsModule } from '../../../features/mds/mds.module';
 import { EduSharingUiModule, TranslationsModule } from 'ngx-edu-sharing-ui';

@@ -62,14 +62,6 @@ export class RenderWrapperComponent implements OnChanges {
         });*/
         // url module
         this.dummyRequest.set(undefined);
-        this.node.set({
-            title: 'Test-Node',
-            mediatype: 'link',
-            properties: {
-                'ccm:wwwurl': ['https://www.youtube.com/watch?v=SVOuYquXuuc'],
-            },
-        } as unknown as Node);
-
         /*
         combineLatest([this.route.params, this.route.queryParams]).subscribe(
             ([params, queryParams]) => {
