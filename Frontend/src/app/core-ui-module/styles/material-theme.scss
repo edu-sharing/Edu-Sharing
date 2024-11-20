@@ -1,6 +1,5 @@
 @use '@angular/material' as mat;
-@use 'angular-material-css-vars/main' as mat-css;
-@use 'angular-material-css-vars/public-util' as mat-css-utilities;
+@use 'angular-material-css-vars' as mat-css-vars;
 
 @import 'variables';
 @import 'branding';
@@ -10,59 +9,34 @@ $mat-css-dark-theme-selector: '.isDarkTheme';
 $mat-css-light-theme-selector: '.isLightTheme';
 
 // init theme
-@include mat-css.init-material-css-vars() using($mat-css-theme) {
-    // If your app has any theme mixins, call them here.
-    // $mat-css-theme gets set to an appropriate value before this content is called.
-    // @include your-custom-component-theme($mat-css-theme);
-}
+
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (impomatrted above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 
-$custom-typography: mat.define-typography-config(
+$custom-typography: mat.m2-define-typography-config(
     $font-family: $primaryFontFamily,
-    $body-1: mat.define-typography-level(100%, normal, 400),
-    $body-2: mat.define-typography-level(100%, normal, 400),
+    $body-1: mat.m2-define-typography-level(100%, normal, 400),
+    $body-2: mat.m2-define-typography-level(100%, normal, 400),
     // mat-optgroups labels, input placeholder
-    $subtitle-1: mat.define-typography-level(90%, normal, 400),
+    $subtitle-1: mat.m2-define-typography-level(90%, normal, 400),
     // mat-table cells
-    $subtitle-2: mat.define-typography-level(90%, normal, 600),
+    $subtitle-2: mat.m2-define-typography-level(90%, normal, 600),
     // mat-table header
-    $button: mat.define-typography-level(100%, normal, 400),
-    $headline-1: mat.define-typography-level(150%, normal, 400),
-    $headline-2: mat.define-typography-level(140%, normal, 400),
+    $button: mat.m2-define-typography-level(100%, normal, 400),
+    $headline-1: mat.m2-define-typography-level(150%, normal, 400),
+    $headline-2: mat.m2-define-typography-level(140%, normal, 400),
 ) !default;
 // Override typography for all Angular Material, including mat-base-typography and all components.
-@include mat.all-component-typographies($custom-typography);
 
-// Override the themes foreground colors.
-// WCAG minimums are
-//  - rgba(black, 0.54) for text on white
-//  - rgba(black, 0.42) for non-text on white
+@mixin app-theme($theme) {
+    // Your app theme
+}
 
-// For reference: default definition from
-// https://github.com/angular/components/blob/master/src/material/core/theming/_palette.scss:
-
-// $dark-dividers: rgba(black, 0.12);
-// $dark-disabled-text: rgba(black, 0.38);
-// $dark-secondary-text: rgba(black, 0.54);
-// $light-theme-foreground-palette: (
-//   base:              black,
-//   divider:           $dark-dividers,
-//   dividers:          $dark-dividers,
-//   disabled:          $dark-disabled-text,
-//   disabled-button:   rgba(black, 0.26),
-//   disabled-text:     $dark-disabled-text,
-//   elevation:         black,
-//   hint-text:         $dark-disabled-text,
-//   secondary-text:    $dark-secondary-text,
-//   icon:              rgba(black, 0.54),
-//   icons:             rgba(black, 0.54),
-//   text:              rgba(black, 0.87),
-//   slider-min:        rgba(black, 0.87),
-//   slider-off:        rgba(black, 0.26),
-//   slider-off-active: rgba(black, 0.38),
-// );
+@include mat-css-vars.init-material-css-vars($typography-config: $custom-typography)
+    using($mat-css-theme) {
+    @include app-theme($mat-css-theme);
+}
 
 $dark-dividers: rgba(black, 0.12);
 $dark-disabled-text: rgba(black, 0.54); // increased contrast
@@ -79,24 +53,6 @@ $dark-secondary-text: rgba(black, 0.54);
         gap: 10px;
     }
 }
-
-$light-theme-foreground-palette: (
-    base: black,
-    divider: $dark-dividers,
-    dividers: $dark-dividers,
-    disabled: $dark-disabled-text,
-    disabled-button: rgba(black, 0.26),
-    disabled-text: $dark-disabled-text,
-    elevation: black,
-    hint-text: $dark-disabled-text,
-    secondary-text: $dark-secondary-text,
-    icon: rgba(black, 0.54),
-    icons: rgba(black, 0.54),
-    text: rgba(black, 0.87),
-    slider-min: rgba(black, 0.87),
-    slider-off: rgba(black, 0.26),
-    slider-off-active: rgba(black, 0.38),
-);
 
 /** custom project specifics */
 [matripplecolor='primary'] {
@@ -233,7 +189,7 @@ mat-tab-group {
 }
 // form border on hover
 .mat-form-field-appearance-outline {
-    --mdc-outlined-text-field-hover-outline-color: #{mat-css-utilities.mat-css-color-primary(300)};
+    --mdc-outlined-text-field-hover-outline-color: #{mat-css-vars.mat-css-color-primary(300)};
 }
 .mat-form-field-dark {
     input,
@@ -259,9 +215,9 @@ mat-tab-group {
     --mdc-outlined-text-field-label-text-color: rgba(255, 255, 255, 0.87);
     --mdc-outlined-text-field-outline-color: rgba(255, 255, 255, 0.6);
     --mdc-outlined-text-field-hover-outline-color: rgba(255, 255, 255, 0.87);
-    --mdc-outlined-text-field-focus-outline-color: #{mat-css-utilities.mat-css-color-primary(100)};
+    --mdc-outlined-text-field-focus-outline-color: #{mat-css-vars.mat-css-color-primary(100)};
     .mdc-text-field--focused:not(.mdc-text-field--disabled) .mdc-floating-label {
-        color: mat-css-utilities.mat-css-color-primary(50);
+        color: mat-css-vars.mat-css-color-primary(50);
     }
     --mdc-outlined-text-field-input-text-color: rgba(255, 255, 255);
 }

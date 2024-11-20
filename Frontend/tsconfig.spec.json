@@ -16,6 +16,15 @@
       "ngx-edu-sharing-ui": [
         "dist/edu-sharing-ui/edu-sharing-ui",
         "dist/edu-sharing-ui"
+      ],
+      // add a symlink to the render frontend inside the projects folder!
+      "ngx-rendering-service": [
+        "projects/rendering-service-lib/dist",
+        "projects/rendering-service-lib"
+      ],
+      "ngx-rendering-service-api": [
+        "projects/rendering-service-api/dist",
+        "projects/rendering-service-api"
       ]
     }
   },
