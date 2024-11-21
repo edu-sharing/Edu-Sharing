@@ -148,6 +148,10 @@ spec:
           mountPath: /opt/bitnami/tomcat/shared/classes/config/cluster
         - name: share-data
           mountPath: /opt/alfresco/alf_data
+        {{- if .Values.persistence.share.safe.enabled }}
+        - name: share-safe
+          mountPath: /opt/alfresco/alf_safe
+        {{- end }}
         {{- with .Values.config.override.config.application.client }}
         - name: file
           mountPath: /opt/bitnami/tomcat/shared/classes/config/defaults/client.config.override.xml

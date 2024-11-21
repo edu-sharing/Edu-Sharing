@@ -142,7 +142,7 @@ public class VersionService {
         versionCache.clear();
     }
 
-    private static String getRenderserviceVersion() throws Exception {
+    public static String getRenderserviceVersion() throws Exception {
         RenderingVersionInfo version = RenderingServiceFactory.getLocalService().getVersion();
         if (version != null) {
             return version.version;

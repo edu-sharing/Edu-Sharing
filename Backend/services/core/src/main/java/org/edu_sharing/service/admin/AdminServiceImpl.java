@@ -1139,7 +1139,24 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Map<String, RepositoryVersionInfo> getVersions() {
         try {
-            return VersionService.getRepositoryVersionInfo();
+            Map<String, RepositoryVersionInfo> result = new HashMap<>(VersionService.getRepositoryVersionInfo());
+            try {
+                RepositoryVersionInfo renderingVersionInfo = new RepositoryVersionInfo();
+                String renderserviceVersion = VersionService.getRenderserviceVersion();
+                if(StringUtils.isNotBlank(renderserviceVersion)) {
+                    renderingVersionInfo.version = new RepositoryVersionInfo.Version();
+                    String[] versionInfos = renderserviceVersion.split("\\.");
+                    renderingVersionInfo.version.major = versionInfos[0];
+                    renderingVersionInfo.version.minor = versionInfos[1];
+                    renderingVersionInfo.version.patch = versionInfos[2];
+                    renderingVersionInfo.version.full = renderserviceVersion;
+                    renderingVersionInfo.repository="service-rendering-service";
+                    result.put(renderingVersionInfo.repository,renderingVersionInfo);
+                }
+            } catch (Exception e) {
+                logger.warn(e.getMessage(), e);
+            }
+            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
