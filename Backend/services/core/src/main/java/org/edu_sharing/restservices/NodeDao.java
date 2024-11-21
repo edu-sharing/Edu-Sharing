@@ -178,22 +178,6 @@ public class NodeDao {
         return null;
     }
 
-    public static String getJWT(String nodeId) throws GeneralSecurityException {
-        org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory.getLocalService();
-
-//        ToolPermissionService toolPermissionService = ToolPermissionServiceFactory.getInstance();
-        String user = AuthenticationUtil.getFullyAuthenticatedUser();
-        List<String> nodePermissions = null;
-        try {
-            nodePermissions = permissionService.getPermissionsForAuthority(nodeId, user);
-        } catch (InsufficientPermissionException e) {
-            throw new RuntimeException(e);
-        }
-//        java.util.Collection<String> toolPermissions = toolPermissionService.getAllToolPermissions(false);
-
-        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimeType(), getMediaType());
-    }
-
     public org.edu_sharing.service.model.NodeRef getNodeRef() {
         if (this.nodeRef != null) {
             return this.nodeRef;
@@ -2332,6 +2316,22 @@ public class NodeDao {
             }
         }
         return values;
+    }
+
+    public String getJWT() throws GeneralSecurityException {
+        org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory.getLocalService();
+
+//        ToolPermissionService toolPermissionService = ToolPermissionServiceFactory.getInstance();
+        String user = AuthenticationUtil.getFullyAuthenticatedUser();
+        List<String> nodePermissions = null;
+        try {
+            nodePermissions = permissionService.getPermissionsForAuthority(nodeId, user);
+        } catch (InsufficientPermissionException e) {
+            throw new RuntimeException(e);
+        }
+//        java.util.Collection<String> toolPermissions = toolPermissionService.getAllToolPermissions(false);
+
+        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimetype(), getMediatype());
     }
 
     private String getMimetype() {

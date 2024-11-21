@@ -22,13 +22,15 @@ public class JwtTokenUtil {
         Date date = new Date();
         String jwt = Jwts.builder()
                 .setHeaderParam("kid", ApplicationInfoList.getHomeRepository().getAppId())  // The key id used to sign this
-                .setHeaderParam("typ", "JWT") // The type
+                .setHeaderParam("typ", "JWS") // The type
+                .setHeaderParam("repoId", ApplicationInfoList.getHomeRepository().getAppId()) // repoId
                 .setExpiration(DateUtils.addSeconds(date, 3600)) //a java.util.Date
                 .setNotBefore(date) //a java.util.Date
                 .setIssuedAt(date) // for example, now
                 .setIssuer(username)
                 .setId(UUID.randomUUID().toString())
                 .setSubject("node permissions")
+                .claim("repoId", ApplicationInfoList.getHomeRepository().getAppId())
                 .claim("node", nodeId)
                 .claim("permissions", permissions)
                 .claim("mimeType", mimeType)

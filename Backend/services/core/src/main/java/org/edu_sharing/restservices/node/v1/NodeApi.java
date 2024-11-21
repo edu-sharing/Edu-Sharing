@@ -2368,11 +2368,11 @@ public class NodeApi  {
 			@Context HttpServletRequest req) {
 
 		try {
-//			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
+			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
 //			node=NodeDao.mapNodeConstants(repoDao,node);
 //
-//			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
-			return Response.status(Response.Status.OK).entity(NodeDao.getJWT(node)).build();
+			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
+			return Response.status(Response.Status.OK).entity(nodeDao.getJWT()).build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);
 		}
