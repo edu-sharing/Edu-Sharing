@@ -162,7 +162,7 @@ public class RemoteObjectService {
 		ApplicationInfo repInfo = ApplicationInfoList.getRepositoryInfoById(sourceRepositoryId);
 		NodeService nsSourceRepo = NodeServiceFactory.getNodeService(sourceRepositoryId);
 		HashMap<String, Object> propsIn = nsSourceRepo.getPropertiesPersisting(null, null, originalNodeId);
-		if(propsIn == null || propsIn.size() == 0) {
+		if(propsIn == null || propsIn.isEmpty()) {
 			throw new Exception("no properties found for source nodeId:" + originalNodeId + ", appId: " + sourceRepositoryId);
 		}
 		if(propsIn.containsKey(CCConstants.CM_NAME)) {
