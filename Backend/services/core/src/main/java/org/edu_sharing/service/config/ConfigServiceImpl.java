@@ -45,7 +45,8 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
     private static String CACHE_KEY = "CLIENT_CONFIG";
     // we use a non-serializable Config as value because this is a local cache and not distributed
     private static SimpleCache<String, Config> configCache = AlfAppContextGate.getApplicationContext().getBean("eduSharingConfigCache", SimpleCache.class);
-    private static SimpleCache<String, Context> contextCache = AlfAppContextGate.getApplicationContext().getBean("eduSharingContextCache", SimpleCache.class);
+    private static SimpleCache<String, Context> contextCacheByDomain = AlfAppContextGate.getApplicationContext().getBean("eduSharingContextCacheByDomain", SimpleCache.class);
+    private static SimpleCache<String, Context> contextCacheById = AlfAppContextGate.getApplicationContext().getBean("eduSharingContextCacheById", SimpleCache.class);
 
     private static final Unmarshaller jaxbUnmarshaller;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -106,16 +107,26 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
     }
 
     @Override
-    public Context getContext(String domain) throws Exception {
-        if(StringUtils.isBlank(domain)) {
+    public Context getContextByDomain(String domain) throws Exception {
+        if (StringUtils.isBlank(domain)) {
             return null;
         }
         buildContextCache();
-        return contextCache.get(domain);
+        return contextCacheByDomain.get(domain);
     }
 
     @Override
-    public List<Context> getAvailableContext() throws Exception {
+    public Context getContextById(String id) throws Exception {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+
+        buildContextCache();
+        return contextCacheById.get(id);
+    }
+
+    @Override
+    public List<Context> getAvailableContext() {
         return AuthenticationUtil.runAsSystem(() -> {
             String eduSharingSystemFolderContext = userEnvironmentTool.getEdu_SharingContextFolder();
             Map<String, Map<String, Object>> dynamicContextObjects = nodeService.getChildrenPropsByType(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, eduSharingSystemFolderContext, CCConstants.CCM_TYPE_CONTEXT);
@@ -130,9 +141,7 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
     }
 
     private void buildContextCache() throws Exception {
-        if (contextCache.getKeys().isEmpty()) {
-            // put an element so that next time, the cache is never empty!
-            contextCache.put("", null);
+        if (contextCacheByDomain.getKeys().isEmpty()) {
             Config config = getConfig();
             if (config.contexts != null && config.contexts.context != null) {
                 for (Context context : config.contexts.context) {
@@ -141,7 +150,7 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
                     }
 
                     for (String dom : context.domain) {
-                        contextCache.put(dom, context);
+                        contextCacheByDomain.put(dom, context);
                     }
                 }
             }
@@ -155,12 +164,52 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
                         .map(x -> x.get(CCConstants.CCM_PROP_CONTEXT_CONFIG).toString())
                         .map(CheckedFunction.wrap(x -> objectMapper.readValue(x, Context.class), null))
                         .filter(Objects::nonNull)
-                        .forEach(x -> Arrays.stream(x.domain).forEach(y -> contextCache.put(y, x)));
+                        .forEach(x -> Arrays.stream(x.domain).filter(Objects::nonNull).forEach(y -> contextCacheByDomain.put(y, x)));
 
                 return null;
             });
+
+
+
+            if(contextCacheByDomain.getKeys().isEmpty()){
+                // put an element so that next time, the cache is never empty!
+                contextCacheByDomain.put("", null);
+            }
+        }
+
+        if(contextCacheById.getKeys().isEmpty()){
+            Config config = getConfig();
+            if (config.contexts != null && config.contexts.context != null) {
+                for (Context context : config.contexts.context) {
+                    if (StringUtils.isNotBlank(context.id)) {
+                        contextCacheById.put(context.id, context);
+                    }
+                }
+            }
+
+            AuthenticationUtil.runAsSystem(() -> {
+                String eduSharingSystemFolderContext = userEnvironmentTool.getEdu_SharingContextFolder();
+                Map<String, Map<String, Object>> dynamicContextObjects = nodeService.getChildrenPropsByType(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, eduSharingSystemFolderContext, CCConstants.CCM_TYPE_CONTEXT);
+                dynamicContextObjects
+                        .values()
+                        .stream()
+                        .map(x -> x.get(CCConstants.CCM_PROP_CONTEXT_CONFIG).toString())
+                        .map(CheckedFunction.wrap(x -> objectMapper.readValue(x, Context.class), null))
+                        .filter(Objects::nonNull)
+                        .filter(x -> StringUtils.isNotBlank(x.id))
+                        .forEach(x -> contextCacheById.put(x.id, x));
+                return null;
+            });
+
+            if(contextCacheById.getKeys().isEmpty()){
+                // put an element so that next time, the cache is never empty!
+                contextCacheById.put("", null);
+            }
         }
     }
+
+
+
 
     @Override
     public Context createOrUpdateContext(Context context) {
@@ -183,7 +232,7 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
 
     @Override
     public Config getConfigByDomain(String domain) throws Exception {
-        Context context = getContext(domain);
+        Context context = getContextByDomain(domain);
         if (context == null) {
             throw new IllegalArgumentException("Context with domain " + domain + " does not exists");
         }
@@ -308,7 +357,7 @@ public class ConfigServiceImpl implements ConfigService, ApplicationListener<Ref
 
     private void refresh() {
         configCache.clear();
-        contextCache.clear();
+        contextCacheByDomain.clear();
         try {
             getConfig();
         } catch (Exception e) {
