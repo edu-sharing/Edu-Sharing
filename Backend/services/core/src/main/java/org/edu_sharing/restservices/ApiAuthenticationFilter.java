@@ -1,29 +1,17 @@
 package org.edu_sharing.restservices;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 import com.typesafe.config.Config;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.authentication.subsystems.SubsystemChainingAuthenticationService;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.authentication.AuthenticationFilter;
 import org.edu_sharing.repository.server.authentication.ContextManagementFilter;
-import org.edu_sharing.service.authentication.EduAuthentication;
 import org.edu_sharing.service.authentication.oauth2.TokenService;
 import org.edu_sharing.service.authentication.oauth2.TokenService.Token;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
@@ -33,15 +21,18 @@ import org.edu_sharing.service.toolpermission.ToolPermissionServiceFactory;
 import org.edu_sharing.spring.security.basic.CSRFConfig;
 import org.springframework.context.ApplicationContext;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
 
     Logger logger = Logger.getLogger(ApiAuthenticationFilter.class);
 
     private TokenService tokenService;
-
-    @Override
-    public void destroy() {
-    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp,
@@ -106,20 +97,18 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
                 }
             } else if (authHdr.length() > 10 && authHdr.substring(0, 10).equalsIgnoreCase(CCConstants.AUTH_HEADER_EDU_TICKET)) {
                 String ticket = authHdr.substring(10).trim();
-                if (ticket != null) {
-                    if (authTool.validateTicket(ticket)) {
-                        // Force a renew of all toolpermissions since they might have now changed!
-                        ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions(true);
-                        //if its APIClient username is ignored and is figured out with authentication service
-                        authTool.storeAuthInfoInSession(authTool.getCurrentUser(), ticket, CCConstants.AUTH_TYPE_TICKET, httpReq.getSession());
-                        validatedAuth = authTool.validateAuthentication(session);
-                    }
+                if (authTool.validateTicket(ticket)) {
+                    // Force a renew of all toolpermissions since they might have now changed!
+                    ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions(true);
+                    //if its APIClient username is ignored and is figured out with authentication service
+                    authTool.storeAuthInfoInSession(authTool.getCurrentUser(), ticket, CCConstants.AUTH_TYPE_TICKET, httpReq.getSession());
+                    validatedAuth = authTool.validateAuthentication(session);
                 }
             }
 
         }
         Config accessConfig = LightbendConfigLoader.get().getConfig("security.access");
-        List<String> AUTHLESS_ENDPOINTS = Arrays.asList(new String[]{"/authentication", "/_about", "/config", "/register", "/sharing",
+        List<String> AUTHLESS_ENDPOINTS = Arrays.asList("/authentication", "/_about", "/config", "/register", "/sharing",
                 "/lti/v13/oidc/login_initiations",
                 "/lti/v13/lti13",
                 "/lti/v13/registration/dynamic",
@@ -127,13 +116,13 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
                 "/lti/v13/details",
                 "/ltiplatform/v13/openid-configuration",
                 "/ltiplatform/v13/openid-registration",
-                "/ltiplatform/v13/content"});
-        List<String> ADMIN_ENDPOINTS = Arrays.asList(new String[]{"/admin", "/bulk", "/lti/v13/registration/static", "/lti/v13/registration/url"});
+                "/ltiplatform/v13/content");
+        List<String> ADMIN_ENDPOINTS = Arrays.asList("/admin", "/bulk", "/lti/v13/registration/static", "/lti/v13/registration/url");
         List<String> DISABLED_ENDPOINTS = new ArrayList<>();
 
         try {
-            if (!ConfigServiceFactory.getCurrentConfig(req).getValue("register.local", true)) {
-                if (ConfigServiceFactory.getCurrentConfig(req).getValue("register.recoverPassword", false)) {
+            if (!ConfigServiceFactory.getCurrentConfig(httpReq).getValue("register.local", true)) {
+                if (ConfigServiceFactory.getCurrentConfig(httpReq).getValue("register.recoverPassword", false)) {
                     DISABLED_ENDPOINTS.add("/register/v1/register");
                     DISABLED_ENDPOINTS.add("/register/v1/activate");
                 } else {
@@ -141,7 +130,7 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
                     DISABLED_ENDPOINTS.add("/register");
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         boolean noAuthenticationNeeded = false;
@@ -203,13 +192,8 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
             return;
         }
 
-        /**
-         * allow authless calls with AUTH_SINGLE_USE_NODEID by appauth
-         */
-        boolean trustedAuth = false;
-        if (ContextManagementFilter.accessTool != null && ContextManagementFilter.accessTool.get() != null) {
-            trustedAuth = true;
-        }
+        // allow authless calls with AUTH_SINGLE_USE_NODEID by appauth
+        boolean trustedAuth = ContextManagementFilter.accessTool != null && ContextManagementFilter.accessTool.get() != null;
 
         // ignore the auth for the login
         if (validatedAuth == null && (!noAuthenticationNeeded && !trustedAuth)) {

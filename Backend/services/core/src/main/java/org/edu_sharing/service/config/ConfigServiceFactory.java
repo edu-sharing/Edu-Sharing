@@ -1,21 +1,23 @@
 package org.edu_sharing.service.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.config.model.Config;
 import org.edu_sharing.alfresco.service.config.model.KeyValuePair;
 import org.edu_sharing.alfresco.service.config.model.Language;
+import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.RequestHelper;
-
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.http.HttpServletRequest;
 import org.edu_sharing.spring.ApplicationContextFactory;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ConfigServiceFactory {
-    private static final String[] DEFAULT_LANGUAGES = new String[]{"de", "en"};
+	private static final String[] DEFAULT_LANGUAGES = new String[]{"de", "en"};
+	public static final String ENFORCED_CONTEXT = "ENFORCED_CONTEXT";
 	static Logger logger = Logger.getLogger(ConfigServiceFactory.class);
 
 	public static ConfigService getConfigService(){
@@ -33,7 +35,7 @@ public class ConfigServiceFactory {
 	}
 	public static String getCurrentContextId(HttpServletRequest req){
 		try {
-			org.edu_sharing.alfresco.service.config.model.Context context = getConfigService().getContext(getCurrentDomain(req));
+			org.edu_sharing.alfresco.service.config.model.Context context = getConfigService().getContextByDomain(getCurrentDomain(req));
 			if(context == null) {
 				return null;
 			}
@@ -43,7 +45,7 @@ public class ConfigServiceFactory {
 			return null;
 		}
 	}
-	public static Config getCurrentConfig(ServletRequest req) throws Exception {
+	public static Config getCurrentConfig(HttpServletRequest req) throws Exception {
 		try {
 			return getConfigService().getConfigByDomain(req==null ? getCurrentDomain() : getCurrentDomain(req));
 		}catch(Throwable t) {
@@ -54,10 +56,40 @@ public class ConfigServiceFactory {
 	public static String getCurrentDomain() {
 		return getCurrentDomain(Context.getCurrentInstance().getRequest());
 	}
-	public static String getCurrentDomain(ServletRequest req) {
+
+	public static String getCurrentDomain(HttpServletRequest req) {
+		Object enforcedContext = req.getSession().getAttribute(ENFORCED_CONTEXT);
+		if(StringUtils.isNotBlank((String)enforcedContext)){
+			return enforcedContext.toString();
+		}
+
 		String domain = new RequestHelper(req).getServerName();
 		logger.debug("current domain:" + domain);
 		return domain;
+	}
+
+	public static void enforceContext(String contextId){
+        try {
+			org.edu_sharing.alfresco.service.config.model.Context context = getConfigService().getContextById(contextId);
+			if(context == null){
+				throw new IllegalArgumentException(String.format("Context with contextId %s does not exists",contextId));
+			}
+
+			if(context.domain == null || context.domain.length == 0){
+				throw new IllegalArgumentException(String.format("Context %s doesn't has domains",contextId));
+			}
+
+			Optional<String> domain = Arrays.stream(context.domain).findFirst();
+			Context.getCurrentInstance().getRequest().getSession().setAttribute(ENFORCED_CONTEXT, domain.get());
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+	}
+
+	public static void clearEnforcedContext(){
+		Context.getCurrentInstance().getRequest().getSession().removeAttribute(ENFORCED_CONTEXT);
 	}
 
 	public static List<KeyValuePair> getLanguageData(List<Language> languages,String language) {
