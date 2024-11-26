@@ -21,7 +21,7 @@
   },
   "private": false,
   "dependencies": {
-    "@angular-devkit/build-angular": "~0.900.6",
+    "@angular-devkit/build-angular": "~15.0.4",
     "@angular/animations": "^9.0.6",
     "@angular/cdk": "~9.1.2",
     "@angular/common": "~9.0.6",
@@ -56,12 +56,12 @@
   "devDependencies": {
     "@angular/cli": "^9.0.6",
     "@babel/core": "^7.8.7",
-    "@storybook/angular": "^5.3.14",
+    "@storybook/angular": "^6.5.15",
     "@types/core-js": "^2.5.2",
     "@types/jasmine": "~3.5.2",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^8.3.0",
     "codelyzer": "^5.1.2",
     "dotenv": "^10.0.0",
     "htmlencode": "0.0.4",
