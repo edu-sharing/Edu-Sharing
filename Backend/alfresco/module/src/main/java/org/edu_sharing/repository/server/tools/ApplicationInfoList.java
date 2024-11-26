@@ -41,6 +41,7 @@ public class ApplicationInfoList {
 	
 	private static SimpleCache<String, ApplicationInfo> appInfos =  (SimpleCache<String, ApplicationInfo>) AlfAppContextGate.getApplicationContext().getBean("eduSharingApplicationInfoCache");
 	private static ApplicationInfo appInfoHome;
+	private static ApplicationInfo appInfoRenderingService2;
 
 	public static ApplicationInfo getRepositoryInfo(String file){
 		return getApplicationInfoByProperty(file, ApplicationInfoProperty.APPFILE);
@@ -89,10 +90,12 @@ public class ApplicationInfoList {
 		return null;
 	}
 
+	@Deprecated
 	public static ApplicationInfo getRenderService() {
 		return getApplicationInfoByProperty(ApplicationInfo.TYPE_RENDERSERVICE, ApplicationInfoProperty.TYPE);
 	}
 
+	@Deprecated
 	public static ApplicationInfo getLearningLocker() {
 		return getApplicationInfoByProperty(ApplicationInfo.TYPE_LEARNING_LOCKER, ApplicationInfoProperty.TYPE);
 	}
@@ -178,6 +181,9 @@ public class ApplicationInfoList {
 					if(repInfo.ishomeNode()) {
 						appInfoHome = repInfo;
 					}
+					if(ApplicationInfo.TYPE_RENDERSERVICE_2.equals(repInfo.getType())) {
+						appInfoRenderingService2 = repInfo;
+					}
 				}
 			}catch(Exception e){
 				e.printStackTrace();
@@ -214,6 +220,13 @@ public class ApplicationInfoList {
 		}
 		if(appInfoHome == null) logger.error("no home repository found. check your application files");
 		return appInfoHome;
+	}
+	public static ApplicationInfo getRenderingService2(){
+		if(appInfos.getKeys().isEmpty()) {
+			initAppInfos();
+		}
+		if(appInfoRenderingService2 == null) logger.warn("no rendering service 2 found. check your application files");
+		return appInfoRenderingService2;
 	}
 	public static ApplicationInfo getHomeRepositoryObeyConfig(String[] allowedRepos){
 

@@ -188,6 +188,11 @@ public class ApplicationInfo implements Comparable<ApplicationInfo>, Serializabl
 	public static final String TYPE_RENDERSERVICE = "SERVICE";
 
 	/**
+	 * kotlin based rendering service
+	 */
+	public static final String TYPE_RENDERSERVICE_2 = "RENDERINGSERVICE_2";
+
+	/**
 	 * LEARNING_LOCKER = reserved for a learning locker system
 	 */
 	public static final String TYPE_LEARNING_LOCKER = "LEARNING_LOCKER";

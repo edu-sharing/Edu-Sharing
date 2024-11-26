@@ -72,6 +72,9 @@
             },
             "type": "array"
           },
+          "renderingService2": {
+            "$ref": "#/components/schemas/RenderingService"
+          },
           "services": {
             "items": {
               "$ref": "#/components/schemas/AboutService"
@@ -4908,6 +4911,14 @@
             "type": "string"
           },
           "privacyInformationUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RenderingService": {
+        "properties": {
+          "url": {
             "type": "string"
           }
         },
@@ -27793,6 +27804,100 @@
           }
         },
         "summary": "Set local permissions of node.",
+        "tags": [
+          "NODE v1"
+        ]
+      }
+    },
+    "/node/v1/nodes/{repository}/{node}/permissions/jwt": {
+      "get": {
+        "description": "Generate a jwt access token of the node",
+        "operationId": "getJWT",
+        "parameters": [
+          {
+            "description": "ID of repository (or \"-home-\" for home repository)",
+            "in": "path",
+            "name": "repository",
+            "required": true,
+            "schema": {
+              "default": "-home-",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of node",
+            "in": "path",
+            "name": "node",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/text": {
+                "schema": {
+                  "format": "byte",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK."
+          },
+          "400": {
+            "content": {
+              "application/text": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Preconditions are not present."
+          },
+          "401": {
+            "content": {
+              "application/text": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authorization failed."
+          },
+          "403": {
+            "content": {
+              "application/text": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Session user has insufficient rights to perform this operation."
+          },
+          "404": {
+            "content": {
+              "application/text": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Ressources are not found."
+          },
+          "500": {
+            "content": {
+              "application/text": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occured."
+          }
+        },
+        "summary": "Generate a jwt access token of the node.",
         "tags": [
           "NODE v1"
         ]

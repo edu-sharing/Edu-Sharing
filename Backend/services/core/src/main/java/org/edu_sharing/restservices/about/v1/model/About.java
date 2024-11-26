@@ -7,12 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Schema(description = "")
 public class About  {
   
   private ServiceVersion version = null;
+  @Getter
+  @Setter
+  @JsonProperty
+  private RenderingService renderingService2 = null;
   private List<AboutService> services = new ArrayList<>();
   private List<PluginInfo> plugins = new ArrayList<>();
   private List<FeatureInfo> features = new ArrayList<>();

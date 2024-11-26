@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
+import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.RepoFactory;
+import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.restservices.ApiApplication;
 import org.edu_sharing.restservices.ApiService;
@@ -56,6 +58,7 @@ public class AboutApi  {
 
 			AboutFeatures features = ApplicationContextFactory.getApplicationContext().getBean(AboutFeatures.class);
 			about.setFeatures(features.getFeatureInfoList());
+			about.setRenderingService2(getRenderingService2());
 			ServiceVersion version = new ServiceVersion();
 	    	
 	    	version.setMajor(ApiApplication.MAJOR);
@@ -114,8 +117,16 @@ public class AboutApi  {
 		}
     	
     }
-    
-    @GET
+
+	private RenderingService getRenderingService2() {
+		ApplicationInfo rs = ApplicationInfoList.getRenderingService2();
+		if(rs != null) {
+			return new RenderingService(rs.getBaseUrl());
+		}
+		return null;
+	}
+
+	@GET
 	@Path("/status/{mode}")
 	@Operation(summary = "status of repo services", description = "returns http status 200 when ok")
 
