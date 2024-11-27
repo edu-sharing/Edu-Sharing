@@ -1,11 +1,8 @@
-import { trigger } from '@angular/animations';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { OptionsHelperDataService, UIAnimation } from 'ngx-edu-sharing-ui';
-import { EventListener } from '../../core-module/core.module';
+import { Component, signal } from '@angular/core';
+import { OptionsHelperDataService } from 'ngx-edu-sharing-ui';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, forkJoin } from 'rxjs';
-import { HOME_REPOSITORY, NodeService, Node } from 'ngx-edu-sharing-api';
-import { RenderDataRequest } from 'ngx-rendering-service-api';
+import { combineLatest } from 'rxjs';
+import { MainNavService } from '../../main/navigation/main-nav.service';
 
 @Component({
     selector: 'es-render2-page',
@@ -15,7 +12,12 @@ import { RenderDataRequest } from 'ngx-rendering-service-api';
 })
 export class Render2PageComponent {
     nodeId = signal<string>(null);
-    constructor(private route: ActivatedRoute, private nodeApi: NodeService) {
+    constructor(private route: ActivatedRoute, private mainNav: MainNavService) {
+        this.mainNav.setMainNavConfig({
+            show: true,
+            showNavigation: false,
+            currentScope: 'render',
+        });
         combineLatest([this.route.params, this.route.queryParams]).subscribe(
             ([params, queryParams]) => {
                 this.nodeId.set(params.node);

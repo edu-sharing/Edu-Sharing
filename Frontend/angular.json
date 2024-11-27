@@ -37,7 +37,8 @@
                 "glob": "**/*",
                 "input": "node_modules/tinymce-i18n/langs5",
                 "output": "/tinymce/langs/"
-              }
+              },
+              { "glob": "**/*", "input": "node_modules/ng2-pdfjs-viewer/pdfjs", "output": "/assets/pdfjs" }
             ],
             "styles": [
               "src/app/core-ui-module/styles/core-base.scss",

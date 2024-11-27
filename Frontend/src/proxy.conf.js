@@ -60,6 +60,27 @@ const PROXY_CONFIG = [
             }
         },
     },
+    {
+        context: ['/rendering2'],
+        target: process.env.RS2_URL,
+        secure: false,
+        changeOrigin: true,
+        pathRewrite: { '^/rendering2': '/' },
+
+        onProxyRes: function (proxyRes, req, res) {
+            proxyRes.headers['X-Edu-Sharing-Proxy-Target'] = process.env.RS2_URL;
+            const cookies = proxyRes.headers['set-cookie'];
+            if (cookies) {
+                proxyRes.headers['set-cookie'] = cookies.map((cookie) =>
+                    cookie
+                        // We serve on a non-HTTPS connection, so 'Secure' cookies won't work.
+                        .replace('; Secure', '')
+                        // 'SameSite=None' is only allowed on 'Secure' cookies.
+                        .replace('; SameSite=None', ''),
+                );
+            }
+        },
+    },
 ];
 
 module.exports = PROXY_CONFIG;

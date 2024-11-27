@@ -1,8 +1,30 @@
 @import 'projects/edu-sharing-ui/assets/scss/variables-scss';
-$rsPaddingHorizontal: 30px;
+$rsPaddingHorizontal: 2vw;
+
+$rsPaddingVertical: 20px;
+$maxHeight: calc(100vh - var(--mainnavHeight) - $rsPaddingVertical);
 rs-root {
     height: 100%;
-    min-height: 50vh;
+    min-height: 10vh;
+    max-height: $maxHeight;
+    margin: $rsPaddingVertical $rsPaddingHorizontal;
+    padding: 0;
+    ::ng-deep {
+        .module {
+            border: none;
+            padding: 0;
+            overflow-y: hidden;
+            &:not(.module-PDF) {
+                > * {
+                    overflow: auto;
+                }
+            }
+            // some modules should get 100% of the browser height
+            rs-module-pdf {
+                height: $maxHeight;
+            }
+        }
+    }
 }
 .render-before {
     display: flex;
