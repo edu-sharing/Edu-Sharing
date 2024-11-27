@@ -8,7 +8,7 @@ import {
     SimpleChanges,
     ViewChild,
 } from '@angular/core';
-import { AboutService, Node, NodeService } from 'ngx-edu-sharing-api';
+import { AboutService, Node, NodeService, NodeServiceUnwrapped } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     OptionsHelperDataService,
@@ -18,6 +18,7 @@ import {
 import { RenderDataRequest, RSApiConfiguration } from 'ngx-rendering-service-api';
 import { firstValueFrom } from 'rxjs';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
+import { RenderDataRequestWithToken } from 'ngx-rendering-service-lib';
 
 @Component({
     selector: 'es-render-wrapper-component',
@@ -31,10 +32,11 @@ export class RenderWrapperComponent implements OnChanges {
     @Input() version: string;
 
     node = signal<Node>(null);
-    request = signal<RenderDataRequest>(null);
+    request = signal<RenderDataRequestWithToken>(null);
 
     constructor(
         private nodeApi: NodeService,
+        private nodeApiUnwrapped: NodeServiceUnwrapped,
         private aboutService: AboutService,
         private translations: TranslationsService,
         private injector: Injector,
@@ -51,7 +53,7 @@ export class RenderWrapperComponent implements OnChanges {
             version: '1.0',
             repoId: '',
         });
-        */
+
         this.request.set({
             nodeId: 'TEST_4k.mp4',
             size: -1,
@@ -120,7 +122,15 @@ export class RenderWrapperComponent implements OnChanges {
             this.injector.get(RSApiConfiguration).rootUrl = about.renderingService2.url;
             console.log(this.injector.get(RSApiConfiguration));
             this.node.set(await firstValueFrom(this.nodeApi.getNode(changes.nodeId.currentValue)));
-            console.log(this.node());
+            const token = await (
+                (await firstValueFrom(
+                    this.nodeApiUnwrapped.getJwt({
+                        repository: this.node().ref.repo,
+                        node: this.node().ref.id,
+                    }),
+                )) as unknown as Blob
+            ).text();
+            console.log(token, this.node());
             this.request.set({
                 nodeId: this.node().ref.id,
                 size: parseInt(this.node().size),
@@ -129,6 +139,7 @@ export class RenderWrapperComponent implements OnChanges {
                 type: this.node().mediatype,
                 repoId: this.node().ref.repo,
                 version: this.node().content.version,
+                token,
             });
             this.optionsHelper.setData({
                 scope: Scope.Render,
