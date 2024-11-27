@@ -13,7 +13,7 @@
     [numberOfAlwaysVisibleOptionsMobile]="0"
   ></es-actionbar>
 </div>
-<rs-root *ngIf="dummyRequest() || node()" [node]="node()" [request]="dummyRequest()"></rs-root>
+<rs-root *ngIf="request() && node()" [node]="node()" [request]="request()"></rs-root>
 <es-mds-editor-wrapper
   *ngIf="node()"
   [embedded]="true"

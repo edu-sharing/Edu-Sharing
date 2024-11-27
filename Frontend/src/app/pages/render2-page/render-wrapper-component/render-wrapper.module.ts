@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { MdsModule } from '../../../features/mds/mds.module';
 import { EduSharingUiModule, TranslationsModule } from 'ngx-edu-sharing-ui';
 import { MatButtonModule } from '@angular/material/button';
+import { SharedModule } from '../../../shared/shared.module';
 
 /**
  * new module for (kotlin based) rendering backend
@@ -18,9 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
         MatButtonModule,
         RenderComponent,
         TranslationsModule,
-        RenderingServiceApiModule.forRoot({
-            //rootUrl: environment.rsUrl
-        }),
+        RenderingServiceApiModule.forRoot({}),
         RenderingServiceLibModule,
         MdsModule,
     ],

@@ -1,7 +1,21 @@
-import { Component, Input, signal, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Node, NodeService } from 'ngx-edu-sharing-api';
-import { ActionbarComponent, OptionsHelperDataService, Scope } from 'ngx-edu-sharing-ui';
-import { RenderDataRequest } from 'ngx-rendering-service-api';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    Injector,
+    Input,
+    OnChanges,
+    signal,
+    SimpleChanges,
+    ViewChild,
+} from '@angular/core';
+import { AboutService, Node, NodeService } from 'ngx-edu-sharing-api';
+import {
+    ActionbarComponent,
+    OptionsHelperDataService,
+    Scope,
+    TranslationsService,
+} from 'ngx-edu-sharing-ui';
+import { RenderDataRequest, RSApiConfiguration } from 'ngx-rendering-service-api';
 import { firstValueFrom } from 'rxjs';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 
@@ -17,9 +31,16 @@ export class RenderWrapperComponent implements OnChanges {
     @Input() version: string;
 
     node = signal<Node>(null);
-    dummyRequest = signal<RenderDataRequest>(null);
+    request = signal<RenderDataRequest>(null);
 
-    constructor(private nodeApi: NodeService, private optionsHelper: OptionsHelperDataService) {
+    constructor(
+        private nodeApi: NodeService,
+        private aboutService: AboutService,
+        private translations: TranslationsService,
+        private injector: Injector,
+        private optionsHelper: OptionsHelperDataService,
+    ) {
+        this.translations.waitForInit().subscribe(() => {});
         this.optionsHelper.registerGlobalKeyboardShortcuts();
         /*this.dummyRequest.set({
             nodeId: 'TEST_lviv.jpg',
@@ -31,7 +52,7 @@ export class RenderWrapperComponent implements OnChanges {
             repoId: '',
         });
         */
-        this.dummyRequest.set({
+        this.request.set({
             nodeId: 'TEST_4k.mp4',
             size: -1,
             type: 'file-video',
@@ -41,7 +62,7 @@ export class RenderWrapperComponent implements OnChanges {
             repoId: '',
         });
 
-        this.dummyRequest.set({
+        this.request.set({
             nodeId: 'TEST_portrait.pdf',
             size: -1,
             type: 'file-pdf',
@@ -61,7 +82,7 @@ export class RenderWrapperComponent implements OnChanges {
             repoId: '',
         });*/
         // url module
-        this.dummyRequest.set(undefined);
+        this.request.set(undefined);
         /*
         combineLatest([this.route.params, this.route.queryParams]).subscribe(
             ([params, queryParams]) => {
@@ -90,7 +111,25 @@ export class RenderWrapperComponent implements OnChanges {
 
     async ngOnChanges(changes: SimpleChanges) {
         if (changes.nodeId) {
+            const about = await firstValueFrom(this.aboutService.getAbout());
+            if (!about.renderingService2) {
+                console.error('no rendering service 2 url was configured. Will not continue.');
+                return;
+            }
+            console.log(about.renderingService2.url);
+            this.injector.get(RSApiConfiguration).rootUrl = about.renderingService2.url;
+            console.log(this.injector.get(RSApiConfiguration));
             this.node.set(await firstValueFrom(this.nodeApi.getNode(changes.nodeId.currentValue)));
+            console.log(this.node());
+            this.request.set({
+                nodeId: this.node().ref.id,
+                size: parseInt(this.node().size),
+                hash: this.node().content.hash,
+                mimeType: this.node().mimetype,
+                type: this.node().mediatype,
+                repoId: this.node().ref.repo,
+                version: this.node().content.version,
+            });
             this.optionsHelper.setData({
                 scope: Scope.Render,
                 activeObjects: [this.node()],
