@@ -121,7 +121,7 @@ public class AboutApi  {
 	private RenderingService getRenderingService2() {
 		ApplicationInfo rs = ApplicationInfoList.getRenderingService2();
 		if(rs != null) {
-			return new RenderingService(rs.getBaseUrl());
+			return new RenderingService(rs.getContentUrl());
 		}
 		return null;
 	}
