@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ConfigService, SessionStorageService } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
 import { TranslationsService } from './translations.service';
+import { Observable } from 'rxjs';
 
 class BridgeServiceStub {
     isRunningCordova() {
@@ -26,7 +27,7 @@ class ConfigServiceStub {
 }
 
 class SessionStorageServiceStub {
-    get(key: string) {
+    get(key: string): Observable<string | null> {
         return rxjs.of(null);
     }
     set(key: string, value: string) {}
