@@ -319,6 +319,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
+            "ignorePath": "projects/embed/src/environments",
             "lintFilePatterns": [
               "projects/embed/**/*.ts",
               "projects/embed/**/*.html"
@@ -514,21 +515,21 @@
     },
     "rendering-service": {
       "projectType": "library",
-      "root": "projects/rendering-service",
-      "sourceRoot": "projects/rendering-service/src",
+      "root": "projects/rendering-service-web-component",
+      "sourceRoot": "projects/rendering-service-web-component/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/rendering-service/ng-package.json"
+            "project": "projects/rendering-service-web-component/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/rendering-service/tsconfig.lib.prod.json"
+              "tsConfig": "projects/rendering-service-web-component/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/rendering-service/tsconfig.lib.json"
+              "tsConfig": "projects/rendering-service-web-component/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -540,8 +541,8 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "projects/rendering-service/tsconfig.spec.json",
-            "karmaConfig": "projects/rendering-service/karma.conf.js"
+            "tsConfig": "projects/rendering-service-web-component/tsconfig.spec.json",
+            "karmaConfig": "projects/rendering-service-web-component/karma.conf.js"
           }
         },
         "lint": {
