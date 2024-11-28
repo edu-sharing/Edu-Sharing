@@ -548,8 +548,8 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": [
-              "projects/rendering-service/**/*.ts",
-              "projects/rendering-service/**/*.html"
+              "projects/rendering-service-web-component/**/*.ts",
+              "projects/rendering-service-web-component/**/*.html"
             ],
             "cache": true
           }
