@@ -18,6 +18,7 @@
     "SSO_UNKNOWN_ERROR": "Login not possible",
     "MISSING_PARAM": "Login not possible",
     "SSO_REQ_ATT_NOT_MATCHES": "Login not possible",
+    "SSO_SAML_IDP_LOGOUT_UNDEFINED": "Single Logout not possible",
     "DETAILS": {
       "share_expired": "The shared link has expired or has been terminated by the owner of the material.",
       "share_file_deleted": "The shared link points to an object which has been deleted. Please contact the author.",
@@ -35,7 +36,8 @@
       "SSO_INSUFFICIENT_REQUIREMENTS": "Insufficient login requirements",
       "MISSING_PARAM": "Incomplete user data",
       "SSO_UNKNOWN_ERROR": "Unknown error",
-      "SSO_REQ_ATT_NOT_MATCHES": "wrong userdata"
+      "SSO_REQ_ATT_NOT_MATCHES": "wrong userdata",
+      "SSO_SAML_IDP_LOGOUT_UNDEFINED": "Authentication Provider does not provide a global logout service. Please close your browser window to proceed logout."
     }
   }
 }
