@@ -2,14 +2,6 @@ version: '3.7'
 
 services:
 
-  repository-cache:
-    image: "${docker.registry}/${docker.common}/${docker.edu_sharing.community.common.redis.name}:${docker.edu_sharing.community.common.redis.tag}"
-    container_name: "repository-cache_${COMPOSE_PROJECT_NAME}"
-    environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-    expose:
-      - 6379
-
   repository-database:
     image: "${docker.registry}/${docker.common}/${docker.edu_sharing.community.common.postgresql.name}:${docker.edu_sharing.community.common.postgresql.tag}"
     container_name: "repository-database_${COMPOSE_PROJECT_NAME}"
@@ -82,7 +74,7 @@ services:
       ALLOW_EMPTY_PASSWORD: "yes"
       CACHE_CLUSTER: "false"
       CACHE_DATABASE: "0"
-      CACHE_HOST: repository-cache
+      CACHE_HOST: redis-cache
       CACHE_PORT: "6379"
       CATALINA_OPTS: >-
         -Xms${REPOSITORY_SERVICE_JAVA_XMS:-2g}
@@ -169,6 +161,7 @@ services:
       - "repository-service-volume-data:/opt/alfresco/alf_data"
       - "repository-service-volume-safe:/opt/alfresco/alf_safe"
     depends_on:
+      - redis-cache
       - repository-database
       - repository-transform
 
