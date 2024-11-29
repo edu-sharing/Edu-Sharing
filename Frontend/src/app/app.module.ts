@@ -67,6 +67,7 @@ import { EduSharingGraphqlModule } from 'ngx-edu-sharing-graphql';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/material/checkbox';
 import { MAT_RADIO_DEFAULT_OPTIONS } from '@angular/material/radio';
 import { MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS } from '@angular/material/slide-toggle';
+import { FooterComponent } from './common/ui/footer/footer.component';
 
 // http://blog.angular-university.io/angular2-ngmodule/
 // -> Making modules more readable using the spread operator
@@ -106,6 +107,7 @@ const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
     ],
     imports: [
         IMPORTS,
+        FooterComponent,
         ApolloModule,
         SharedModule,
         MainModule,

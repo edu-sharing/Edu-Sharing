@@ -8,7 +8,6 @@ import { InfobarComponent } from './common/ui/infobar/infobar.component';
 import { AutocompleteComponent } from './common/ui/autocomplete/autocomplete.component';
 import { CookieInfoComponent } from './common/ui/cookie-info/cookie-info.component';
 import { PoweredByComponent } from './common/ui/powered-by/powered-by.component';
-import { FooterComponent } from './common/ui/footer/footer.component';
 import { GlobalContainerComponent } from './common/ui/global-container/global-container.component';
 import { RocketchatComponent } from './common/ui/global-container/rocketchat/rocketchat.component';
 import { ButtonsTestComponent } from './common/test/buttons/buttons-test.component';
@@ -41,7 +40,6 @@ export const DECLARATIONS = [
     ToolListComponent,
     ToucheventDirective,
     PoweredByComponent,
-    FooterComponent,
     CookieInfoComponent,
     MatConfirmGroupComponent,
     ToolpermissionCheckDirective,
