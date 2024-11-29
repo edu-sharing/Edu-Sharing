@@ -17,7 +17,7 @@ import {
 import { RSApiConfiguration } from 'ngx-rendering-service-api';
 import { firstValueFrom } from 'rxjs';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
-import { RenderDataRequestWithToken } from 'ngx-rendering-service-lib';
+import { RenderDataRequestWithToken } from 'ngx-rendering-service-api';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -134,6 +134,7 @@ export class RenderWrapperComponent implements OnChanges {
                     }),
                 )) as unknown as Blob
             ).text();
+            //const token = 'tst';
             console.log(token, this.node());
             this.request.set({
                 nodeId: this.node().ref.id,
