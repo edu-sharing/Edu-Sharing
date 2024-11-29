@@ -55,6 +55,7 @@
     -->
     <spring-security.version>6.2.6</spring-security.version>
 
+
   </properties>
 
   <profiles>
@@ -1268,6 +1269,11 @@
         <version>2.0.0-M1</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.edu_sharing</groupId>
+        <artifactId>edu_sharing-community-common-deployment-mongodb-compose</artifactId>
+        <version>7.0-1</version>
+      </dependency>
 
     </dependencies>
 
