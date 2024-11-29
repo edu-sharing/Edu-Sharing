@@ -120,7 +120,10 @@ export class RenderWrapperComponent implements OnChanges {
             }
             console.log(about.renderingService2?.url);
             if (environment.production) {
-                this.injector.get(RSApiConfiguration).rootUrl = about.renderingService2.url;
+                this.injector.get(RSApiConfiguration).rootUrl = about.renderingService2.url.replace(
+                    /\/$/g,
+                    '',
+                );
             } else {
                 this.injector.get(RSApiConfiguration).rootUrl = '/rendering2';
             }
