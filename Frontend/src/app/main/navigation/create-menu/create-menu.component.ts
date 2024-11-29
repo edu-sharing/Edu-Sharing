@@ -490,19 +490,15 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
 
     private async createConnector(connector: Connector, event: AddWithConnectorDialogResult) {
         const prop = this.nodeHelper.propertiesFromConnector(event);
-        let win: any;
-        if (!this.bridge.isRunningCordova()) {
-            win = window.open('');
-        }
         this.nodeService
             .createNode((await this.getParent()).ref.id, RestConstants.CCM_TYPE_IO, [], prop, false)
             .subscribe(
                 (data: NodeWrapper) => {
-                    this.editConnector(data.node, event.type as Filetype, win, connector);
+                    this.editConnector(data.node, event.type as Filetype, event.window, connector);
                     this.onCreate.emit([data.node]);
                 },
                 (error: any) => {
-                    win.close();
+                    event.window?.close();
                     if (
                         this.nodeHelper.handleNodeError(event.name, error) ===
                         RestConstants.DUPLICATE_NODE_RESPONSE
