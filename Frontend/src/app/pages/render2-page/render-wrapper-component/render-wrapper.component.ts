@@ -1,5 +1,4 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     Injector,
     Input,
@@ -15,7 +14,7 @@ import {
     Scope,
     TranslationsService,
 } from 'ngx-edu-sharing-ui';
-import { RenderDataRequest, RSApiConfiguration } from 'ngx-rendering-service-api';
+import { RSApiConfiguration } from 'ngx-rendering-service-api';
 import { firstValueFrom } from 'rxjs';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 import { RenderDataRequestWithToken } from 'ngx-rendering-service-lib';
@@ -119,7 +118,7 @@ export class RenderWrapperComponent implements OnChanges {
                 console.error('no rendering service 2 url was configured. Will not continue.');
                 return;
             }
-            console.log(about.renderingService2.url);
+            console.log(about.renderingService2?.url);
             if (environment.production) {
                 this.injector.get(RSApiConfiguration).rootUrl = about.renderingService2.url;
             } else {
