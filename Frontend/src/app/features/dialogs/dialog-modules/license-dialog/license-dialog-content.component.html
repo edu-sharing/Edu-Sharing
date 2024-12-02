@@ -246,6 +246,86 @@
   [(ccSourceUrl)]="ccSourceUrl"
   [(ccProfileUrl)]="ccProfileUrl"
 ></es-license-source>
+<div class="ai-info">
+  <button class="more clickable" (click)="aiOpen = !aiOpen">
+    <span class="title">{{ 'WORKSPACE.LICENSE.AI.TITLE' | translate }}</span>
+    <i esIcon="keyboard_arrow_up" *ngIf="aiOpen"></i>
+    <i esIcon="keyboard_arrow_down" *ngIf="!aiOpen"></i>
+  </button>
+  <div *ngIf="aiOpen" [@overlay]="aiOpen" class="ai-details">
+    <mat-checkbox
+      [(ngModel)]="ai.allowUsage"
+      [indeterminate]="ai.allowUsage === 'indeterminate'"
+      (ngModelChange)="updateAi()"
+    >
+      <es-multi-line-label>
+        <ng-container slot="label">
+          {{ 'WORKSPACE.LICENSE.AI.USE_FOR_TRAINING' | translate }}
+        </ng-container>
+        <ng-container slot="description">
+          <span innerHTML="{{ 'WORKSPACE.LICENSE.AI.USE_FOR_TRAINING_INFO' | translate }}"></span>
+        </ng-container>
+      </es-multi-line-label>
+    </mat-checkbox>
+
+    <mat-checkbox
+      [(ngModel)]="ai.generated"
+      [indeterminate]="ai.generated === 'indeterminate'"
+      (ngModelChange)="updateAi()"
+    >
+      <es-multi-line-label>
+        <ng-container slot="label">
+          <span>{{ 'WORKSPACE.LICENSE.AI.GENERATED' | translate }}</span>
+        </ng-container>
+        <ng-container slot="description">
+          <span innerHTML="{{ 'WORKSPACE.LICENSE.AI.GENERATED_INFO' | translate }}"></span>
+        </ng-container>
+      </es-multi-line-label>
+    </mat-checkbox>
+    <ng-container *ngIf="ai.generated !== false">
+      <mat-form-field>
+        <mat-label>
+          {{ 'WORKSPACE.LICENSE.AI.TOOL' | translate }}
+        </mat-label>
+        <mat-select [(ngModel)]="ai.tool" (ngModelChange)="updateAi()">
+          <mat-option value="">{{ 'WORKSPACE.LICENSE.AI.TOOL_NO_INFO' | translate }}</mat-option>
+          <mat-option value="custom">{{
+            'WORKSPACE.LICENSE.AI.TOOL_CUSTOM' | translate
+          }}</mat-option>
+          <mat-option value="indeterminate" *ngIf="ai.tool === 'indeterminate'">{{
+            'WORKSPACE.LICENSE.AI.TOOL_INDETERMINATE' | translate
+          }}</mat-option>
+          <mat-option *ngFor="let tool of aiTools" [value]="tool.id">{{ tool.caption }}</mat-option>
+        </mat-select>
+        <mat-hint>
+          {{ 'WORKSPACE.LICENSE.AI.TOOL_INFO' | translate }}
+        </mat-hint>
+      </mat-form-field>
+      <mat-form-field *ngIf="ai.tool === 'custom'">
+        <mat-label>
+          {{ 'WORKSPACE.LICENSE.AI.TOOL_CUSTOM_NAME' | translate }}
+        </mat-label>
+        <input matInput [(ngModel)]="ai.toolCustom" />
+      </mat-form-field>
+      <mat-checkbox
+        [(ngModel)]="ai.manuallyModified"
+        [indeterminate]="ai.manuallyModified === 'indeterminate'"
+        (ngModelChange)="updateAi()"
+      >
+        <es-multi-line-label>
+          <ng-container slot="label">
+            {{ 'WORKSPACE.LICENSE.AI.MANUALLY_MODIFIED' | translate }}
+          </ng-container>
+          <ng-container slot="description">
+            <span
+              innerHTML="{{ 'WORKSPACE.LICENSE.AI.MANUALLY_MODIFIED_INFO' | translate }}"
+            ></span>
+          </ng-container>
+        </es-multi-line-label>
+      </mat-checkbox>
+    </ng-container>
+  </div>
+</div>
 <div class="currentLicense">
   <h4 *ngIf="type !== 'MULTI'">{{ 'WORKSPACE.LICENSE.CURRENT' | translate }}</h4>
   <img *ngIf="type !== 'MULTI'" class="currentLicenseIcon" src="{{ getLicenseIcon() }}" />
@@ -309,5 +389,6 @@
         'WORKSPACE.LICENSE.MORE' | translate
       }}</a>
     </div>
+    <div class="ai-info">{{ getAiProperties() | esLicenseAiInfo }}</div>
   </div>
 </div>

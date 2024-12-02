@@ -1,3 +1,4 @@
+
 {
   "CHOOSEENVIRONMENT": "Auswahl der Umgebung",
   "YES": "Ja",
@@ -321,6 +322,12 @@
     "TITLE_OF_WORK": "Titel",
     "LINK_AUTHOR": "Link zum/zur Autor{{GENDER_SEPARATOR}}in",
     "DESCRIPTION_REQUIRED": "Die Lizenzbeschreibung muss ausgefüllt sein",
+    "AI": {
+      "NO_USAGE_ALLOWED": "Nicht für KI-Training freigegeben.",
+      "GENERATED": "KI-Generiert",
+      "TOOL": ". Erstellt mit {{tool}}",
+      "MODIFIED": "(wurde nachbearbeitet)"
+    },
     "NAMES": {
       "NONE": "Keine oder unbekannte Lizenz",
       "MULTI": "Unterschiedliche Lizenzen",

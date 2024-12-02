@@ -47,11 +47,13 @@ import { MdsEditorWidgetVersionComponent } from './mds-editor/widgets/mds-editor
 import { MdsEditorWidgetTinyMCE } from './mds-editor/widgets/mds-editor-widget-wysiwyg-html/mds-editor-widget-tinymce.component';
 import { MdsViewerComponent } from './mds-viewer/mds-viewer.component';
 import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
+import { LicenseAiPipe } from './mds-editor/widgets/mds-editor-widget-license/license-details/license-ai.pipe';
 
 @NgModule({
     declarations: [
         HighlightPipe,
         LabelPipe,
+        LicenseAiPipe,
         LicenseDetailsComponent,
         MdsEditorComponent,
         MdsEditorCoreComponent,
@@ -94,6 +96,7 @@ import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
     imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule],
     exports: [
         LicenseDetailsComponent,
+        LicenseAiPipe,
         MdsEditorWidgetAuthorComponent,
         MdsEditorWrapperComponent,
         MdsViewerComponent,

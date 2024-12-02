@@ -546,19 +546,6 @@ public class CCConstants {
 
 	public static final int HTTP_INSUFFICIENT_STORAGE = 503;
 
-    public static final List<String> CHILDOBJECT_IGNORED_PARENT_PROPERTIES = Arrays.asList(
-    		CCConstants.CM_NAME,
-			CCConstants.CCM_PROP_IO_REPL_EDUCATIONAL_LEARNINGRESSOURCETYPE, // Materialart
-			CCConstants.CCM_PROP_IO_COMMONLICENSE_KEY,
-			CCConstants.CCM_PROP_IO_LICENSE_DESCRIPTION,
-			CCConstants.CCM_PROP_IO_COMMONLICENSE_CC_LOCALE,
-			CCConstants.CCM_PROP_IO_COMMONLICENSE_CC_VERSION,
-			CCConstants.LOM_PROP_LIFECYCLE_VERSION,
-			CCConstants.CCM_PROP_IO_WWWURL,
-			CCConstants.ALFRESCO_MIMETYPE,
-			CCConstants.LOM_PROP_TECHNICAL_FORMAT,
-			CCConstants.LOM_PROP_TECHNICAL_SIZE
-	);
     public static final String AUTHORITY_DELETED_USER = "DELETED_USER";
     /**
      * authority needed for appAuth authentication and read only tasks
@@ -1160,6 +1147,11 @@ public class CCConstants {
 	public final static String CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED = "{http://www.campuscontent.de/model/1.0}questionsallowed";
 	public final static String CCM_PROP_IO_COMMONLICENSE_CC_VERSION = "{http://www.campuscontent.de/model/1.0}commonlicense_cc_version";
 	public final static String CCM_PROP_IO_COMMONLICENSE_CC_LOCALE = "{http://www.campuscontent.de/model/1.0}commonlicense_cc_locale";
+
+	public final static String CCM_PROP_IO_COMMONLICENSE_AI_ALLOW_USAGE = "{http://www.campuscontent.de/model/1.0}commonlicense_ai_allow_usage";
+	public final static String CCM_PROP_IO_COMMONLICENSE_AI_GENERATED = "{http://www.campuscontent.de/model/1.0}commonlicense_ai_generated";
+	public final static String CCM_PROP_IO_COMMONLICENSE_AI_MANUALLY_MODIFIED = "{http://www.campuscontent.de/model/1.0}commonlicense_ai_manually_modified";
+	public final static String CCM_PROP_IO_COMMONLICENSE_AI_TOOL = "{http://www.campuscontent.de/model/1.0}commonlicense_ai_tool";
 	//time of license
 	public final static String CCM_PROP_IO_LICENSE_FROM = "{http://www.campuscontent.de/model/1.0}license_from";
 	public final static String CCM_PROP_IO_LICENSE_TO = "{http://www.campuscontent.de/model/1.0}license_to";

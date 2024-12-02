@@ -17,7 +17,6 @@
 }
 
 es-mds-editor-widget-author {
-    flex-grow: 1;
     padding-top: 20px;
 }
 
@@ -156,6 +155,9 @@ fieldset {
 
 .currentLicenseDescription {
     color: $textLight;
+    .ai-info {
+        white-space: pre-line;
+    }
 }
 
 .currentLicenseDescription div {
@@ -203,5 +205,27 @@ fieldset {
         grid-template-rows: auto auto auto;
         grid-gap: 15px;
         width: 100%;
+    }
+}
+.ai-info {
+    flex-grow: 1;
+    .more {
+        width: 100%;
+        display: flex;
+        gap: 20px;
+        background: $cardLightBackground;
+        border: none;
+        align-items: center;
+        padding: 10px 20px;
+        .title {
+            flex-grow: 1;
+            text-align: left;
+        }
+    }
+    .ai-details {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
 }

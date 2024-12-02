@@ -146,7 +146,11 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
             CCConstants.CCM_PROP_IO_LICENSE_TITLE_OF_WORK,
             CCConstants.CCM_PROP_IO_LICENSE_SOURCE_URL,
             CCConstants.CCM_PROP_IO_LICENSE_PROFILE_URL,
-            CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_ALLOW_USAGE,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_GENERATED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_MANUALLY_MODIFIED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_TOOL,
     };
 
 

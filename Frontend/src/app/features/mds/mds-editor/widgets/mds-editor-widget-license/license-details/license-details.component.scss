@@ -72,4 +72,7 @@ h5 {
 }
 .currentLicenseDescription {
     color: $textLight;
+    .ai-info {
+        white-space: pre-line;
+    }
 }
