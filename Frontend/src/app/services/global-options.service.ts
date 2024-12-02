@@ -1,6 +1,6 @@
 import { Injectable, TemplateRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { OptionItem } from '../../../dist/edu-sharing-ui';
+import { OptionItem } from 'ngx-edu-sharing-ui';
 import { Node } from 'ngx-edu-sharing-api';
 
 export type PostProcessOptionsCallback = (options: OptionItem[], objects: Node[]) => void;
