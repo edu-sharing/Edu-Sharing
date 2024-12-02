@@ -36,7 +36,7 @@
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
-            <phase>prepare-package</phase>
+            <phase>compile</phase>
             <configuration>
               <includeArtifactIds>
                 edu_sharing-community-common-deployment-redis-cluster-compose
@@ -55,7 +55,7 @@
         <executions>
           <execution>
             <id>commons</id>
-            <phase>package</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
