@@ -534,8 +534,11 @@
     "MOODLE": {
       "TITLE": "new Moodle content",
       "FILENAME": "the following file is being created",
-      "NAME": "MOODLE",
+      "NAME": "Moodle",
       "PLACEHOLDER": "Name of content"
+    },
+    "CURRICULUM": {
+      "NAME": "Kanban"
     },
     "MIMETYPE": {
       "imsqti_xmlv2p1_questionnaire": "Questionnaire",

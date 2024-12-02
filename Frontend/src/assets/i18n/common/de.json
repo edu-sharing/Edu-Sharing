@@ -630,6 +630,9 @@
       "PLACEHOLDER": "Name des Inhalts",
       "FILENAME": "Folgende Datei wird erstellt"
     },
+    "CURRICULUM": {
+      "NAME": "Pinnwannd"
+    },
     "MIMETYPE": {
       "imsqti_xmlv2p1_questionnaire": "Fragebogen",
       "imsqti_xmlv2p1_test": "Test",
