@@ -6,7 +6,9 @@ import { ApiConfiguration } from './api/api-configuration';
 /**
  * Configuration for the performed HTTP requests
  */
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ApiRequestConfiguration {
     private authForNextRequest: string | null = null;
     private _locale: string | null = null;
