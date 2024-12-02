@@ -16,7 +16,12 @@
       {{ 'RECYCLE.NO_RESULTS_MESSAGE' | translate }}
     </h3>
     <h3 *ngIf="!searchQuery" class="empty mat-heading-3">
-      {{ 'RECYCLE.ARCHIVE_EMPTY' | translate }}
+      <ng-container *ngIf="(dataSource.connectPagination() | async).total === 0">
+        {{ 'RECYCLE.ARCHIVE_EMPTY' | translate }}
+      </ng-container>
+      <ng-container *ngIf="(dataSource.connectPagination() | async).total !== 0">
+        {{ 'RECYCLE.ARCHIVE_REORDERING' | translate }}
+      </ng-container>
     </h3>
   </ng-template>
 </es-node-entries-wrapper>
