@@ -855,6 +855,11 @@
         <property name="ccm:title_series">
           <type>d:text</type>
         </property>
+        <!-- subtitle, i.e. eaf subtitle -->
+        <property name="ccm:title_subtitle">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
 
         <!-- userdefined preview image -->
         <property name="ccm:userdefined_preview">

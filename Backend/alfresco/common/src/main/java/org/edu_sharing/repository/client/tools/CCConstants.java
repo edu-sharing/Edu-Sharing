@@ -1185,6 +1185,7 @@ public class CCConstants {
 	public final static String CCM_PROP_IO_THUMBNAILURL ="{http://www.campuscontent.de/model/1.0}thumbnailurl";
 
 	public final static String CCM_PROP_IO_TITLE_SERIES ="{http://www.campuscontent.de/model/1.0}title_series";
+	public final static String CCM_PROP_IO_TITLE_SUBTITLE ="{http://www.campuscontent.de/model/1.0}title_subtitle";
 
 	public static final String CCM_PROP_IO_SCHOOLCONTEXT = "{http://www.campuscontent.de/model/1.0}schoolcontext";
 	public static final String CCM_PROP_IO_SCHOOLTOPIC = "{http://www.campuscontent.de/model/1.0}schooltopic";
