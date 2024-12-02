@@ -9,6 +9,7 @@ import {
     AddWithConnectorDialogData,
     AddWithConnectorDialogResult,
 } from './add-with-connector-dialog-data';
+import { CordovaService } from '../../../../common/services/cordova.service';
 
 @Component({
     selector: 'es-add-with-connector-dialog',
@@ -29,6 +30,7 @@ export class AddWithConnectorDialogComponent {
     constructor(
         @Inject(CARD_DIALOG_DATA) public data: AddWithConnectorDialogData,
         private dialogRef: CardDialogRef<AddWithConnectorDialogData, AddWithConnectorDialogResult>,
+        private cordova: CordovaService,
     ) {
         this.initDialogConfig();
     }
@@ -41,7 +43,11 @@ export class AddWithConnectorDialogComponent {
         if (!this.name.trim()) {
             return;
         }
-        this.dialogRef.close({ name: this.name, type: this.getType() });
+        let win: Window;
+        if (!this.cordova.isRunningCordova()) {
+            win = window.open('');
+        }
+        this.dialogRef.close({ name: this.name, type: this.getType(), window: win });
     }
 
     private processConnector(connector: Connector): Connector {

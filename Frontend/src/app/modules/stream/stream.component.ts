@@ -404,15 +404,11 @@ export class StreamComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private createConnector(connector: Connector, event: AddWithConnectorDialogResult) {
         const prop = this.nodeHelper.propertiesFromConnector(event);
-        let win: any;
-        if (!this.cordova.isRunningCordova()) {
-            win = window.open('');
-        }
         this.nodeService
             .createNode(RestConstants.INBOX, RestConstants.CCM_TYPE_IO, [], prop, false)
             .subscribe(
                 (data: NodeWrapper) => {
-                    this.editConnector(data.node, event.type as Filetype, win, connector);
+                    this.editConnector(data.node, event.type as Filetype, event.window, connector);
                     UIHelper.goToWorkspaceFolder(
                         this.nodeService,
                         this.router,
@@ -421,7 +417,7 @@ export class StreamComponent implements OnInit, AfterViewInit, OnDestroy {
                     );
                 },
                 (error: any) => {
-                    win.close();
+                    event.window?.close();
                     if (
                         this.nodeHelper.handleNodeError(event.name, error) ==
                         RestConstants.DUPLICATE_NODE_RESPONSE
