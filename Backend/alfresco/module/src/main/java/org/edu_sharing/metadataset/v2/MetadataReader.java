@@ -586,10 +586,12 @@ public class MetadataReader {
                 switch (name) {
                     case "valuespace":
                         Node type = data.getAttributes().getNamedItem("type");
+                        Node lenient = data.getAttributes().getNamedItem("lenient");
                         valuespaces.add(
                                 new ValuespaceInfo(
                                         value,
-                                        type == null ? null : ValuespaceInfo.ValuespaceType.valueOf(type.getNodeValue())
+                                        type == null ? null : ValuespaceInfo.ValuespaceType.valueOf(type.getNodeValue()),
+                                        lenient != null && Boolean.parseBoolean(lenient.getNodeValue())
                                 ));
                         break;
                     case "valuespaceCombineStrategy":
@@ -687,7 +689,16 @@ public class MetadataReader {
     private ValuespaceData getValuespaceExternal(ValuespaceInfo value) throws Exception {
         ValuespaceReader reader = ValuespaceReader.getSupportedReader(value);
         if (reader != null) {
-            return reader.getValuespace(locale);
+            try {
+                return reader.getValuespace(locale);
+            } catch(Throwable t) {
+                if(value.isLenient()) {
+                    log.error("Could not read valuespace " + value.getValue() + ": " + t.getMessage(), t);
+                    return new ValuespaceData(new MetadataKey(), Collections.emptyList());
+                } else {
+                    throw t;
+                }
+            }
         } else {
             log.warn("No viable metadata reader found for url {}", value);
         }

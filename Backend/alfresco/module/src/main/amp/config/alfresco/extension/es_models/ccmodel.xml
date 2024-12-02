@@ -1724,7 +1724,24 @@
         <property name="ccm:commonlicense_cc_locale">
           <type>d:text</type>
         </property>
+        <!-- allow usage of the material for ai training -->
+        <property name="ccm:commonlicense_ai_allow_usage">
+          <type>d:boolean</type>
+        </property>
+        <!-- the element was generated mainly by ai -->
+        <property name="ccm:commonlicense_ai_generated">
+          <type>d:boolean</type>
+        </property>
+        <!-- the element was manually modified after creation -->
+        <property name="ccm:commonlicense_ai_manually_modified">
+          <type>d:boolean</type>
+        </property>
 
+        <!-- tool/network used for generation -->
+        <property name="ccm:commonlicense_ai_tool">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
         <!-- gueltigkeitszeitraum von importierten Objecten und istLizensValide
           TODO raus -->
         <property name="ccm:license_from">
