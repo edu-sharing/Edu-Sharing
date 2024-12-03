@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
 import org.edu_sharing.restservices.*;
 import org.edu_sharing.restservices.node.v1.model.NodeEntry;
@@ -23,10 +24,11 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/bulk/v1")
 @Tag(name= "BULK v1" )
-@ApiService(value = "BULK", major = 1, minor = 1)
+@ApiService(value = "BULK", major = 1, minor = 2)
 @Consumes({ "application/json" })
 @Produces({"application/json"})
 public class BulkApi {
@@ -102,6 +104,41 @@ public class BulkApi {
 				entry.getNode().setRef(new org.edu_sharing.restservices.shared.NodeRef(RepositoryDao.getHomeRepository(), node.getId()));
 			}
 			return Response.ok().entity(entry).build();
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t, ErrorResponse.ErrorResponseLogging.relaxed);
+		}
+	}
+
+	@POST
+	@Path("/list")
+
+	@Operation(summary = "lists given nodes", description = "lists all currently synchronized nodes matching the posted, multiple criteria")
+
+	@ApiResponses(value = { @ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = NodeEntry[].class))),
+			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+	public Response list(@Context HttpServletRequest req,
+						 @Parameter(description = "properties that must match (with \"AND\" concatenated)" , required=true ) HashMap<String, String[]> properties,
+						 @Parameter(description = "Return the full node. If you don't need the data, set to false to only return the id (will improve performance)", required = false, schema = @Schema(defaultValue="true")) @QueryParam("resolveNode") Boolean resolveNode
+	) {
+		try {
+			List<NodeEntry> nodes = BulkServiceFactory.getInstance().list(properties).stream().map(
+					node -> {
+						NodeEntry entry = new NodeEntry();
+						if (resolveNode == null || resolveNode) {
+							entry.setNode(NodeDao.getAsNodeSimple(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, node.getId())));
+						} else {
+							entry.setNode(new Node());
+							entry.getNode().setRef(new org.edu_sharing.restservices.shared.NodeRef(RepositoryDao.getHomeRepository(), node.getId()));
+						}
+						return entry;
+					}
+			).collect(Collectors.toList());
+
+			return Response.ok().entity(nodes).build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t, ErrorResponse.ErrorResponseLogging.relaxed);
 		}

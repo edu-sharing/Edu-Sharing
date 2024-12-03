@@ -358,8 +358,9 @@ public class BulkServiceImpl implements BulkService, ApplicationListener<Refresh
 		return diffs;
 	}
 
+
 	@Override
-	public NodeRef find(Map<String, String[]> properties) throws Exception {
+	public List<NodeRef> list(Map<String, String[]> properties) throws Exception {
 		CMISSearchHelper.CMISSearchData data = new CMISSearchHelper.CMISSearchData();
 		// this uses SOLR and is not synchronized!
 		// data.inTree = primaryFolder.getId();
@@ -368,7 +369,11 @@ public class BulkServiceImpl implements BulkService, ApplicationListener<Refresh
 				NodeServiceHelper.getPropertiesSinglevalue(
 						NodeServiceHelper.transformShortToLongProperties(properties)
 				),data);
-		result = filterCMISResult(result, primaryFolder);
+		return filterCMISResult(result, primaryFolder);
+	}
+	@Override
+	public NodeRef find(Map<String, String[]> properties) throws Exception {
+		List<NodeRef> result = list(properties);
 		if(result.size()==1){
 			return result.get(0);
 		}else if(result.size()>1){
