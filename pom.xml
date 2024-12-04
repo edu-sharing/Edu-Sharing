@@ -535,9 +535,9 @@
       </dependency>
 
       <dependency>
-        <groupId>net.sourceforge.htmlunit</groupId>
+        <groupId>org.htmlunit</groupId>
         <artifactId>htmlunit</artifactId>
-        <version>2.13</version>
+        <version>4.7.0</version>
       </dependency>
 
 

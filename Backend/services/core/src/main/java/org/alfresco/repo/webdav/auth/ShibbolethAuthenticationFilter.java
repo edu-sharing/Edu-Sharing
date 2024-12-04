@@ -22,19 +22,18 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.springframework.context.ApplicationContext;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlOption;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSelect;
+import org.htmlunit.BrowserVersion;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlButton;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlOption;
+import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlSelect;
 
 
 /**
@@ -48,7 +47,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 
 	private static final String PARAM_DOMAIN = "domain";
 	private static final String SEPAR_DOMAIN = "@";
-	
+
 	private static final Log logger = LogFactory.getLog(ShibbolethAuthenticationFilter.class);
 
 	// Allow an authentication ticket to be passed as part of a request to bypass authentication
@@ -72,10 +71,10 @@ public class ShibbolethAuthenticationFilter implements Filter {
 	private String defaultSelector;
 	private String redirectPath;
 
-	
+
 	/**
 	 * Initialize the filter
-	 * 
+	 *
 	 * @param config FitlerConfig
 	 * @exception ServletException
 	 */
@@ -91,7 +90,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 		this.defaultDomain = config.getInitParameter("defaultDomain");
 		this.defaultSelector = config.getInitParameter("defaultSelector");
 		this.redirectPath = config.getInitParameter("redirectPath");
-		
+
 		// Setup the authentication context
 
 		ApplicationContext context = AlfAppContextGate.getApplicationContext();
@@ -99,16 +98,16 @@ public class ShibbolethAuthenticationFilter implements Filter {
 
 		this.m_nodeService = serviceRegistry.getNodeService();
 		this.m_authService = serviceRegistry.getAuthenticationService();
-		this.m_transactionService = serviceRegistry.getTransactionService();		
+		this.m_transactionService = serviceRegistry.getTransactionService();
 		this.m_personService = serviceRegistry.getPersonService();
-		
+
 		this.m_authComp = (AuthenticationComponent) context.getBean("AuthenticationComponent");
 
 	}
 
 	/**
 	 * Run the authentication filter
-	 * 
+	 *
 	 * @param req ServletRequest
 	 * @param resp ServletResponse
 	 * @param chain FilterChain
@@ -119,7 +118,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
 	ServletException
 	{
-		
+
 		logger.debug("starting");
 
 		HttpServletRequest httpReq = (HttpServletRequest) req;
@@ -134,7 +133,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 			logger.debug("new websession");
 
 			// Get the authorization header
-			
+
 			String authHdr = httpReq.getHeader("Authorization");
 			if ( (authHdr != null) && (authHdr.length() > 5) && authHdr.substring(0,5).equalsIgnoreCase("BASIC"))
 			{
@@ -161,36 +160,36 @@ public class ShibbolethAuthenticationFilter implements Filter {
 					password = "";
 				}
 
-				
+
 				try {
 
 					String[] usernameParts = username.split(SEPAR_DOMAIN);
-					
-					String localname = 
-							  (usernameParts.length == 2) 
-							? usernameParts[0] 
+
+					String localname =
+							  (usernameParts.length == 2)
+							? usernameParts[0]
 							: username;
 
-					logger.debug("localname = <"+ localname +">");					
+					logger.debug("localname = <"+ localname +">");
 
 					String defaultDomain = httpReq.getParameter(PARAM_DOMAIN);
-					
-					String domain = 
-							 (usernameParts.length == 2) 
-							? usernameParts[1] 
-							:    (defaultDomain != null) 
-								? defaultDomain 
-								:    (this.defaultDomain != null) 
+
+					String domain =
+							 (usernameParts.length == 2)
+							? usernameParts[1]
+							:    (defaultDomain != null)
+								? defaultDomain
+								:    (this.defaultDomain != null)
 									? this.defaultDomain
 									: "";
 
-					logger.debug("domain = <"+ domain +">");					
-					
+					logger.debug("domain = <"+ domain +">");
+
 					String scopedname = localname + (0 < domain.length() ? SEPAR_DOMAIN + domain : "");
-					
+
 					String proxyHost = System.getProperty("https.proxyHost");
 					String proxyPort = System.getProperty("https.proxyPort");
-					
+
 					final WebClient webClient =
 							  (proxyHost != null & proxyPort != null)
 							? new WebClient(BrowserVersion.getDefault(), proxyHost, Integer.parseInt(proxyPort))
@@ -199,78 +198,78 @@ public class ShibbolethAuthenticationFilter implements Filter {
 					HtmlPage page =
 							doAutoLogin(
 									doAutoWAYF(
-											(HtmlPage) webClient.getPage(this.protectedURL), 
+											(HtmlPage) webClient.getPage(this.protectedURL),
 											domain,
-											this.defaultSelector), 
-									localname, 
+											this.defaultSelector),
+									localname,
 									password);
 
-					String content = page.asText();
+					String content = page.asNormalizedText();
 					page.cleanUp();
-					
-					webClient.closeAllWindows();
+
+					webClient.close();
 
 					if (content.contains(this.successContent)) {
-						
+
 						logger.debug("auth by shibboleth successful");
-						
+
 						UserTransaction tx = null;
 						try
-						{						
+						{
 							// Set security context
-							
+
 							this.m_authComp.setCurrentUser(scopedname);
 
 							// Start a transaction
-	
+
 							tx = this.m_transactionService.getUserTransaction();
 							tx.begin();
-	
+
 							NodeRef personRef = this.m_personService.getPerson(scopedname);
-							
+
 							NodeRef homeRef = (NodeRef) this.m_nodeService.getProperty(personRef, ContentModel.PROP_HOMEFOLDER);
-	
+
 							// Check that the home space node exists - else Login cannot proceed
-	
+
 							if (this.m_nodeService.exists(homeRef) == false) {
 								throw new InvalidNodeRefException(homeRef);
 							}
-							
+
 							user = new WebDAVUser( username, this.m_authService.getCurrentTicket(), homeRef);
-	
+
 							tx.commit();
-							tx = null;						
-							
+							tx = null;
+
 							httpReq.getSession().setAttribute(
-									BaseAuthenticationFilter.AUTHENTICATION_USER, 
+									BaseAuthenticationFilter.AUTHENTICATION_USER,
 									user);
-							
+
 						} catch (Throwable e) {
-							
+
 							// Clear the user object to signal authentication failure
 							user = null;
 							logger.error(e);
-							
+
 						} finally {
-							
+
 							try
 							{
 								if (tx != null) {
 									tx.rollback();
 								}
-								
+
 							} catch (Exception tex) {
 								logger.error(tex);
 							}
-							
+
 						}
-						
+
 					} else {
-						
+
 						logger.debug("auth by shibboleth failed");
-						
+
 					}
-					
+
 				} catch (Exception e) {
 					logger.error(e);
 				}
@@ -281,7 +280,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 				// Check if the request includes an authentication ticket
 
 				String ticket = req.getParameter( ShibbolethAuthenticationFilter.ARG_TICKET);
-				
+
 				logger.debug("auth by ticket:"+ticket);
 
 				if ( (ticket != null) &&  (ticket.length() > 0))
@@ -301,7 +300,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 					// Debug
 
 					logger.debug(
-							"Logon via ticket from " + req.getRemoteHost() + " (" + req.getRemoteAddr() + ":" + req.getRemotePort() + ")" + 
+							"Logon via ticket from " + req.getRemoteHost() + " (" + req.getRemoteAddr() + ":" + req.getRemotePort() + ")" +
 							" ticket=" + ticket);
 
 					UserTransaction tx = null;
@@ -382,7 +381,7 @@ public class ShibbolethAuthenticationFilter implements Filter {
 		}
 		else
 		{
-			
+
 			logger.debug("websession exists, ticket: "+user.getTicket());
 			try
 			{
@@ -408,16 +407,16 @@ public class ShibbolethAuthenticationFilter implements Filter {
 		// Chain other filters
 
 		if (this.redirectPath != null) {
-			
+
 			req.getRequestDispatcher(this.redirectPath).forward(req, resp);
-			
+
 		} else {
-			
+
 			chain.doFilter(req, resp);
-			
+
 		}
 	}
-	
+
 	private HtmlPage doAutoWAYF(HtmlPage page, String domain, String selector) {
 
 		HtmlPage result = page;
@@ -427,71 +426,71 @@ public class ShibbolethAuthenticationFilter implements Filter {
 		logger.debug("selector: " + selector);
 
 		try {
-			
+
 			HtmlSelect select = page.getHtmlElementById("idpSelectSelector");
-		
+
 			boolean idpFound = false;
 			for (HtmlOption option1 : select.getOptions()) {
-	
+
 				String idp = option1.getValueAttribute();
-					
-				boolean found = (selector != null) ? idp.equals(selector) : idp.contains(domain); 
-				
+
+				boolean found = (selector != null) ? idp.equals(selector) : idp.contains(domain);
+
 				if ((! idpFound) && found) {
-					
-					option1.setSelected(true);					
+
+					option1.setSelected(true);
 					logger.debug("idp <"+ idp +"> selected");
-					
+
 					idpFound = true;
-					
+
 				} else {
-					
-					option1.setSelected(false);					
+
+					option1.setSelected(false);
 					logger.debug("idp <"+ idp +">");
 				}
-				
+
 			}
-			
+
 			if (idpFound) {
-				
+
 				result = page.getHtmlElementById("idpSelectListButton").click();
-	
+
 				page.cleanUp();
-	
+
 				logger.debug(result.asXml());
 			}
-			
+
 		} catch (Exception e) {
 			logger.error(e);
 		}
-		
+
 		return result;
 	}
-	
+
 	private HtmlPage doAutoLogin(HtmlPage page, String localname, String password) {
-		
+
 		HtmlPage result = page;
 
 		try {
-			
+
 			final HtmlForm form2 = (HtmlForm) page.getByXPath("//form").get(0);
-			
+
 			form2.getInputByName("j_username").setValueAttribute(localname);
 			form2.getInputByName("j_password").setValueAttribute(password);
 
 			HtmlButton button2 =
 					(HtmlButton) form2.getByXPath("//button[@type='submit']").get(0);
-			
+
 			result = button2.click();
 
 			page.cleanUp();
 
 			logger.debug(result.asXml());
-			
+
 		} catch (Exception e) {
 			logger.error(e);
 		}
-		
+
 		return result;
 	}
 
@@ -499,5 +498,5 @@ public class ShibbolethAuthenticationFilter implements Filter {
 	public void destroy() {
 		// TODO Auto-generated method stub
 
-	}	
+	}
 }

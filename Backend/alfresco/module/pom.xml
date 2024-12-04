@@ -572,7 +572,7 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sourceforge.htmlunit</groupId>
+      <groupId>org.htmlunit</groupId>
       <artifactId>htmlunit</artifactId>
       <scope>runtime</scope>
     </dependency>
