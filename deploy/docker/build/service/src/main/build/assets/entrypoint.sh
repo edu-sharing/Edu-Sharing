@@ -379,7 +379,7 @@ grep -q '^[#]*\s*alfresco-pdf-renderer\.exe=' "${alfProps}" || echo 'alfresco-pd
 sed -i -r 's|^[#]*\s*local\.transform\.pipeline\.config\.dir=.*|local.transform.pipeline.config.dir='"$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines|" "${alfProps}"
 grep -q '^[#]*\s*local\.transform\.pipeline\.config\.dir=' "${alfProps}" || echo "local.transform.pipeline.config.dir=$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines" >>"${alfProps}"
 # fix: Error reading /opt/alfresco/tomcat/shared/classes/config/defaults/transform/pipelines/.gitkeep
-rm -f "$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines/.gitkeep"
+rm -f "$ALF_HOME/tomcat/shared/classes/config/defaults/transform/pipelines/.gitkeep"
 
 sed -i -r 's|^[#]*\s*ooo\.exe=.*|ooo.exe=|' "${alfProps}"
 grep -q '^[#]*\s*ooo\.exe=' "${alfProps}" || echo "ooo.exe=" >>"${alfProps}"
