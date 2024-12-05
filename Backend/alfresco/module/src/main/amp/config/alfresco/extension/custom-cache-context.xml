@@ -59,7 +59,7 @@
     </bean>
 
     <bean name="eduSharingContextCacheById" factory-bean="cacheFactory" factory-method="createCache">
-      <constructor-arg value="cache.eduSharingContextCacheByDomain"/>
+      <constructor-arg value="cache.eduSharingContextCacheById"/>
     </bean>
 
     <bean name="eduSharingVersionCache" factory-bean="cacheFactory" factory-method="createCache">
