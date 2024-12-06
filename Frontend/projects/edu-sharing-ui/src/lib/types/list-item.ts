@@ -1,5 +1,6 @@
 import { Sort, SortDirection } from '@angular/material/sort';
 import { Observable } from 'rxjs';
+import { EventEmitter } from '@angular/core';
 
 export type ListItemType = 'NODE' | 'NODE_PROPOSAL' | 'COLLECTION' | 'ORG' | 'GROUP' | 'USER';
 
@@ -63,5 +64,5 @@ export class SortEvent extends ListItemSort {
 export interface SortPanel {
     active: string;
     direction: SortDirection;
-    readonly sortChange: Observable<Sort>;
+    readonly sortChange: EventEmitter<Sort>;
 }

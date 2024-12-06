@@ -484,6 +484,11 @@
       <textEscapingPolicy>all</textEscapingPolicy>
     </widget>
     <widget>
+      <id>ccm:commonlicense_ai_tool</id>
+      <type>multivalueFixedBadges</type>
+      <valuespace type="SKOS" lenient="true">https://vocabs.edu-sharing.net/w3id.org/edu-sharing/vocabs/aiTools/index.json</valuespace>
+    </widget>
+    <widget>
       <id>virtual:user_files</id>
       <caption>virtual_user_files</caption>
       <type>checkbox</type>

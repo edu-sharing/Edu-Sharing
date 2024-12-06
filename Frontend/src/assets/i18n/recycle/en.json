@@ -6,6 +6,7 @@
     "NO_RESULTS_MESSAGE": "There are no items matching the search term in the recycle bin.",
     "ENTER_NEW_TEXT": "Please enter a new search term.",
     "ARCHIVE_EMPTY": "There are no objects in the recycle bin.",
+    "ARCHIVE_REORDERING": "The recycle bin is currently re-indexed. Please try again in a view seconds.",
     "DELETE": {
       "CONFIRM_TITLE": "Delete the object permanently?",
       "CONFIRM_MESSAGE": "If you permanently delete objects, you can not restore them later.",

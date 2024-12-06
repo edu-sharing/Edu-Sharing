@@ -17,6 +17,7 @@ import {
     map,
     pairwise,
     share,
+    skip,
     startWith,
     switchMap,
     takeUntil,
@@ -41,7 +42,6 @@ import { SearchPageRestoreService } from './search-page-restore.service';
 import { SearchPageService, SearchRequestParams } from './search-page.service';
 import { RestConstants } from '../../core-module/rest/rest-constants';
 import { MdsWidgetType } from 'src/app/features/mds/types/types';
-import { RestSearchService } from 'src/app/core-module/core.module';
 import { ActivatedRoute } from '@angular/router';
 import { UserModifiableValuesService } from './user-modifiable-values';
 import { Sort } from '@angular/material/sort';
@@ -93,7 +93,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
     ) {
         this._registerPageRestore();
         this._registerSearchObservables();
-        this._registerColumnsAndSortConfig();
+        this._registerColumns();
         this._registerLoadingProgress();
         this._registerResultDiffCount();
         this._registerDefaultSort();
@@ -211,7 +211,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
             });
     }
 
-    private _registerColumnsAndSortConfig(): void {
+    private _registerColumns(): void {
         // Get MDS definition.
         const mds: Observable<MdsDefinition> = rxjs
             .combineLatest([
@@ -232,16 +232,35 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
         mds.pipe(
             map((mds) => MdsHelperService.getColumns(this._translate, mds, 'searchCollections')),
         ).subscribe(this.collectionColumns);
-        // Register sort.
-        mds.pipe(map((mds) => MdsHelperService.getSortInfo(mds, 'search'))).subscribe(
-            (sortInfo) => {
-                if (this.state.value.sortConfig === null || !this.state.value.sortConfig?.columns) {
-                    this.patchState({
-                        sortConfig: {
+    }
+    /**
+     * switches the default sort based on a present search string or not
+     */
+    private _registerDefaultSort() {
+        combineLatest([
+            this._searchPage.activeMetadataSet.observeValue().pipe(filter((mds) => !!mds)),
+            this._searchPage.activeRepository.observeValue(),
+        ])
+            .pipe(
+                switchMap(([metadataSet, repository]) =>
+                    this._mds.getMetadataSet({ repository, metadataSet }),
+                ),
+                filter((mds) => !!mds.sorts.find((s) => s.id === 'search')?.defaultSearch),
+            )
+            .subscribe((mds) => {
+                const sorts = mds.sorts.find((s) => s.id === 'search');
+                this._searchPage.searchString
+                    .observeValue()
+                    .pipe(
+                        distinctUntilChanged((a, b) => (a == null ? b == null : b != null)),
+                        first(),
+                    )
+                    .subscribe((searchString) => {
+                        const state = searchString ? sorts.defaultSearch : sorts.default;
+                        // console.log(searchString, mds, state);
+                        let config: Partial<ListSortConfig> = {
                             allowed: true,
-                            active: sortInfo.default.sortBy,
-                            direction: sortInfo.default.sortAscending ? 'asc' : 'desc',
-                            columns: sortInfo.columns?.map(
+                            columns: sorts.columns?.map(
                                 ({ id, mode }) =>
                                     new ListItemSort(
                                         'NODE',
@@ -249,41 +268,41 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                                         mode as 'ascending' | 'descending',
                                     ),
                             ),
-                        },
+                        };
+                        // first call: only override if NO state is present
+                        // i.e. the state is already set via parameters
+                        if (!this.state.value.sortConfig?.active) {
+                            config = {
+                                ...config,
+                                active: state.sortBy,
+                                direction: state.sortAscending ? 'asc' : 'desc',
+                            };
+                        }
+                        this.patchState({
+                            sortConfig: {
+                                ...this.state.value.sortConfig,
+                                ...config,
+                            },
+                        });
                     });
-                }
-            },
-        );
-    }
-    /**
-     * switches the default sort based on a present search string or not
-     */
-    private _registerDefaultSort() {
-        combineLatest([
-            this._searchPage.searchString
-                .observeValue()
-                .pipe(distinctUntilChanged((a, b) => (a == null ? b == null : b != null))),
-            combineLatest([
-                this._searchPage.activeMetadataSet.observeValue().pipe(filter((mds) => !!mds)),
-                this._searchPage.activeRepository.observeValue(),
-            ]).pipe(
-                switchMap(([metadataSet, repository]) =>
-                    this._mds.getMetadataSet({ repository, metadataSet }),
-                ),
-            ),
-        ])
-            .pipe(filter(([_, mds]) => !!mds.sorts.find((s) => s.id === 'search')?.defaultSearch))
-            .subscribe(([searchString, mds]) => {
-                const sorts = mds.sorts.find((s) => s.id === 'search');
-                const state = searchString ? sorts.defaultSearch : sorts.default;
-                console.log(searchString, mds, state);
-                this.patchState({
-                    sortConfig: {
-                        ...this.state.value.sortConfig,
-                        active: state.sortBy,
-                        direction: state.sortAscending ? 'asc' : 'desc',
-                    },
-                });
+                // observe later changes between the state of the search query and handle them as the user is switching the sort by
+                this._searchPage.searchString
+                    .observeValue()
+                    .pipe(
+                        distinctUntilChanged((a, b) => (a == null ? b == null : b != null)),
+                        skip(1),
+                    )
+                    .subscribe((searchString) => {
+                        const state = searchString ? sorts.defaultSearch : sorts.default;
+                        this.resultsDataSource.sortPanel.active = state.sortBy;
+                        this.resultsDataSource.sortPanel.direction = state.sortAscending
+                            ? 'asc'
+                            : 'desc';
+                        this.resultsDataSource.sortPanel.sortChange.emit({
+                            active: state.sortBy,
+                            direction: state.sortAscending ? 'asc' : 'desc',
+                        });
+                    });
             });
     }
     patchState(data: Partial<SearchPageState>) {
