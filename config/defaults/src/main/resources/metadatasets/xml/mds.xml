@@ -514,11 +514,11 @@
       <id>curriculum_editable</id>
       <caption>Zugriffsrechte</caption>
       <bottomCaption>Welche Zugriffsrechte sollen Personen auf das Kanban erhalten, für die dieses Objekt in edu-sharing freigegeben wird. (Dieser Wert kann später im Curriculum für das Objekt geändert werden)</bottomCaption>
-      <defaultvalue>read</defaultvalue>
+      <defaultvalue>0</defaultvalue>
       <type>singleoption</type>
       <values>
-        <entry cap="nur Leserechte">read</entry>
-        <entry cap="Lese- und Bearbeitungsrechte">write</entry>
+        <entry cap="nur Leserechte">0</entry>
+        <entry cap="Lese- und Bearbeitungsrechte">1</entry>
       </values>
     </widget>
   </widgets>
@@ -1317,10 +1317,10 @@
       <basequery>
         {"bool":
         {"must":[
-          {"match":{"nodeRef.storeRef.protocol":"workspace"}},
-          {"match":{"aspects":"ccm:collection"}},
-          {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
-          {"match":{"properties.cm:owner.keyword":"${authority}"}}
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
+        {"match":{"properties.cm:owner.keyword":"${authority}"}}
         ]}
         }
       </basequery>
@@ -1329,14 +1329,14 @@
       <basequery>
         {"bool":
         {"must":[
-          {"match":{"nodeRef.storeRef.protocol":"workspace"}},
-          {"match":{"aspects":"ccm:collection"}},
-          {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
         ],
         "must_not":[
-          {"match":{"properties.cm:owner.keyword":"${authority}"}},
-          {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
-          {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
+        {"match":{"properties.cm:owner.keyword":"${authority}"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
         ]}
         }
       </basequery>
