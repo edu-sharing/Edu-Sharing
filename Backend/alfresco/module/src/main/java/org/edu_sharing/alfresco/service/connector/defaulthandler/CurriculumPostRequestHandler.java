@@ -19,7 +19,8 @@ public class CurriculumPostRequestHandler implements SimpleConnector.PostRequest
             String uri = getApiRoot(request) + "kanbans/" + apiResult.get("id").toString();
             setPermissions(request, apiResult);
             HashMap<String, Serializable> result = new HashMap<>();
-            result.put(CCConstants.CCM_PROP_IO_WWWURL, uri);
+            result.put(CCConstants.CCM_PROP_IO_WWWURL,  apiResult.getString("sharing_link"));
+            result.put(CCConstants.LOM_PROP_TECHNICAL_LOCATION, uri);
             return result;
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
