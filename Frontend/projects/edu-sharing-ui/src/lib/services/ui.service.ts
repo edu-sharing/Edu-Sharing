@@ -13,6 +13,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { UIConstants } from '../util/ui-constants';
 import { OptionItem } from '../types/option-item';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+import { Node } from 'ngx-edu-sharing-api';
 
 @Injectable({ providedIn: 'root' })
 export class UIService {
@@ -128,13 +129,10 @@ export class UIService {
      * can be used by dropdown or action menus to update the state for the current element
      * @param options
      */
-    async updateOptionEnabledState(
-        options: BehaviorSubject<OptionItem[]>,
-        object: Node | any = null,
-    ) {
-        options.value.forEach((o) => {
+    async updateOptionEnabledState(options: BehaviorSubject<OptionItem[]>, objects: Node[] = null) {
+        options.value?.forEach((o) => {
             o.isEnabled = !o.customEnabledCallback;
-            o.enabledCallback(object).then((result) => {
+            o.enabledCallback(objects).then((result) => {
                 o.isEnabled = result;
                 options.next(options.value);
             });

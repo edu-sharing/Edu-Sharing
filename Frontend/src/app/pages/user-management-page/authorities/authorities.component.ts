@@ -349,6 +349,10 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
     }
 
     private search() {
+        if (this._searchQuery) {
+            this.sortConfig.active = 'score';
+            this.sortConfig.direction = 'desc';
+        }
         this.refresh();
     }
     public changeSort(event: ListSortConfig) {

@@ -19,6 +19,11 @@
         }
     }
 }
+#importMediacentersSelect,
+#importOrganisationsSelect,
+#importOrgMcSelect {
+    display: none;
+}
 .select-mediacenter {
     display: flex;
     flex-direction: column;

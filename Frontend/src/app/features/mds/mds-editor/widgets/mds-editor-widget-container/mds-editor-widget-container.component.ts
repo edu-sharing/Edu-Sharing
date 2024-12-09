@@ -115,9 +115,9 @@ export class MdsEditorWidgetContainerComponent
         return this.isHidden ? 'hidden' : 'shown';
     }
 
-    readonly editorBulkMode: EditorBulkMode;
     readonly labelId: string;
     readonly descriptionId: string;
+    editorBulkMode: EditorBulkMode;
     bulkMode: BehaviorSubject<BulkMode>;
     missingRequired: MdsWidget['isRequired'] | null;
     isHidden: boolean;
@@ -157,14 +157,29 @@ export class MdsEditorWidgetContainerComponent
         }
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
         if (this.label === true) {
             this.label = this.widget.definition.caption;
         }
         if (this.widget && this.editorBulkMode?.isBulk) {
-            this.bulkMode = new BehaviorSubject(
-                this.editorBulkMode.bulkBehavior === BulkBehavior.Replace ? 'replace' : 'no-change',
-            );
+            let type: BulkMode =
+                this.editorBulkMode.bulkBehavior === BulkBehavior.Replace ? 'replace' : 'no-change';
+            if (BulkBehavior.Replace) {
+                const initValues = await this.widget.getInitalValuesAsync();
+                if (
+                    initValues?.individualValues &&
+                    this.editorBulkMode.bulkBehavior === BulkBehavior.Replace
+                ) {
+                    console.info(
+                        'one field has already mixed values, enforcing Default mode for it',
+                        this.widget.definition.id,
+                        initValues,
+                    );
+                    type = 'no-change';
+                    this.editorBulkMode = { isBulk: true, bulkBehavior: BulkBehavior.Default };
+                }
+            }
+            this.bulkMode = new BehaviorSubject(type);
             this.bulkMode.subscribe((bulkMode) => this.widget.setBulkMode(bulkMode));
         }
         if (this.control) {

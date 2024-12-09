@@ -23,7 +23,7 @@ class SKOSReaderTest {
 
     @BeforeEach
     void setUp() {
-        underTest = Mockito.spy(new SKOSReader(new ValuespaceInfo("", ValuespaceInfo.ValuespaceType.SKOS)));
+        underTest = Mockito.spy(new SKOSReader(new ValuespaceInfo("", ValuespaceInfo.ValuespaceType.SKOS, false)));
     }
 
     @Test

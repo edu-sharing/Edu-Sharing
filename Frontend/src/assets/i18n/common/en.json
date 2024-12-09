@@ -534,8 +534,11 @@
     "MOODLE": {
       "TITLE": "new Moodle content",
       "FILENAME": "the following file is being created",
-      "NAME": "MOODLE",
+      "NAME": "Moodle",
       "PLACEHOLDER": "Name of content"
+    },
+    "CURRICULUM": {
+      "NAME": "Kanban"
     },
     "MIMETYPE": {
       "imsqti_xmlv2p1_questionnaire": "Questionnaire",
@@ -555,6 +558,13 @@
     "TITLE_OF_WORK": "Title",
     "LINK_AUTHOR": "Link to author",
     "DESCRIPTION_REQUIRED": "Please add a license description",
+    "AI": {
+      "NO_USAGE_ALLOWED": "Not to be used for ai training.",
+      "GENERATED": "ai generated",
+      "TOOL": ". generated with {{tool}}",
+      "MODIFIED": "(has been modified)"
+    },
+
     "NAMES": {
       "NONE": "No or unknown license",
       "MULTI": "Multiple licenses",

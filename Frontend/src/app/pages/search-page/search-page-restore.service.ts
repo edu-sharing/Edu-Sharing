@@ -43,7 +43,6 @@ export class SearchPageRestoreService {
     }
     registerMdsState(state: BehaviorSubject<MdsState>): void {
         state.subscribe((s) => {
-            console.log('register', s);
             this._getEntryOrCreate().mdsState = s;
         });
     }

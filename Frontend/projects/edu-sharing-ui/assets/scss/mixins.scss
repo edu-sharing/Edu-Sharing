@@ -6,13 +6,13 @@
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
-@mixin limitLineCount($count, $lineHeight: 1) {
+@mixin limitLineCount($count, $lineHeight: 1, $important: false) {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    line-height: $lineHeight + em;
-    max-height: $count * $lineHeight + em;
-    -webkit-line-clamp: $count; /* number of lines to show */
+    line-height: ($lineHeight + em) if($important, !important, null);
+    max-height: ($count * $lineHeight + em) if($important, !important, null);
+    -webkit-line-clamp: $count if($important, !important, null); /* number of lines to show */
     -webkit-box-orient: vertical;
     /* autoprefixer: off */
 }

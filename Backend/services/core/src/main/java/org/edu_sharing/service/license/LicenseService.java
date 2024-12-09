@@ -4,7 +4,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.tools.URLHelper;
 
 public class LicenseService {
-
+	private static String DEFAULT_LICENSE_VERSION = "4.0";
 	public String getIconUrl(String license,boolean dynamic){
 		if(license==null || license.isEmpty())
 			license="none";
@@ -58,7 +58,7 @@ public class LicenseService {
 		}
 		
 		if(result != null){
-			version = (version == null) ? "3.0" : version;
+			version = (version == null) ? DEFAULT_LICENSE_VERSION : version;
 			if(result.contains("${version}")){
 				result = result.replace("${version}", version);
 			}
@@ -71,5 +71,5 @@ public class LicenseService {
 		
 		return result;
 	}
-		
+
 }

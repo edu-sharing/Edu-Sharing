@@ -1,7 +1,16 @@
 <div class="currentLicense">
-  <h4 *ngIf="type !== 'MULTI'">{{ 'WORKSPACE.LICENSE.CURRENT' | translate }}</h4>
-  <img *ngIf="type !== 'MULTI'" class="currentLicenseIcon" src="{{ getLicenseIcon() }}" />
-  <div class="license-additional-data" *ngIf="type === 'CC_BY' || type === 'CC_BY_SA'">
+  <h4 *ngIf="type !== 'MULTI' && displayMode === 'full'">
+    {{ 'WORKSPACE.LICENSE.CURRENT' | translate }}
+  </h4>
+  <img
+    *ngIf="type !== 'MULTI' && displayMode === 'full'"
+    class="currentLicenseIcon"
+    src="{{ getLicenseIcon() }}"
+  />
+  <div
+    class="license-additional-data"
+    *ngIf="(type === 'CC_BY' || type === 'CC_BY_SA') && displayMode === 'full'"
+  >
     <div *ngIf="ccVersion != '4.0'" class="licenseLocale">
       {{ 'COUNTRY_CODE.' + (ccCountry ? ccCountry : 'INTERNATIONAL') | translate }}
     </div>
@@ -39,10 +48,17 @@
         {{ 'COUNTRY_CODE.' + (ccCountry ? ccCountry : 'INTERNATIONAL') | uppercase | translate }}.
       </div>
     </div>
-    <div *ngIf="type === 'CC_BY' || type === 'CC_0'" class="licenseUrl">
+    <div
+      *ngIf="
+        (type === 'CC_BY' || type === 'CC_0') &&
+        (displayMode === 'full' || displayMode === 'minimalUrl')
+      "
+      class="licenseUrl"
+    >
       <a [href]="getLicenseUrl() | async" target="_blank">{{
         'WORKSPACE.LICENSE.MORE' | translate
       }}</a>
     </div>
+    <div class="ai-info">{{ properties || nodes?.[0]?.properties | esLicenseAiInfo }}</div>
   </div>
 </div>

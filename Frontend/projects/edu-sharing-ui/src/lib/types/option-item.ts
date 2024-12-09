@@ -6,6 +6,7 @@
 
  */
 import { KeyboardShortcutCondition } from '../types/keyboard-shortcuts';
+import { Node } from 'ngx-edu-sharing-api';
 
 export enum NodesRightMode {
     // rights on the current node, no matter if its a reference or origianl
@@ -86,7 +87,7 @@ export class OptionItem {
      * Is handled by optionsHelper and may not be used otherwise
      * Please use @customShowCallback instead
      */
-    public showCallback: (node?: Node | any) => Promise<boolean>;
+    public showCallback: (nodes?: Node[]) => Promise<boolean>;
     /**
      * A function called with the node as parm which should return true or false if the option should be shown for this node
      * Will be called by the optionsHelper
@@ -97,7 +98,7 @@ export class OptionItem {
      * Is handled by optionsHelper and may not be used otherwise
      * Please use @customEnabledCallback instead
      */
-    public enabledCallback: (node?: Node | any) => Promise<boolean>;
+    public enabledCallback: (nodes?: Node[]) => Promise<boolean>;
     /**
      * A function called with the node as param which should return true or false if the option should be enabled or not
      * Will be called by the optionsHelper

@@ -25,7 +25,6 @@ type Range = NodeCacheRange;
 
 export interface NodeRequestParams {
     range: Range;
-    sort?: Sort;
 }
 
 export interface NodeResponse<T> {
@@ -285,7 +284,7 @@ export class NodeDataSourceRemote<
 
     private _downloadAndCache(missingRange: Range): Observable<void> {
         if (missingRange) {
-            return this._remote({ range: missingRange, sort: this._sortHandler.currentSort }).pipe(
+            return this._remote({ range: missingRange }).pipe(
                 tap((response) => (this._paginationHandler.length = response.total)),
                 tap((response) =>
                     this._cache.add(this._getCacheSlice(missingRange, response.data)),

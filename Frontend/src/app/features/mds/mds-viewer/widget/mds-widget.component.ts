@@ -9,7 +9,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { DateHelper, FormatSizePipe } from 'ngx-edu-sharing-ui';
+import { DateHelper, FormatSizePipe, UIConstants } from 'ngx-edu-sharing-ui';
 import { MdsEditorInstanceService, Widget } from '../../mds-editor/mds-editor-instance.service';
 import { MdsEditorViewComponent } from '../../mds-editor/mds-editor-view/mds-editor-view.component';
 import { ViewInstanceService } from '../../mds-editor/mds-editor-view/view-instance.service';
@@ -20,6 +20,8 @@ import { MdsWidgetType } from '../../types/types';
 import { UIService } from '../../../../core-module/rest/services/ui.service';
 import { MatRipple } from '@angular/material/core';
 import { filter } from 'rxjs/operators';
+import { MdsValue } from 'ngx-edu-sharing-api';
+import { UIHelper } from '../../../../core-ui-module/ui-helper';
 
 @Component({
     selector: 'es-mds-widget',
@@ -27,6 +29,7 @@ import { filter } from 'rxjs/operators';
     styleUrls: ['mds-widget.component.scss'],
 })
 export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, OnChanges {
+    readonly ROUTER_PREFIX = UIConstants.ROUTER_PREFIX;
     private static readonly inlineEditing: MdsWidgetType[] = [
         MdsWidgetType.Text,
         MdsWidgetType.Number,
@@ -101,7 +104,7 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
             case 'multivalueBadges':
             case 'singlevalueTree':
             case 'multivalueTree':
-                return 'array';
+                return this.viewInstance.treeDisplay === 'flat' ? 'array' : 'tree';
             case 'slider':
                 return 'slider';
             case 'duration':
@@ -234,5 +237,44 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
             //const result = await this.view.injectEditField(this, this.editWrapper.nativeElement.children[0]);
             //await this.ui.scrollSmoothElementToChild(result.htmlElement);
         }
+    }
+
+    /**
+     * return the path for a given value in a tree
+     */
+    getPath(v: string) {
+        const path: MdsValue[] = [];
+        let pointer: string = v;
+        for (let i = 0; i < 100; i++) {
+            const mapped = this.widget.definition.values.find((w) => w.id === pointer);
+            if (mapped) {
+                path.push(mapped);
+                pointer = mapped.parent;
+            } else {
+                break;
+            }
+        }
+        return path.reverse();
+    }
+
+    /**
+     * fetch the raw node value
+     * Note: Will not work in a bulk state!
+     */
+    getRawValue() {
+        return this.mdsEditorInstance.nodes$.value?.[0].properties[this.widget.definition.id];
+    }
+
+    protected readonly UIHelper = UIHelper;
+
+    getSearchParams(key: MdsValue) {
+        const params: any = {};
+        const mds: { [key: string]: string[] } = {};
+        mds[this.widget.definition.id] = [key.id];
+        params.mds = this.mdsEditorInstance.mdsId;
+        params.sidenav = true;
+        params.repo = this.mdsEditorInstance.nodes$.value?.[0].ref.repo;
+        params.filters = JSON.stringify(mds);
+        return params;
     }
 }

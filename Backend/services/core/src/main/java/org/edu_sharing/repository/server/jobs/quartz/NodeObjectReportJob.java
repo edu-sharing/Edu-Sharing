@@ -6,7 +6,6 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
@@ -30,9 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,11 +59,11 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
     }
 
     public enum ReportType {
-        @JobFieldDescription(description = "The job will generate a monthly report (only on 1st of January, April, July and October)")
+        @JobFieldDescription(description = "The job will generate a monthly report (beginning from the 1st of the month)")
         Monthly,
-        @JobFieldDescription(description = "The job will generate a quaternary report (only on 1st of January, April, July and October)")
+        @JobFieldDescription(description = "The job will generate a quaternary report (beginning from the 1st day of the quartal)")
         Quarterly,
-        @JobFieldDescription(description = "The job will generate a yearly report (only on 1st of January)")
+        @JobFieldDescription(description = "The job will generate a yearly report (beginning from 1st of January)")
         Yearly,
     }
 
@@ -89,7 +86,7 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
     @JobFieldDescription(description = "List of grouped (custom) fields to be fetched from the tracking data", sampleValue = "field1")
     private List<String> groupFields = Collections.emptyList();
 
-    @JobFieldDescription(description = "use a custom date (month) to run the job for. Note: The job will run the month BEFORE the given date!", sampleValue = "YYYY-MM-DD")
+    @JobFieldDescription(description = "use a custom date (month) to run the job for. Note: The job will run to the given date from the first of the given month, quartal or year!", sampleValue = "YYYY-MM-DD")
     private Date customDate = null;
 
     @JobFieldDescription(description = "Defines the reporting period", sampleValue = "Monthly")
@@ -109,6 +106,9 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
     @JobFieldDescription(description = "List of aspects to filter by", sampleValue = "[]")
     private List<String> aspectFilters = Collections.emptyList();
 
+    @JobFieldDescription(description = "force run, even if the date is currently not the 1st")
+    private boolean force = false;
+
     @Autowired
     private TrackingService trackingService;
 
@@ -119,7 +119,7 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         LocalDate now = LocalDate.now();
-        if (customDate == null && now.getDayOfMonth() != 1) {
+        if (!force && now.getDayOfMonth() != 1) {
             logger.error("Job not running because of date: " + now.getDayOfMonth());
             return;
         }
@@ -129,21 +129,20 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
 
     private Void createStats() {
         LocalDate to = LocalDate.now();
-        if (this.customDate != null) {
+        if (customDate != null) {
             to = customDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         }
         to = to.minusDays(1);
 
-        LocalDate from;
+        LocalDate from = to.withDayOfMonth(1);
         switch (type) {
             case Monthly:
-                from = to.minusMonths(1).plusDays(1);
                 break;
             case Yearly:
-                from = to.minusYears(1).minusMonths(1).plusDays(1);
+                from = from.withMonth(1);
                 break;
             case Quarterly:
-                from = to.minusMonths(3).plusDays(1);
+                from = from.withMonth(from.getMonth().firstMonthOfQuarter().getValue());
                 break;
             default:
                 throw new NotImplementedException(type.name());
@@ -154,7 +153,7 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
             List<StatisticEntryNode> nodeStatisics = trackingService.getNodeStatisics(
                     TrackingService.GroupingType.Node,
                     Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC)),
-                    Date.from(to.atStartOfDay().toInstant(ZoneOffset.UTC)),
+                    Date.from(to.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC)),
                     "",
                     additionalFields,
                     groupFields,
@@ -195,22 +194,11 @@ public class NodeObjectReportJob extends AbstractJobMapAnnotationParams {
         StringBuilder sb = new StringBuilder(filename);
         if (appendDate) {
             sb.append("_");
-            switch (type) {
-                case Yearly:
-                    sb.append(from.format(DateTimeFormatter.ofPattern(("yyyy"))));
-                    break;
-                case Quarterly:
-                    sb.append(from.format(DateTimeFormatter.ofPattern(("yyyy"))));
-                    sb.append("-Q");
-                    sb.append(to.getMonthValue()/3);
-                    break;
-                case Monthly:
-                    sb.append(from.format(DateTimeFormatter.ofPattern(("yyyy-MM"))));
-                    break;
-                default:
-                    throw new NotImplementedException(type.name());
-            }
+            sb.append(from.format(DateTimeFormatter.ofPattern(("yyMMdd"))));
+            sb.append("-");
+            sb.append(to.format(DateTimeFormatter.ofPattern(("yyMMdd"))));
         }
+
         sb.append(".csv");
         return sb.toString();
     }

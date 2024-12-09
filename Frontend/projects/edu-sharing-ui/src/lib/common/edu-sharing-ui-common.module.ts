@@ -27,6 +27,7 @@ import { VCardNamePipe } from '../pipes/vcard-name.pipe';
 import { SortDropdownComponent } from '../sort-dropdown/sort-dropdown.component';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { PropertySlugPipe } from '../pipes/property-slug.pipe';
+import { NodeLicensePipe } from '../pipes/node-license.pipe';
 
 @NgModule({
     declarations: [
@@ -43,6 +44,7 @@ import { PropertySlugPipe } from '../pipes/property-slug.pipe';
         NodeIconPipe,
         NodeImagePipe,
         NodeImageSizePipe,
+        NodeLicensePipe,
         NodePersonNamePipe,
         NodeTitlePipe,
         NodeUrlComponent,

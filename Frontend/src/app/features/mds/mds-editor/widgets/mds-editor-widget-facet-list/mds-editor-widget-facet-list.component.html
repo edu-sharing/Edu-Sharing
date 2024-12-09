@@ -30,7 +30,7 @@
   </ul>
   <button
     *ngIf="
-      (facetAggregationSubject | async)?.hasMore && facetValuesFiltered.length < MAX_FACET_COUNT
+      (facetAggregationSubject | async)?.hasMore && facetValuesFiltered?.length < MAX_FACET_COUNT
     "
     mat-button
     color="primary"

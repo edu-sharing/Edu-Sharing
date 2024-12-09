@@ -2687,22 +2687,23 @@ public class NodeDao {
         nodeService.setOwner(this.getId(), username);
     }
 
-    public void setProperty(String property, Serializable value, boolean keepModifiedDate) {
+    public static void setProperty(RepositoryDao repoDao, String nodeId, String property, Serializable value, boolean keepModifiedDate) {
+        NodeService nodeService = NodeServiceFactory.getNodeService(repoDao.getId());
         if (keepModifiedDate) {
             nodeService.keepModifiedDate(
-                    StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(),
-                    () -> setPropertyInternal(property, value)
+                    StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId,
+                    () -> setPropertyInternal(nodeService, nodeId, property, value)
             );
         } else {
-            setPropertyInternal(property, value);
+            setPropertyInternal(nodeService, nodeId, property, value);
         }
     }
 
-    private void setPropertyInternal(String property, Serializable value) {
+    private static void setPropertyInternal(NodeService nodeService, String nodeId, String property, Serializable value) {
         if (value == null) {
-            nodeService.removeProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(), property);
+            nodeService.removeProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId, property);
         } else {
-            nodeService.setProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(), property, value, false);
+            nodeService.setProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId, property, value, false);
         }
     }
 

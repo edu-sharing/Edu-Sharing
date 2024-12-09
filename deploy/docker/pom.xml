@@ -87,7 +87,7 @@
     </docker.edu_sharing.community.common.redis.name>
 
     <docker.edu_sharing.community.common.redis.tag>
-      6.2.14
+      7.4.1
     </docker.edu_sharing.community.common.redis.tag>
 
     <docker.edu_sharing.community.common.varnish.name>

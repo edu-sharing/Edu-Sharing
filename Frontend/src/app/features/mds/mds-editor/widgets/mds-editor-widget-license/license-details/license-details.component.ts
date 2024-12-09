@@ -17,6 +17,13 @@ export class LicenseDetailsComponent implements OnChanges {
         [RestConstants.LOM_PROP_RIGHTS_DESCRIPTION]: 'lom.rights.description',
     };
 
+    /**
+     * display mode
+     * full: show all details including icon, link, and so one
+     * minimal: show only name and description
+     * minimalUrl: like minimal but with license url
+     */
+    @Input() displayMode: 'full' | 'minimal' | 'minimalUrl' = 'full';
     @Input() nodes: Node[];
     @Input() properties: Values;
     type: string;
@@ -36,7 +43,7 @@ export class LicenseDetailsComponent implements OnChanges {
     ) {}
     ngOnChanges(changes: SimpleChanges) {
         // Set the `draggable` attribute when this directive is active.
-        if (changes.nodes?.currentValue) {
+        if (changes.nodes?.currentValue || changes.properties?.currentValue) {
             this.readLicense();
         }
     }
@@ -50,11 +57,11 @@ export class LicenseDetailsComponent implements OnChanges {
             if (license.indexOf('ND') !== -1) this.ccShare = 'ND';
             if (license.indexOf('NC') !== -1) this.ccCommercial = 'NC';
 
-            this.ccVersion = this.getValueForAll(
-                RestConstants.CCM_PROP_LICENSE_CC_VERSION,
-                this.ccVersion,
-            );
-            this.ccCountry = this.getValueForAll(RestConstants.CCM_PROP_LICENSE_CC_LOCALE);
+            // also see @LicenseService
+            this.ccVersion =
+                this.getValueForAll(RestConstants.CCM_PROP_LICENSE_CC_VERSION, this.ccVersion) ||
+                '4.0';
+            this.ccCountry = this.getValueForAll(RestConstants.CCM_PROP_LICENSE_CC_LOCALE) || 'DE';
         }
         if (license === 'CC_0') {
             this.type = 'CC_0';

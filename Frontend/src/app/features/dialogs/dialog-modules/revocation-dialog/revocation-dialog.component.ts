@@ -34,14 +34,14 @@ export class RevocationDialogComponent {
 
             this.dialogRef.patchConfig({
                 buttons: DialogButton.getSaveCancel(
-                    () => {},
+                    () => this.dialogRef.close(),
                     () => this.save(),
                 ),
             });
         } else {
             this.edit = false;
             const buttons = [
-                new DialogButton('CANCEL', DialogButton.TYPE_CANCEL, () => {}),
+                new DialogButton('CANCEL', DialogButton.TYPE_CANCEL, () => this.dialogRef.close()),
                 new DialogButton('WORKSPACE.REVOCATION.REVOKE', DialogButton.TYPE_DANGER, () =>
                     this.save(),
                 ),

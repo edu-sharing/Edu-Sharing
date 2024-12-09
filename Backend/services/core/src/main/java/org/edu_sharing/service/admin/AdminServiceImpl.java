@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.module.ModuleInstallState;
 import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -67,6 +68,7 @@ import org.edu_sharing.service.version.VersionService;
 import org.edu_sharing.spring.ApplicationContextFactory;
 import org.edu_sharing.spring.scope.refresh.ContextRefreshUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.w3c.dom.Document;
@@ -97,6 +99,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final ModuleService moduleService;
     private final VersionService versionService;
+    private final ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
+    private final ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
     //cause standard properties class does not save the values sorted
     static class SortedProperties extends Properties {
@@ -171,44 +175,47 @@ public class AdminServiceImpl implements AdminService {
         if (!isEveryone && AuthorityServiceFactory.getLocalService().getMemberships(authority).contains(CCConstants.AUTHORITY_GROUP_ALFRESCO_ADMINISTRATORS)) {
             throw new IllegalArgumentException("Toolpermissions are not supported for members of " + CCConstants.AUTHORITY_GROUP_ALFRESCO_ADMINISTRATORS);
         }
-        Map<String, ToolPermission> toolpermissions = new HashMap<>();
-        // refresh the tp in this case, since may a new one is created meanwhile by the client
-        for (String tp : tpService.getAllToolPermissions(true)) {
-            String nodeId = tpService.getToolPermissionNodeId(tp, true);
-            List<String> permissionsExplicit = permissionService.getExplicitPermissionsForAuthority(nodeId, authority);
-            List<String> permissions = permissionService.getPermissionsForAuthority(nodeId, authority);
-            ToolPermission status = new ToolPermission();
-            Boolean managed = (Boolean) NodeServiceHelper.getPropertyNative(
-                    new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId),
-                    CCConstants.CCM_PROP_TOOLPERMISSION_SYSTEM_MANAGED
-            );
-            status.setSystemManaged(managed != null && managed);
+        // transaction reduces additional sub-transactions and improves performance significantly
+        return serviceRegistry.getRetryingTransactionHelper().doInTransaction(() -> {
+            Map<String, ToolPermission> toolpermissions = new HashMap<>();
+            // refresh the tp in this case, since may a new one is created meanwhile by the client
+            for (String tp : tpService.getAllToolPermissions(true)) {
+                String nodeId = tpService.getToolPermissionNodeId(tp, true);
+                List<String> permissionsExplicit = permissionService.getExplicitPermissionsForAuthority(nodeId, authority);
+                List<String> permissions = permissionService.getPermissionsForAuthority(nodeId, authority);
+                ToolPermission status = new ToolPermission();
+                Boolean managed = (Boolean) NodeServiceHelper.getPropertyNative(
+                        new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId),
+                        CCConstants.CCM_PROP_TOOLPERMISSION_SYSTEM_MANAGED
+                );
+                status.setSystemManaged(managed != null && managed);
 
-            if (permissionsExplicit.contains(CCConstants.PERMISSION_DENY)) {
-                status.setExplicit(ToolPermission.Status.DENIED);
-            } else if (permissionsExplicit.contains(CCConstants.PERMISSION_READ)) {
-                status.setExplicit(ToolPermission.Status.ALLOWED);
+                if (permissionsExplicit.contains(CCConstants.PERMISSION_DENY)) {
+                    status.setExplicit(ToolPermission.Status.DENIED);
+                } else if (permissionsExplicit.contains(CCConstants.PERMISSION_READ)) {
+                    status.setExplicit(ToolPermission.Status.ALLOWED);
+                }
+                if (permissions.contains(CCConstants.PERMISSION_DENY)) {
+                    status.setEffective(ToolPermission.Status.DENIED);
+                    status.setEffectiveSource(getEffectiveSource(nodeId, authority, CCConstants.PERMISSION_DENY));
+                } else if (permissions.contains(CCConstants.PERMISSION_READ)) {
+                    status.setEffective(ToolPermission.Status.ALLOWED);
+                    status.setEffectiveSource(getEffectiveSource(nodeId, authority, CCConstants.PERMISSION_READ));
+                }
+                toolpermissions.put(tp, status);
             }
-            if (permissions.contains(CCConstants.PERMISSION_DENY)) {
-                status.setEffective(ToolPermission.Status.DENIED);
-                status.setEffectiveSource(getEffectiveSource(nodeId, authority, CCConstants.PERMISSION_DENY));
-            } else if (permissions.contains(CCConstants.PERMISSION_READ)) {
-                status.setEffective(ToolPermission.Status.ALLOWED);
-                status.setEffectiveSource(getEffectiveSource(nodeId, authority, CCConstants.PERMISSION_READ));
-            }
-            toolpermissions.put(tp, status);
-        }
-        return toolpermissions;
+            return toolpermissions;
+        });
     }
 
     private List<Group> getEffectiveSource(String nodeId, String authority, String permissionName) throws Exception {
         PermissionService permissionService = PermissionServiceFactory.getLocalService();
         List<Group> result = new ArrayList<>();
-		// getMemberships can not be called for group everyone
-		if(authority.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)) {
-			result.add(Group.getEveryone());
-			return result;
-		}
+        // getMemberships can not be called for group everyone
+        if(authority.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)) {
+            result.add(Group.getEveryone());
+            return result;
+        }
         for (String group : AuthorityServiceFactory.getLocalService().getMemberships(authority)) {
             List<String> permissionsExplicit = permissionService.getExplicitPermissionsForAuthority(nodeId, group);
             if (permissionsExplicit.contains(permissionName)) {
@@ -276,29 +283,29 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-	@Override
-	public void writePublisherToMDSXml(String vcardProps, String valueSpaceProp, String ignoreValues, String filePath, Map<String,String> authInfo) throws Throwable {
-		File file = new File(filePath);
-		Result result = new StreamResult(file);
-		writePublisherToMDSXml(result,vcardProps,valueSpaceProp,ignoreValues,authInfo);
-	}
-	
-	public String getPublisherToMDSXml(List<String> vcardProps, String valueSpaceProp, String ignoreValues, Map<String,String> authInfo) throws Throwable {
-		StringWriter writer=new StringWriter();
-		Result result = new StreamResult(writer);
-		writePublisherToMDSXml(result,StringUtils.join(vcardProps,","),valueSpaceProp,ignoreValues,authInfo);
-		return writer.toString();
-	}
-	@Override
-	public List<JobInfo> getJobs() throws Throwable {
-		return JobHandler.getInstance().getAllRunningJobs();
-	}
-	@Override
-	public void cancelJob(String jobName, boolean force) throws Throwable {
-		if(!JobHandler.getInstance().cancelJob(jobName, force)){
-			throw new Exception("Job could not be canceled. Scheduler returned false");
-		}
-	}
+    @Override
+    public void writePublisherToMDSXml(String vcardProps, String valueSpaceProp, String ignoreValues, String filePath, Map<String,String> authInfo) throws Throwable {
+        File file = new File(filePath);
+        Result result = new StreamResult(file);
+        writePublisherToMDSXml(result,vcardProps,valueSpaceProp,ignoreValues,authInfo);
+    }
+
+    public String getPublisherToMDSXml(List<String> vcardProps, String valueSpaceProp, String ignoreValues, Map<String,String> authInfo) throws Throwable {
+        StringWriter writer=new StringWriter();
+        Result result = new StreamResult(writer);
+        writePublisherToMDSXml(result,StringUtils.join(vcardProps,","),valueSpaceProp,ignoreValues,authInfo);
+        return writer.toString();
+    }
+    @Override
+    public List<JobInfo> getJobs() throws Throwable {
+        return JobHandler.getInstance().getAllRunningJobs();
+    }
+    @Override
+    public void cancelJob(String jobName, boolean force) throws Throwable {
+        if(!JobHandler.getInstance().cancelJob(jobName, force)){
+            throw new Exception("Job could not be canceled. Scheduler returned false");
+        }
+    }
 
     public void writePropertyToMDSXml(Result result, String property) throws Throwable {
         Collection<String> values = getAllValuesFor(property);
@@ -554,22 +561,22 @@ public class AdminServiceImpl implements AdminService {
         if (!appFile.exists()) {
             props.storeToXML(new FileOutputStream(appFile), "");
         } else {
-			throw new Exception("File "+appFile.getPath() + " already exists");
+            throw new Exception("File "+appFile.getPath() + " already exists");
         }
 
 
-		String existingFileList = getAppPropertiesApplications();
+        String existingFileList = getAppPropertiesApplications();
 
-		if(existingFileList == null) {
-			try {
-				boolean ignored = appFile.delete();
-			} catch(Throwable t){
-				logger.warn("Could not rollback app file " + appFile.getName(), t);
-			}
-			throw new Exception("AppList is currently empty. Please try again later");
-		}
+        if(existingFileList == null) {
+            try {
+                boolean ignored = appFile.delete();
+            } catch(Throwable t){
+                logger.warn("Could not rollback app file " + appFile.getName(), t);
+            }
+            throw new Exception("AppList is currently empty. Please try again later");
+        }
 
-		String newProperty=existingFileList+","+filename;
+        String newProperty=existingFileList+","+filename;
         changeAppPropertiesApplications(newProperty, new Date() + " added file:" + filename);
 
 
@@ -945,24 +952,24 @@ public class AdminServiceImpl implements AdminService {
 
     }
 
-	@Override
-	public Object startJobSync(String jobClass, Map<String,Object> params) throws Throwable {
-		ImmediateJobListener listener = startJob(jobClass, params);
-		while(true) {
-			if(listener.wasExecuted()) {
-				Optional<JobInfo> result = getJobs().stream().filter(job -> job.getStatus().equals(JobInfo.Status.Finished) && job.getJobClass().getName().equals(jobClass)).max((a, b) -> Long.compare(a.getFinishTime(), b.getFinishTime()));
-				if(result.isEmpty()) {
-					throw new IllegalStateException("Job status not found");
-				}
-				return result.get().getJobDataMap().get(JobHandler.KEY_RESULT_DATA);
-			}
-			if(listener.isVetoed()) {
-				throw new Exception("job was vetoed by " + listener.getVetoBy());
-			}
+    @Override
+    public Object startJobSync(String jobClass, Map<String,Object> params) throws Throwable {
+        ImmediateJobListener listener = startJob(jobClass, params);
+        while(true) {
+            if(listener.wasExecuted()) {
+                Optional<JobInfo> result = getJobs().stream().filter(job -> job.getStatus().equals(JobInfo.Status.Finished) && job.getJobClass().getName().equals(jobClass)).max((a, b) -> Long.compare(a.getFinishTime(), b.getFinishTime()));
+                if(result.isEmpty()) {
+                    throw new IllegalStateException("Job status not found");
+                }
+                return result.get().getJobDataMap().get(JobHandler.KEY_RESULT_DATA);
+            }
+            if(listener.isVetoed()) {
+                throw new Exception("job was vetoed by " + listener.getVetoBy());
+            }
             //noinspection BusyWait
             Thread.sleep(1000);
-		}
-	}
+        }
+    }
 
     @Override
     public void startCacheRefreshingJob(String folderId, boolean sticky) throws Exception {
@@ -1064,16 +1071,16 @@ public class AdminServiceImpl implements AdminService {
                 JobDescription.JobFieldDescription fieldDesc = new JobDescription.JobFieldDescription();
                 fieldDesc.setName(f.getName());
                 boolean isArray = f.getType().isAssignableFrom(Collection.class) || f.getType().equals(List.class);
-				Class<?> type;
-				if(isArray) {
-					Type subtype = ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
-					if (subtype instanceof ParameterizedType) {
-						subtype = ((ParameterizedType) subtype).getActualTypeArguments()[0];
-					}
-					 type = (Class<?>) subtype;
-				} else {
-					type = f.getType();
-				}
+                Class<?> type;
+                if(isArray) {
+                    Type subtype = ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
+                    if (subtype instanceof ParameterizedType) {
+                        subtype = ((ParameterizedType) subtype).getActualTypeArguments()[0];
+                    }
+                    type = (Class<?>) subtype;
+                } else {
+                    type = f.getType();
+                }
                 fieldDesc.setType(type);
                 fieldDesc.setIsArray(isArray);
                 fieldDesc.setDescription(f.getAnnotation(JobFieldDescription.class).description());

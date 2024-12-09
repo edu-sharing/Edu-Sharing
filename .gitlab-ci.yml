@@ -11,7 +11,7 @@ variables:
 
 default:
   #image: maven:3.8.4-eclipse-temurin-17
-  image: maven:3.9.2-amazoncorretto-17-debian-bullseye
+  image: maven:3.9.9-eclipse-temurin-17-focal
   services:
     - name: "$DIND_IMAGE"
       alias: docker
@@ -126,8 +126,8 @@ test docker:
     - apt-get update -y
     - apt-get install -y ca-certificates curl gnupg jq lsb-release wait-for-it
     - mkdir -p /etc/apt/keyrings
-    - curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     - apt-get update -y
     - apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
     - apt-get install -y php php-curl php-dom php-gd php-mbstring php-xml php-zip
@@ -171,8 +171,8 @@ e2e:
     - apt-get update -y
     - apt-get install -y ca-certificates curl gnupg jq lsb-release wait-for-it
     - mkdir -p /etc/apt/keyrings
-    - curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     - apt-get update -y
     - apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
     - apt-get install -y php php-curl php-dom php-gd php-mbstring php-xml php-zip

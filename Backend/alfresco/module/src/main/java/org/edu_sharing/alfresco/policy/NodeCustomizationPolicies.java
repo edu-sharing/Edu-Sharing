@@ -131,36 +131,11 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
             CCConstants.CCM_PROP_RESTRICTED_ACCESS,
             CCConstants.CCM_PROP_RESTRICTED_ACCESS_PERMISSIONS,
     };
-    /**
-     * These are the properties that will be copied to all io_reference nodes inside collections
-     * if the original node gets changed
-     */
-    private static final Collection<String> IO_REFERENCE_COPY_PROPERTIES = new ArrayList<>(
-            Arrays.asList(
-                    CCConstants.CCM_PROP_IO_COMMONLICENSE_KEY,
-                    CCConstants.CCM_PROP_IO_COMMONLICENSE_CC_LOCALE,
-                    CCConstants.CCM_PROP_IO_COMMONLICENSE_CC_VERSION,
-                    CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED,
-                    CCConstants.CCM_PROP_IO_LICENSE,
-                    CCConstants.CCM_PROP_IO_LICENSE_DESCRIPTION,
-                    CCConstants.CCM_PROP_IO_LICENSE_FROM,
-                    CCConstants.CCM_PROP_IO_LICENSE_PROFILE_URL,
-                    CCConstants.CCM_PROP_IO_LICENSE_SOURCE_URL,
-                    CCConstants.CCM_PROP_IO_LICENSE_TITLE_OF_WORK,
-                    CCConstants.CCM_PROP_IO_LICENSE_TO,
-                    CCConstants.CCM_PROP_IO_LICENSE_VALID,
 
-                    // fix for 4.2, override changed content resource props
-                    CCConstants.CCM_PROP_CCRESSOURCETYPE,
-                    CCConstants.CCM_PROP_CCRESSOURCESUBTYPE,
-                    CCConstants.CCM_PROP_CCRESSOURCEVERSION,
 
-                    // fix for 4.2, override all relevant metadata when changed on original
-                    CCConstants.LOM_PROP_GENERAL_TITLE,
-                    CCConstants.LOM_PROP_GENERAL_KEYWORD,
-                    CCConstants.LOM_PROP_GENERAL_DESCRIPTION,
-                    CCConstants.LOM_PROP_EDUCATIONAL_LEARNINGRESOURCETYPE
-            )
+    /* These props are always overriden on a given io reference if the original changes, regardless of the current state */
+    public static final List<String> IO_REFERENCE_OVERRIDE_PROPS = List.of(
+            CCConstants.LOM_PROP_TECHNICAL_SIZE
     );
 
     public static final String[] LICENSE_PROPS = new String[]{
@@ -171,14 +146,12 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
             CCConstants.CCM_PROP_IO_LICENSE_TITLE_OF_WORK,
             CCConstants.CCM_PROP_IO_LICENSE_SOURCE_URL,
             CCConstants.CCM_PROP_IO_LICENSE_PROFILE_URL,
-            CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_ALLOW_USAGE,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_GENERATED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_MANUALLY_MODIFIED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_TOOL,
     };
-
-    static {
-        // add all contributor array maps (e.g. author) to be copied to collection refs
-        IO_REFERENCE_COPY_PROPERTIES.addAll(CCConstants.getLifecycleContributerPropsMap().values());
-        IO_REFERENCE_COPY_PROPERTIES.addAll(CCConstants.getMetadataContributerPropsMap().values());
-    }
 
 
     static Logger logger = Logger.getLogger(NodeCustomizationPolicies.class);
@@ -704,6 +677,14 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
                 }
             }
         }
+
+        // override all specific props
+        for (QName prop : propSet) {
+            if (IO_REFERENCE_OVERRIDE_PROPS.contains(prop.toString())) {
+                ioColRefProperties.put(prop, after.get(prop));
+            }
+        }
+
         try {
             nodeService.setProperties(ref, ioColRefProperties);
         } catch (DuplicateChildNodeNameException e) {

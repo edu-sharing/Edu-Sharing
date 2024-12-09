@@ -10,15 +10,13 @@ import {
 import { LicenseDialogData, LicenseDialogResult } from './license-dialog-data';
 
 import { TranslateService } from '@ngx-translate/core';
-import { Acl, Values } from 'dist/edu-sharing-api/lib/api/models';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
     ConfigurationService,
     DialogButton,
-    LocalPermissionsResult,
     Node,
-    NodePermissions,
+    Properties,
     RestConnectorService,
     RestConstants,
     RestHelper,
@@ -32,7 +30,10 @@ import { UserPresentableError } from '../../../../features/mds/mds-editor/mds-ed
 import { MdsEditorInstanceService } from '../../../../features/mds/mds-editor/mds-editor-instance.service';
 import { ViewInstanceService } from '../../../../features/mds/mds-editor/mds-editor-view/view-instance.service';
 import { MdsEditorWidgetAuthorComponent } from '../../../../features/mds/mds-editor/widgets/mds-editor-widget-author/mds-editor-widget-author.component';
-import { NodeService } from 'ngx-edu-sharing-api';
+import { NodeService, MdsWidget, MdsValue, Acl } from 'ngx-edu-sharing-api';
+import { trigger } from '@angular/animations';
+import { UIAnimation } from 'ngx-edu-sharing-ui';
+import { MdsWidgetValue } from '../../../mds/types/types';
 
 const ALL_LICENSE_TYPES = [
     'NONE',
@@ -144,6 +145,7 @@ const ALL_COUNTRIES = [
     templateUrl: './license-dialog-content.component.html',
     styleUrls: ['./license-dialog-content.component.scss'],
     providers: [MdsEditorInstanceService, ViewInstanceService],
+    animations: [trigger('overlay', UIAnimation.openOverlay(UIAnimation.ANIMATION_TIME_FAST))],
 })
 export class LicenseDialogContentComponent implements OnInit {
     @ViewChild('selectLicense') selectLicense: ElementRef;
@@ -158,6 +160,7 @@ export class LicenseDialogContentComponent implements OnInit {
     @Output() done = new EventEmitter<LicenseDialogResult>();
     @Output() isLoading = new EventEmitter<boolean>();
     @Output() canSave = new EventEmitter<boolean>();
+    aiTools: Array<MdsWidgetValue> = [];
 
     set primaryType(primaryType: string) {
         if (!primaryType.startsWith('CC_BY')) {
@@ -232,6 +235,13 @@ export class LicenseDialogContentComponent implements OnInit {
     ccVersion = '4.0';
     ccCountry = '';
     ccProfileUrl = '';
+    ai: {
+        allowUsage?: boolean | 'indeterminate';
+        generated?: boolean | 'indeterminate';
+        manuallyModified?: boolean | 'indeterminate';
+        tool?: string | 'indeterminate' | 'custom';
+        toolCustom?: string;
+    } = {};
     copyrightType = 'COPYRIGHT_FREE';
     rightsDescription = '';
 
@@ -253,6 +263,7 @@ export class LicenseDialogContentComponent implements OnInit {
     private allowedLicenses: string[];
     private releaseMulti: string;
     private allowRelease = true; // FIXME: not used.
+    aiOpen = false;
 
     constructor(
         private connector: RestConnectorService,
@@ -289,6 +300,7 @@ export class LicenseDialogContentComponent implements OnInit {
             async (nodes) => {
                 try {
                     await this.mdsEditorInstanceService.initWithNodes(nodes);
+                    this.initAiTools();
                 } catch (e) {
                     if (e instanceof UserPresentableError || e.message) {
                         this.toast.error(null, e.message);
@@ -321,12 +333,11 @@ export class LicenseDialogContentComponent implements OnInit {
         );
     }
 
-    private initProperties(properties: any) {
+    private async initProperties(properties: any) {
         this.loadConfig();
         this._properties = properties;
-        this.readLicense();
         this.setDefaultModeState();
-        this.mdsEditorInstanceService.initWithNodes(
+        await this.mdsEditorInstanceService.initWithNodes(
             [
                 {
                     properties,
@@ -334,6 +345,8 @@ export class LicenseDialogContentComponent implements OnInit {
             ],
             { refetch: false },
         );
+        this.initAiTools();
+        this.readLicense();
         this.isLoading.emit(false);
         this.updateCanSave();
     }
@@ -418,7 +431,7 @@ export class LicenseDialogContentComponent implements OnInit {
             // this.toast.error(null,'WORKSPACE.LICENSE.RELEASE_WITHOUT_LICENSE');
             // return;
         }
-        let prop: Values = {};
+        let prop: Properties = {};
 
         prop = await this.getProperties(prop);
         this.isLoading.emit(true);
@@ -475,6 +488,49 @@ export class LicenseDialogContentComponent implements OnInit {
         let license = this.getValueForAll(RestConstants.CCM_PROP_LICENSE, 'MULTI', 'NONE');
         if (!license) license = 'NONE';
         this.type = license;
+        this.ai = {
+            allowUsage:
+                this.getValueForAll(
+                    RestConstants.CCM_PROP_LICENSE_AI_ALLOW_USAGE,
+                    'indeterminate',
+                    true,
+                ) === 'false'
+                    ? false
+                    : this.getValueForAll(
+                          RestConstants.CCM_PROP_LICENSE_AI_ALLOW_USAGE,
+                          'indeterminate',
+                          true,
+                      ),
+            generated:
+                this.getValueForAll(
+                    RestConstants.CCM_PROP_LICENSE_AI_GENERATED,
+                    'indeterminate',
+                    false,
+                ) === 'false'
+                    ? false
+                    : this.getValueForAll(
+                          RestConstants.CCM_PROP_LICENSE_AI_GENERATED,
+                          'indeterminate',
+                          false,
+                      ),
+            manuallyModified:
+                this.getValueForAll(
+                    RestConstants.CCM_PROP_LICENSE_AI_MANUALLY_MODIFIED,
+                    'indeterminate',
+                    false,
+                ) === 'false'
+                    ? false
+                    : this.getValueForAll(
+                          RestConstants.CCM_PROP_LICENSE_AI_MANUALLY_MODIFIED,
+                          'indeterminate',
+                          false,
+                      ),
+            tool: this.getValueForAll(RestConstants.CCM_PROP_LICENSE_AI_TOOL, 'indeterminate', ''),
+        };
+        if (this.ai.tool && !this.aiTools?.find((t) => t.id === this.ai.tool)) {
+            this.ai.toolCustom = this.ai.tool;
+            this.ai.tool = 'custom';
+        }
         if (license.startsWith('CC_BY')) {
             this.type = 'CC_BY';
             if (license.indexOf('SA') != -1) this.ccShare = 'SA';
@@ -664,8 +720,35 @@ export class LicenseDialogContentComponent implements OnInit {
                 }
             });
     }
-
+    getAiProperties() {
+        const props: { [key in string]: string[] } = {};
+        if (this.ai.allowUsage !== 'indeterminate') {
+            props[RestConstants.CCM_PROP_LICENSE_AI_ALLOW_USAGE] = [this.ai.allowUsage + ''];
+        }
+        if (this.ai.generated !== 'indeterminate') {
+            props[RestConstants.CCM_PROP_LICENSE_AI_GENERATED] = [this.ai.generated + ''];
+        }
+        if (this.ai.manuallyModified !== 'indeterminate') {
+            props[RestConstants.CCM_PROP_LICENSE_AI_MANUALLY_MODIFIED] = [
+                this.ai.manuallyModified + '',
+            ];
+        }
+        if (this.ai.tool && this.ai.tool !== 'indeterminate') {
+            props[RestConstants.CCM_PROP_LICENSE_AI_TOOL] = [this.ai.tool];
+        }
+        if (this.ai.tool && this.ai.tool === 'custom') {
+            props[RestConstants.CCM_PROP_LICENSE_AI_TOOL] = [this.ai.toolCustom];
+        }
+        return props;
+    }
     async getProperties(prop = this._properties) {
+        prop = {
+            ...prop,
+            ...this.getAiProperties(),
+        };
+        if (this.type === 'MULTI') {
+            return prop;
+        }
         prop[RestConstants.CCM_PROP_LICENSE] = [this.getLicenseProperty()];
         if (!this.contactIndeterminate)
             prop[RestConstants.CCM_PROP_QUESTIONSALLOWED] = [this.contact];
@@ -789,5 +872,22 @@ export class LicenseDialogContentComponent implements OnInit {
         this.oerAvailable =
             !this.allowedLicenses || this.allowedLicenses.filter((e) => e !== 'NONE').length > 0;
         this.oerMode = this.oerAvailable && (this.isOerLicense() || this.primaryType == 'NONE');
+    }
+
+    private initAiTools() {
+        const widget = this.mdsEditorInstanceService.mdsDefinition$.value.widgets.find(
+            (w: MdsWidget) => w.id === RestConstants.CCM_PROP_LICENSE_AI_TOOL,
+        );
+        if (widget == null) {
+            console.warn(
+                `The mds of this node or repository is not having the widget ${RestConstants.CCM_PROP_LICENSE_AI_TOOL}. A selection of ai tools will not be available!`,
+            );
+            return;
+        }
+        this.aiTools = widget.values;
+    }
+
+    updateAi() {
+        this.canSave.emit(true);
     }
 }
