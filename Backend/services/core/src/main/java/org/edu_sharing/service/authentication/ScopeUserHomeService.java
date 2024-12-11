@@ -11,5 +11,6 @@ public interface ScopeUserHomeService {
 
 	public void setManageEduGroupFolders(boolean manageEduGroupFolders);
 	
+	public boolean isManageEduGroupFolders();
 
 }
