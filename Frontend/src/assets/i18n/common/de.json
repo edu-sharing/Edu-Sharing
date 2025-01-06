@@ -993,6 +993,7 @@
   "SIGNUP_GROUP": {
     "TITLE": "In Gruppe einschreiben",
     "SUBTITLE": "Einer neuen Gruppe beitreten",
+    "SEARCH": "Gruppen-Liste durchsuchen",
     "SELECT_GROUP": "Wählen Sie eine Gruppe aus der untenstehenden Liste, in welche Sie beitreten möchten.",
     "NO_GROUPS": "Derzeit sind keine Gruppen verfügbar, denen beigetreten werden kann.",
     "CONFIRM_GROUP": "Sie werden der folgenden Gruppe beitreten:",

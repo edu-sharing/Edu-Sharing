@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import {
     DialogButton,
     Group,
@@ -11,6 +11,8 @@ import { Toast } from '../../../../services/toast';
 import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { JoinGroupDialogData, JoinGroupDialogResult } from './join-group-dialog-data';
+import { FormControl, FormGroup } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 enum Step {
     selectGroup,
@@ -23,13 +25,18 @@ enum Step {
     styleUrls: ['./join-group-dialog.component.scss'],
 })
 export class JoinGroupDialogComponent implements OnInit {
+    @ViewChild('searchControl') searchControl: ElementRef<HTMLInputElement>;
     readonly STEP = Step;
     dialogStep: Step = Step.selectGroup;
     group: Group;
     groups: Group[];
+    filteredGroups: Group[] = [];
     password = '';
     groupsLoading = true;
     userGroups: Group[];
+    searchForm = new FormGroup({
+        search: new FormControl(''),
+    });
 
     constructor(
         @Inject(CARD_DIALOG_DATA) public data: JoinGroupDialogData,
@@ -39,6 +46,9 @@ export class JoinGroupDialogComponent implements OnInit {
         private toast: Toast,
     ) {
         this.updateButtons();
+        this.searchForm.valueChanges
+            .pipe(takeUntilDestroyed())
+            .subscribe(() => this.searchGroups());
         this.connector.isLoggedIn(false).subscribe((data: LoginResult) => {
             const request = {
                 count: RestConstants.COUNT_UNLIMITED,
@@ -47,6 +57,8 @@ export class JoinGroupDialogComponent implements OnInit {
                 (groups) => {
                     this.groups = groups.groups;
                     this.groupsLoading = false;
+                    this.searchGroups();
+                    setTimeout(() => this.searchControl.nativeElement.focus());
                 },
                 (error) => {
                     this.toast.error(error);
@@ -128,5 +140,22 @@ export class JoinGroupDialogComponent implements OnInit {
 
     isMemberOf(group: Group) {
         return !!this.userGroups?.find((g) => g.authorityName === group.authorityName);
+    }
+
+    searchGroups() {
+        if (this.searchForm.value.search === '') {
+            this.filteredGroups = this.groups;
+        } else {
+            const value = this.searchForm.value.search.toLowerCase();
+            this.filteredGroups = this.groups?.filter(
+                (g) =>
+                    g.authorityName.toLowerCase().includes(value) ||
+                    g.profile.displayName?.toLowerCase().includes(value) ||
+                    g.profile.groupEmail?.toLowerCase().includes(value),
+            );
+            if (!this.filteredGroups.includes(this.group)) {
+                this.select(null);
+            }
+        }
     }
 }

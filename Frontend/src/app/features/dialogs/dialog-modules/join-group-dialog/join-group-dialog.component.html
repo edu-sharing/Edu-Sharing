@@ -2,23 +2,32 @@
   <p class="mat-heading-5">{{ 'SIGNUP_GROUP.SELECT_GROUP' | translate }}</p>
   <es-spinner *ngIf="groupsLoading"></es-spinner>
   <ng-container *ngIf="!groupsLoading">
-    <button
-      *ngFor="let g of groups"
-      mat-ripple
-      (click)="select(g)"
-      [class.selected]="g === group"
-      [class.is-member]="isMemberOf(g)"
-    >
-      <es-authority-row
-        [authority]="g"
-        [secondaryTitle]="
-          (isMemberOf(g)
-            ? 'SIGNUP_GROUP.ALREADY_MEMBER'
-            : 'SIGNUP_GROUP.SIGNUP_TYPE.' + g.signupMethod
-          ) | translate
-        "
-      ></es-authority-row>
-    </button>
+    <form [formGroup]="searchForm" *ngIf="groups?.length">
+      <mat-form-field floatLabel="always">
+        <mat-label>{{ 'SIGNUP_GROUP.SEARCH' | translate }}</mat-label>
+        <i esIcon="search" matIconPrefix></i>
+        <input matInput type="search" formControlName="search" autofocus #searchControl />
+      </mat-form-field>
+    </form>
+    <div class="list">
+      <button
+        *ngFor="let g of filteredGroups"
+        mat-ripple
+        (click)="select(g)"
+        [class.selected]="g === group"
+        [class.is-member]="isMemberOf(g)"
+      >
+        <es-authority-row
+          [authority]="g"
+          [secondaryTitle]="
+            (isMemberOf(g)
+              ? 'SIGNUP_GROUP.ALREADY_MEMBER'
+              : 'SIGNUP_GROUP.SIGNUP_TYPE.' + g.signupMethod
+            ) | translate
+          "
+        ></es-authority-row>
+      </button>
+    </div>
   </ng-container>
   <p class="mat-heading-4 no-groups-message" *ngIf="!groupsLoading && !groups?.length">
     {{ 'SIGNUP_GROUP.NO_GROUPS' | translate }}

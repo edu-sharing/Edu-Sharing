@@ -5,17 +5,38 @@ $cardPadding: 25px;
 .select-group {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    gap: 20px;
+    * {
+        height: auto;
+    }
+    form {
+        mat-form-field {
+            width: 100%;
+        }
+    }
     p {
         display: flex;
         justify-content: center;
+    }
+    .list {
+        height: 0;
+        flex-grow: 1;
+        margin: 0 -#{$cardPadding};
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .mat-heading-5 {
+        margin: 0;
     }
     .no-groups-message {
         margin-top: 20%;
         color: $textLight;
     }
     button {
-        margin: 0 -#{$cardPadding};
         padding: 0 $cardPadding;
+        min-height: 70px;
         border-radius: 0;
         background: none;
         border: none;
