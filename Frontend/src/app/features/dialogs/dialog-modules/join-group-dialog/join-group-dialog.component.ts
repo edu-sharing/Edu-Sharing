@@ -3,6 +3,7 @@ import {
     DialogButton,
     Group,
     LoginResult,
+    RequestObject,
     RestConnectorService,
     RestConstants,
     RestIamService,
@@ -50,8 +51,10 @@ export class JoinGroupDialogComponent implements OnInit {
             .pipe(takeUntilDestroyed())
             .subscribe(() => this.searchGroups());
         this.connector.isLoggedIn(false).subscribe((data: LoginResult) => {
-            const request = {
+            const request: RequestObject = {
                 count: RestConstants.COUNT_UNLIMITED,
+                sortBy: [RestConstants.CM_PROP_AUTHORITY_DISPLAYNAME],
+                sortAscending: [true],
             };
             this.iam.searchGroups('*', true, '', '*', request).subscribe(
                 (groups) => {

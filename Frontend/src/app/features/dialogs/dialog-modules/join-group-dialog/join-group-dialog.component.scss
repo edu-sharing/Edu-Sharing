@@ -35,7 +35,7 @@ $cardPadding: 25px;
         color: $textLight;
     }
     button {
-        padding: 0 $cardPadding;
+        padding: 0 $cardPadding + 10px;
         min-height: 70px;
         border-radius: 0;
         background: none;
