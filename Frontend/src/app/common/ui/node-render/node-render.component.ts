@@ -618,6 +618,7 @@ export class NodeRenderComponent implements EventListener, OnInit, OnDestroy, Af
             },
             postPrepareOptions: (options, objects) => {
                 if (this.version && this.version !== RestConstants.NODE_VERSION_CURRENT) {
+                    options.filter((o) => o.name === 'OPTIONS.OPEN')[0].customEnabledCallback = () => false;
                     options.filter((o) => o.name === 'OPTIONS.OPEN')[0].isEnabled = false;
                 }
             },
