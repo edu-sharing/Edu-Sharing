@@ -197,7 +197,7 @@ public class DOIService implements HandleService {
         List<String> author = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR));
         List<String> authorFreetext = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_AUTHOR_FREETEXT));
         if(author == null || author.isEmpty()){
-            if((authorFreetext == null || authorFreetext.isEmpty()) && failOnMissing){
+            if((authorFreetext == null || authorFreetext.isEmpty() || authorFreetext.stream().allMatch(a -> (a == null || a.trim().isEmpty()))) && failOnMissing){
                 throw new DOIServiceMissingAttributeException(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR),"Creator");
             }
         }
@@ -206,8 +206,12 @@ public class DOIService implements HandleService {
                     .add(Data.Creator.builder().name(VCardConverter.getNameForVCardString(a)).build()));
         }
         if(authorFreetext != null && !authorFreetext.isEmpty()){
-            authorFreetext.stream().forEach(a -> doi.getData().getAttributes().getCreators()
-                    .add(Data.Creator.builder().name(a).build()));
+            authorFreetext.stream().forEach(a -> {
+                if(a != null && !a.trim().isEmpty()) {
+                    doi.getData().getAttributes().getCreators()
+                            .add(Data.Creator.builder().name(a).build());
+                }
+            });
         }
 
 
