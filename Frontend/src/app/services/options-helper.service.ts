@@ -730,6 +730,10 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             if (n?.aspects?.includes('ccm:ltitool_node')) {
                 return true;
             }
+            // simple connector node;
+            if (n?.properties[RestConstants.CCM_PROP_CCRESSOURCETYPE]?.[0] === 'connector') {
+                return true;
+            }
             return (
                 this.connectors.connectorSupportsEdit(n) != null ||
                 (await this.ltiPlatformService.toolForNode(n)) != null
@@ -1574,7 +1578,9 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         connectorType: Connector = null,
     ) {
         const ltiTool = await this.ltiPlatformService.toolForNode(node);
-        if (node.aspects?.includes('ccm:ltitool_node') || ltiTool) {
+        if (node.properties[RestConstants.CCM_PROP_CCRESSOURCETYPE]?.[0] === 'connector') {
+            UIHelper.openWindow(win, node.properties[RestConstants.CCM_PROP_IO_WWWURL]?.[0]);
+        } else if (node.aspects?.includes('ccm:ltitool_node') || ltiTool) {
             UIHelper.openLTIResourceLink(win, node);
         } else {
             UIHelper.openConnector(
