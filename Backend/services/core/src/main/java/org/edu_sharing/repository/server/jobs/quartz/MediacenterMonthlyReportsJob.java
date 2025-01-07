@@ -95,6 +95,9 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
     @JobFieldDescription(description = "force run, even if the date is currently not the 1st")
     private boolean force = false;
 
+    @JobFieldDescription(description = "When set to true, the job will generate the monthly report")
+    private boolean generateMonthly = true;
+
     @JobFieldDescription(description = "When set to true, the job will generate a yearly report as well (only on 1st January)")
     private boolean generateYearly = false;
 
@@ -154,9 +157,10 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
                 logger.info("Building stats for mediacenter " + mediacenter);
                 Date startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
                 Date endDate = Date.from(to.atTime(23, 59).toInstant(ZoneOffset.UTC));
-                generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
-                generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
-
+                if(generateMonthly) {
+                    generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
+                    generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
+                }
                 if (generateYearly && localDate.getMonthValue() == 1) {
                     from = localDate.minusYears(1).withDayOfMonth(1);
                     startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
