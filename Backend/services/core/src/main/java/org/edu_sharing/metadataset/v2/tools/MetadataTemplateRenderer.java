@@ -461,7 +461,7 @@ public class MetadataTemplateRenderer {
 						.replace("{{tool}}", StringUtils.join(propertiesNative.get(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_TOOL), ", "));
 			}*/
 			if (getBoolean(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_MANUALLY_MODIFIED, false)) {
-				info += I18nAngular.getTranslationAngular("common", "LICENSE.AI.MODIFIED");
+				info += " " + I18nAngular.getTranslationAngular("common", "LICENSE.AI.MODIFIED");
 			}
 			result.add(info);
 		}
