@@ -129,7 +129,7 @@ public class ArchiveApi {
 			
 			List<Node> data = new ArrayList<>();
 	    	for (NodeRef ref : search.getResult()) {
-	    		
+	    		try {
 					if (ref.isArchived()) {
 						data.add(NodeDao.getNode(repoDao, NodeDao.archiveStoreProtocol, NodeDao.archiveStoreId, ref.getId(), filter).asNode());
 					} else {
