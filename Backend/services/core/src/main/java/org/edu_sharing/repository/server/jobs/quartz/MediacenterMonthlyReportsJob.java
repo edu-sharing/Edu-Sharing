@@ -321,7 +321,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             case Quarterly:
                 sb.append(startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(("yyyy"))));
                 sb.append("-Q");
-                sb.append(endDate.getMonth()/3);
+                sb.append((endDate.getMonth() + 1)/3);
                 break;
 
             default:
