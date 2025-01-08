@@ -143,14 +143,14 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             if (customDate != null) {
                 localDate = customDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             }
-
-            LocalDate lastMonth = localDate.minusMonths(1);
-            LocalDate from = lastMonth.withDayOfMonth(1);
-
-            YearMonth month = YearMonth.from(from);
-            LocalDate to = month.atEndOfMonth();
-
             for (String mediacenter : mediacenters == null ? SearchServiceFactory.getLocalService().getAllMediacenters() : mediacenters) {
+
+                LocalDate lastMonth = localDate.minusMonths(1);
+                LocalDate from = lastMonth.withDayOfMonth(1);
+
+                YearMonth month = YearMonth.from(from);
+                LocalDate to = month.atEndOfMonth();
+
                 if (isInterrupted()) {
                     return null;
                 }
