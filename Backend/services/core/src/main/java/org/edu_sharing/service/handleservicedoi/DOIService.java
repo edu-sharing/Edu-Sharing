@@ -129,7 +129,7 @@ public class DOIService implements HandleService {
             return false;
         }
         DOI doi = getDOI(handleId);
-        doi.getData().getAttributes().setState(eventState);
+        doi.getData().getAttributes().setEvent(eventState);
         updateDOIWithMetadata(handleId, doi);
         return true;
     }

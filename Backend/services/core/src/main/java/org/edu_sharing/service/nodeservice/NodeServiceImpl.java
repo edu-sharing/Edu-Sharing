@@ -1236,7 +1236,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 		try{
 			ApplicationContext eduAppContext = ApplicationContextFactory.getApplicationContext();
 			eduAppContext.getBean(FeatureInfoDoiService.class);
-			handleServiceFactory.instance(HandleServiceFactory.IMPLEMENTATION.doi).updateState(nodeId, "register");
+			handleServiceFactory.instance(HandleServiceFactory.IMPLEMENTATION.doi).updateState(nodeId, "hide");
 		}catch (NoSuchBeanDefinitionException e){
 			logger.info("doi service not enabled");
 		}
