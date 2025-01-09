@@ -731,7 +731,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                 return true;
             }
             // simple connector node;
-            if (n?.properties[RestConstants.CCM_PROP_CCRESSOURCETYPE]?.[0] === 'connector') {
+            if (n?.properties?.[RestConstants.CCM_PROP_CCRESSOURCETYPE]?.[0] === 'connector') {
                 return true;
             }
             return (
