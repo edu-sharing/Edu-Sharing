@@ -32,7 +32,7 @@ public class Data {
         private List<Title> titles;
         private String publisher;
         private Container container;
-        private int publicationYear;
+        private Integer publicationYear;
         private List<Object> subjects;
         private List<Contributor> contributors;
         private List<Date> dates;
