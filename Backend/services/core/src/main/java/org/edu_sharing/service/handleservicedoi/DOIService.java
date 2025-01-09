@@ -134,8 +134,14 @@ public class DOIService implements HandleService {
             logger.info("Node "+ nodeId+ " has no doi, will not update state");
             return false;
         }
-        DOI doi = getDOI(handleId);
-        doi.getData().getAttributes().setEvent(eventState);
+        DOI doi = DOI.builder()
+                .data(Data.builder()
+                        .type("dois")
+                        .attributes(Data.Attributes.builder()
+                                .event(eventState)
+                                .build())
+                        .build())
+                .build();
         updateDOIWithMetadata(handleId, doi);
         return true;
     }
