@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="3.0" xmlns="https://jakarta.ee/xml/ns/jaxb">
+  <!--
+
+Diese Datei wurde mit der Eclipse Implementation of JAXB, v3.0.0 generiert 
+Siehe https://eclipse-ee4j.github.io/jaxb-ri 
+Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
+Generiert: 2025.01.08 um 08:27:34 PM CET 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://datacite.org/schema/kernel-4">
+    <schemaBindings map="false">
+      <package name="org.edu_sharing.service.handleservicedoi.model.xml"/>
+    </schemaBindings>
+    <bindings scd="tns:resource">
+      <class ref="org.edu_sharing.service.handleservicedoi.model.xml.Resource"/>
+    </bindings>
+    <bindings scd="~tns:nameIdentifier">
+      <class ref="org.edu_sharing.service.handleservicedoi.model.xml.NameIdentifier"/>
+    </bindings>
+    <bindings scd="~tns:affiliation">
+      <class ref="org.edu_sharing.service.handleservicedoi.model.xml.Affiliation"/>
+    </bindings>
+    <bindings scd="~tns:point">
+      <class ref="org.edu_sharing.service.handleservicedoi.model.xml.Point"/>
+    </bindings>
+    <bindings scd="~tns:box">
+      <class ref="org.edu_sharing.service.handleservicedoi.model.xml.Box"/>
+    </bindings>
+    <bindings scd="~tns:titleType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.TitleType"/>
+    </bindings>
+    <bindings scd="~tns:contributorType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.ContributorType"/>
+    </bindings>
+    <bindings scd="~tns:dateType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.DateType"/>
+    </bindings>
+    <bindings scd="~tns:resourceType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.ResourceType"/>
+    </bindings>
+    <bindings scd="~tns:relationType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.RelationType"/>
+    </bindings>
+    <bindings scd="~tns:relatedIdentifierType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.RelatedIdentifierType"/>
+    </bindings>
+    <bindings scd="~tns:funderIdentifierType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.FunderIdentifierType"/>
+    </bindings>
+    <bindings scd="~tns:descriptionType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.DescriptionType"/>
+    </bindings>
+    <bindings scd="~tns:nameType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.NameType"/>
+    </bindings>
+    <bindings scd="~tns:numberType">
+      <typesafeEnumClass ref="org.edu_sharing.service.handleservicedoi.model.xml.NumberType"/>
+    </bindings>
+  </bindings>
+</bindings>
+
