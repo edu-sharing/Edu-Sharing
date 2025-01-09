@@ -2,6 +2,7 @@ package org.edu_sharing.service.handleservicedoi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class Data {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
+    @SuperBuilder
     public static class Creator {
         private String name;
         private List<Object> affiliation;
@@ -85,15 +86,12 @@ public class Data {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
-    public static class Contributor {
-        private String name;
+    @SuperBuilder
+    public static class Contributor extends Creator {
         private String givenName;
         private String familyName;
-        private List<String> affiliation;
         private String contributorType;
-        private List<NameIdentifier> nameIdentifiers;
-    }
+     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Getter
