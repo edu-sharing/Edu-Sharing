@@ -1359,6 +1359,8 @@ public class CCConstants {
 
 	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_VALUESPACE = "EDUSYSTEM_VALUESPACE";
 
+	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_ORG_DELETE_PROTOCOL = "EDUSYSTEM_ORG_DELETE_PROTOCOL";
+
 
 	public final static String CCM_ASPECT_GROUP_SIGNUP = "{http://www.campuscontent.de/model/1.0}group_signup";
 
@@ -1587,6 +1589,8 @@ public class CCConstants {
 	public final static String I18n_SYSTEMFOLDER_SERVICE = "systemfolder_service";
 
 	public final static String I18n_SYSTEMFOLDER_VALUESPACE = "systemfolder_valuespace";
+
+	public final static String I18n_SYSTEMFOLDER_ORG_DELETE_PROTOCOL = "systemfolder_org_delete_protocol";
 
 
 	//Gruppen root Folder

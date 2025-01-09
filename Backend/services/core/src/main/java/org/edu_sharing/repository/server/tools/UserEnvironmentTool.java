@@ -238,6 +238,10 @@ public class UserEnvironmentTool {
 		return result;
 		*/
 	}
+
+	public String getEdu_SharingOrganisatinDeleteProtocolFolder() throws Throwable{
+		return getOrCreateSystemFolderByName(CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_ORG_DELETE_PROTOCOL,CCConstants.I18n_SYSTEMFOLDER_ORG_DELETE_PROTOCOL);
+	}
 	public String getOrCreateSystemFolderByName(String constantName,String i18nId) throws Throwable {
         String result;
         String systemFolderId = getEdu_SharingSystemFolderBase();

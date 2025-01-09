@@ -329,6 +329,10 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 						try {
 							return sdf.parse(p);
 						} catch (ParseException e) {
+							long l = Long.parseLong(p);
+							if(l > 0) {
+								return new Date(l);
+							}
 							throw new RuntimeException(e);
 						}
 					}).collect(Collectors.toList());
@@ -344,6 +348,10 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 						try {
 							return sdf.parse(p);
 						} catch (ParseException e) {
+							long l = Long.parseLong(p);
+							if(l > 0) {
+								return new Date(l);
+							}
 							throw new RuntimeException(e);
 						}
 					}).collect(Collectors.toList());
