@@ -43,6 +43,10 @@ public class OaiDublinCoreMetadataFormatWriter extends AbstractMetadataFormatWri
         if (StringUtils.isNotBlank(handleId)) {
             context.createAndAppendElement("dc:identifier", root, "info:eu-repo/semantics/altIdentifier/hdl/" + handleId);
         }
+        String doiId = propertyMapper.getString(CCConstants.CCM_PROP_PUBLISHED_DOI_ID);
+        if (StringUtils.isNotBlank(doiId)) {
+            context.createAndAppendElement("dc:identifier", root, "info:eu-repo/semantics/altIdentifier/doi/" + doiId);
+        }
         context.createAndAppendElement("dc:identifier", root, "UID:urn:uuid:" + propertyMapper.getString(CCConstants.SYS_PROP_NODE_UID));
 
         context.createAndAppendElement("dc:title", root, propertyMapper.getString(CCConstants.LOM_PROP_GENERAL_TITLE, propertyMapper.getString(CCConstants.CM_NAME)));
