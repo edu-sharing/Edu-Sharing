@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.lang3.StringUtils;
+import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.service.permission.PermissionServiceHelper;
 import org.edu_sharing.service.util.PropertyMapper;
@@ -24,6 +25,7 @@ public class Context {
 
     private final Document document;
     private final PropertyMapper propertyMapper;
+    private final MetadataSet metadataSet;
     private final String nodeId;
     private final String language;
 
@@ -33,8 +35,9 @@ public class Context {
         return hasWritePermission;
     }
 
-    public Context(PropertyMapper propertyMapper, String nodeId) throws ParserConfigurationException {
+    public Context(PropertyMapper propertyMapper, MetadataSet metadataSet, String nodeId) throws ParserConfigurationException {
         this.propertyMapper = propertyMapper;
+        this.metadataSet = metadataSet;
         this.nodeId = nodeId;
 
         language = Optional.ofNullable(propertyMapper.getString(CCConstants.LOM_PROP_GENERAL_LANGUAGE))

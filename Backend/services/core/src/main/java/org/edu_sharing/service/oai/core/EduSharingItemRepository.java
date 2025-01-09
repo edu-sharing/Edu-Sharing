@@ -12,6 +12,7 @@ import io.gdcc.xoai.model.oaipmh.ResumptionToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
@@ -100,7 +101,7 @@ public class EduSharingItemRepository implements ItemRepository {
             // todo compare results
             boolean useNew= true;
             if(useNew) {
-                formatWriter.write(os, nodeRef.getNodeId(), ValueTool.getMultivalue(nodeRef.getProperties()));
+                formatWriter.write(os, new org.alfresco.service.cmr.repository.NodeRef(new StoreRef(nodeRef.getStoreProtocol(), nodeRef.getStoreId()), nodeRef.getNodeId()), ValueTool.getMultivalue(nodeRef.getProperties()));
             } else {
                 new OAILOMExporterHSOER().write(os, nodeRef.getNodeId());
             }
