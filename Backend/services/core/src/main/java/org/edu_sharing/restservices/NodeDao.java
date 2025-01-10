@@ -83,6 +83,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.edu_sharing.service.permission.HandleParam;
 
@@ -200,6 +201,16 @@ public class NodeDao {
             defaultProps.addAll(mds.getWidgetsByNode(getType(), getAspectsNative(), false).stream().map(MetadataWidget::getSuggestDisplayProperty).filter(Objects::nonNull).collect(Collectors.toSet()));
             defaultProps.addAll(Arrays.stream(NodeCustomizationPolicies.SAFE_PROPS).map(CCConstants::getValidLocalName).collect(Collectors.toList()));
             defaultProps.addAll(Arrays.stream(NodeCustomizationPolicies.LICENSE_PROPS).map(CCConstants::getValidLocalName).collect(Collectors.toList()));
+
+            // don't remove published only properties
+            Stream.of(
+                        CCConstants.CCM_PROP_PUBLISHED_DOI_ID,
+                        CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID,
+                        CCConstants.CCM_PROP_PUBLISHED_DATE
+                    )
+                    .map(CCConstants::getValidLocalName)
+                    .forEach(defaultProps::remove);
+
             for (String prop : defaultProps) {
                 if (!props.containsKey(prop) && CCConstants.getValidGlobalName(prop) != null) {
                     // delete removed properties
@@ -215,6 +226,8 @@ public class NodeDao {
                         false);
             }
 
+            // fix duplicate child name issues in publishing folder
+            props.remove(CCConstants.getValidLocalName(CCConstants.CM_NAME));
             return changeProperties(props);
         } catch (Throwable t) {
             throw DAOException.mapping(t);
