@@ -82,6 +82,7 @@ import { CardComponent } from '../../../shared/components/card/card.component';
 import * as jQuery from 'jquery';
 import { BridgeService } from '../../../core-bridge-module/bridge.service';
 import { CardDialogService } from '../../../features/dialogs/card-dialog/card-dialog.service';
+import { RouterHelper } from '../../../core-ui-module/router.helper';
 
 @Component({
     selector: 'es-node-render',
@@ -313,6 +314,20 @@ export class NodeRenderComponent implements EventListener, OnInit, OnDestroy, Af
                     setTimeout(() => {
                         console.log(this.mainNavService.getMainNav());
                         if (!this.isDestroyed) {
+                            if (RouterComponent.history.value?.length > 1) {
+                                const last =
+                                    RouterComponent.history.value[
+                                        RouterComponent.history.value.length - 2
+                                    ];
+                                console.info('Enforcing back, may h5p navigation was present');
+                                RouterHelper.navigateToAbsoluteUrl(
+                                    this.platformLocation,
+                                    this.router,
+                                    last,
+                                    true,
+                                );
+                                return;
+                            }
                             this.mainNavService.patchMainNavConfig({ showNavigation: true });
                             setTimeout(() => {
                                 this.mainNavService.getMainNav().topBar.toggleMenuSidebar();
@@ -618,7 +633,8 @@ export class NodeRenderComponent implements EventListener, OnInit, OnDestroy, Af
             },
             postPrepareOptions: (options, objects) => {
                 if (this.version && this.version !== RestConstants.NODE_VERSION_CURRENT) {
-                    options.filter((o) => o.name === 'OPTIONS.OPEN')[0].customEnabledCallback = () => false;
+                    options.filter((o) => o.name === 'OPTIONS.OPEN')[0].customEnabledCallback =
+                        () => false;
                     options.filter((o) => o.name === 'OPTIONS.OPEN')[0].isEnabled = false;
                 }
             },
