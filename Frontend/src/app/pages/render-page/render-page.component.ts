@@ -526,7 +526,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                             this.handleProposal();
                             this.renderHelper.doAll(this._node);
                             this.loadNode();
-                            this.loadSimilarNodes();
+                            // this.loadSimilarNodes();
                             this.linkSearchableWidgets();
                             this.specialTemplate = null;
                             if (this.nodeHelper.isNodeRevoked(this._node)) {
