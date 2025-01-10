@@ -314,7 +314,7 @@ public EduGroup getEduGroup(String authority){
 	}
 	@Override
 	public Set<String> getMemberships(String username) {
-		if(AuthenticationUtil.getFullyAuthenticatedUser() != null && AuthenticationUtil.getFullyAuthenticatedUser().equals(username)){
+		if(!AuthenticationUtil.isRunAsUserTheSystemUser() && AuthenticationUtil.getFullyAuthenticatedUser() != null && AuthenticationUtil.getFullyAuthenticatedUser().equals(username)){
 			return serviceRegistry.getAuthorityService().getAuthorities();
 		}else {
 			return serviceRegistry.getAuthorityService().getAuthoritiesForUser(username);
