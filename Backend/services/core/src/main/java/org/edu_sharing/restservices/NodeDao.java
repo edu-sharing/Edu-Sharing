@@ -204,9 +204,10 @@ public class NodeDao {
 
             // don't remove published only properties
             Stream.of(
-                        CCConstants.CCM_PROP_PUBLISHED_DOI_ID,
-                        CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID,
-                        CCConstants.CCM_PROP_PUBLISHED_DATE
+                            CCConstants.CCM_PROP_PUBLISHED_DOI_ID,
+                            CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID,
+                            CCConstants.CCM_PROP_PUBLISHED_DATE,
+                            CCConstants.CCM_PROP_IO_PUBLISHED_ORIGINAL
                     )
                     .map(CCConstants::getValidLocalName)
                     .forEach(defaultProps::remove);
@@ -228,6 +229,10 @@ public class NodeDao {
 
             // fix duplicate child name issues in publishing folder
             props.remove(CCConstants.getValidLocalName(CCConstants.CM_NAME));
+
+            // fix published mode only for original
+            props.remove(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_PUBLISHED_MODE));
+
             return changeProperties(props);
         } catch (Throwable t) {
             throw DAOException.mapping(t);
