@@ -12,15 +12,13 @@ import {
     OnDestroy,
     OnInit,
     Output,
-    signal,
     SimpleChange,
     TemplateRef,
     Type,
     ViewChild,
     ViewContainerRef,
-    WritableSignal,
 } from '@angular/core';
-import { Subject } from 'rxjs';
+import { interval, Subject } from 'rxjs';
 import { NodeEntriesTemplatesService } from './node-entries-templates.service';
 import { NodeEntriesComponent } from './node-entries.component';
 import {
@@ -43,10 +41,17 @@ import { OptionItem, Scope } from '../types/option-item';
 import { NodeHelperService } from '../services/node-helper.service';
 import { ListItem } from '../types/list-item';
 import { TemporaryStorageService } from '../services/temporary-storage.service';
-import { CollectionReference, GenericAuthority, Node, User } from 'ngx-edu-sharing-api';
+import {
+    CollectionReference,
+    GenericAuthority,
+    Node,
+    NodeService,
+    User,
+} from 'ngx-edu-sharing-api';
 import { VirtualNode } from '../types/api-models';
 import { OptionsHelperDataService } from '../services/options-helper-data.service';
 import { UIService } from '../services/ui.service';
+import { switchMap, take, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'es-node-entries-wrapper',
@@ -146,6 +151,7 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
         private temporaryStorageService: TemporaryStorageService,
         private ngZone: NgZone,
         private entriesService: NodeEntriesService<T>,
+        private nodeService: NodeService,
         public optionsHelper: OptionsHelperDataService,
         private nodeHelperService: NodeHelperService,
         private uiService: UIService,
@@ -286,7 +292,6 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
                 );
             }
             if (hits.length === 1) {
-                console.log('copy', d, hits);
                 this.nodeHelperService.copyDataToNode(d as Node, hits[0] as Node);
             }
         });
@@ -311,7 +316,7 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
             (o as VirtualNode).virtual = true;
             return o;
         });
-        virtual.forEach((v) => {
+        virtual.forEach((v: T) => {
             const contains = this.dataSource
                 .getData()
                 .some((d) =>
@@ -323,6 +328,23 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
                 this.updateNodes([v]);
             } else {
                 this.dataSource.appendData([v], 'before');
+            }
+            if ((v as VirtualNode).observe) {
+                interval(2000)
+                    .pipe(
+                        take(10),
+                        takeUntil(this.destroyed),
+                        switchMap(() =>
+                            this.nodeService.getNode((v as VirtualNode).ref.id, {
+                                repository: (v as VirtualNode).ref.repo,
+                            }),
+                        ),
+                    )
+                    .subscribe((node) => {
+                        console.log(node);
+                        (node as VirtualNode).virtual = true;
+                        this.updateNodes([node as T]);
+                    });
             }
         });
         this.entriesService.selection.clear();

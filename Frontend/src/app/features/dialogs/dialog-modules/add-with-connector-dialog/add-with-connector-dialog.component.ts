@@ -1,7 +1,7 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { Connector } from 'ngx-edu-sharing-api';
 import { BehaviorSubject } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { delay, filter, first } from 'rxjs/operators';
 import { DialogButton } from '../../../../core-module/core.module';
 import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
@@ -96,6 +96,15 @@ export class AddWithConnectorDialogComponent {
             .pipe(first((name) => !!name))
             .subscribe(() => this.dialogRef.patchConfig({ closable: Closable.Standard }));
         setTimeout(() => {
+            this.mdsEditorRef?.mdsEditorInstance.mdsInflated
+                .pipe(
+                    filter((v) => v),
+                    first(),
+                    delay(0),
+                )
+                .subscribe(() => {
+                    this.mdsEditorRef?.mdsEditorInstance.focusFirstWidget();
+                });
             this.mdsEditorRef?.mdsEditorInstance
                 .observeCanSave()
                 .subscribe((can) => (createButton.disabled = !can));

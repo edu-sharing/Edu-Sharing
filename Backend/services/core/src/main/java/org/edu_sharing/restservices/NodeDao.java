@@ -643,9 +643,12 @@ public class NodeDao {
         node.setPreview(new Preview());
         // allow fetching as admin to properly resolve the url
         AuthenticationUtil.runAsSystem(() -> {
-            node.getPreview().setUrl(
-                    URLTool.getPreviewServletUrl(nodeRef.getId(), StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier())
-            );
+            try {
+                node.getPreview().setUrl(
+                        URLTool.getPreviewServletUrl(nodeRef.getId(), StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier())
+                );
+            } catch(Throwable ignored) {
+            }
             return null;
         });
         return node;

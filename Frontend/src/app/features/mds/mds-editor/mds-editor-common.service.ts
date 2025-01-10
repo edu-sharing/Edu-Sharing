@@ -151,7 +151,6 @@ export class MdsEditorCommonService {
     }
 
     async fetchNodesSuggestions(nodes: Node[]): Promise<NodeSuggestionResponseDto[]> {
-        console.log('Read suggestions!');
         return await forkJoin(
             nodes.map((n) =>
                 this.suggestionsV1Service.getSuggestionsByNodeId({

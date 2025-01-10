@@ -22,6 +22,7 @@ import {
     Scope,
     Target,
     UIAnimation,
+    VirtualNode,
 } from 'ngx-edu-sharing-ui';
 import { Observable, Subject } from 'rxjs';
 import { delay, takeUntil } from 'rxjs/operators';
@@ -516,7 +517,9 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                         event.data,
                         connector,
                     );
-                    this.onCreate.emit([data.node]);
+                    const node: VirtualNode = { ...data.node, virtual: true };
+                    node.observe = true;
+                    this.onCreate.emit([node]);
                 },
                 (error: any) => {
                     win.close();

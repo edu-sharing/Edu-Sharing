@@ -3,15 +3,19 @@ package org.edu_sharing.restservices.shared;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-;
 import lombok.Getter;
 import lombok.Setter;
+import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.restservices.NodeDao;
 import org.edu_sharing.restservices.collection.v1.model.Collection;
+import org.edu_sharing.service.mime.MimeTypesV2;
 import org.edu_sharing.service.model.NodeRefImpl;
 import org.edu_sharing.service.rating.RatingDetails;
 
 import java.io.Serializable;
 import java.util.*;
+
+;
 
 @Schema(description = "")
 public class Node implements Serializable {
@@ -58,6 +62,22 @@ public class Node implements Serializable {
 	private Map<NodeRefImpl.Relation, Node> relations;
 	private List<Contributor> contributors;
 	private boolean isPublic;
+
+	/**
+	 * fake a node from a ref
+	 * i.e. if the real node could not be fetched or is deleted
+	 * @param ref
+	 * @return
+	 */
+	public static Node FakeFromRef(NodeRef ref) throws IllegalAccessException, InstantiationException {
+		Node node = NodeDao.createEmptyDummy(Node.class, ref);
+		node.setPreview(new Preview());
+		node.setIconURL(new MimeTypesV2().getDefaultIcon());
+		HashMap<String, String[]> props = new HashMap<>();
+		props.put(CCConstants.getValidLocalName(CCConstants.CM_NAME), new String[]{ref.getId()});
+		node.setProperties(props);
+		return node;
+	}
 
 	/**
    **/

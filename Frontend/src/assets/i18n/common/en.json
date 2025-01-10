@@ -899,6 +899,7 @@
   "SIGNUP_GROUP": {
     "TITLE": "Enroll in group",
     "SUBTITLE": "Join a new group",
+    "SEARCH": "Filter group list",
     "SELECT_GROUP": "Select a group from the list below which you would like to join.",
     "NO_GROUPS": "There are currently no groups available to join.",
     "CONFIRM_GROUP": "You will join the following group:",

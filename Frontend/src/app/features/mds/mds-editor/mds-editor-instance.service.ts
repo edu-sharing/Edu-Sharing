@@ -907,7 +907,8 @@ export class MdsEditorInstanceService implements OnDestroy {
         this.suggestionsSupported = (await this.aboutService.getAbout().toPromise())?.plugins?.some(
             (p) => p.id === 'mongo-plugin',
         );
-        if (this.suggestionsSupported) {
+        if (this.suggestionsSupported && this.editorMode === 'nodes') {
+            console.log(this.editorMode);
             try {
                 this.suggestionMetadata$.next(
                     await this.mdsEditorCommonService.fetchNodesSuggestions(nodes),

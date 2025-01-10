@@ -739,8 +739,8 @@ export class DialogsService {
             title: 'SIGNUP_GROUP.TITLE',
             subtitle: 'SIGNUP_GROUP.SUBTITLE',
             avatar: { kind: 'icon', icon: 'group_add' },
-            width: 500,
-            minHeight: 600,
+            width: 700,
+            height: 800,
             closable: Closable.Casual,
         });
     }

@@ -13,8 +13,7 @@ import org.edu_sharing.metadataset.v2.MetadataWidget;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.service.handleservice.HandleServiceNotConfiguredException;
-import org.edu_sharing.service.handleservicedoi.model.DOI;
-import org.edu_sharing.service.handleservicedoi.model.Data;
+import org.edu_sharing.service.handleservicedoi.model.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.VCardConverter;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
@@ -101,11 +100,18 @@ public class DOIService implements HandleService {
     public String update(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception {
         logger.debug("Updating DOI: " + handleId);
         DOI doi = mapForPublishing(nodeId, properties);
+        if(doi.getXmlRepresentation() != null){
+            XMLHelper xmlHelper = new XMLHelper();
+            xmlHelper.setIdentifier(doi.getXmlRepresentation(),handleId);
+            doi.getData().getAttributes().setXml(Base64.getEncoder().encodeToString(xmlHelper.marshal(doi.getXmlRepresentation()).getBytes()));
+            doi.setXmlRepresentation(null);
+        }
         return updateDOIWithMetadata(handleId, doi);
     }
 
     private String updateDOIWithMetadata(String handleId, DOI doi) throws DOIServiceException {
         HttpEntity<DOI> entity = new HttpEntity<>(doi,getHttpHeaders());
+        doi.getData().getAttributes().setDoi(handleId);
         ResponseEntity<DOI> doiResponseEntity = template.exchange(baseUrl+"/dois/"+ handleId, HttpMethod.PUT, entity, DOI.class);
         try {
             logger.info("updateDOIWithMetadata:" + new Gson().toJson(doi));
@@ -128,8 +134,14 @@ public class DOIService implements HandleService {
             logger.info("Node "+ nodeId+ " has no doi, will not update state");
             return false;
         }
-        DOI doi = getDOI(handleId);
-        doi.getData().getAttributes().setState(eventState);
+        DOI doi = DOI.builder()
+                .data(Data.builder()
+                        .type("dois")
+                        .attributes(Data.Attributes.builder()
+                                .event(eventState)
+                                .build())
+                        .build())
+                .build();
         updateDOIWithMetadata(handleId, doi);
         return true;
     }
@@ -181,35 +193,34 @@ public class DOIService implements HandleService {
 
     @NotNull
     public DOI getBasicMapping(String nodeId, Map<QName, Serializable> properties, boolean failOnMissing) throws Exception {
-        DOI doi = DOI.builder()
-                .data(Data.builder()
-                        .type("dois")
-                        .attributes(Data.Attributes.builder()
-                                .creators(new ArrayList<>())
-                                .titles(new ArrayList<>())
-                                .event("publish")
-                                .build())
-                        .build())
-                .build();
+        return getBasicMapping(nodeId, properties, failOnMissing, false);
+    }
 
-        //creator
-        //the main researchers involved working on the data, or the authors of the publication in priority order. May be a corporate/institutional or personal name.
+    public DOI getBasicMapping(String nodeId, Map<QName, Serializable> properties, boolean failOnMissing, boolean xml) throws Exception {
+
+        Helper helper = (xml) ? new XMLHelper() : new JSONHelper();
+
+
+
         List<String> author = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR));
         List<String> authorFreetext = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_AUTHOR_FREETEXT));
         if(author == null || author.isEmpty()){
-            if((authorFreetext == null || authorFreetext.isEmpty()) && failOnMissing){
+            if((authorFreetext == null || authorFreetext.isEmpty() || authorFreetext.stream().allMatch(a -> (a == null || a.trim().isEmpty()))) && failOnMissing){
                 throw new DOIServiceMissingAttributeException(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR),"Creator");
             }
         }
         if(author != null && !author.isEmpty()) {
-            author.stream().forEach(a -> doi.getData().getAttributes().getCreators()
-                    .add(Data.Creator.builder().name(VCardConverter.getNameForVCardString(a)).build()));
+            author.stream().forEach(a -> {
+                helper.addCreator(VCardConverter.getNameForVCardString(a),null);
+            });
         }
         if(authorFreetext != null && !authorFreetext.isEmpty()){
-            authorFreetext.stream().forEach(a -> doi.getData().getAttributes().getCreators()
-                    .add(Data.Creator.builder().name(a).build()));
+            authorFreetext.stream().forEach(a -> {
+                if(a != null && !a.trim().isEmpty()) {
+                    helper.addCreator(a,null);
+                }
+            });
         }
-
 
         //title
         String title = (String) properties.get(QName.createQName(CCConstants.LOM_PROP_GENERAL_TITLE));
@@ -217,9 +228,8 @@ public class DOIService implements HandleService {
         if(StringUtils.isEmpty(title) && failOnMissing){
             throw new DOIServiceMissingAttributeException(CCConstants.getValidLocalName(CCConstants.LOM_PROP_GENERAL_TITLE),"Title");
         }
-        doi.getData().getAttributes().getTitles().add(Data.Title.builder().title(title).build());
+        helper.addTitle(title);
 
-        //publisher
         List<String> publisherList = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_PUBLISHER));
         String publisher;
         if((publisherList == null || publisherList.isEmpty())){
@@ -228,7 +238,7 @@ public class DOIService implements HandleService {
             }
         } else {
             publisher = publisherList.get(0);
-            doi.getData().getAttributes().setPublisher(VCardConverter.getNameForVCardString(publisher));
+            helper.setPublisher(VCardConverter.getNameForVCardString(publisher));
         }
 
         //published year
@@ -240,25 +250,25 @@ public class DOIService implements HandleService {
         } else {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(d);
-            doi.getData().getAttributes().setPublicationYear(calendar.get(Calendar.YEAR));
+            helper.setPublicationYear(calendar.get(Calendar.YEAR));
         }
 
 
         //learning resourcetype
         List<String> lrts = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_IO_REPL_EDUCATIONAL_LEARNINGRESSOURCETYPE));
-        Data.Types lrt;
+        String mapping;
         if(lrts == null || lrts.isEmpty()){
-            lrt = Data.Types.builder().resourceTypeGeneral("Other").build();
+            mapping = "Other";
             // throw new DOIServiceMissingAttributeException(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_EDUCATIONAL_LEARNINGRESSOURCETYPE), "resourceTypeGeneral");
         } else {
-            String mapping = getMapping(nodeId,CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_EDUCATIONAL_LEARNINGRESSOURCETYPE),lrts);
+            mapping = getMapping(nodeId,CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_EDUCATIONAL_LEARNINGRESSOURCETYPE),lrts);
             if(mapping == null) mapping = "Other";
-            lrt = Data.Types.builder().resourceTypeGeneral(mapping).build();
-        }
-        doi.getData().getAttributes().setTypes(lrt);
 
+        }
+        helper.setResourceType(mapping);
 
         //url
+        DOI doi = helper.getDoi();
         doi.getData().getAttributes().setUrl(getContentLink(properties));
         return doi;
     }

@@ -245,7 +245,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                 switchMap(([metadataSet, repository]) =>
                     this._mds.getMetadataSet({ repository, metadataSet }),
                 ),
-                filter((mds) => !!mds.sorts.find((s) => s.id === 'search')?.defaultSearch),
+                filter((mds) => !!mds.sorts.find((s) => s.id === 'search')),
             )
             .subscribe((mds) => {
                 const sorts = mds.sorts.find((s) => s.id === 'search');
@@ -257,7 +257,7 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                     )
                     .subscribe((searchString) => {
                         const state = searchString ? sorts.defaultSearch : sorts.default;
-                        // console.log(searchString, mds, state);
+                        console.log(searchString, mds, state);
                         let config: Partial<ListSortConfig> = {
                             allowed: true,
                             columns: sorts.columns?.map(

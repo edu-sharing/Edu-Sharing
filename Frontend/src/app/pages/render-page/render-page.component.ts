@@ -507,7 +507,6 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                                 set,
                                 'search',
                             );
-                            console.log(this.mds.value);
                             this.linkSearchableWidgets();
                         });
                         this.mdsService
@@ -777,7 +776,9 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     private async linkSearchableWidgets() {
         try {
             this.viewInstanceService.treeDisplay = 'path';
-            await this.mdsEditorInstanceService.initWithNodes([this._node]);
+            await this.mdsEditorInstanceService.initWithNodes([this._node], {
+                editorMode: 'viewer',
+            });
             this.mdsEditorInstanceService.widgets.value
                 .filter((w) => w.definition.isSearchable)
                 .forEach((w) => {
