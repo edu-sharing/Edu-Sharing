@@ -14,7 +14,7 @@ import {
 } from 'ngx-edu-sharing-ui';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RestConnectorService } from '../core-module/core.module';
+import { DialogButton, RestConnectorService } from '../core-module/core.module';
 import { RestConstants } from '../core-module/rest/rest-constants';
 import { CardDialogRef } from '../features/dialogs/card-dialog/card-dialog-ref';
 import {
@@ -25,6 +25,7 @@ import { DialogsService } from '../features/dialogs/dialogs.service';
 import { ToastMessageComponent } from '../main/toast-message/toast-message.component';
 import { GlobalProgressComponent } from '../shared/components/global-progress/global-progress.component';
 import { BridgeService } from './bridge.service';
+import { UIHelper } from '../core-ui-module/ui-helper';
 
 interface CustomAction {
     link: {
@@ -343,7 +344,17 @@ export class Toast extends ToastAbstract implements OnDestroy {
                 label: this.translate.instant('DETAILS'),
                 callback: () =>
                     this.dialogs.openGenericDialog({
-                        title: dialogTitle,
+                        title: this.translate.instant(dialogTitle, translationParameters),
+                        buttons: [
+                            {
+                                label: 'WORKSPACE.SHARE_LINK.COPY_CLIPBOARD',
+                                config: { color: 'standard', position: 'opposite' },
+                                callback: async () => {
+                                    UIHelper.copyToClipboard(dialogMessage);
+                                    return false;
+                                },
+                            },
+                        ],
                         message: dialogMessage,
                         messageParameters: translationParameters,
                     }),
