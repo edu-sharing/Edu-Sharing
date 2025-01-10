@@ -60,7 +60,7 @@ import { ScrollPositionRestorationService } from '../services/scroll-position-re
 export class RouterComponent implements OnInit, DoCheck, AfterViewInit {
     private static readonly CHECKS_PER_SECOND_WARNING_THRESHOLD = 0;
     private static readonly CONSECUTIVE_TRANSGRESSION_THRESHOLD = 10;
-    private static history = new BehaviorSubject<string[]>([]);
+    static history = new BehaviorSubject<string[]>([]);
 
     public static isRedirectedFromLogin() {
         const history = RouterComponent.history.value;
