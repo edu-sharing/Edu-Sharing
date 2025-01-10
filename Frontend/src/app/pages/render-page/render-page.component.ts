@@ -780,7 +780,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                 editorMode: 'viewer',
             });
             this.mdsEditorInstanceService.widgets.value
-                .filter((w) => w.definition.isSearchable)
+                ?.filter((w) => w.definition.isSearchable)
                 .forEach((w) => {
                     try {
                         const values = document.querySelectorAll(
