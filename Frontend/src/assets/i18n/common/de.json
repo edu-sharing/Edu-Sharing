@@ -171,7 +171,10 @@
     "TOOLPERMISSION_SIGNUP_GROUP": "Zu einer Organisation/Gruppe einschreiben (gilt nur für seperat dafür freigegebene Organisationen/Gruppen)",
     "TOOLPERMISSION_COLLECTION_PROPOSAL": "Vorschlagen von Materialien für Sammlungen, für welche die nutzende Person keine Schreibrechte hat",
     "TOOLPERMISSION_RATE": "Die Berechtigung zum Bewerten von Materialien",
-    "TOOLPERMISSION_MANAGE_RELATIONS": "Verwalten und erstellen von Beziehungen zwischen Elementen"
+    "TOOLPERMISSION_MANAGE_RELATIONS": "Verwalten und erstellen von Beziehungen zwischen Elementen",
+    "TOOLPERMISSION_INVITE_TIMEBASED": "Zeitlich beschränkte Freigaben erstellen",
+    "TOOLPERMISSION_SUGGESTION_READ": "Vorschläge für Metadaten an Elementen abrufen",
+    "TOOLPERMISSION_SUGGESTION_WRITE": "Vorschläge für Metadaten an Elementen erstellen"
   },
   "NO_WRITE_PERMISSIONS": "Keine Rechte für diesen Vorgang",
   "NODE_SEARCH": "Elemente suchen...",
