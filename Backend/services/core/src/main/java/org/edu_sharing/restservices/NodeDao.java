@@ -83,15 +83,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.edu_sharing.service.permission.HandleParam;
 
 public class NodeDao {
     private static Logger logger = Logger.getLogger(NodeDao.class);
     private static final StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-	/**
-	 * also check @PermissionServiceHelper.PERMISSIONS
-	 */
+    /**
+     * also check @PermissionServiceHelper.PERMISSIONS
+     */
     private static final String[] DAO_PERMISSIONS = new String[]{
             org.alfresco.service.cmr.security.PermissionService.READ,
             org.alfresco.service.cmr.security.PermissionService.ADD_CHILDREN,
@@ -150,8 +151,8 @@ public class NodeDao {
     }
 
     public static NodeStatsEntry.NodeStats getStats(NodeDao node) throws DAOException {
-        if(!node.isFromRemoteRepository()) {
-            if(!node.access.contains(PermissionService.CHANGE_PERMISSIONS)) {
+        if (!node.isFromRemoteRepository()) {
+            if (!node.access.contains(PermissionService.CHANGE_PERMISSIONS)) {
                 throw new DAORestrictedAccessException(new SecurityException("Requires " + PermissionService.CHANGE_PERMISSIONS), node.getId());
             }
             try {
@@ -168,11 +169,11 @@ public class NodeDao {
     }
 
     public org.edu_sharing.service.model.NodeRef getNodeRef() {
-		if(this.nodeRef != null) {
-			return this.nodeRef;
-		}
-		return new org.edu_sharing.service.model.NodeRefImpl(repoDao.getId(), storeProtocol, storeId, nodeId);
-	}
+        if (this.nodeRef != null) {
+            return this.nodeRef;
+        }
+        return new org.edu_sharing.service.model.NodeRefImpl(repoDao.getId(), storeProtocol, storeId, nodeId);
+    }
 
     public static NodeDao getNodeWithVersion(RepositoryDao repoDao, String nodeId, String versionLabel) throws DAOException {
         if (versionLabel != null && versionLabel.equals("-1"))
@@ -196,10 +197,21 @@ public class NodeDao {
         HashMap<String, String[]> props = fromDao.getAllProperties();
         try {
             MetadataSet mds = MetadataHelper.getMetadataset(new NodeRef(repoDao, getId()));
-            HashSet<String> defaultProps = mds.getWidgetsByNode(getType(), getAspectsNative(), false).stream().map(MetadataWidget::getId).collect(Collectors.toCollection(HashSet::new));
-            defaultProps.addAll(mds.getWidgetsByNode(getType(), getAspectsNative(), false).stream().map(MetadataWidget::getSuggestDisplayProperty).filter(Objects::nonNull).collect(Collectors.toSet()));
+            HashSet<String> defaultProps = mds.getWidgetsByNode(this.type, getAspectsNative(), false).stream().map(MetadataWidget::getId).collect(Collectors.toCollection(HashSet::new));
+            defaultProps.addAll(mds.getWidgetsByNode(this.type, getAspectsNative(), false).stream().map(MetadataWidget::getSuggestDisplayProperty).filter(Objects::nonNull).collect(Collectors.toSet()));
             defaultProps.addAll(Arrays.stream(NodeCustomizationPolicies.SAFE_PROPS).map(CCConstants::getValidLocalName).collect(Collectors.toList()));
             defaultProps.addAll(Arrays.stream(NodeCustomizationPolicies.LICENSE_PROPS).map(CCConstants::getValidLocalName).collect(Collectors.toList()));
+
+            // don't remove published only properties
+            Stream.of(
+                            CCConstants.CCM_PROP_PUBLISHED_DOI_ID,
+                            CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID,
+                            CCConstants.CCM_PROP_PUBLISHED_DATE,
+                            CCConstants.CCM_PROP_IO_PUBLISHED_ORIGINAL
+                    )
+                    .map(CCConstants::getValidLocalName)
+                    .forEach(defaultProps::remove);
+
             for (String prop : defaultProps) {
                 if (!props.containsKey(prop) && CCConstants.getValidGlobalName(prop) != null) {
                     // delete removed properties
@@ -214,6 +226,12 @@ public class NodeDao {
                         nodeService.getPropertyNative(fromDao.getStoreProtocol(), fromDao.getStoreIdentifier(), fromDao.getId(), prop),
                         false);
             }
+
+            // fix duplicate child name issues in publishing folder
+            props.remove(CCConstants.getValidLocalName(CCConstants.CM_NAME));
+
+            // fix published mode only for original
+            props.remove(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_PUBLISHED_MODE));
 
             return changeProperties(props);
         } catch (Throwable t) {
@@ -851,7 +869,7 @@ public class NodeDao {
         if (nodeRef != null && nodeRef.getPublic() != null) {
             this.isPublic = nodeRef.getPublic();
         } else {
-			if(!StringUtils.isBlank(ApplicationInfoList.getHomeRepository().getGuest_username())) {
+            if (!StringUtils.isBlank(ApplicationInfoList.getHomeRepository().getGuest_username())) {
                 this.isPublic = usedPermissionService.hasPermission(
                         storeProtocol,
                         storeId,
@@ -1186,7 +1204,7 @@ public class NodeDao {
             }
             props.put(CCConstants.CCM_PROP_IO_CREATE_VERSION, new String[]{new Boolean(version).toString()});
             nodeService.updateNode(nodeId, props);
-            nodeService.writeContent(storeRef, nodeId, result.getInputStream(), result.getMediaType().toString(),null,
+            nodeService.writeContent(storeRef, nodeId, result.getInputStream(), result.getMediaType().toString(), null,
                     isDirectory() ? CCConstants.CCM_PROP_MAP_ICON : CCConstants.CCM_PROP_IO_USERDEFINED_PREVIEW);
             PreviewCache.purgeCache(nodeId);
             return new NodeDao(repoDao, nodeId);
@@ -1500,7 +1518,7 @@ public class NodeDao {
         Content content = new Content();
         content.setUrl(getContentUrl());
         // skip hash + version for search cause of performance penalties
-        if(Arrays.asList(CallSourceHelper.CallSource.Search, CallSourceHelper.CallSource.Sitemap).contains(CallSourceHelper.getCallSource())) {
+        if (Arrays.asList(CallSourceHelper.CallSource.Search, CallSourceHelper.CallSource.Sitemap).contains(CallSourceHelper.getCallSource())) {
             return content;
         }
         content.setVersion(getContentVersion(data));
@@ -1616,14 +1634,14 @@ public class NodeDao {
                 }
 
                 for (Map.Entry<Authority, List<String>> entry : authPerm.entrySet()) {
-					ACE ace = getACEAsSystem(entry.getKey());
+                    ACE ace = getACEAsSystem(entry.getKey());
                     ace.setPermissions(entry.getValue());
                     ace.setEditable(entry.getKey().isEditable());
                     result.getLocalPermissions().getPermissions().add(ace);
                 }
 
                 for (Map.Entry<Authority, List<String>> entry : authPermInherited.entrySet()) {
-					ACE ace = getACEAsSystem(entry.getKey());
+                    ACE ace = getACEAsSystem(entry.getKey());
                     ace.setPermissions(entry.getValue());
                     result.getInheritedPermissions().add(ace);
                 }
@@ -1639,11 +1657,11 @@ public class NodeDao {
 
     }
 
-	private ACE getACEAsSystem(Authority key){
-		return AuthenticationUtil.runAsSystem(new RunAsWork<ACE>() {
+    private ACE getACEAsSystem(Authority key) {
+        return AuthenticationUtil.runAsSystem(new RunAsWork<ACE>() {
 
-			@Override
-			public ACE doWork() throws Exception {
+            @Override
+            public ACE doWork() throws Exception {
                 try {
                     if (key.getAuthorityType().name().equals("GROUP")) {
                         GroupProfile group = GroupDao.getGroup(repoDao, key.getAuthorityName()).asGroup().getProfile();
@@ -1662,8 +1680,8 @@ public class NodeDao {
                     // this may happens for a virtual user, e.g. GROUP_EVERYONE
                     return new ACE(key, null, null);
                 }
-			}
-		});
+            }
+        });
     }
 
     public void setPermissions(ACL permissions, String mailText, Boolean sendMail, Boolean sendCopy) throws DAOException {
@@ -1788,16 +1806,16 @@ public class NodeDao {
     public Person getCreatedBy() {
 
         Person ref = new Person();
-        if(nodeProps.get(CCConstants.NODECREATOR_FIRSTNAME) != null && nodeProps.get(CCConstants.NODECREATOR_LASTNAME) != null) {
+        if (nodeProps.get(CCConstants.NODECREATOR_FIRSTNAME) != null && nodeProps.get(CCConstants.NODECREATOR_LASTNAME) != null) {
             ref.setFirstName((String) nodeProps
                     .get(CCConstants.NODECREATOR_FIRSTNAME));
             ref.setLastName((String) nodeProps
                     .get(CCConstants.NODECREATOR_LASTNAME));
             if (resolveUsernames && this.checkUserHasPermissionToSeeMail((String) nodeProps.get(CCConstants.CM_PROP_C_CREATOR)))
                 ref.setMailbox((String) nodeProps.get(CCConstants.NODECREATOR_EMAIL));
-        } else if(resolveUsernames && authorityService != null) {
+        } else if (resolveUsernames && authorityService != null) {
             User user = authorityService.getUser((String) nodeProps.get(CCConstants.CM_PROP_C_CREATOR));
-            if(user != null) {
+            if (user != null) {
                 ref.setFirstName(user.getGivenName());
                 ref.setLastName(user.getSurname());
                 if (this.checkUserHasPermissionToSeeMail((String) nodeProps.get(CCConstants.CM_PROP_C_CREATOR)))
@@ -1808,7 +1826,7 @@ public class NodeDao {
     }
 
     private Person getOwner() {
-        if(resolveUsernames) {
+        if (resolveUsernames) {
             User owner = null;
             if (ownerUsername != null && !ownerUsername.trim().equals("")) {
                 if (authorityService != null) {
@@ -1906,16 +1924,16 @@ public class NodeDao {
     private Person getModifiedBy() {
 
         Person ref = new Person();
-        if(nodeProps.get(CCConstants.NODEMODIFIER_FIRSTNAME) != null && nodeProps.get(CCConstants.NODEMODIFIER_LASTNAME) != null) {
+        if (nodeProps.get(CCConstants.NODEMODIFIER_FIRSTNAME) != null && nodeProps.get(CCConstants.NODEMODIFIER_LASTNAME) != null) {
             ref.setFirstName((String) nodeProps
                     .get(CCConstants.NODEMODIFIER_FIRSTNAME));
             ref.setLastName((String) nodeProps
                     .get(CCConstants.NODEMODIFIER_LASTNAME));
             if (resolveUsernames && this.checkUserHasPermissionToSeeMail((String) nodeProps.get(CCConstants.CM_PROP_C_MODIFIER)))
                 ref.setMailbox((String) nodeProps.get(CCConstants.NODEMODIFIER_EMAIL));
-        } else if(resolveUsernames && authorityService != null) {
+        } else if (resolveUsernames && authorityService != null) {
             User user = authorityService.getUser((String) nodeProps.get(CCConstants.CM_PROP_C_MODIFIER));
-            if(user != null) {
+            if (user != null) {
                 ref.setFirstName(user.getGivenName());
                 ref.setLastName(user.getSurname());
                 if (this.checkUserHasPermissionToSeeMail((String) nodeProps.get(CCConstants.CM_PROP_C_MODIFIER)))
@@ -1953,14 +1971,14 @@ public class NodeDao {
 
     private RatingDetails getRating() {
         try {
-			if(access.contains(CCConstants.PERMISSION_RATE_READ)) {
-				// skip permission checks, this can be useful if the user might have indirect access via collection
-				return AuthenticationUtil.runAsSystem(() -> RatingServiceFactory.getRatingService(repoDao.getId()).getAccumulatedRatings(getNodeRef(), null));
-			} else {
-				return RatingServiceFactory.getRatingService(repoDao.getId()).getAccumulatedRatings(getNodeRef(), null);
-			}
+            if (access.contains(CCConstants.PERMISSION_RATE_READ)) {
+                // skip permission checks, this can be useful if the user might have indirect access via collection
+                return AuthenticationUtil.runAsSystem(() -> RatingServiceFactory.getRatingService(repoDao.getId()).getAccumulatedRatings(getNodeRef(), null));
+            } else {
+                return RatingServiceFactory.getRatingService(repoDao.getId()).getAccumulatedRatings(getNodeRef(), null);
+            }
         } catch (Throwable t) {
-            if(t.getCause() instanceof InsufficientPermissionException) {
+            if (t.getCause() instanceof InsufficientPermissionException) {
                 // ignored
                 return null;
             }
@@ -2040,7 +2058,7 @@ public class NodeDao {
             version.setMinor(Integer.parseInt(versionTokens[1]));
             version.setMinor(Integer.parseInt(versionTokens[1]));
             return version;
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             logger.warn("Could not parse version for node " + nodeId, e);
             NodeVersionRef version = new NodeVersionRef();
             version.setNode(getRef());
@@ -2125,7 +2143,7 @@ public class NodeDao {
                 if (json.has("comment"))
                     history.setComment(json.getString("comment"));
                 try {
-					history.setEditor(new PersonDao(repoDao,json.getString("editor")).asPersonSimple(false));
+                    history.setEditor(new PersonDao(repoDao, json.getString("editor")).asPersonSimple(false));
                 } catch (Throwable t) {
                     // The user may has no permission or entry deleted
                     history.setEditor(new UserSimple());
@@ -2137,9 +2155,9 @@ public class NodeDao {
                     try {
                         String authority = arr.getString(i);
                         if (authority.startsWith(PermissionService.GROUP_PREFIX)) {
-							list[i]=new GroupDao(repoDao, authority).asGroup(false);
+                            list[i] = new GroupDao(repoDao, authority).asGroup(false);
                         } else {
-							list[i]=new PersonDao(repoDao,authority).asPersonSimple(false);
+                            list[i] = new PersonDao(repoDao, authority).asPersonSimple(false);
                         }
                     } catch (Throwable t) {
                         // The user may has no permission or entry deleted
@@ -2150,9 +2168,9 @@ public class NodeDao {
                 history.setReceiver(list);
                 history.setStatus(json.getString("status"));
                 Object time = json.get("time");
-                if(time instanceof String) {
+                if (time instanceof String) {
                     history.setTime(Long.parseLong((String) time));
-                } else if(time instanceof Long) {
+                } else if (time instanceof Long) {
                     history.setTime((Long) time);
                 } else {
                     logger.info("Can not cast time: " + time + ":" + json.toString());
@@ -2261,13 +2279,13 @@ public class NodeDao {
     }
 
     private Preview getPreview() {
-		if(previewData != null){
-			return new Preview(getStoreProtocol(),
-					getStoreIdentifier(),
-					remoteId!=null ? remoteId : getRef().getId(),
-					previewData
-			);
-		}
+        if (previewData != null) {
+            return new Preview(getStoreProtocol(),
+                    getStoreIdentifier(),
+                    remoteId != null ? remoteId : getRef().getId(),
+                    previewData
+            );
+        }
         Preview result = new Preview(nodeService,
                 getStoreProtocol(),
                 getStoreIdentifier(),
@@ -2616,7 +2634,7 @@ public class NodeDao {
         }
     }
 
-	private void setPropertyInternal(String property, Serializable value) {
+    private void setPropertyInternal(String property, Serializable value) {
         if (value == null) {
             nodeService.removeProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), this.getId(), property);
         } else {
