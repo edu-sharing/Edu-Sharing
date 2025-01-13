@@ -42,7 +42,6 @@ import {
     RestConnectorService,
     RestConstants,
     RestMdsService,
-    RestSearchService,
 } from '../../../core-module/core.module';
 import {
     BulkBehavior,
@@ -442,9 +441,11 @@ export class MdsEditorInstanceService implements OnDestroy {
          * whether the field was missing and scrolled into view
          */
         registerShowMissingRequired(f: (shouldScrollIntoView: boolean) => boolean) {
-            if (this.showMissingRequiredFunction) {
-                throw new Error('onShowMissingRequired was called more than once');
-            }
+            // might be called twice since the form control gets initiated more than once
+            // see @MdsEditorWidgetTextComponent
+            /*if (this.showMissingRequiredFunction) {
+                // throw new Error('onShowMissingRequired was called more than once');
+            }*/
             this.showMissingRequiredFunction = f;
         }
 
@@ -1231,6 +1232,15 @@ export class MdsEditorInstanceService implements OnDestroy {
 
     observeCompletionStatus(): Observable<CompletionStatus> {
         return this.completionStatus$.asObservable();
+    }
+
+    /**
+     * display an error for all widgets which are required but not filled out
+     */
+    markMissingRequiredWidgets() {
+        for (let w of this.widgets.value) {
+            w.showMissingRequired(false);
+        }
     }
 
     /**

@@ -155,6 +155,9 @@ export class MdsEditorWidgetContainerComponent
         if (changes.widget) {
             this.registerIsHidden();
         }
+        if (changes.control) {
+            this.initFormControl(this.control);
+        }
     }
 
     async ngOnInit() {
@@ -259,15 +262,29 @@ export class MdsEditorWidgetContainerComponent
     }
 
     private scrollIntoViewAndFocus(): void {
-        new Promise((resolve) => {
-            // Expand section (view) if needed.
-            if (this.viewInstance.isExpanded$.value) {
-                resolve(null);
-            } else {
-                this.viewInstance.isExpanded$.next(true);
-                setTimeout(() => resolve(null));
-            }
-        }).then(async () => {
+        Promise.all([
+            new Promise((resolve) => {
+                // Expand section (view) if needed.
+                if (this.viewInstance.isExpanded$.value) {
+                    resolve(null);
+                } else {
+                    this.viewInstance.isExpanded$.next(true);
+                    setTimeout(() => resolve(null));
+                }
+            }),
+            new Promise((resolve) => {
+                // Show extended widgets if needed.
+                if (
+                    !this.widget.definition.isExtended ||
+                    this.mdsEditorInstance.shouldShowExtendedWidgets$.value
+                ) {
+                    resolve(null);
+                } else {
+                    this.mdsEditorInstance.shouldShowExtendedWidgets$.next(true);
+                    setTimeout(() => resolve(null));
+                }
+            }),
+        ]).then(async () => {
             await this.uiService.scrollSmoothElementToChild(this.elementRef.nativeElement);
             /*this.elementRef.nativeElement.scrollIntoView({
                 behavior: 'smooth',
