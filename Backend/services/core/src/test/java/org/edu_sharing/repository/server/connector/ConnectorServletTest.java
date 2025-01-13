@@ -4,6 +4,7 @@ import com.github.davidmoten.guavamini.Maps;
 import com.lyncode.test.check.Assert;
 import org.edu_sharing.alfresco.service.connector.SimpleConnector;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.SimpleErrorWithDetailsException;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +27,7 @@ class ConnectorServletTest {
 
     @Test
     @Disabled
-    void handleSimpleConnectorTestOauthFormCurriculum() throws UnsupportedEncodingException {
+    void handleSimpleConnectorTestOauthFormCurriculum() throws UnsupportedEncodingException, SimpleErrorWithDetailsException {
         SimpleConnector connector = new SimpleConnector();
         SimpleConnector.SimpleConnectorApi api = new SimpleConnector.SimpleConnectorApi();
         connector.setApi(api);

@@ -5,6 +5,7 @@
     "403": "security error",
     "404": "Ouh sorry,\n we are looking for this page, too.",
     "500": "Something went wrong,\n we're working on a solution.",
+    "OTHER": "Unknown error",
     "share_expired": "This link has expired.",
     "share_file_deleted": "The object has been deleted.",
     "invalid_share": "invalid link",

@@ -23,6 +23,7 @@
       "403": "Der Zugriff auf den gewünschten Bereich bzw. die gewünschte Ressource ist leider nicht möglich",
       "404": "Fehler 404",
       "500": "Fehler 500",
+      "OTHER": "Unbekannter Fehler",
       "share_expired": "Die Linkfreigabe ist abgelaufen oder wurde vom Besitzer des Materials beendet",
       "share_file_deleted": "Die Linkfreigabe zeigt auf eine bereits gelöschte Datei. Bitte kontaktieren Sie den/die Autor{{GENDER_SEPARATOR}}in",
       "invalid_share": "Der angegebene Link ist ungültig",

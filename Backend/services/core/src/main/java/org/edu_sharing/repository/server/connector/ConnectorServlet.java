@@ -24,6 +24,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
+import org.edu_sharing.repository.server.SimpleErrorWithDetailsException;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.HttpQueryTool;
@@ -232,7 +233,7 @@ public class ConnectorServlet extends HttpServlet  {
 		return converted;
 	}
 
-	HashMap<String, Serializable> handleSimpleConnector(Map<String, String[]> requestParameters, SimpleConnector simpleConnector, NodeRef nodeRefOriginal) throws UnsupportedEncodingException {
+	HashMap<String, Serializable> handleSimpleConnector(Map<String, String[]> requestParameters, SimpleConnector simpleConnector, NodeRef nodeRefOriginal) throws UnsupportedEncodingException, SimpleErrorWithDetailsException {
 		RequestBuilder builder = null;
 		String url = replaceSimpleConnectorAttributes(requestParameters, simpleConnector.getApi().getUrl(), (data) -> URLEncoder.encode(StringUtils.join(data)));
 		if(simpleConnector.getApi().getMethod().equals(SimpleConnector.SimpleConnectorApi.Method.Post)) {
@@ -249,12 +250,15 @@ public class ConnectorServlet extends HttpServlet  {
 					}
 					// builder.setHeader()
 				}
-				String auth = new HttpQueryTool().query(builderAuth);
+				String auth = "";
 				try {
+					auth = new HttpQueryTool().query(builderAuth);
 					JSONObject authJson = new JSONObject(auth);
 					builder.setHeader("Authorization", "Bearer " + authJson.get("access_token"));
 				}catch(JSONException e) {
 					throw new IllegalArgumentException("Wrong json data received: " + auth, e);
+				}catch(Throwable t) {
+					throw new SimpleErrorWithDetailsException("Authentication failed for connector " + simpleConnector.getId() + ". Check the configuration.");
 				}
             }
 			if(simpleConnector.getApi().getBodyType() == null) {
