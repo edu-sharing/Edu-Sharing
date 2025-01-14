@@ -2331,7 +2331,12 @@ public class NodeDao {
         }
 //        java.util.Collection<String> toolPermissions = toolPermissionService.getAllToolPermissions(false);
 
-        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimetype(), getMediatype());
+        String replicationSource = Arrays.stream(getProperties()
+                .getOrDefault(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPLICATIONSOURCE), new String[0]))
+                .findFirst()
+                .orElse(null);
+
+        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimetype(), getMediatype(), replicationSource);
     }
 
     private String getMimetype() {
