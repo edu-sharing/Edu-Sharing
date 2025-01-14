@@ -65,7 +65,7 @@ public class OaiLomHSOERMetadataFormatWriter extends AbstractMetadataFormatWrite
     protected boolean filterVCardEmail;
 
 
-    private final MetadataFormat metadataFormat = MetadataFormat.metadataFormat("hsoerlom")
+    private final MetadataFormat metadataFormat = MetadataFormat.metadataFormat("hs_oer_lom")
             .withSchemaLocation("http://www.w3.org/2001/XMLSchema-instance https://www.oerbw.de/hsoerlom https://w3id.org/dini-ag-kim/hs-oer-lom-profil/latest/schemas/hs-oer-lom.xsd")
             .withNamespace("https://www.oerbw.de/hsoerlom")
             .withTransformer(MetadataFormat.identity());
