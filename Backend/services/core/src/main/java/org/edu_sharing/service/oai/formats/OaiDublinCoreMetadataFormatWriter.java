@@ -21,6 +21,65 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * The `OaiDublinCoreMetadataFormatWriter` class is responsible for generating
+ * metadata in the Dublin Core format for Open Archives Initiative (OAI) protocols.
+ * It extends the `AbstractMetadataFormatWriter` to provide the specific implementation
+ * for handling Dublin Core metadata.
+
+ * <p>This class is a Spring-managed component that integrates repository metadata
+ * and contextual data to produce metadata elements adhering to the Dublin Core
+ * specification.</p>
+
+ * <p>The class uses various helper services and utilities to map repository
+ * properties to Dublin Core fields. It also supports filtering and cleaning
+ * of sensitive information such as emails from VCards, based on configuration
+ * and permissions.</p>
+
+ * ### Key Features:
+ * - Defines the Dublin Core `MetadataFormat` with a namespace and schema location.
+ * - Converts repository-specific properties into Dublin Core metadata fields.
+ * - Handles property mappings, contributor roles, date formats, and filtering of sensitive data.
+ * - Provides utilities for adding namespaces and preparing contributor elements.
+ * - Utilizes Spring features like `@Value`, `@Lazy`, and `@RefreshScope` for dynamic configuration.
+
+ * ### Usage:
+ * This class is used in the context of an OAI server implementation to output
+ * Dublin Core metadata for repository items.
+
+ * ### Configuration:
+ * - `repository.privacy.filterVCardEmail`: Controls whether email addresses are
+ *   filtered out from VCards. Default is `true`.
+
+ * ### Dependencies:
+ * - `PropertyMapper` for accessing repository properties.
+ * - `VCardConverter` for handling VCard data.
+ * - `LicenseService` for resolving license information.
+ * - `URLHelper` for generating URLs.
+
+ * ### Dublin Core Elements Generated:
+ * - `dc:identifier`
+ * - `dc:title`
+ * - `dc:description`
+ * - `dc:language`
+ * - `dc:subject`
+ * - `dc:creator`
+ * - `dc:publisher`
+ * - `dc:date`
+ * - `dc:contributor`
+ * - `dc:format`
+ * - `dc:source`
+ * - `dc:type`
+ * - `dc:audience`
+ * - `dc:rights`
+
+ * ### Author:
+ * This class is designed as part of the edu-sharing OAI module.
+
+ * ### See Also:
+ * - Dublin Core Metadata Initiative (DCMI): https://www.dublincore.org/
+ * - Open Archives Initiative: https://www.openarchives.org/
+ */
 @Component
 public class OaiDublinCoreMetadataFormatWriter extends AbstractMetadataFormatWriter {
 

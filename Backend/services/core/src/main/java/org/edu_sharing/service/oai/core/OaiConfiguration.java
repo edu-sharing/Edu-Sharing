@@ -24,6 +24,25 @@ import javax.xml.transform.TransformerConfigurationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Configuration class for setting up the OAI-PMH (Open Archives Initiative Protocol for Metadata Harvesting)
+ * provider in the EduSharing system. This class is responsible for configuring the repository settings,
+ * item repository, and set repository for OAI metadata harvesting.
+ *
+ * The OAI-PMH configuration allows EduSharing to provide metadata records to external harvesters in accordance
+ * with the OAI-PMH standard. This class sets up essential components for OAI-PMH operations, including the
+ * repository configuration, metadata format support, and the handling of sets and items.
+ *
+ * Key functionalities include:
+ * - Configuring the OAI-PMH repository settings, such as granularity, identifier prefix, and repository metadata.
+ * - Defining the item repository used to fetch metadata records.
+ * - Defining the set repository, which manages the sets of items that can be harvested in OAI-PMH requests.
+ * - Providing a data provider that integrates the repository, set repository, and item repository, enabling
+ *   the OAI-PMH data harvesting functionality.
+ *
+ * This configuration class ensures that the EduSharing OAI provider is correctly set up, with support for metadata
+ * formats, sets, and item retrieval in line with OAI-PMH standards.
+ */
 @Lazy
 @Configuration
 @RequiredArgsConstructor

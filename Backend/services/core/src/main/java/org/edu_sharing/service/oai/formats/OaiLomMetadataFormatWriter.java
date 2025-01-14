@@ -29,6 +29,53 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * The {@code OaiLomMetadataFormatWriter} class is responsible for implementing
+ * the logic required to create and manage the "LOM" (Learning Object Metadata)
+ * format for use in the OAI-PMH (Open Archives Initiative Protocol for Metadata Harvesting).
+ *
+ * <p>This class generates the LOM metadata structure based on the IEEE LOM standard
+ * and is configured with specific namespace and schema information. It is designed
+ * to be used within an OAI-PMH metadata provider and ensures compatibility with
+ * OAI requirements.
+ *
+ * <h2>Configuration</h2>
+ * <ul>
+ *   <li>{@code exporter.oai.lom.identifier.catalog}: Specifies the identifier catalog.
+ *       Defaults to the application ID from the home repository.</li>
+ *   <li>{@code repository.privacy.filterVCardEmail}: Boolean flag to filter VCard email
+ *       addresses for privacy compliance. Defaults to {@code true}.</li>
+ * </ul>
+ *
+ * <h2>Dependencies</h2>
+ * <ul>
+ *   <li>{@code MetadataFormat}: Represents the LOM metadata format,
+ *       including its namespace and schema location.</li>
+ *   <li>{@code AbstractMetadataFormatWriter}: Parent class providing shared functionality
+ *       for metadata format writers.</li>
+ *   <li>Spring annotations for lazy initialization, component registration,
+ *       and dynamic property refresh.</li>
+ * </ul>
+ *
+ * <h2>Key Methods</h2>
+ * <ul>
+ *   <li>{@link #getFormat()}: Returns the metadata format configuration for LOM.</li>
+ *   <li>{@link #build(Context)}: Builds the LOM metadata XML structure using
+ *       the provided {@code Context} object.</li>
+ * </ul>
+ *
+ * <h2>Usage</h2>
+ * <p>This class is a Spring-managed component and can be injected where needed.
+ * It dynamically updates its configuration at runtime when properties are refreshed.
+ * It is primarily used in systems that provide OAI-PMH services for LOM-compliant metadata.
+ * </p>
+ *
+ * <h2>References</h2>
+ * <ul>
+ *   <li>IEEE LOM Standard: http://ltsc.ieee.org/xsd/LOM</li>
+ *   <li>OAI-PMH: https://www.openarchives.org/OAI/openarchivesprotocol.html</li>
+ * </ul>
+ */
 @Lazy
 @Slf4j
 @Component

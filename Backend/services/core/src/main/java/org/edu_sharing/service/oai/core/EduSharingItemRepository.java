@@ -41,6 +41,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * A custom implementation of the {@link ItemRepository} interface used for retrieving and managing OAI items
+ * in the EduSharing system. This repository interacts with EduSharing's content store and exports metadata in
+ * various OAI-PMH formats.
+ *
+ * This class facilitates the fetching of OAI metadata for items in EduSharing by implementing the OAI-PMH
+ * {@link ItemRepository} interface, which allows interaction with OAI records, their metadata, and item identifiers.
+ * It supports querying items based on OAI metadata formats, managing item identifiers, and performing searches on
+ * the repository based on filters and resumption tokens. Additionally, the class manages the conversion of item data
+ * to specific OAI metadata formats using registered format writers.
+ *
+ * Key functionalities include:
+ * - Retrieving metadata and item identifiers based on OAI format prefixes.
+ * - Fetching and returning items with their metadata in specific formats.
+ * - Handling the retrieval of items using filters, resumption tokens, and metadata format-specific operations.
+ * - Interacting with the EduSharing repository's content store to resolve nodes and gather metadata.
+ *
+ * This repository is also capable of performing searches on EduSharing content using various criteria like node ID,
+ * creation date, and metadata filters, and can handle large result sets with pagination via resumption tokens.
+ * The repository employs services for searching, metadata formatting, and conversion, ensuring that data is retrieved
+ * and returned in accordance with OAI-PMH standards.
+ *
+ * It integrates with EduSharing's metadata helper functions, search service, and item export services to produce
+ * compliant OAI-PMH responses for items in the repository.
+ */
 @Slf4j
 @Lazy
 @Component

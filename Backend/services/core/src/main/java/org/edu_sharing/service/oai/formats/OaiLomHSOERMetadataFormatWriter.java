@@ -45,6 +45,49 @@ import java.util.stream.Collectors;
 // please refer to
 // https://dini-ag-kim.github.io/hs-oer-lom-profil/latest/
 
+/**
+ * The `OaiLomHSOERMetadataFormatWriter` class provides functionality to generate metadata
+ * in the HS-OER-LOM profile format for Open Archives Initiative (OAI) protocols.
+ * It extends the `AbstractMetadataFormatWriter` and implements the specific logic
+ * for handling metadata conforming to the HS-OER-LOM specification.
+ *
+ * <p>This class integrates metadata from the repository, applies transformation rules,
+ * and generates XML elements compliant with the HS-OER-LOM schema.</p>
+ *
+ * ### Key Features:
+ * - Defines the HS-OER-LOM `MetadataFormat` with its namespace, schema location, and transformer.
+ * - Maps repository properties to HS-OER-LOM fields, ensuring compliance with the schema.
+ * - Supports filtering of VCard email addresses based on privacy settings.
+ * - Utilizes Spring features like `@Value`, `@Lazy`, and `@RefreshScope` for dynamic configuration.
+ *
+ * ### Dependencies:
+ * - `NodeService`: For accessing and manipulating repository nodes.
+ * - `GuestService`: For handling guest user access and related configurations.
+ * - `PermissionService`: To enforce access control and permissions during metadata generation.
+ *
+ * ### Configuration:
+ * - `exporter.oai.lom.identifier.catalog`: Identifier catalog used in metadata generation.
+ *   Defaults to the application's home repository ID.
+ * - `repository.privacy.filterVCardEmail`: Flag to enable or disable filtering of VCard email addresses.
+ *   Default is `true`.
+ *
+ * ### Metadata Format Details:
+ * - **Schema Location**:
+ *   `http://www.w3.org/2001/XMLSchema-instance https://www.oerbw.de/hsoerlom https://w3id.org/dini-ag-kim/hs-oer-lom-profil/latest/schemas/hs-oer-lom.xsd`
+ * - **Namespace**:
+ *   `https://www.oerbw.de/hsoerlom`
+ * - **Transformer**: Identity transformer for HS-OER-LOM metadata.
+ *
+ * ### Usage:
+ * This class is used within an OAI-PMH provider setup to output metadata in the HS-OER-LOM format.
+ *
+ * ### See Also:
+ * - [HS-OER-LOM Profile Documentation](https://dini-ag-kim.github.io/hs-oer-lom-profil/latest/)
+ * - Open Archives Initiative: https://www.openarchives.org/
+ *
+ * ### Author:
+ * Designed for the edu-sharing OAI module to support standardized metadata dissemination.
+ */
 @Lazy
 @Slf4j
 @Component

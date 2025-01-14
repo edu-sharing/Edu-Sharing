@@ -14,6 +14,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A registry for managing and retrieving OAI metadata format writers.
+ * This class is responsible for storing and accessing different {@link OaiMetadataFormatWriter}
+ * instances based on the metadata format prefix. It filters and initializes format writers based on
+ * the supported formats specified in the configuration and provides methods to retrieve metadata format writers
+ * or metadata formats associated with specific OAI-PMH formats.
+ *
+ * The registry is initialized with a list of metadata format writers and a configuration array of supported formats.
+ * It allows for easy retrieval of the appropriate format writer for a given OAI format prefix.
+ *
+ * This class is part of the OAI export functionality and is used to select the correct format writer
+ * based on the desired metadata format for exporting records.
+ */
 @Lazy
 @Component
 @RefreshScope
