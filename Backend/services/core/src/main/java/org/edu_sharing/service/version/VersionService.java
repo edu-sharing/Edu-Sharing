@@ -131,6 +131,9 @@ public class VersionService implements ApplicationListener<RefreshScopeRefreshed
             value = getRepositoryVersion();
         } else if (type.equals(Type.RENDERSERVICE)) {
             value = getRenderserviceVersion();
+            if(value == null){
+                return value;
+            }
             // cleanup version and only keep major + minor
             try {
                 Pattern pattern = Pattern.compile("(\\d\\.\\d)\\..*");

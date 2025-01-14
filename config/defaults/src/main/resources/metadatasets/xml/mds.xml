@@ -1447,6 +1447,18 @@
         <mandatory>false</mandatory>
       </property>
     </query>
+    <query join="AND" id="oai">
+<!--      <basequery>ISNULL:@ccm\:tool_category</basequery>-->
+      <property name="from">
+        <statement>{"bool":{"must":[{"range":{"properties.cm:modified":{"gte":"${value}"}}}]}</statement>
+      </property>
+      <property name="until">
+        <statement>{"bool":{"must":[{"range":{"properties.cm:modified":{"lte":"${value}"}}}]}</statement>
+      </property>
+      <property name="nodeId">
+        <statement>{"bool":{"must":[{"wildcard":{"nodeRef.id":{"value":"${value}","case_insensitive":true}}}]}}</statement>
+      </property>
+    </query>
     <query join="AND" id="collections">
       <basequery propertyNull="ngsearchword">
         {"bool":{

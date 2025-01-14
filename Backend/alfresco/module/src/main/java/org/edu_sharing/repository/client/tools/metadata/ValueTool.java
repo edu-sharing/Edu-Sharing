@@ -35,8 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 
+@Deprecated(forRemoval = true, since="9.1")
 public class ValueTool {
 
+	/**
+	 * @deprecated no replacement planed
+	 */
+	@Deprecated(forRemoval = true, since="9.1")
 	public static String[] getMultivalue(String mvValue){
 		String[] result = null;
 		if (mvValue.contains(CCConstants.MULTIVALUE_SEPARATOR)) {
@@ -46,9 +51,19 @@ public class ValueTool {
 		}
 		return result;
 	}
+
+	/**
+	 * @deprecated no replacement planed
+	 */
+	@Deprecated(forRemoval = true, since="9.1")
 	public static String toMultivalue(String[] multivalue){
 		return StringUtils.join(multivalue,CCConstants.MULTIVALUE_SEPARATOR);
 	}
+
+	/**
+	 * @deprecated no replacement planed
+	 */
+	@Deprecated(forRemoval = true, since="9.1")
 	public static Map<String, Object> getMultivalue(Map<String, Object> data){
 		for(Map.Entry<String, Object> entry : data.entrySet()) {
 			if(entry.getValue() instanceof String) {
@@ -60,6 +75,8 @@ public class ValueTool {
 		}
 		return data;
 	}
+
+	@Deprecated(forRemoval = true, since="9.1")
 	public static Map<String, Object> toMultivalue(Map<String, Object> data){
 		for(Map.Entry<String, Object> entry : data.entrySet()) {
 			if(entry.getValue() instanceof Iterable) {

@@ -25,7 +25,6 @@
     <module>rest</module>
     <!--module>soap</module-->
     <module>webapp</module>
-    <module>xoai</module>
     <module>graphql</module>
   </modules>
 
