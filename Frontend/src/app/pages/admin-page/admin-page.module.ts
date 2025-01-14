@@ -33,7 +33,7 @@ import { CodeEditorComponent } from './code-editor/code-editor';
         SharedModule,
         AdminPageRoutingModule,
         MdsModule,
-        MonacoEditorModule.forRoot({ baseUrl: './assets' }),
+        MonacoEditorModule.forRoot({ baseUrl: './assets/monaco/min/vs/' }),
     ],
 })
 export class AdminPageModule {}

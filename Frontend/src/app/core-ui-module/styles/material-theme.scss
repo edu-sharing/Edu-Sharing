@@ -455,6 +455,7 @@ label .label-secondary {
     align-items: center;
 }
 .monaco-editor {
+    outline: none !important;
     background-color: transparent !important;
     mat-label,
     mat-hint {
