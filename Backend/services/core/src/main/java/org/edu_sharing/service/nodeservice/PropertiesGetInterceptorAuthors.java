@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class PropertiesGetInterceptorAuthors extends PropertiesGetInterceptorDefault {
     @Override
-    public Map<String, Object> beforeCacheProperties(PropertiesContext context) {
+    public Map<String, Object> beforeDeliverProperties(PropertiesContext context) {
         try {
             Object author = context.getProperties().get(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_AUTHOR);
             if(author == null) {
@@ -27,8 +27,8 @@ public class PropertiesGetInterceptorAuthors extends PropertiesGetInterceptorDef
                 freetext = Collections.emptyList();
             }
             List<String> result = Stream.concat(
-                    ((freetext instanceof List) ? ((List<String>)freetext) : Collections.singletonList(freetext.toString())).stream(),
-                    ((author instanceof List) ? ((List<String>)author) : Collections.singletonList(author.toString())).stream().map(VCardConverter::getNameForVCardString)
+                    ((freetext instanceof List) ? ((List<String>)freetext) : Arrays.asList(ValueTool.getMultivalue(freetext.toString()))).stream(),
+                    ((author instanceof List) ? ((List<String>)author) : Arrays.asList(ValueTool.getMultivalue(author.toString()))).stream().map(VCardConverter::getNameForVCardString)
             ).filter(StringUtils::isNotBlank).collect(Collectors.toList());
 
             // fix after DESP-738
