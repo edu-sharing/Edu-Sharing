@@ -1430,7 +1430,22 @@ public class IamApi  {
 
 	    	List<Authority> result = new ArrayList<Authority>();
 	    	for (String user: search.getData()) {
-	    		result.add(getUserOrGroup(repoDao, user));
+				try {
+					result.add(getUserOrGroup(repoDao, user));
+				}catch(DAOMissingException e) {
+					logger.warn("Authority " + user + " as provided by search was not found", e);
+					if(user.startsWith(PermissionService.GROUP_PREFIX)) {
+						Group groupObj = new Group();
+						groupObj.setAuthorityName(user);
+						groupObj.setAuthorityType(Authority.Type.GROUP);
+						result.add(groupObj);
+					} else {
+						User userObj = new User();
+						userObj.setAuthorityName(user);
+						userObj.setAuthorityType(Authority.Type.USER);
+						result.add(userObj);
+					}
+				}
 	    	}	
 	    	AuthorityEntries response = new AuthorityEntries();
 	    	response.setList(result);

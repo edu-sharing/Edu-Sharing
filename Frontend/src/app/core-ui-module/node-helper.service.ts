@@ -260,6 +260,9 @@ export class NodeHelperService extends NodeHelperServiceBase {
      * @returns {string}
      */
     public getUserDisplayName(user: AuthorityProfile | User) {
+        if (!user.profile) {
+            return user.authorityName.trim();
+        }
         return (user.profile.firstName + ' ' + user.profile.lastName).trim();
     }
     isSavedSearchObject(node: Node) {

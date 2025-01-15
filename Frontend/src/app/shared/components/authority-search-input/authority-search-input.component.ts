@@ -300,11 +300,11 @@ export class AuthoritySearchInputComponent {
     ): SuggestItem[] {
         const result: SuggestItem[] = [];
         for (const user of authorities) {
-            const group = (user.profile as GroupProfile).displayName != null;
+            const group = (user.profile as GroupProfile)?.displayName != null;
             const item = new SuggestItem(
                 user.authorityName,
                 group
-                    ? (user.profile as GroupProfile).displayName
+                    ? (user.profile as GroupProfile)?.displayName
                     : this.nodeHelper.getUserDisplayName(user as AuthorityProfile),
                 group ? 'group' : 'person',
                 '',
