@@ -41,6 +41,7 @@ import {
     OptionsHelperDataService,
     Scope,
     UIConstants,
+    VirtualNode,
 } from 'ngx-edu-sharing-ui';
 import { Subject, forkJoin as observableForkJoin, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -681,13 +682,18 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
                     if (this.isRootLevel) {
                         if (this.scope === RestConstants.COLLECTIONSCOPE_MY) {
                             this.listCollections.addVirtualNodes(
-                                await this.sessionStorageService
-                                    .get(
-                                        SessionStorageService.KEY_ROOT_COLLECTIONS,
-                                        [],
-                                        Store.Session,
-                                    )
-                                    .toPromise(),
+                                (
+                                    await this.sessionStorageService
+                                        .get(
+                                            SessionStorageService.KEY_ROOT_COLLECTIONS,
+                                            [],
+                                            Store.Session,
+                                        )
+                                        .toPromise()
+                                ).map((n: VirtualNode) => {
+                                    n.override = false;
+                                    return n;
+                                }),
                             );
                         }
                         this.finishCollectionLoading();

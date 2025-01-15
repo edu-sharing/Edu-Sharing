@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { NodePermissions, NodeService } from 'ngx-edu-sharing-api';
+import { NodePermissions, NodeService, SessionStorageService, Store } from 'ngx-edu-sharing-api';
 import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import {
@@ -42,6 +42,7 @@ export class DeleteNodesDialogComponent implements OnInit {
         private nodeHelper: NodeHelperService,
         private nodeService: NodeService,
         private temporaryStorage: TemporaryStorageService,
+        private sessionStorageService: SessionStorageService,
         private toast: Toast,
         private usageService: RestUsageService,
     ) {
@@ -116,6 +117,7 @@ export class DeleteNodesDialogComponent implements OnInit {
 
     private onConfirm(): void {
         this.dialogRef.patchState({ isLoading: true });
+        this.removeTemporaryCollections(this.data.nodes);
         forkJoinWithErrors(this.data.nodes.map((node) => this.processNode(node))).subscribe(
             ({ successes: processedNodes, errors }) => {
                 if (errors.length === 0) {
@@ -186,5 +188,17 @@ export class DeleteNodesDialogComponent implements OnInit {
                 this.temporaryStorage.remove('workspace_clipboard');
             }
         }
+    }
+
+    private async removeTemporaryCollections(nodes: Node[]) {
+        const collections: Node[] = await this.sessionStorageService
+            .get(SessionStorageService.KEY_ROOT_COLLECTIONS, [], Store.Session)
+            .toPromise();
+        console.log(collections);
+        await this.sessionStorageService.set(
+            SessionStorageService.KEY_ROOT_COLLECTIONS,
+            collections.filter((c) => !nodes.find((n) => c.ref.id === n.ref.id)),
+            Store.Session,
+        );
     }
 }
