@@ -6550,6 +6550,9 @@
             },
             "type": "array"
           },
+          "appleTouchIcon": {
+            "type": "string"
+          },
           "availableMds": {
             "items": {
               "$ref": "#/components/schemas/AvailableMds"
@@ -6602,6 +6605,9 @@
             "type": "string"
           },
           "extension": {
+            "type": "string"
+          },
+          "favicon": {
             "type": "string"
           },
           "frontpage": {
@@ -8763,12 +8769,12 @@
             }
           },
           {
-            "description": "targetDir",
+            "description": "subObjectHandler",
             "in": "query",
-            "name": "format",
+            "name": "subObjectHandler",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "boolean"
             }
           }
         ],
@@ -8830,7 +8836,7 @@
             "description": "Fatal error occured."
           }
         },
-        "summary": "Export Nodes with given Metadata Format",
+        "summary": "Export Nodes with LOM Metadata Format",
         "tags": [
           "ADMIN v1"
         ]

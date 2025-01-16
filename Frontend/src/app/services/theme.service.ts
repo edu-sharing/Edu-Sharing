@@ -31,6 +31,7 @@ export class ThemeService {
         this.configService.observeConfig().subscribe(
             (config) => {
                 const colors = config.themeColors?.color;
+                this.setFavicon(config.favicon, config.appleTouchIcon);
                 if (colors) {
                     console.info('apply branding from config', colors);
                     this.applyFromConfigColors(colors);
@@ -49,6 +50,17 @@ export class ThemeService {
 
     applyFromConfigColors(colors: Array<ConfigThemeColor>) {
         colors.forEach((c) => this.setColor(c.variable, c.value));
+    }
+
+    private setFavicon(favicon?: string, appleTouchIcon?: string) {
+        if (favicon?.trim()) {
+            const iconRef = document.querySelector('html head link[rel=icon]');
+            (iconRef as HTMLLinkElement).href = favicon;
+        }
+        if (appleTouchIcon?.trim()) {
+            const appleRef = document.querySelector('html head link[rel=apple-touch-icon]');
+            (appleRef as HTMLLinkElement).href = appleTouchIcon;
+        }
     }
 
     setColor(variable: Variable | string, color: string) {
