@@ -1313,7 +1313,9 @@
     "CHILDREN": "Children",
     "CHILDREN_NONE": "This element has no child objects",
     "CUSTOM_PROPERTY_NAME": "Enter name for custom property",
-    "CUSTOM_PROPERTY_VALUE": "Enter value for custom property"
+    "CUSTOM_PROPERTY_VALUE": "Enter value for custom property",
+    "CONTEXT_ACTIONS": "Actions for this element-type",
+    "ALL_ACTIONS": "All actions (might be not compatible with this type!)"
   },
   "NOTIFICATION": {
     "MENU": "Notifications",

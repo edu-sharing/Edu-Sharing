@@ -23,4 +23,5 @@ sed -i -r 's|^[#]*\s*management\.server\.port=.*|management.server.port='"${my_m
 grep -q '^[#]*\s*management\.server\.port=' "application.properties" || echo "management.server.port=${my_ms_port}" >>"application.properties"
 ########################################################################################################################
 
-exec "java" "-jar" "edu_sharing-community-repository-backend-transform-${org.edu_sharing:edu_sharing-community-repository-backend-transform:jar.version}.jar" "${JAVA_OPTS:-}" "$@"
+#exec "java" "-jar" "edu_sharing-community-repository-backend-transform-${org.edu_sharing:edu_sharing-community-repository-backend-transform:jar.version}.jar" "${JAVA_OPTS:-}" "$@"
+exec java ${JAVA_OPTS:-} -jar "edu_sharing-community-repository-backend-transform-${org.edu_sharing:edu_sharing-community-repository-backend-transform:jar.version}.jar" $@

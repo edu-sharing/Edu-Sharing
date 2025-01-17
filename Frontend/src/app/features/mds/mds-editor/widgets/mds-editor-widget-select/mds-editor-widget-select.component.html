@@ -7,7 +7,9 @@
   <mat-select
     #select
     [formControl]="formControl"
-    [placeholder]="widget.definition.placeholder"
+    [placeholder]="
+      showBulkMixedValues() ? ('MDS.DIFFERENT_VALUES' | translate) : widget.definition.placeholder
+    "
     esOnAttributeChange="aria-activedescendant"
     (attributeChange)="onActiveDescendantChanges($event)"
     (blur)="onBlur.emit()"

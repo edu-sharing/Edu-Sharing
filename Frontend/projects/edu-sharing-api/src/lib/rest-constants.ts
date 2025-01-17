@@ -90,6 +90,8 @@ export class RestConstants {
     public static CCM_PROP_WF_INSTRUCTIONS = 'ccm:wf_instructions';
     public static CCM_PROP_WF_PROTOCOL = 'ccm:wf_protocol';
     public static CCM_PROP_REPLICATIONSOURCE = 'ccm:replicationsource';
+    public static CM_PROP_ESSSOTYPE = 'cm:esssotype';
+    public static SSO_TYPE_Shibboleth = 'shibboleth';
     public static CCM_PROP_REPLICATIONMODIFIED = 'ccm:replicationmodified';
     public static CCM_PROP_REPLICATIONSOURCETIMESTAMP = 'ccm:replicationsourcetimestamp';
     public static CCM_PROP_EDUSCOPENAME = 'ccm:eduscopename';

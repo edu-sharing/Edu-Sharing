@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.server.tools;
 
 import net.sourceforge.cardme.engine.VCardEngine;
+import net.sourceforge.cardme.io.FoldingScheme;
 import net.sourceforge.cardme.io.VCardWriter;
 import net.sourceforge.cardme.vcard.VCard;
 import net.sourceforge.cardme.vcard.VCardImpl;
@@ -211,6 +212,7 @@ public class VCardConverter {
 			method.setAccessible(true);
 			return ((List<VCard>) method.invoke(engine, vcardString)).stream().map(cleanup).map((vCard) -> {
 				VCardWriter writer = new VCardWriter();
+				writer.setFoldingScheme(FoldingScheme.NONE);
 				writer.setVCard(vCard);
 				try {
 					return writer.buildVCardString();

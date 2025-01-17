@@ -152,7 +152,7 @@ public class VersionService implements ApplicationListener<RefreshScopeRefreshed
 	public void invalidateCache(){
         versionCache.clear();
     }
-	private String getRenderserviceVersion() throws Exception{
+    public String getRenderserviceVersion() throws Exception{
         RenderingVersionInfo version = RenderingServiceFactory.getLocalService().getVersion();
         if (version != null) {
             return version.version;

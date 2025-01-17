@@ -47,6 +47,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts.service'
 import { OptionsHelperService } from './services/options-helper.service';
 import { Toast } from './services/toast';
 import { SharedModule } from './shared/shared.module';
+import { FooterComponent } from './shared/components/footer/footer.component';
 
 const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
     showDelay: 500,
@@ -57,6 +58,7 @@ const matTooltipDefaultOptions: MatTooltipDefaultOptions = {
 @NgModule({
     declarations: [AppComponent, CustomGlobalExtensionsComponent, extensionDeclarations],
     imports: [
+        FooterComponent,
         ApolloModule,
         AppRoutingModule,
         BrowserAnimationsModule,

@@ -1,11 +1,9 @@
 package org.edu_sharing.spring.security.openid;
 
-import com.typesafe.config.Config;
 import io.opentelemetry.api.internal.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.repository.client.tools.UrlTool;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.config.ConfigServiceFactory;
@@ -151,7 +149,7 @@ public class SecurityConfigurationOpenIdConnect {
                 .fromIssuerLocation(config.getIssuer())
                 .clientId(config.getClientId())
                 .clientSecret(config.getSecret())
-                .scope("openid")
+                .scope(config.getScopes())
                 .registrationId(StringUtils.isNullOrEmpty(config.getContextId()) ? DEFAULT_REGISTRATION_ID : config.getContextId())
                 .build()));
         return new InMemoryClientRegistrationRepository(registrations);

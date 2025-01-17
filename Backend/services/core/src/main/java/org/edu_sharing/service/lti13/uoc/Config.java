@@ -3,7 +3,6 @@ package org.edu_sharing.service.lti13.uoc;
 import edu.uoc.elc.lti.tool.Tool;
 import edu.uoc.elc.spring.lti.tool.BasicToolDefinition;
 import edu.uoc.elc.spring.lti.tool.ToolDefinitionBean;
-import edu.uoc.elc.spring.lti.tool.ToolFactory;
 import edu.uoc.lti.accesstoken.AccessTokenRequestBuilder;
 import edu.uoc.lti.accesstoken.JSONAccessTokenRequestBuilderImpl;
 import edu.uoc.lti.claims.ClaimAccessor;
@@ -16,6 +15,7 @@ import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.edu_sharing.service.lti13.uoc.elc.spring.lti.tool.ToolFactory;
 
 public class Config {
     private static BasicToolDefinition getBasicToolDefinition(ApplicationInfo platform){
@@ -60,12 +60,6 @@ public class Config {
     }
 
     public static Tool getTool(ApplicationInfo platform, HttpServletRequest request, boolean clearSession){
-        /**
-         * @TODO
-         *  jakarta/javax lib problem
-         *  justed fixed compile problems
-         */
-        return null;
-        //return new ToolFactory().from(getToolDefinitionBean(platform), request, clearSession);
+        return new ToolFactory().from(getToolDefinitionBean(platform), request, clearSession);
     }
 }

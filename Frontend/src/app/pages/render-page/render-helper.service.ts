@@ -181,7 +181,11 @@ export class RenderHelperService {
     }
 
     private getCollectionsContainingNode(node: Node): Observable<Node[]> {
-        const id = this.getOriginalId(node);
+        let id = this.getOriginalId(node);
+        // a childobject can never be in a collection, but its parent may
+        if (node.aspects?.includes(RestConstants.CCM_ASPECT_IO_CHILDOBJECT)) {
+            id = node.parent?.id;
+        }
         return this.networkService.isFromHomeRepository(node).pipe(
             switchMap((home) => {
                 if (home) {

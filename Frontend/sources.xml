@@ -12,6 +12,7 @@
     <fileSet>
       <directory></directory>
       <outputDirectory></outputDirectory>
+      <!-- which files shall be bundled into the jar (add all relevant for frontend build to be reused in the customer project -->
       <includes>
         <include>projects/**</include>
         <include>src/**</include>
@@ -20,6 +21,7 @@
         <include>.angular/**</include>
         <include>node_modules/**</include>
         <include>dist/**</include>
+        <include>.browserslistrc</include>
         <include>*.ts</include>
         <include>*.js</include>
         <include>*.json</include>

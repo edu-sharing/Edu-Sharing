@@ -1412,7 +1412,16 @@
       </basequery>
     </query>
     <query join="AND" id="workflowReceive">
-      <basequery/>
+      <basequery>
+        {"bool":{
+        "must":[
+        {"term":{"nodeRef.storeRef.protocol":"workspace"}}
+        ],
+        "must_not":[
+        {"exists":{"field": "properties.ccm:published_original"}}
+        ]
+        }}
+      </basequery>
     </query>
     <query join="AND" id="workspace">
       <property name="ngsearchword">
@@ -1616,7 +1625,14 @@
       </property>
     </query>
     <query join="AND" id="mediacenter_filter">
-      <basequery>{"term":{"type":"ccm:io"}}</basequery>
+      <basequery>{"bool":{"must":[
+        {"term":{"type":"ccm:io"}}
+        ],
+        "must_not":[
+        {"term":{"aspects":"ccm:mediacenter_statistics"}},
+        {"term":{"aspects":"ccm:collection_io_reference"}}
+        ]}}
+      </basequery>
       <specialFilter>exclude_system_folder</specialFilter>
       <specialFilter>exclude_sites_folder</specialFilter>
       <specialFilter>exclude_people_folder</specialFilter>
@@ -1625,9 +1641,6 @@
           {"wildcard":{"properties.cm:name.keyword":{"value":"*${value}*"}}},
           {"wildcard":{"properties.cclom:title":{"value":"*${value}*"}}},
           {"wildcard":{"properties.ccm:replicationsourceid.keyword":{"value":"*${value}*"}}}
-          ],
-          "must_not":[
-          {"term":{"aspects":"ccm:mediacenter_statistics"}}
           ]}}
         </statement>
       </property>

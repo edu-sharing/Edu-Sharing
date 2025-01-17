@@ -82,6 +82,7 @@ import { DialogsService } from '../../features/dialogs/dialogs.service';
 import { MdsWidgetComponent } from '../../features/mds/mds-viewer/widget/mds-widget.component';
 import { MdsEditorInstanceService } from '../../features/mds/mds-editor/mds-editor-instance.service';
 import { ViewInstanceService } from '../../features/mds/mds-editor/mds-editor-view/view-instance.service';
+import { RouterHelper } from '../../util/router.helper';
 
 @Component({
     selector: 'es-render-page',
@@ -313,6 +314,20 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                     // use a timeout to let the browser try to go back in history first
                     setTimeout(() => {
                         if (!this.isDestroyed) {
+                            if (AppComponent.history.value?.length > 1) {
+                                const last =
+                                    AppComponent.history.value[
+                                        AppComponent.history.value.length - 2
+                                    ];
+                                console.info('Enforcing back, may h5p navigation was present');
+                                RouterHelper.navigateToAbsoluteUrl(
+                                    this.platformLocation,
+                                    this.router,
+                                    last,
+                                    true,
+                                );
+                                return;
+                            }
                             this.mainNavService.patchMainNavConfig({ showNavigation: true });
                             setTimeout(() => {
                                 this.mainNavService.getMainNav().topBar?.toggleMenuSidebar();
@@ -626,6 +641,8 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
             },
             postPrepareOptions: (options, objects) => {
                 if (this.version && this.version !== RestConstants.NODE_VERSION_CURRENT) {
+                    options.filter((o) => o.name === 'OPTIONS.OPEN')[0].customEnabledCallback =
+                        async () => false;
                     options.filter((o) => o.name === 'OPTIONS.OPEN')[0].isEnabled = false;
                 }
             },
@@ -680,20 +697,25 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
 
     private getSequence(onFinish: () => void) {
         if (this._node.aspects.indexOf(RestConstants.CCM_ASPECT_IO_CHILDOBJECT) != -1) {
-            this.nodeApi.getNodeMetadata(this._node.parent.id).subscribe((data) => {
-                this.sequenceParent = data.node;
-                this.nodeApi
-                    .getNodeChildobjects(this.sequenceParent.ref.id, this.sequenceParent.ref.repo)
-                    .subscribe((data: NodeList) => {
-                        if (data.nodes.length > 0) {
-                            this.sequence = data;
-                        } else {
-                            this.sequence = null;
-                        }
-                        setTimeout(() => this.setScrollparameters(), 100);
-                        onFinish();
-                    });
-            });
+            this.nodeApi
+                .getNodeMetadata(this._node.parent.id, [RestConstants.ALL], this._node.parent.repo)
+                .subscribe((data) => {
+                    this.sequenceParent = data.node;
+                    this.nodeApi
+                        .getNodeChildobjects(
+                            this.sequenceParent.ref.id,
+                            this.sequenceParent.ref.repo,
+                        )
+                        .subscribe((data: NodeList) => {
+                            if (data.nodes.length > 0) {
+                                this.sequence = data;
+                            } else {
+                                this.sequence = null;
+                            }
+                            setTimeout(() => this.setScrollparameters(), 100);
+                            onFinish();
+                        });
+                });
         } else {
             this.sequenceParent = this._node;
             this.nodeApi

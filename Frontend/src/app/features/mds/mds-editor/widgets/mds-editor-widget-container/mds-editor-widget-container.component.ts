@@ -298,9 +298,13 @@ export class MdsEditorWidgetContainerComponent
     private setDisabled(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
         if (isDisabled) {
-            this.control.disable();
+            if (!this.control.disabled) {
+                this.control.disable();
+            }
         } else {
-            this.control.enable();
+            if (this.control.disabled) {
+                this.control.enable();
+            }
         }
     }
 

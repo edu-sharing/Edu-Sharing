@@ -104,8 +104,7 @@ public class RenderingApi {
 			}
 
 			if(remote != null) {
-				org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry entity = (org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry) RepoProxyFactory.getRepoProxy().getDetailsSnippetWithParameters(remote.getRepository(), remote.getNodeId(), nodeVersion, displayMode, parameters, req).getEntity();
-				return Response.status(Response.Status.OK).entity(entity).build();
+				return RepoProxyFactory.getRepoProxy().getDetailsSnippetWithParameters(remote.getRepository(), remote.getNodeId(), nodeVersion, displayMode, parameters, req);
 			} else {
 				RenderingDetails detailsSnippet = new RenderingDao(repoDao).getDetails(node, nodeVersion, displayMode, parameters);
 				if(detailsSnippet.getException() != null) {

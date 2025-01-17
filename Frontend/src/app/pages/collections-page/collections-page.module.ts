@@ -8,6 +8,7 @@ import { CollectionsPageRoutingModule } from './collections-page-routing.module'
 import { CollectionsPageComponent } from './collections-page.component';
 import { InfobarComponent } from './infobar/infobar.component';
 import { CollectionProposalsComponent } from './collection-proposals/collection-proposals.component';
+import { FooterComponent } from '../../shared/components/footer/footer.component';
 
 @NgModule({
     declarations: [
@@ -18,7 +19,7 @@ import { CollectionProposalsComponent } from './collection-proposals/collection-
         CollectionsPageComponent,
         InfobarComponent,
     ],
-    imports: [SharedModule, MdsModule, CollectionsPageRoutingModule],
+    imports: [SharedModule, MdsModule, CollectionsPageRoutingModule, FooterComponent],
     exports: [CollectionInfoBarComponent, CollectionContentComponent],
 })
 export class CollectionsPageModule {}

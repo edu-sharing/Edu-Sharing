@@ -2497,7 +2497,13 @@
           "destroySession": {
             "type": "boolean"
           },
+          "localUrl": {
+            "type": "string"
+          },
           "next": {
+            "type": "string"
+          },
+          "ssoUrl": {
             "type": "string"
           },
           "url": {
@@ -6279,8 +6285,10 @@
           },
           "skills": {
             "items": {
+              "nullable": true,
               "type": "string"
             },
+            "nullable": true,
             "type": "array"
           },
           "type": {
@@ -6333,8 +6341,10 @@
           },
           "skills": {
             "items": {
+              "nullable": true,
               "type": "string"
             },
+            "nullable": true,
             "type": "array"
           },
           "type": {
@@ -6382,8 +6392,10 @@
           },
           "skills": {
             "items": {
+              "nullable": true,
               "type": "string"
             },
+            "nullable": true,
             "type": "array"
           },
           "type": {

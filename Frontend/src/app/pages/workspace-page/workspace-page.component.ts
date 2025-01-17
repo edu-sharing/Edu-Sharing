@@ -758,8 +758,13 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
                         this.selectedNodeTree = null;
                     },
                     (error: any) => {
+                        // no access to full path, try to "fake" current folder
+                        if (error.status === RestConstants.HTTP_FORBIDDEN) {
+                            this.path = [this.currentFolder];
+                        } else {
+                            this.path = [];
+                        }
                         this.selectedNodeTree = null;
-                        this.path = [];
                         this.breadcrumbsService.setNodePath(this.path);
                     },
                 );

@@ -379,8 +379,8 @@ grep -q '^[#]*\s*alfresco-pdf-renderer\.root=' "${alfProps}" || echo "alfresco-p
 sed -i -r 's|^[#]*\s*alfresco-pdf-renderer\.exe=.*|alfresco-pdf-renderer.exe=${alfresco-pdf-renderer.root}/alfresco-pdf-renderer|' "${alfProps}"
 grep -q '^[#]*\s*alfresco-pdf-renderer\.exe=' "${alfProps}" || echo 'alfresco-pdf-renderer.exe=${alfresco-pdf-renderer.root}/alfresco-pdf-renderer' >>"${alfProps}"
 
-sed -i -r 's|^[#]*\s*local\.transform\.pipeline\.config\.dir=.*|local.transform.pipeline.config.dir='"$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines|" "${alfProps}"
-grep -q '^[#]*\s*local\.transform\.pipeline\.config\.dir=' "${alfProps}" || echo "local.transform.pipeline.config.dir=$ALF_HOME/tomcat/shared/classes/config/default/transform/pipelines" >>"${alfProps}"
+sed -i -r 's|^[#]*\s*local\.transform\.pipeline\.config\.dir=.*|local.transform.pipeline.config.dir='"$ALF_HOME/tomcat/shared/classes/config/defaults/transform/pipelines|" "${alfProps}"
+grep -q '^[#]*\s*local\.transform\.pipeline\.config\.dir=' "${alfProps}" || echo "local.transform.pipeline.config.dir=$ALF_HOME/tomcat/shared/classes/config/defaults/transform/pipelines" >>"${alfProps}"
 # fix: Error reading /opt/alfresco/tomcat/shared/classes/config/defaults/transform/pipelines/.gitkeep
 rm -f "$ALF_HOME/tomcat/shared/classes/config/defaults/transform/pipelines/.gitkeep"
 

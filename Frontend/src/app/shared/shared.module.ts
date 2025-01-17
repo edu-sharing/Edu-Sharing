@@ -41,7 +41,6 @@ import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.compo
 import { CalendarComponent } from './components/calendar/calendar.component';
 import { CardComponent } from './components/card/card.component';
 import { CollectionChooserComponent } from './components/collection-chooser/collection-chooser.component';
-import { FooterComponent } from './components/footer/footer.component';
 import { GlobalProgressComponent } from './components/global-progress/global-progress.component';
 import { InfoMessageComponent } from './components/info-message/info-message.component';
 import { InputPasswordComponent } from './components/input-password/input-password.component';
@@ -93,7 +92,6 @@ import { extensionSchemas } from '../extension/extension-schemas';
         ElementRefDirective,
         EscapeHtmlPipe,
         FileDropDirective,
-        FooterComponent,
         GlobalProgressComponent,
         ImageConfigDirective,
         InfoMessageComponent,
@@ -162,7 +160,6 @@ import { extensionSchemas } from '../extension/extension-schemas';
         ElementRefDirective,
         EscapeHtmlPipe,
         FileDropDirective,
-        FooterComponent,
         FormsModule,
         GlobalProgressComponent,
         ImageConfigDirective,

@@ -68,6 +68,10 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>edu_sharing-community-repository-backend-services-doi</artifactId>
+    </dependency>
     <!-- provided -->
 
     <dependency>

@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
 
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.generated.repository.backend.services.rest.client.model.RenderingDetailsEntry;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -87,9 +88,6 @@ public class RenderingProxy extends HttpServlet {
 		if(usernameDecrypted==null || usernameDecrypted.isEmpty()){
 			throw new RenderingException(HttpServletResponse.SC_BAD_REQUEST,"Encrypted username was empty. Check your keys",RenderingException.I18N.encryption,new Throwable());
 		}
-
-		// remove any old states from current session before continuing
-		req.getSession().removeAttribute(CCConstants.AUTH_SINGLE_USE_NODEID);
 
 		// will throw if the usage is invalid
 		Usage usage = validateUsage(req, nodeId, parentId, usernameDecrypted);
@@ -442,8 +440,7 @@ public class RenderingProxy extends HttpServlet {
 		if(appInfoApplication != null &&
 				(ApplicationInfo.TYPE_LMS.equals(appInfoApplication.getType()) ||
 				 ApplicationInfo.TYPE_CMS.equals(appInfoApplication.getType()))) {
-			req.getSession().setAttribute(CCConstants.AUTH_SINGLE_USE_NODEID, parentId);
-			req.getSession().setAttribute(CCConstants.AUTH_SINGLE_USE_TIMESTAMP, ts);
+			Context.getCurrentInstance().addSingleUseNode(parentId);
 
 			//new AuthenticationToolAPI().authenticateUser(usernameDecrypted, session);
 			AuthenticationToolAPI authTool = new AuthenticationToolAPI();

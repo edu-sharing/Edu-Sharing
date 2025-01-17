@@ -1273,6 +1273,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             node = this.getObjects(node, data)[0];
             this.dialogs.openNodeEmbedDialog({ node });
         });
+        embedNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         embedNode.constrains = [Constrain.NoBulk, Constrain.HomeRepository];
         embedNode.scopes = [Scope.Render];
         embedNode.group = DefaultGroups.View;
@@ -1806,6 +1807,10 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         data: OptionData,
         objects: Node[] | any[],
     ) {
+        // allow all options in debug scope
+        if (data.scope === Scope.DebugShowAll) {
+            return null;
+        }
         if (constrains.indexOf(Constrain.NoCollectionReference) !== -1) {
             if (
                 objects.some((o) => o.aspects.indexOf(RestConstants.CCM_ASPECT_IO_REFERENCE) !== -1)

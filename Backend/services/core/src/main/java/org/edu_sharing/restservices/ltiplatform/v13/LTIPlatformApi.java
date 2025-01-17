@@ -289,7 +289,7 @@ public class LTIPlatformApi {
              * @TODO build id_token and send it to redirect_uri
              */
 
-            Map<String,String> formParams = new HashMap<>();
+            Map<String, String> formParams = new HashMap<>();
             formParams.put("id_token", jwt);
             formParams.put("state", state);
             return Response.ok(ApiTool.getHTML(redirect_uri, formParams)).build();
@@ -685,14 +685,16 @@ public class LTIPlatformApi {
                                                             @Context HttpServletRequest req) {
         try {
 
-            if (jwt != null) {
-                Jws<Claims> claimsJws = LTIJWTUtil.validateJWT(jwt, ApplicationInfoList.getHomeRepository());
-                String jwtNodeId = (String) claimsJws.getBody().get(CCConstants.NODEID);
-                if (jwtNodeId == null) {
-                    throw new Exception("nodeId not found in validated jwt");
-                }
-                if (!jwtNodeId.equals(nodeId)) {
-                    throw new Exception("wrong nodeId found in validated jwt");
+            if (jwt != null || org.edu_sharing.alfresco.repository.server.authentication.Context.getCurrentInstance().isSingleUseNodeId(nodeId)) {
+                if (jwt != null) {
+                    Jws<Claims> claimsJws = LTIJWTUtil.validateJWT(jwt, ApplicationInfoList.getHomeRepository());
+                    String jwtNodeId = (String) claimsJws.getBody().get(CCConstants.NODEID);
+                    if (jwtNodeId == null) {
+                        throw new Exception("nodeId not found in validated jwt");
+                    }
+                    if (!jwtNodeId.equals(nodeId)) {
+                        throw new Exception("wrong nodeId found in validated jwt");
+                    }
                 }
                 return AuthenticationUtil.runAsSystem(() -> generateLoginInitationResouceLinkRaw(nodeId, editMode, version, launchPresentation, req));
             } else {

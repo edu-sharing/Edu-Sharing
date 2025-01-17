@@ -21,6 +21,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.UrlTool;
@@ -175,7 +176,7 @@ public class AuthenticationFilterPreview implements jakarta.servlet.Filter {
 			//authService.authenticate(ApplicationInfoList.getHomeRepository().getUsername(), ApplicationInfoList.getHomeRepository().getPassword().toCharArray());
 			//ticket = authService.getCurrentTicket();
             //invalidateTicket = true;
-            ((HttpServletRequest)req).getSession(true).setAttribute(CCConstants.AUTH_SINGLE_USE_NODEID,nodeId);
+			Context.getCurrentInstance().addSingleUseNode(nodeId);
 		}
 		else if (accessToken != null && !accessToken.trim().equals("")) {
 			//oAuth

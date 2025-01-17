@@ -407,7 +407,7 @@ public class EduFileFolderServiceImpl extends AbstractBaseCopyService implements
                 // use the helper which is also used by the local node service and filter out special nodes which are also invisible in workspace
                 List<NodeRef> toTransform = childRefs.stream().
                         map((ChildAssociationRef::getChildRef)).
-                        filter((NodeRef ref)->!EduSharingNodeHelper.shouldFilter(ref,new ArrayList<>(Arrays.asList(new String[] {"edugroup"})))).
+                        filter((NodeRef ref)->!EduSharingNodeHelper.shouldFilter(ref, List.of("edugroup"))).
                         collect(Collectors.toList());
                 results = toFileInfo(toTransform);
             }

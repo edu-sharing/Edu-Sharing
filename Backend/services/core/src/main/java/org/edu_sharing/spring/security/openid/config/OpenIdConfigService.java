@@ -5,7 +5,6 @@ import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigObject;
 import org.apache.commons.lang3.StringUtils;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfresco.service.guest.GuestConfig;
 import org.edu_sharing.spring.security.openid.SecurityConfigurationOpenIdConnect;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

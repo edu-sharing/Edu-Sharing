@@ -230,7 +230,9 @@
     "CHILDREN": "Children",
     "CHILDREN_NONE": "Dieses Element besitzt keine Child Objekte",
     "CUSTOM_PROPERTY_NAME": "Eigene Property eingeben",
-    "CUSTOM_PROPERTY_VALUE": "Wert für Property eingeben"
+    "CUSTOM_PROPERTY_VALUE": "Wert für Property eingeben",
+    "CONTEXT_ACTIONS": "Aktionen für diesen Element-Typ",
+    "ALL_ACTIONS": "Alle Aktionen (ggf. nicht mit diesen Typ kompatibel!)"
   },
   "SIDEBAR": {
     "WORKSPACE": "Workspace",
@@ -738,8 +740,8 @@
     "DIFFERENT_VALUES": "(Verschiedene Werte)",
     "HAS_CHANGES": "geändert",
     "TITLE": "Infos bearbeiten",
-    "SHOW_EXTENDED_FALSE": "Erweitere Infos ausgeblendet",
-    "SHOW_EXTENDED_TRUE": "Erweitere Infos eingeblendet",
+    "SHOW_EXTENDED_FALSE": "Erweiterte Infos ausgeblendet",
+    "SHOW_EXTENDED_TRUE": "Erweiterte Infos eingeblendet",
     "SHOW_EXTENDED_SEARCH": "Weitere Filter anzeigen",
     "AUTHOR_LABEL": "Urheber{{GENDER_SEPARATOR}}in-Angaben",
     "AUTHOR_FREETEXT": "Freie Urheber{{GENDER_SEPARATOR}}in-Angabe",

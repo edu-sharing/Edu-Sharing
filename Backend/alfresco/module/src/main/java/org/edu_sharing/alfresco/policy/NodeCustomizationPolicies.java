@@ -231,7 +231,9 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
                                Map<NodeRef, NodeRef> copyMap) {
         // add/override the previous node context
         copyMap.forEach((source, dest) -> {
-            addCurrentContext(dest);
+            if (nodeService.exists(dest)) {
+                addCurrentContext(dest);
+            }
         });
     }
 
@@ -630,7 +632,8 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
                 logger.info("---> UPDATE/CREATE THUMBNAIL FOR LINK(" + afterURL + ") ON NODE(" + nodeRef.getId() + ")");
 
                 String linktype = (String) after.get(QName.createQName(CCConstants.CCM_PROP_LINKTYPE));
-                if (linktype != null && linktype.equals(CCConstants.CCM_VALUE_LINK_LINKTYPE_USER_GENERATED)) {
+                // only generate if node has no thumb yet
+                if (linktype != null && linktype.equals(CCConstants.CCM_VALUE_LINK_LINKTYPE_USER_GENERATED) && !after.containsKey(QName.createQName(CCConstants.CCM_PROP_IO_USERDEFINED_PREVIEW))) {
                     generateWebsitePreview(nodeRef, afterURL);
                 }
             }

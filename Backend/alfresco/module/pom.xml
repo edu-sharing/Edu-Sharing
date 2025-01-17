@@ -378,7 +378,7 @@
 
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
+      <artifactId>activemq-client-jakarta</artifactId>
       <scope>provided</scope>
     </dependency>
 
