@@ -1,23 +1,24 @@
 package org.edu_sharing.service.handleservicedoi;
 
 import com.google.gson.Gson;
-import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.metadataset.v2.MetadataKey;
 import org.edu_sharing.metadataset.v2.MetadataWidget;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
+import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.tools.VCardConverter;
 import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.service.handleservice.HandleServiceNotConfiguredException;
 import org.edu_sharing.service.handleservicedoi.model.*;
-import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.tools.VCardConverter;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
+import org.edu_sharing.spring.scope.refresh.RefreshScopeRefreshedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DOIService implements HandleService {
 
@@ -42,51 +44,63 @@ public class DOIService implements HandleService {
         DOI getCustomMapping(DOIService doiService, String nodeId, Map<QName, Serializable> properties) throws DOIServiceMissingAttributeException;
     }
 
-    Logger logger = Logger.getLogger(DOIService.class);
 
     //https://api.test.datacite.org/
-    String baseUrl = "https://api.datacite.org";
-    String accountId;
-    String prefix;
-    String password;
-    boolean enabled = false;
+
 
     private final Optional<DOIPropertyMapping> customMapping;
+    private final BeanFactory beanFactory;
+    private DoiConfig doiConfig;
 
     RestTemplate template = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
 
-    public DOIService(Optional<DOIPropertyMapping> customMapping) throws HandleServiceNotConfiguredException {
+    public DOIService(Optional<DOIPropertyMapping> customMapping, BeanFactory beanFactory) throws HandleServiceNotConfiguredException {
         this.customMapping = customMapping;
+        this.beanFactory = beanFactory;
+        loadConfig();
+    }
 
-        Config config = LightbendConfigLoader.get().getConfig("repository.doiservice");
-        enabled = config.getBoolean("enabled");
-        if (enabled) {
-            baseUrl = config.getString("baseUrl");
-            accountId = config.getString("accountId");
-            prefix = config.getString("prefix");
-            password = config.getString("password");
+    @EventListener
+    public void onRefreshScopeRefreshed(RefreshScopeRefreshedEvent event){
+        loadConfig();
+    }
+
+    private void loadConfig() {
+        try {
+            DoiConfig doiConfig = beanFactory.getBean(DoiConfig.class);
+
+            if(doiConfig.isEnabled()){
+                Objects.requireNonNull(doiConfig.getBaseUrl());
+                Objects.requireNonNull(doiConfig.getAccountId());
+                Objects.requireNonNull(doiConfig.getPrefix());
+                Objects.requireNonNull(doiConfig.getPassword());
+            }
+           this.doiConfig = doiConfig;
+        }catch (Throwable t){
+            log.error("Could not initialize doi service properly cause of error in config, please check config for \"repository.doiservice\"", t);
         }
     }
 
+
     @Override
     public boolean enabled() {
-        return enabled;
+        return doiConfig.isEnabled();
     }
 
     @Override
     public boolean available() {
         HttpHeaders headers = new HttpHeaders();
-        headers.put("Accept", Arrays.asList("text/plain"));
+        headers.put("Accept", List.of("text/plain"));
         HttpEntity<DOI> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> exchange = template.exchange(baseUrl + "/heartbeat", HttpMethod.GET, entity, String.class);
-        logger.debug("heartbeat check response: " + exchange.getBody());
-        return exchange.getStatusCode() == HttpStatusCode.valueOf(200) ? true : false;
+        ResponseEntity<String> exchange = template.exchange(doiConfig.getBaseUrl() + "/heartbeat", HttpMethod.GET, entity, String.class);
+        log.debug("heartbeat check response: {}", exchange.getBody());
+        return exchange.getStatusCode() == HttpStatusCode.valueOf(200);
     }
 
     public DOI getDOI(String id) {
 
         HttpEntity<DOI> entity = new HttpEntity<>(getHttpHeaders());
-        ResponseEntity<DOI> result = template.exchange(baseUrl + "/dois/" + id, HttpMethod.GET, entity, DOI.class);
+        ResponseEntity<DOI> result = template.exchange(doiConfig.getBaseUrl() + "/dois/" + id, HttpMethod.GET, entity, DOI.class);
 
         return result.getBody();
     }
@@ -99,7 +113,7 @@ public class DOIService implements HandleService {
 
     @Override
     public String update(String handleId, String nodeId, Map<QName, Serializable> properties) throws Exception {
-        logger.debug("Updating DOI: " + handleId);
+        log.debug("Updating DOI: {}", handleId);
         DOI doi = mapForPublishing(nodeId, properties);
         if (doi.getXmlRepresentation() != null) {
             XMLHelper xmlHelper = new XMLHelper();
@@ -113,9 +127,9 @@ public class DOIService implements HandleService {
     private String updateDOIWithMetadata(String handleId, DOI doi) throws DOIServiceException {
         HttpEntity<DOI> entity = new HttpEntity<>(doi, getHttpHeaders());
         doi.getData().getAttributes().setDoi(handleId);
-        ResponseEntity<DOI> doiResponseEntity = template.exchange(baseUrl + "/dois/" + handleId, HttpMethod.PUT, entity, DOI.class);
+        ResponseEntity<DOI> doiResponseEntity = template.exchange(doiConfig.getBaseUrl() + "/dois/" + handleId, HttpMethod.PUT, entity, DOI.class);
         try {
-            logger.info("updateDOIWithMetadata:" + new Gson().toJson(doi));
+            log.info("updateDOIWithMetadata:{}", new Gson().toJson(doi));
         } catch (Throwable ignored) {
         }
         if (!doiResponseEntity.getStatusCode().is2xxSuccessful()) {
@@ -133,7 +147,7 @@ public class DOIService implements HandleService {
     public boolean updateState(String nodeId, String eventState) throws Exception {
         String handleId = (String) NodeServiceHelper.getPropertyNative(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId), CCConstants.CCM_PROP_PUBLISHED_DOI_ID);
         if (handleId == null) {
-            logger.info("Node " + nodeId + " has no doi, will not update state");
+            log.info("Node {} has no doi, will not update state", nodeId);
             return false;
         }
         DOI doi = DOI.builder()
@@ -152,7 +166,7 @@ public class DOIService implements HandleService {
     public String delete(String handleId, String nodeId) throws Exception {
         //only works for drafts
         HttpEntity<Void> entity = new HttpEntity<>(getHttpHeaders());
-        ResponseEntity<Void> doiResponseEntity = template.exchange(baseUrl + "/dois/" + handleId, HttpMethod.DELETE, entity, Void.class);
+        ResponseEntity<Void> doiResponseEntity = template.exchange(doiConfig.getBaseUrl() + "/dois/" + handleId, HttpMethod.DELETE, entity, Void.class);
         if (!doiResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new DOIServiceException("delete id:" + handleId + " failed. api returned: " + doiResponseEntity.getStatusCode());
         }
@@ -166,17 +180,17 @@ public class DOIService implements HandleService {
                 .data(Data.builder()
                         .type("dois")
                         .attributes(Data.Attributes.builder()
-                                .prefix(prefix).build())
+                                .prefix(doiConfig.getPrefix()).build())
                         .build())
                 .build();
 
         HttpEntity<DOI> entity = new HttpEntity<>(doi, getHttpHeaders());
 
-        ResponseEntity<DOI> doiResponseEntity = template.exchange(baseUrl + "/dois/", HttpMethod.POST, entity, DOI.class);
+        ResponseEntity<DOI> doiResponseEntity = template.exchange(doiConfig.getBaseUrl() + "/dois/", HttpMethod.POST, entity, DOI.class);
         if (!doiResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new Exception("generate id failed. api returned: " + doiResponseEntity.getStatusCode());
         }
-        logger.debug("generated DOI: " + doiResponseEntity.getBody().getData().getId());
+        log.debug("generated DOI: {}", doiResponseEntity.getBody().getData().getId());
         return doiResponseEntity.getBody().getData().getId();
     }
 
@@ -276,13 +290,13 @@ public class DOIService implements HandleService {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.put("Authorization", Arrays.asList(DOIService.getBasicAuthenticationHeader(accountId, password)));
-        headers.put("Content-Type", Arrays.asList("application/vnd.api+json"));
-        headers.put("Accept", Arrays.asList("*/*"));
+        headers.put("Authorization", List.of(DOIService.getBasicAuthenticationHeader(doiConfig.getAccountId(), doiConfig.getPassword())));
+        headers.put("Content-Type", List.of("application/vnd.api+json"));
+        headers.put("Accept", List.of("*/*"));
         return headers;
     }
 
-    public static final String getBasicAuthenticationHeader(String username, String password) {
+    public static String getBasicAuthenticationHeader(String username, String password) {
         String valueToEncode = username + ":" + password;
         return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
     }
@@ -300,7 +314,7 @@ public class DOIService implements HandleService {
             }
 
         } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
         }
         return null;
     }
