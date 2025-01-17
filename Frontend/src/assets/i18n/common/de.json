@@ -171,7 +171,10 @@
     "TOOLPERMISSION_SIGNUP_GROUP": "Zu einer Organisation/Gruppe einschreiben (gilt nur für seperat dafür freigegebene Organisationen/Gruppen)",
     "TOOLPERMISSION_COLLECTION_PROPOSAL": "Vorschlagen von Materialien für Sammlungen, für welche die nutzende Person keine Schreibrechte hat",
     "TOOLPERMISSION_RATE": "Die Berechtigung zum Bewerten von Materialien",
-    "TOOLPERMISSION_MANAGE_RELATIONS": "Verwalten und erstellen von Beziehungen zwischen Elementen"
+    "TOOLPERMISSION_MANAGE_RELATIONS": "Verwalten und erstellen von Beziehungen zwischen Elementen",
+    "TOOLPERMISSION_INVITE_TIMEBASED": "Zeitlich beschränkte Freigaben erstellen",
+    "TOOLPERMISSION_SUGGESTION_READ": "Vorschläge für Metadaten an Elementen abrufen",
+    "TOOLPERMISSION_SUGGESTION_WRITE": "Vorschläge für Metadaten an Elementen erstellen"
   },
   "NO_WRITE_PERMISSIONS": "Keine Rechte für diesen Vorgang",
   "NODE_SEARCH": "Elemente suchen...",
@@ -227,7 +230,9 @@
     "CHILDREN": "Children",
     "CHILDREN_NONE": "Dieses Element besitzt keine Child Objekte",
     "CUSTOM_PROPERTY_NAME": "Eigene Property eingeben",
-    "CUSTOM_PROPERTY_VALUE": "Wert für Property eingeben"
+    "CUSTOM_PROPERTY_VALUE": "Wert für Property eingeben",
+    "CONTEXT_ACTIONS": "Aktionen für diesen Element-Typ",
+    "ALL_ACTIONS": "Alle Aktionen (ggf. nicht mit diesen Typ kompatibel!)"
   },
   "SIDEBAR": {
     "WORKSPACE": "Workspace",
@@ -321,6 +326,12 @@
     "TITLE_OF_WORK": "Titel",
     "LINK_AUTHOR": "Link zum/zur Autor{{GENDER_SEPARATOR}}in",
     "DESCRIPTION_REQUIRED": "Die Lizenzbeschreibung muss ausgefüllt sein",
+    "AI": {
+      "NO_USAGE_ALLOWED": "Nicht für KI-Training freigegeben.",
+      "GENERATED": "KI-Generiert",
+      "TOOL": ". Erstellt mit {{tool}}",
+      "MODIFIED": "(wurde nachbearbeitet)"
+    },
     "NAMES": {
       "NONE": "Keine oder unbekannte Lizenz",
       "MULTI": "Unterschiedliche Lizenzen",
@@ -623,6 +634,9 @@
       "PLACEHOLDER": "Name des Inhalts",
       "FILENAME": "Folgende Datei wird erstellt"
     },
+    "CURRICULUM": {
+      "NAME": "Pinnwannd"
+    },
     "MIMETYPE": {
       "imsqti_xmlv2p1_questionnaire": "Fragebogen",
       "imsqti_xmlv2p1_test": "Test",
@@ -726,8 +740,8 @@
     "DIFFERENT_VALUES": "(Verschiedene Werte)",
     "HAS_CHANGES": "geändert",
     "TITLE": "Infos bearbeiten",
-    "SHOW_EXTENDED_FALSE": "Erweitere Infos ausgeblendet",
-    "SHOW_EXTENDED_TRUE": "Erweitere Infos eingeblendet",
+    "SHOW_EXTENDED_FALSE": "Erweiterte Infos ausgeblendet",
+    "SHOW_EXTENDED_TRUE": "Erweiterte Infos eingeblendet",
     "SHOW_EXTENDED_SEARCH": "Weitere Filter anzeigen",
     "AUTHOR_LABEL": "Urheber{{GENDER_SEPARATOR}}in-Angaben",
     "AUTHOR_FREETEXT": "Freie Urheber{{GENDER_SEPARATOR}}in-Angabe",
@@ -984,6 +998,7 @@
   "SIGNUP_GROUP": {
     "TITLE": "In Gruppe einschreiben",
     "SUBTITLE": "Einer neuen Gruppe beitreten",
+    "SEARCH": "Gruppen-Liste durchsuchen",
     "SELECT_GROUP": "Wählen Sie eine Gruppe aus der untenstehenden Liste, in welche Sie beitreten möchten.",
     "NO_GROUPS": "Derzeit sind keine Gruppen verfügbar, denen beigetreten werden kann.",
     "CONFIRM_GROUP": "Sie werden der folgenden Gruppe beitreten:",

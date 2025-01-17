@@ -1,5 +1,6 @@
 package org.edu_sharing.service.search.model;
 
+import co.elastic.clients.elasticsearch._types.ScriptSortType;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.mapping.FieldType;
 import org.alfresco.service.ServiceRegistry;
@@ -134,7 +135,7 @@ public class SortDefinition implements Serializable {
 			if(sortDefintionEntry.getProperty().equalsIgnoreCase("score")) {
 				builder.sort(sort->sort.score(score->score.order(sortOrder)));
 			} else if(sortDefintionEntry.getProperty().equalsIgnoreCase("tree")) {
-				builder.sort(sort->sort.script(script -> script.script(s->s.source("doc['fullpath'].value + '/' + doc['nodeRef.id'].value"))));
+				builder.sort(sort->sort.script(script -> script.script(s->s.source("doc['fullpath'].value + '/' + doc['nodeRef.id'].value")).type(ScriptSortType.String)));
 			}else if(ALLOWED_SORT_MAIN_PROPERTIES.contains(sortDefintionEntry.getProperty())) {
 				builder.sort(sort->sort.field(field->field.field(sortDefintionEntry.getProperty()).order(sortOrder)));
 			}else {

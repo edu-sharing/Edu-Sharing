@@ -19,11 +19,10 @@ import org.edu_sharing.metadataset.v2.MetadataSet;
 import org.edu_sharing.metadataset.v2.MetadataWidget;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MetadataPresettingPolicy implements
 		NodeServicePolicies.OnCreateNodePolicy,
@@ -191,23 +190,29 @@ public class MetadataPresettingPolicy implements
 		try {
 			MetadataSet mds = MetadataReader.getMetadataset(ApplicationInfoList.getHomeRepository(), mdsId,"default");
 			for(MetadataWidget widget : mds.getWidgetsByTemplate("io_template")){
-				QName prop = QName.createQName(CCConstants.getValidGlobalName(widget.getId()));
-				Serializable value = nodeService.getProperty(templateRef, prop);
-				Serializable current = nodeService.getProperty(targetRef, prop);
-				if(value!=null) {
-					// mutli value: try to merge the values
-					if(widget.isMultivalue() && current!=null && current instanceof List && value instanceof List){
-						List currentList = (List) current;
-						List valueList = (List) value;
-						for(Object v : valueList){
-							if(!currentList.contains(v)){
-								currentList.add(v);
+				Set<QName> props = new HashSet();
+				props.add(QName.createQName(CCConstants.getValidGlobalName(widget.getId())));
+				if(StringUtils.hasText(widget.getSuggestDisplayProperty())){
+					props.add(QName.createQName(CCConstants.getValidGlobalName(widget.getSuggestDisplayProperty())));
+				}
+				for(QName prop : props){
+					Serializable value = nodeService.getProperty(templateRef, prop);
+					Serializable current = nodeService.getProperty(targetRef, prop);
+					if(value!=null) {
+						// mutli value: try to merge the values
+						if(widget.isMultivalue() && current!=null && current instanceof List && value instanceof List){
+							List currentList = (List) current;
+							List valueList = (List) value;
+							for(Object v : valueList){
+								if(!currentList.contains(v)){
+									currentList.add(v);
+								}
 							}
+							nodeService.setProperty(targetRef,prop, (Serializable) currentList);
 						}
-						nodeService.setProperty(targetRef,prop, (Serializable) currentList);
-					}
-					else{
-						nodeService.setProperty(targetRef, prop, value);
+						else{
+							nodeService.setProperty(targetRef, prop, value);
+						}
 					}
 				}
 			}

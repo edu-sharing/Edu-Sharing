@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.edu_sharing.restservices.ApiService;
 import org.edu_sharing.restservices.ArchiveDao;
@@ -16,10 +20,6 @@ import org.edu_sharing.restservices.RepositoryDao;
 import org.edu_sharing.restservices.archive.v1.model.RestoreResults;
 import org.edu_sharing.restservices.shared.*;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,12 +129,17 @@ public class ArchiveApi {
 			
 			List<Node> data = new ArrayList<>();
 	    	for (NodeRef ref : search.getResult()) {
-	    		
-	    		if(ref.isArchived()){
-	    			data.add(NodeDao.getNode(repoDao, NodeDao.archiveStoreProtocol,NodeDao.archiveStoreId, ref.getId(), filter).asNode());
-	    		}else{
-	    			data.add(NodeDao.getNode(repoDao, ref.getId(),filter).asNode());
-	    		}
+	    		try {
+					if (ref.isArchived()) {
+						data.add(NodeDao.getNode(repoDao, NodeDao.archiveStoreProtocol, NodeDao.archiveStoreId, ref.getId(), filter).asNode());
+					} else {
+						data.add(NodeDao.getNode(repoDao, ref.getId(), filter).asNode());
+					}
+				}catch(Throwable t) {
+					logger.error("Can not resolve archived node " + ref.getId(), t);
+					data.add(Node.FakeFromRef(ref));
+
+				}
 	    	}
 			
 			Pagination pagination = new Pagination();

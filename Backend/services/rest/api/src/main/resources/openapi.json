@@ -2500,7 +2500,13 @@
           "destroySession": {
             "type": "boolean"
           },
+          "localUrl": {
+            "type": "string"
+          },
           "next": {
+            "type": "string"
+          },
+          "ssoUrl": {
             "type": "string"
           },
           "url": {
@@ -6290,8 +6296,10 @@
           },
           "skills": {
             "items": {
+              "nullable": true,
               "type": "string"
             },
+            "nullable": true,
             "type": "array"
           },
           "type": {
@@ -6344,8 +6352,10 @@
           },
           "skills": {
             "items": {
+              "nullable": true,
               "type": "string"
             },
+            "nullable": true,
             "type": "array"
           },
           "type": {
@@ -6393,8 +6403,10 @@
           },
           "skills": {
             "items": {
+              "nullable": true,
               "type": "string"
             },
+            "nullable": true,
             "type": "array"
           },
           "type": {
@@ -6561,6 +6573,9 @@
             },
             "type": "array"
           },
+          "appleTouchIcon": {
+            "type": "string"
+          },
           "availableMds": {
             "items": {
               "$ref": "#/components/schemas/AvailableMds"
@@ -6613,6 +6628,9 @@
             "type": "string"
           },
           "extension": {
+            "type": "string"
+          },
+          "favicon": {
             "type": "string"
           },
           "frontpage": {
@@ -11176,6 +11194,150 @@
         ]
       }
     },
+    "/admin/v1/repositoryConfig/enforceContext": {
+      "delete": {
+        "operationId": "clearEnforcedContext",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "OK."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Preconditions are not present."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authorization failed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Session user has insufficient rights to perform this operation."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Ressources are not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occured."
+          }
+        },
+        "summary": "set/update the repository config object",
+        "tags": [
+          "ADMIN v1"
+        ]
+      }
+    },
+    "/admin/v1/repositoryConfig/enforceContext/{contextId}": {
+      "put": {
+        "operationId": "enforceContext",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "OK."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Preconditions are not present."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authorization failed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Session user has insufficient rights to perform this operation."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Ressources are not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occured."
+          }
+        },
+        "summary": "set/update the repository config object",
+        "tags": [
+          "ADMIN v1"
+        ]
+      }
+    },
     "/admin/v1/serverUpdate/list": {
       "get": {
         "description": "list available update tasks",
@@ -12673,6 +12835,109 @@
           }
         },
         "summary": "gets a given node",
+        "tags": [
+          "BULK v1"
+        ]
+      }
+    },
+    "/bulk/v1/list": {
+      "post": {
+        "description": "lists all currently synchronized nodes matching the posted, multiple criteria",
+        "operationId": "list",
+        "parameters": [
+          {
+            "description": "Return the full node. If you don't need the data, set to false to only return the id (will improve performance)",
+            "in": "query",
+            "name": "resolveNode",
+            "schema": {
+              "default": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "properties that must match (with \"AND\" concatenated)",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Node"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Preconditions are not present."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authorization failed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Session user has insufficient rights to perform this operation."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Ressources are not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occured."
+          }
+        },
+        "summary": "lists given nodes",
         "tags": [
           "BULK v1"
         ]

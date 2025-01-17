@@ -9,6 +9,7 @@ import { SearchPageRoutingModule } from './search-page-routing.module';
 import { SearchPageToolbarComponent } from './search-page-toolbar.component';
 import { SearchPageComponent } from './search-page.component';
 import { EduSharingUiModule } from 'ngx-edu-sharing-ui';
+import { FooterComponent } from '../../shared/components/footer/footer.component';
 
 @NgModule({
     declarations: [
@@ -19,7 +20,13 @@ import { EduSharingUiModule } from 'ngx-edu-sharing-ui';
         SearchPageResultsComponent,
         SearchPageResultsAllComponent,
     ],
-    imports: [SearchPageRoutingModule, SharedModule, EduSharingUiModule, MdsModule],
+    imports: [
+        SearchPageRoutingModule,
+        SharedModule,
+        EduSharingUiModule,
+        MdsModule,
+        FooterComponent,
+    ],
     // This module is lazy-loaded and should not export anything.
     exports: [],
 })

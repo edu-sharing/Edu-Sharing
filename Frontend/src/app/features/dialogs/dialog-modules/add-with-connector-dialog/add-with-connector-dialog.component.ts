@@ -1,7 +1,7 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { Connector } from 'ngx-edu-sharing-api';
 import { BehaviorSubject } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { delay, filter, first } from 'rxjs/operators';
 import { DialogButton } from '../../../../core-module/core.module';
 import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
@@ -12,6 +12,7 @@ import {
 import { MdsEditorWrapperComponent } from '../../../mds/mds-editor/mds-editor-wrapper/mds-editor-wrapper.component';
 import { FormatDatePipe } from 'ngx-edu-sharing-ui';
 import { TranslateService } from '@ngx-translate/core';
+import { CordovaService } from '../../../../services/cordova.service';
 
 @Component({
     selector: 'es-add-with-connector-dialog',
@@ -33,6 +34,7 @@ export class AddWithConnectorDialogComponent {
     constructor(
         @Inject(CARD_DIALOG_DATA) public data: AddWithConnectorDialogData,
         private dialogRef: CardDialogRef<AddWithConnectorDialogData, AddWithConnectorDialogResult>,
+        private cordova: CordovaService,
         private translate: TranslateService,
     ) {
         this.initDialogConfig();
@@ -70,7 +72,11 @@ export class AddWithConnectorDialogComponent {
         } else if (!this.name.trim()) {
             return;
         }
-        this.dialogRef.close({ name: this.name, type: this.getType(), data });
+        let win: Window;
+        if (!this.cordova.isRunningCordova()) {
+            win = window.open('');
+        }
+        this.dialogRef.close({ name: this.name, type: this.getType(), window: win, data: data });
     }
 
     private processConnector(connector: Connector): Connector {
@@ -96,6 +102,15 @@ export class AddWithConnectorDialogComponent {
             .pipe(first((name) => !!name))
             .subscribe(() => this.dialogRef.patchConfig({ closable: Closable.Standard }));
         setTimeout(() => {
+            this.mdsEditorRef?.mdsEditorInstance.mdsInflated
+                .pipe(
+                    filter((v) => v),
+                    first(),
+                    delay(0),
+                )
+                .subscribe(() => {
+                    this.mdsEditorRef?.mdsEditorInstance.focusFirstWidget();
+                });
             this.mdsEditorRef?.mdsEditorInstance
                 .observeCanSave()
                 .subscribe((can) => (createButton.disabled = !can));

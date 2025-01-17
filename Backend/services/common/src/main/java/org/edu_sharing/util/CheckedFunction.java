@@ -10,13 +10,13 @@ import java.util.function.Function;
  * @param <R> the type of the output to the function
  */
 @FunctionalInterface
-public interface CheckedFunction<T, R> {
+public interface CheckedFunction<T, R, E extends Exception> {
     /** Applies this function to the given argument.
      * @param t the function argument
      * @return the function result
-     * @throws Exception thrown by this function
+     * @throws E thrown by this function
      */
-    R apply(T t) throws Exception;
+    R apply(T t) throws E;
 
     /**
      * Applies this function to the given argument.
@@ -25,7 +25,7 @@ public interface CheckedFunction<T, R> {
      * @param <R> the type of the output to the function
      * @return the function object {@link Function} that might throw a {@link RuntimeException}
      */
-    static <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction) {
+    static <T, R, E extends Exception> Function<T, R> wrap(CheckedFunction<T, R, E> checkedFunction) {
         return t -> {
             try {
                 return checkedFunction.apply(t);
@@ -43,7 +43,7 @@ public interface CheckedFunction<T, R> {
      * @param <R> the type of the output to the function
      * @return the function object {@link Function} that returns the default value in case of an exception
      */
-    static <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction, R defaultValue) {
+    static <T, R, E extends Exception> Function<T, R> wrap(CheckedFunction<T, R, E> checkedFunction, R defaultValue) {
         return t -> {
             try {
                 return checkedFunction.apply(t);

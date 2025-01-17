@@ -174,7 +174,7 @@
       <ng-container *ngIf="VCARD_FIELDS.includes(item.name)">
         {{
           $any(getNode()).properties[item.name]
-            ? ($any(getNode()).properties[item.name][0] | vcardName)
+            ? ($any(getNode()).properties[item.name] | vcardName)
             : ''
         }}
       </ng-container>

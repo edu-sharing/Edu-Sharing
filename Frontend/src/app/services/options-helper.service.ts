@@ -730,6 +730,10 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             if (n?.aspects?.includes('ccm:ltitool_node')) {
                 return true;
             }
+            // simple connector node;
+            if (n?.properties?.[RestConstants.CCM_PROP_CCRESSOURCETYPE]?.[0] === 'connector') {
+                return true;
+            }
             return (
                 this.connectors.connectorSupportsEdit(n) != null ||
                 (await this.ltiPlatformService.toolForNode(n)) != null
@@ -1269,6 +1273,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             node = this.getObjects(node, data)[0];
             this.dialogs.openNodeEmbedDialog({ node });
         });
+        embedNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         embedNode.constrains = [Constrain.NoBulk, Constrain.HomeRepository];
         embedNode.scopes = [Scope.Render];
         embedNode.group = DefaultGroups.View;
@@ -1574,7 +1579,9 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         connectorType: Connector = null,
     ) {
         const ltiTool = await this.ltiPlatformService.toolForNode(node);
-        if (node.aspects?.includes('ccm:ltitool_node') || ltiTool) {
+        if (node.properties[RestConstants.CCM_PROP_CCRESSOURCETYPE]?.[0] === 'connector') {
+            UIHelper.openWindow(win, node.properties[RestConstants.CCM_PROP_IO_WWWURL]?.[0]);
+        } else if (node.aspects?.includes('ccm:ltitool_node') || ltiTool) {
             UIHelper.openLTIResourceLink(win, node);
         } else {
             UIHelper.openConnector(
@@ -1800,6 +1807,10 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         data: OptionData,
         objects: Node[] | any[],
     ) {
+        // allow all options in debug scope
+        if (data.scope === Scope.DebugShowAll) {
+            return null;
+        }
         if (constrains.indexOf(Constrain.NoCollectionReference) !== -1) {
             if (
                 objects.some((o) => o.aspects.indexOf(RestConstants.CCM_ASPECT_IO_REFERENCE) !== -1)

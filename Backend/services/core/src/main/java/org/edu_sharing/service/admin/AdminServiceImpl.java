@@ -33,7 +33,6 @@ import org.edu_sharing.repository.client.tools.StringTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
-import org.edu_sharing.repository.server.RepoFactory;
 import org.edu_sharing.repository.server.importer.ExcelLOMImporter;
 import org.edu_sharing.repository.server.importer.collections.CollectionImporter;
 import org.edu_sharing.repository.server.jobs.quartz.*;
@@ -1017,11 +1016,11 @@ public class AdminServiceImpl implements AdminService {
         ContextRefreshUtils.refreshContext();
     }
 
-    public void exportLom(String filterQuery, String targetDir, boolean subobjectHandler) throws Exception {
+    public void exportLom(String filterQuery, String targetDir, String format) throws Exception {
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put(ExporterJob.PARAM_LUCENE_FILTER, filterQuery);
         paramsMap.put(ExporterJob.PARAM_OUTPUT_DIR, targetDir);
-        paramsMap.put(ExporterJob.PARAM_WITH_SUBOBJECTS, Boolean.toString(subobjectHandler));
+        paramsMap.put(ExporterJob.PARAM_FORMAT, format);
         paramsMap.put(JobHandler.AUTH_INFO_KEY, getAuthInfo());
         ImmediateJobListener jobListener = JobHandler.getInstance().startJob(ExporterJob.class, paramsMap);
         if (jobListener.isVetoed()) {
@@ -1133,7 +1132,24 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Map<String, RepositoryVersionInfo> getVersions() {
         try {
-            return versionService.getRepositoryVersionInfo();
+            Map<String, RepositoryVersionInfo> result = new HashMap<>(versionService.getRepositoryVersionInfo());
+            try {
+                RepositoryVersionInfo renderingVersionInfo = new RepositoryVersionInfo();
+                String renderserviceVersion = versionService.getRenderserviceVersion();
+                if(StringUtils.isNotBlank(renderserviceVersion)) {
+                    renderingVersionInfo.version = new RepositoryVersionInfo.Version();
+                    String[] versionInfos = renderserviceVersion.split("\\.");
+                    renderingVersionInfo.version.major = versionInfos[0];
+                    renderingVersionInfo.version.minor = versionInfos[1];
+                    renderingVersionInfo.version.patch = versionInfos[2];
+                    renderingVersionInfo.version.full = renderserviceVersion;
+                    renderingVersionInfo.repository="service-rendering-service";
+                    result.put(renderingVersionInfo.repository,renderingVersionInfo);
+                }
+            } catch (Exception e) {
+                logger.warn(e.getMessage(), e);
+            }
+            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

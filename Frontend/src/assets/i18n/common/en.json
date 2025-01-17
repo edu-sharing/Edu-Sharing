@@ -165,7 +165,10 @@
     "TOOLPERMISSION_MANAGE_RELATIONS": "Manage and create relationships between elements",
     "TOOLPERMISSION_RATE_WRITE": "The permission to rate materials (requires TOOLPERMISSION_RATE_READ)",
     "TOOLPERMISSION_COLLECTION_PROPOSAL": "Suggesting materials for collections for which the user does not have write permissions",
-    "TOOLPERMISSION_RATE_READ": "The right to view reviews of materials"
+    "TOOLPERMISSION_RATE_READ": "The right to view reviews of materials",
+    "TOOLPERMISSION_INVITE_TIMEBASED": "Create time-restricted invitations",
+    "TOOLPERMISSION_SUGGESTION_READ": "Read metadata suggestions on materials",
+    "TOOLPERMISSION_SUGGESTION_WRITE": "Add metadata suggestions to materials"
   },
   "NO_WRITE_PERMISSIONS": "No permissions",
   "NODE_SEARCH": "Search elements...",
@@ -534,8 +537,11 @@
     "MOODLE": {
       "TITLE": "new Moodle content",
       "FILENAME": "the following file is being created",
-      "NAME": "MOODLE",
+      "NAME": "Moodle",
       "PLACEHOLDER": "Name of content"
+    },
+    "CURRICULUM": {
+      "NAME": "Kanban"
     },
     "MIMETYPE": {
       "imsqti_xmlv2p1_questionnaire": "Questionnaire",
@@ -555,6 +561,13 @@
     "TITLE_OF_WORK": "Title",
     "LINK_AUTHOR": "Link to author",
     "DESCRIPTION_REQUIRED": "Please add a license description",
+    "AI": {
+      "NO_USAGE_ALLOWED": "Not to be used for ai training.",
+      "GENERATED": "ai generated",
+      "TOOL": ". generated with {{tool}}",
+      "MODIFIED": "(has been modified)"
+    },
+
     "NAMES": {
       "NONE": "No or unknown license",
       "MULTI": "Multiple licenses",
@@ -889,6 +902,7 @@
   "SIGNUP_GROUP": {
     "TITLE": "Enroll in group",
     "SUBTITLE": "Join a new group",
+    "SEARCH": "Filter group list",
     "SELECT_GROUP": "Select a group from the list below which you would like to join.",
     "NO_GROUPS": "There are currently no groups available to join.",
     "CONFIRM_GROUP": "You will join the following group:",
@@ -1299,7 +1313,9 @@
     "CHILDREN": "Children",
     "CHILDREN_NONE": "This element has no child objects",
     "CUSTOM_PROPERTY_NAME": "Enter name for custom property",
-    "CUSTOM_PROPERTY_VALUE": "Enter value for custom property"
+    "CUSTOM_PROPERTY_VALUE": "Enter value for custom property",
+    "CONTEXT_ACTIONS": "Actions for this element-type",
+    "ALL_ACTIONS": "All actions (might be not compatible with this type!)"
   },
   "NOTIFICATION": {
     "MENU": "Notifications",

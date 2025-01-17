@@ -1,85 +1,83 @@
 package org.edu_sharing.repository.server.jobs.quartz;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.alfresco.repo.node.MLPropertyInterceptor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import io.gdcc.xoai.dataprovider.model.Item;
+import io.gdcc.xoai.dataprovider.model.MetadataFormat;
+import io.gdcc.xoai.xml.XmlWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
-import org.edu_sharing.repository.server.exporter.OAILOMExporter;
-import org.edu_sharing.repository.server.exporter.OAILOMWithSubobjectsExporter;
+import org.edu_sharing.repository.server.jobs.quartz.annotation.JobFieldDescription;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
-import org.edu_sharing.service.oai.OAIExporterFactory;
+import org.edu_sharing.service.oai.core.EduMetadataFormatRegistry;
+import org.edu_sharing.service.oai.core.EduSharingItemRepository;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class ExporterJob extends AbstractJob {
+import java.io.FileOutputStream;
+import java.util.Map;
 
-	public static final String PARAM_LUCENE_FILTER = "lucenefilter";
+@Slf4j
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+public class ExporterJob extends AbstractJobMapAnnotationParams {
 
-	public static final String PARAM_OUTPUT_DIR = "outputdir";
-	
-	public static final String PARAM_WITH_SUBOBJECTS = "withsubobjects";
+    public static final String PARAM_LUCENE_FILTER = "luceneFilter";
 
-	Log logger = LogFactory.getLog(ExporterJob.class);
+    public static final String PARAM_OUTPUT_DIR = "outputDirectory";
+    public static final String PARAM_FORMAT = "format";
 
-	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
 
-		Map jobDataMap = context.getJobDetail().getJobDataMap();
-		String luceneFilter = (String) jobDataMap.get(PARAM_LUCENE_FILTER);
-		String outputdir = (String) jobDataMap.get(PARAM_OUTPUT_DIR);
-		
-		Boolean withSubObjects = Boolean.valueOf((String) jobDataMap.get(PARAM_WITH_SUBOBJECTS));
+    @JobFieldDescription(description = "Export format", sampleValue = "lom")
+    public String format;
 
-		if (luceneFilter != null && outputdir != null) {
+    @JobFieldDescription
+    public String luceneFilter;
 
-			try {
-			
-				ApplicationInfo appInfo = ApplicationInfoList.getHomeRepository();
-				
-				Map<String, String> authInfo = new AuthenticationToolAPI().createNewSession(appInfo.getUsername(), appInfo.getPassword());
-				MCAlfrescoAPIClient apiClient = new MCAlfrescoAPIClient(authInfo);
-				String[] nodeIds = apiClient.searchNodeIds(luceneFilter);
+    @JobFieldDescription
+    public String outputDirectory;
 
-				if (nodeIds != null) {
-					logger.info("found " + nodeIds.length + " to export with " + PARAM_LUCENE_FILTER + ": " + luceneFilter);
 
-					for (String nodeId : nodeIds) {
+    @Autowired
+    private EduMetadataFormatRegistry eduMetadataFormatRegistry;
 
-						if(withSubObjects){
-							new OAILOMWithSubobjectsExporter(nodeId).export(outputdir);
-						}else{
-							OAIExporterFactory.getOAILOMExporter().export(outputdir,nodeId);
-						}
-					}
+    @Autowired
+    private EduSharingItemRepository eduSharingItemRepository;
 
-				}else{
-					logger.info("found nothing with " + PARAM_LUCENE_FILTER + ": " + luceneFilter);
-				}
-			} catch (ParserConfigurationException e) {
-				logger.error(e.getMessage(), e);
-			} catch (FileNotFoundException e) {
-				logger.error(e.getMessage(), e);
-			}catch(Throwable e){
-				logger.error(e.getMessage(), e);
-			}
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        if (luceneFilter == null || outputDirectory == null) {
+            return;
+        }
 
-			
+        try {
+            MetadataFormat formatWriter = eduMetadataFormatRegistry.getMetadataFormat(format);
 
-		}
+            ApplicationInfo appInfo = ApplicationInfoList.getHomeRepository();
 
-	}
+            Map<String, String> authInfo = new AuthenticationToolAPI().createNewSession(appInfo.getUsername(), appInfo.getPassword());
+            MCAlfrescoAPIClient apiClient = new MCAlfrescoAPIClient(authInfo);
+            String[] nodeIds = apiClient.searchNodeIds(luceneFilter);
 
-	@Override
-	public Class[] getJobClasses() {
-		return allJobs;
-	}
+            if (nodeIds != null) {
+                log.info("found {} to export with " + PARAM_LUCENE_FILTER + ": {}", nodeIds.length, luceneFilter);
 
+
+                for (String nodeId : nodeIds) {
+                    try(FileOutputStream os = new FileOutputStream(outputDirectory + "/" + nodeId + ".xml")) {
+                        Item item = eduSharingItemRepository.getItem(nodeId, formatWriter);
+                        try (XmlWriter writer = new XmlWriter(os)) {
+                            item.getMetadata().write(writer);
+                        }
+                    }
+                }
+
+            } else {
+                log.info("found nothing with " + PARAM_LUCENE_FILTER + ": {}", luceneFilter);
+            }
+        } catch (Throwable e) {
+            log.error(e.getMessage(), e);
+        }
+
+    }
 }

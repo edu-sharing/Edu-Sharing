@@ -104,11 +104,14 @@ button {
 
 .breadcrumb-inner {
     color: $primary;
-    display: flex;
+    display: block;
     padding: 2px 4px;
     gap: 3px;
     white-space: nowrap;
     align-items: center;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .breadcrumb-readonly .breadcrumb-element:not(.breadcrumb-element-active) {

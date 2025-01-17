@@ -6,6 +6,7 @@
     "NO_RESULTS_MESSAGE": "Im Papierkorb befinden sich keine Objekte, die zu dem eingegeben Suchbegriff passen.",
     "ENTER_NEW_TEXT": "Neuen Suchbegriff eingeben",
     "ARCHIVE_EMPTY": "Keine Objekte im Papierkorb vorhanden.",
+    "ARCHIVE_REORDERING": "Der Papierkorb wird gerade reindexiert. Bitte versuchen Sie es in einigen Sekunden erneut.",
     "DELETE": {
       "CONFIRM_TITLE": "Objekt wirklich endgültig löschen?",
       "CONFIRM_MESSAGE": "Wenn Sie Objekte endgültig löschen, können Sie diese später nicht mehr wiederherstellen.",

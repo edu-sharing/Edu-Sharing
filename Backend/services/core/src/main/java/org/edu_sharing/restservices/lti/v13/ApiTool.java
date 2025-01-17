@@ -2,7 +2,7 @@ package org.edu_sharing.restservices.lti.v13;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.security.Encryption;
@@ -101,7 +101,7 @@ public class ApiTool {
         if(ApplicationInfoList.getRepositoryInfoById(appId).isLtiUsagesEnabled()){
             Usage usage = usageService.getUsage(appId, contextId, node, null);
             if(usage != null){
-                session.setAttribute(CCConstants.AUTH_SINGLE_USE_NODEID, node);
+                Context.getCurrentInstance().addSingleUseNode(node);
             }
         }
     }

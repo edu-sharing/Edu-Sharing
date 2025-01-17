@@ -1474,11 +1474,13 @@ export class PermissionsAuthoritiesComponent implements OnChanges, AfterViewInit
                 new ListItemSort('USER', 'email'),
                 new ListItemSort('USER', 'status'),
             ];
-        } else {
+        } else if (this._mode == 'GROUP') {
             this.sortConfig.columns = [
                 new ListItemSort('GROUP', 'displayName'),
                 new ListItemSort('GROUP', 'groupType'),
             ];
+        } else {
+            this.sortConfig.columns = [new ListItemSort('ORG', 'displayName')];
         }
         this.sortConfig.active = this.sortConfig.columns[0].name;
         this.columns = this.getColumns(this._mode, this.embedded);

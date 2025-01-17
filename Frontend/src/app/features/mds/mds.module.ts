@@ -49,11 +49,13 @@ import { MdsViewerComponent } from './mds-viewer/mds-viewer.component';
 import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
 import { EduSharingUiModule } from 'ngx-edu-sharing-ui';
 import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-editor-widget-childobjects/mds-editor-widget-childobjects.component';
+import { LicenseAiPipe } from './mds-editor/widgets/mds-editor-widget-license/license-details/license-ai.pipe';
 
 @NgModule({
     declarations: [
         HighlightPipe,
         LabelPipe,
+        LicenseAiPipe,
         LicenseDetailsComponent,
         MdsEditorComponent,
         MdsEditorCoreComponent,
@@ -97,6 +99,7 @@ import { MdsEditorWidgetChildobjectsComponent } from './mds-editor/widgets/mds-e
     imports: [SharedModule, NgxSliderModule, EditorModule, MatFormFieldModule, EduSharingUiModule],
     exports: [
         LicenseDetailsComponent,
+        LicenseAiPipe,
         MdsEditorWidgetAuthorComponent,
         MdsEditorWidgetCollectionsComponent,
         MdsEditorWrapperComponent,

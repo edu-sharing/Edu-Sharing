@@ -282,6 +282,11 @@ public class MetadataTemplateRenderer {
 									value += getLicenseDescription(licenseName).replaceAll("((<br \\/>)|(\\n))", TEXT_LICENSE_SEPERATOR);
 								}
 							}
+							if(renderingMode.equals(RenderingMode.HTML)) {
+								if(!getLicenseAi().isEmpty()) {
+									value += "<div class='licenseDescription'>" +  StringUtils.join(getLicenseAi(), "<br>") + "</div>";
+								}
+							}
 							if (renderingMode.equals(RenderingMode.HTML) && (
 									properties.get(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_LICENSE_TITLE_OF_WORK)) != null
 											|| properties.get(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_LICENSE_PROFILE_URL)) != null
@@ -432,6 +437,35 @@ public class MetadataTemplateRenderer {
 			html += "</div></div>";
 		}
 		return html;
+	}
+
+	private boolean getBoolean(String key, boolean defaultValue) {
+		String[] data = propertiesNative.get(CCConstants.getValidLocalName(key));
+		if(data == null || data.length < 1) {
+			return defaultValue;
+		}
+		return Boolean.parseBoolean(data[0]);
+	}
+
+	// See  @LicenseAiPipe
+	private List<String> getLicenseAi() {
+		List<String> result = new ArrayList<>();
+		if (!getBoolean(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_ALLOW_USAGE, true)) {
+			result.add(I18nAngular.getTranslationAngular("common", "LICENSE.AI.NO_USAGE_ALLOWED"));
+		}
+		if (getBoolean(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_GENERATED, false)) {
+			String info = I18nAngular.getTranslationAngular("common", "LICENSE.AI.GENERATED");
+			// @TODO: we would need to map the tool via the mds!
+			/*if(propertiesNative.get(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_TOOL) != null) {
+				info += I18nAngular.getTranslationAngular("common", "LICENSE.AI.TOOL")
+						.replace("{{tool}}", StringUtils.join(propertiesNative.get(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_TOOL), ", "));
+			}*/
+			if (getBoolean(CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_MANUALLY_MODIFIED, false)) {
+				info += " " + I18nAngular.getTranslationAngular("common", "LICENSE.AI.MODIFIED");
+			}
+			result.add(info);
+		}
+		return result;
 	}
 
 	private boolean renderMaterialFeedback(MetadataWidget widget, StringBuffer widgetHtml) {

@@ -48,7 +48,8 @@ public class DateTool {
 		}else{
 			df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, new Locale(splittedLocale[0],splittedLocale[1]));
 		}
-		
+		df.setTimeZone(TimeZone.getTimeZone("CET"));
+
 		
 		try {
 			

@@ -484,6 +484,11 @@
       <textEscapingPolicy>all</textEscapingPolicy>
     </widget>
     <widget>
+      <id>ccm:commonlicense_ai_tool</id>
+      <type>multivalueFixedBadges</type>
+      <valuespace type="SKOS" lenient="true">https://vocabs.edu-sharing.net/w3id.org/edu-sharing/vocabs/aiTools/index.json</valuespace>
+    </widget>
+    <widget>
       <id>virtual:user_files</id>
       <caption>virtual_user_files</caption>
       <type>checkbox</type>
@@ -509,11 +514,11 @@
       <id>curriculum_editable</id>
       <caption>Zugriffsrechte</caption>
       <bottomCaption>Welche Zugriffsrechte sollen Personen auf das Kanban erhalten, für die dieses Objekt in edu-sharing freigegeben wird. (Dieser Wert kann später im Curriculum für das Objekt geändert werden)</bottomCaption>
-      <defaultvalue>read</defaultvalue>
+      <defaultvalue>0</defaultvalue>
       <type>singleoption</type>
       <values>
-        <entry cap="nur Leserechte">read</entry>
-        <entry cap="Lese- und Bearbeitungsrechte">write</entry>
+        <entry cap="nur Leserechte">0</entry>
+        <entry cap="Lese- und Bearbeitungsrechte">1</entry>
       </values>
     </widget>
   </widgets>
@@ -1312,10 +1317,10 @@
       <basequery>
         {"bool":
         {"must":[
-          {"match":{"nodeRef.storeRef.protocol":"workspace"}},
-          {"match":{"aspects":"ccm:collection"}},
-          {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
-          {"match":{"properties.cm:owner.keyword":"${authority}"}}
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}},
+        {"match":{"properties.cm:owner.keyword":"${authority}"}}
         ]}
         }
       </basequery>
@@ -1324,14 +1329,14 @@
       <basequery>
         {"bool":
         {"must":[
-          {"match":{"nodeRef.storeRef.protocol":"workspace"}},
-          {"match":{"aspects":"ccm:collection"}},
-          {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
+        {"match":{"nodeRef.storeRef.protocol":"workspace"}},
+        {"match":{"aspects":"ccm:collection"}},
+        {"match":{"properties.ccm:collectionlevel0.keyword":"true"}}
         ],
         "must_not":[
-          {"match":{"properties.cm:owner.keyword":"${authority}"}},
-          {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
-          {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
+        {"match":{"properties.cm:owner.keyword":"${authority}"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"EDITORIAL"}},
+        {"match":{"properties.ccm:collectiontype.keyword":"MEDIA_CENTER"}}
         ]}
         }
       </basequery>
@@ -1407,7 +1412,16 @@
       </basequery>
     </query>
     <query join="AND" id="workflowReceive">
-      <basequery/>
+      <basequery>
+        {"bool":{
+        "must":[
+        {"term":{"nodeRef.storeRef.protocol":"workspace"}}
+        ],
+        "must_not":[
+        {"exists":{"field": "properties.ccm:published_original"}}
+        ]
+        }}
+      </basequery>
     </query>
     <query join="AND" id="workspace">
       <property name="ngsearchword">
@@ -1440,6 +1454,18 @@
         <statement>{"wildcard":{"fullpath":"${valueRaw}*"}}</statement>
         <preprocessor>node_path</preprocessor>
         <mandatory>false</mandatory>
+      </property>
+    </query>
+    <query join="AND" id="oai">
+<!--      <basequery>ISNULL:@ccm\:tool_category</basequery>-->
+      <property name="from">
+        <statement>{"bool":{"must":[{"range":{"properties.cm:modified":{"gte":"${value}"}}}]}</statement>
+      </property>
+      <property name="until">
+        <statement>{"bool":{"must":[{"range":{"properties.cm:modified":{"lte":"${value}"}}}]}</statement>
+      </property>
+      <property name="nodeId">
+        <statement>{"bool":{"must":[{"wildcard":{"nodeRef.id":{"value":"${value}","case_insensitive":true}}}]}}</statement>
       </property>
     </query>
     <query join="AND" id="collections">
@@ -1599,7 +1625,14 @@
       </property>
     </query>
     <query join="AND" id="mediacenter_filter">
-      <basequery>{"term":{"type":"ccm:io"}}</basequery>
+      <basequery>{"bool":{"must":[
+        {"term":{"type":"ccm:io"}}
+        ],
+        "must_not":[
+        {"term":{"aspects":"ccm:mediacenter_statistics"}},
+        {"term":{"aspects":"ccm:collection_io_reference"}}
+        ]}}
+      </basequery>
       <specialFilter>exclude_system_folder</specialFilter>
       <specialFilter>exclude_sites_folder</specialFilter>
       <specialFilter>exclude_people_folder</specialFilter>
@@ -1608,9 +1641,6 @@
           {"wildcard":{"properties.cm:name.keyword":{"value":"*${value}*"}}},
           {"wildcard":{"properties.cclom:title":{"value":"*${value}*"}}},
           {"wildcard":{"properties.ccm:replicationsourceid.keyword":{"value":"*${value}*"}}}
-          ],
-          "must_not":[
-          {"term":{"aspects":"ccm:mediacenter_statistics"}}
           ]}}
         </statement>
       </property>

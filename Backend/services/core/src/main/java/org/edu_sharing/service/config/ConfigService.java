@@ -17,8 +17,10 @@ public interface ConfigService {
      * @return
      * @throws Exception
      */
-    Context getContext(String domain) throws Exception;
+    Context getContextByDomain(String domain) throws Exception;
     List<Context> getAvailableContext() throws Exception;
+
+    Context getContextById(String id) throws Exception;
 
     Context createOrUpdateContext(Context context);
 

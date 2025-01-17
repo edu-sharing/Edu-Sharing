@@ -19,6 +19,8 @@ import {
     MdsService,
     Node,
     ProposalNode,
+    SessionStorageService,
+    Store,
 } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
@@ -39,6 +41,7 @@ import {
     OptionsHelperDataService,
     Scope,
     UIConstants,
+    VirtualNode,
 } from 'ngx-edu-sharing-ui';
 import { Subject, forkJoin as observableForkJoin, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -111,6 +114,7 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
     @ContentChild('empty') emptyRef: TemplateRef<unknown>;
     @ViewChild('actionbarReferences') actionbarReferences: ActionbarComponent;
     @ViewChild('listReferences') listReferences: ListEventInterface<CollectionReference>;
+    @ViewChild('listCollections') listCollections: ListEventInterface<Node>;
 
     private mainNavUpdateTrigger = new Subject<void>();
     sortCollectionColumns: ListItemSort[] = [
@@ -175,6 +179,7 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
         private bridge: BridgeService,
         private collectionService: RestCollectionService,
         private configurationService: ConfigService,
+        private sessionStorageService: SessionStorageService,
         private dialogs: DialogsService,
         private infobar: InfobarService,
         private loadingScreen: LoadingScreenService,
@@ -667,7 +672,7 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
                 this.collection.ref.repo,
             )
             .subscribe(
-                (collection) => {
+                async (collection) => {
                     // transfere sub collections and content
                     this.dataSourceCollections.setData(
                         collection.collections,
@@ -675,6 +680,22 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
                     );
                     this.dataSourceCollections.isLoading = false;
                     if (this.isRootLevel) {
+                        if (this.scope === RestConstants.COLLECTIONSCOPE_MY) {
+                            this.listCollections.addVirtualNodes(
+                                (
+                                    await this.sessionStorageService
+                                        .get(
+                                            SessionStorageService.KEY_ROOT_COLLECTIONS,
+                                            [],
+                                            Store.Session,
+                                        )
+                                        .toPromise()
+                                ).map((n: VirtualNode) => {
+                                    n.override = false;
+                                    return n;
+                                }),
+                            );
+                        }
                         this.finishCollectionLoading();
                         return;
                     }

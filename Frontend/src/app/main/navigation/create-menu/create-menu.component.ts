@@ -22,6 +22,7 @@ import {
     Scope,
     Target,
     UIAnimation,
+    VirtualNode,
 } from 'ngx-edu-sharing-ui';
 import { Observable, Subject } from 'rxjs';
 import { delay, takeUntil } from 'rxjs/operators';
@@ -501,10 +502,6 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
 
     private async createConnector(connector: Connector, event: AddWithConnectorDialogResult) {
         const prop = this.nodeHelper.propertiesFromConnector(event);
-        let win: any;
-        if (!this.bridge.isRunningCordova()) {
-            win = window.open('');
-        }
         this.nodeService
             .createNode((await this.getParent()).ref.id, RestConstants.CCM_TYPE_IO, [], prop, false)
             .subscribe(
@@ -512,14 +509,16 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                     this.editConnector(
                         data.node,
                         event.type as Filetype,
-                        win,
+                        event.window,
                         event.data,
                         connector,
                     );
-                    this.onCreate.emit([data.node]);
+                    const node: VirtualNode = { ...data.node, virtual: true };
+                    node.observe = true;
+                    this.onCreate.emit([node]);
                 },
                 (error: any) => {
-                    win.close();
+                    event.window?.close();
                     if (
                         this.nodeHelper.handleNodeError(event.name, error) ===
                         RestConstants.DUPLICATE_NODE_RESPONSE

@@ -44,7 +44,7 @@
   <mat-form-field
     class="mat-form-textarea"
     [hideRequiredMarker]="true"
-    [floatLabel]="widget.definition.placeholder ? 'always' : 'auto'"
+    [floatLabel]="widget.definition.placeholder || showBulkMixedValues() ? 'always' : 'auto'"
   >
     <mat-label>
       {{ widget.definition.caption }}

@@ -146,7 +146,11 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
             CCConstants.CCM_PROP_IO_LICENSE_TITLE_OF_WORK,
             CCConstants.CCM_PROP_IO_LICENSE_SOURCE_URL,
             CCConstants.CCM_PROP_IO_LICENSE_PROFILE_URL,
-            CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_QUESTIONSALLOWED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_ALLOW_USAGE,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_GENERATED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_MANUALLY_MODIFIED,
+            CCConstants.CCM_PROP_IO_COMMONLICENSE_AI_TOOL,
     };
 
 
@@ -227,7 +231,9 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
                                Map<NodeRef, NodeRef> copyMap) {
         // add/override the previous node context
         copyMap.forEach((source, dest) -> {
-            addCurrentContext(dest);
+            if (nodeService.exists(dest)) {
+                addCurrentContext(dest);
+            }
         });
     }
 
@@ -626,7 +632,8 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
                 logger.info("---> UPDATE/CREATE THUMBNAIL FOR LINK(" + afterURL + ") ON NODE(" + nodeRef.getId() + ")");
 
                 String linktype = (String) after.get(QName.createQName(CCConstants.CCM_PROP_LINKTYPE));
-                if (linktype != null && linktype.equals(CCConstants.CCM_VALUE_LINK_LINKTYPE_USER_GENERATED)) {
+                // only generate if node has no thumb yet
+                if (linktype != null && linktype.equals(CCConstants.CCM_VALUE_LINK_LINKTYPE_USER_GENERATED) && !after.containsKey(QName.createQName(CCConstants.CCM_PROP_IO_USERDEFINED_PREVIEW))) {
                     generateWebsitePreview(nodeRef, afterURL);
                 }
             }

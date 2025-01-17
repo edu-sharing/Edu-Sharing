@@ -175,7 +175,13 @@ Short version works only with `short="always"`.
       (nodeDropped)="onDropped($event)"
       class="breadcrumb-element"
     >
-      <span class="breadcrumb-inner" [class.breadcrumb-inner-active]="currentPos">
+      <span
+        class="breadcrumb-inner"
+        [class.breadcrumb-inner-active]="currentPos"
+        esCheckTextOverflow
+        #text="esCheckTextOverflow"
+        [matTooltip]="text.hasTextOverflow() ? (node ? node.name : '') : null"
+      >
         <span *ngIf="currentPos && invisibleDescription" class="cdk-visually-hidden">
           {{ 'BREADCRUMB_LOCATION_PREFIX' | translate }}
         </span>

@@ -243,6 +243,14 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
      * return the path for a given value in a tree
      */
     getPath(v: string) {
+        if (!this.widget.definition.values) {
+            return [
+                {
+                    id: v,
+                    caption: v,
+                },
+            ];
+        }
         const path: MdsValue[] = [];
         let pointer: string = v;
         for (let i = 0; i < 100; i++) {

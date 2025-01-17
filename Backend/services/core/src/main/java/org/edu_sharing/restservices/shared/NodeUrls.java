@@ -14,9 +14,8 @@ public class NodeUrls {
         repositoryBaseUrl = URLHelper.getBaseUrl(true);
         if(node.getAspects().contains(CCConstants.getValidLocalName(CCConstants.CCM_ASPECT_LTITOOL_NODE))){
             generateLtiResourceLink = repositoryBaseUrl + "/rest/ltiplatform/v13/generateLoginInitiationFormResourceLink?nodeId=" + node.getRef().getId();
-            if(Context.getCurrentInstance() != null && Context.getCurrentInstance().getSessionAttribute(CCConstants.AUTH_SINGLE_USE_NODEID) != null){
-                String singleUseNodeId = Context.getCurrentInstance().getSessionAttribute(CCConstants.AUTH_SINGLE_USE_NODEID);
-                if(singleUseNodeId.equals(node.getRef().getId())){
+            if(Context.getCurrentInstance() != null){
+                if(Context.getCurrentInstance().isSingleUseNodeId(node.getRef().getId())){
                     //generate short living jwt
                     try {
                         String jwt = LTIJWTUtil.getShortAccessJwt(node.getRef().getId(),60);

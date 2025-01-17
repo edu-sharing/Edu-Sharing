@@ -1853,7 +1853,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
             // this occurs sometimes in workspace
             // it seems it is an alfresco bug:
             // https://issues.alfresco.com/jira/browse/ETHREEOH-2461
-            log.error("Thats maybe an alfreco bug: https://issues.alfresco.com/jira/browse/ETHREEOH-2461", e);
+            log.error("Thats maybe an alfreco bug: https://issues.alfresco.com/jira/browse/ETHREEOH-2461, node id: " + nodeId, e);
         }
 
     }

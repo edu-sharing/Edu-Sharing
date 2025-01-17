@@ -6,11 +6,14 @@ import { Component, Input } from '@angular/core';
 import { ConfigurationHelper } from '../../../core-module/core.module';
 import { ConfigService } from 'ngx-edu-sharing-api';
 import { take } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'es-footer',
     templateUrl: 'footer.component.html',
     styleUrls: ['footer.component.scss'],
+    imports: [CommonModule],
+    standalone: true,
 })
 export class FooterComponent {
     banner: any;

@@ -563,8 +563,14 @@ export class UIHelper {
             },
         );
     }
+    static openWindow(w: Window, url: string) {
+        if (w == null) {
+            w = window.open('');
+        }
+        w.location.href = url;
+    }
 
-    static openLTIResourceLink(w: any, node: Node) {
+    static openLTIResourceLink(w: Window, node: Node) {
         //let w = window.open('');
         if (w == null) {
             console.log('window is null');

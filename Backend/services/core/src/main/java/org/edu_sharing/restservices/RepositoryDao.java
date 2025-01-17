@@ -132,13 +132,21 @@ public class RepositoryDao {
 		return this.appInfo.getAppCaption();
 	}
 	public String getIcon() {
-		if(this.appInfo.getIcon()!=null && !this.appInfo.getIcon().isEmpty())
-			return URLTool.getBaseUrl()+"/"+this.appInfo.getIcon();
+		if(this.appInfo.getIcon()!=null && !this.appInfo.getIcon().isEmpty()) {
+			if(appInfo.getIcon().startsWith("http://") || appInfo.getIcon().startsWith("https://")) {
+				return appInfo.getIcon();
+			}
+			return URLTool.getBaseUrl() + "/" + this.appInfo.getIcon();
+		}
 		return null;
 	}
 	public String getLogo() {
-		if(this.appInfo.getLogo()!=null && !this.appInfo.getLogo().isEmpty())
+		if(this.appInfo.getLogo()!=null && !this.appInfo.getLogo().isEmpty()){
+			if(appInfo.getLogo().startsWith("http://") || appInfo.getLogo().startsWith("https://")) {
+				return appInfo.getLogo();
+			}
 			return URLTool.getBaseUrl()+"/"+this.appInfo.getLogo();
+		}
 		return null;
 	}
 	public boolean isHomeRepo() {

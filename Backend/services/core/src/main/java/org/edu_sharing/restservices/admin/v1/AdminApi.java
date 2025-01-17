@@ -11,6 +11,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
@@ -44,6 +48,7 @@ import org.edu_sharing.service.admin.model.GlobalGroup;
 import org.edu_sharing.service.admin.model.RepositoryConfig;
 import org.edu_sharing.service.admin.model.ServerUpdateInfo;
 import org.edu_sharing.service.admin.model.ToolPermission;
+import org.edu_sharing.service.config.ConfigServiceFactory;
 import org.edu_sharing.service.lifecycle.PersonDeleteOptions;
 import org.edu_sharing.service.lifecycle.PersonLifecycleService;
 import org.edu_sharing.service.lifecycle.PersonReport;
@@ -57,10 +62,6 @@ import org.edu_sharing.service.search.model.SortDefinition;
 import org.edu_sharing.service.version.RepositoryVersionInfo;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -1063,7 +1064,7 @@ public class AdminApi {
 	@GET
 	@Path("/export/lom")
 
-	@Operation(summary = "Export Nodes with LOM Metadata Format", description = "Export Nodes with LOM Metadata Format.")
+	@Operation(summary = "Export Nodes with given Metadata Format", description = "Export Nodes with LOM Metadata Format.")
 
 	@ApiResponses(value = { @ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Void.class))),
 			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -1074,10 +1075,10 @@ public class AdminApi {
 	public Response exportLOM(
 			@Parameter(description = "filterQuery", required = true) @QueryParam("filterQuery") String filterQuery,
 			@Parameter(description = "targetDir", required = true) @QueryParam("targetDir") String targetDir,
-			@Parameter(description = "subObjectHandler", required = true) @QueryParam("subObjectHandler") Boolean subObjectHandler,
+			@Parameter(description = "targetDir", required = true) @QueryParam("format") String format,
 			@Context HttpServletRequest req) {
 		try {
-			AdminServiceFactory.getInstance().exportLom(filterQuery, targetDir, subObjectHandler);
+			AdminServiceFactory.getInstance().exportLom(filterQuery, targetDir, format);
 			return Response.ok().build();
 		} catch (Throwable t) {
 			return ErrorResponse.createResponse(t);
@@ -1523,6 +1524,47 @@ public class AdminApi {
 			return ErrorResponse.createResponse(t);
 		}
 	}
+
+	@PUT
+	@Path("/repositoryConfig/enforceContext/{contextId}")
+	@Operation(summary = "set/update the repository config object")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Void.class))),
+			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+	public Response enforceContext(@Context HttpServletRequest req, @PathParam("contextId") String contextId) {
+		try {
+			ConfigServiceFactory.enforceContext(contextId);
+			return Response.ok().build();
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+	}
+
+	@DELETE
+	@Path("/repositoryConfig/enforceContext")
+	@Operation(summary = "set/update the repository config object")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Void.class))),
+			@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+	public Response clearEnforcedContext(@Context HttpServletRequest req) {
+		try {
+			ConfigServiceFactory.clearEnforcedContext();
+			return Response.ok().build();
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+	}
+
+
+
 	@GET
 	@Path("/configFile")
 	@Operation(summary = "get a base system config file (e.g. edu-sharing.conf)")

@@ -115,9 +115,9 @@ export class MdsEditorWidgetContainerComponent
         return this.isHidden ? 'hidden' : 'shown';
     }
 
-    readonly editorBulkMode: EditorBulkMode;
     readonly labelId: string;
     readonly descriptionId: string;
+    editorBulkMode: EditorBulkMode;
     bulkMode: BehaviorSubject<BulkMode>;
     missingRequired: MdsWidget['isRequired'] | null;
     isHidden: boolean;
@@ -155,16 +155,34 @@ export class MdsEditorWidgetContainerComponent
         if (changes.widget) {
             this.registerIsHidden();
         }
+        if (changes.control) {
+            this.initFormControl(this.control);
+        }
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
         if (this.label === true) {
             this.label = this.widget.definition.caption;
         }
         if (this.widget && this.editorBulkMode?.isBulk) {
-            this.bulkMode = new BehaviorSubject(
-                this.editorBulkMode.bulkBehavior === BulkBehavior.Replace ? 'replace' : 'no-change',
-            );
+            let type: BulkMode =
+                this.editorBulkMode.bulkBehavior === BulkBehavior.Replace ? 'replace' : 'no-change';
+            if (BulkBehavior.Replace) {
+                const initValues = await this.widget.getInitalValuesAsync();
+                if (
+                    initValues?.individualValues &&
+                    this.editorBulkMode.bulkBehavior === BulkBehavior.Replace
+                ) {
+                    console.info(
+                        'one field has already mixed values, enforcing Default mode for it',
+                        this.widget.definition.id,
+                        initValues,
+                    );
+                    type = 'no-change';
+                    this.editorBulkMode = { isBulk: true, bulkBehavior: BulkBehavior.Default };
+                }
+            }
+            this.bulkMode = new BehaviorSubject(type);
             this.bulkMode.subscribe((bulkMode) => this.widget.setBulkMode(bulkMode));
         }
         if (this.control) {
@@ -186,7 +204,7 @@ export class MdsEditorWidgetContainerComponent
 
     private registerIsHidden(): void {
         const shouldShowFactors = [this.widget.meetsDynamicCondition];
-        if (this.widget.definition.isExtended) {
+        if (this.widget.definition.isExtended && this.mdsEditorInstance.editorMode !== 'viewer') {
             shouldShowFactors.push(this.mdsEditorInstance.shouldShowExtendedWidgets$);
         }
         combineLatest(shouldShowFactors)
@@ -244,15 +262,29 @@ export class MdsEditorWidgetContainerComponent
     }
 
     private scrollIntoViewAndFocus(): void {
-        new Promise((resolve) => {
-            // Expand section (view) if needed.
-            if (this.viewInstance.isExpanded$.value) {
-                resolve(null);
-            } else {
-                this.viewInstance.isExpanded$.next(true);
-                setTimeout(() => resolve(null));
-            }
-        }).then(async () => {
+        Promise.all([
+            new Promise((resolve) => {
+                // Expand section (view) if needed.
+                if (this.viewInstance.isExpanded$.value) {
+                    resolve(null);
+                } else {
+                    this.viewInstance.isExpanded$.next(true);
+                    setTimeout(() => resolve(null));
+                }
+            }),
+            new Promise((resolve) => {
+                // Show extended widgets if needed.
+                if (
+                    !this.widget.definition.isExtended ||
+                    this.mdsEditorInstance.shouldShowExtendedWidgets$.value
+                ) {
+                    resolve(null);
+                } else {
+                    this.mdsEditorInstance.shouldShowExtendedWidgets$.next(true);
+                    setTimeout(() => resolve(null));
+                }
+            }),
+        ]).then(async () => {
             await this.uiService.scrollSmoothElementToChild(this.elementRef.nativeElement);
             /*this.elementRef.nativeElement.scrollIntoView({
                 behavior: 'smooth',
@@ -266,9 +298,13 @@ export class MdsEditorWidgetContainerComponent
     private setDisabled(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
         if (isDisabled) {
-            this.control.disable();
+            if (!this.control.disabled) {
+                this.control.disable();
+            }
         } else {
-            this.control.enable();
+            if (this.control.disabled) {
+                this.control.enable();
+            }
         }
     }
 

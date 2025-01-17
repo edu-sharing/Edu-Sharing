@@ -95,6 +95,9 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
     @JobFieldDescription(description = "force run, even if the date is currently not the 1st")
     private boolean force = false;
 
+    @JobFieldDescription(description = "When set to true, the job will generate the monthly report")
+    private boolean generateMonthly = true;
+
     @JobFieldDescription(description = "When set to true, the job will generate a yearly report as well (only on 1st January)")
     private boolean generateYearly = false;
 
@@ -140,23 +143,24 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             if (customDate != null) {
                 localDate = customDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             }
-
-            LocalDate lastMonth = localDate.minusMonths(1);
-            LocalDate from = lastMonth.withDayOfMonth(1);
-
-            YearMonth month = YearMonth.from(from);
-            LocalDate to = month.atEndOfMonth();
-
             for (String mediacenter : mediacenters == null ? SearchServiceFactory.getLocalService().getAllMediacenters() : mediacenters) {
+
+                LocalDate lastMonth = localDate.minusMonths(1);
+                LocalDate from = lastMonth.withDayOfMonth(1);
+
+                YearMonth month = YearMonth.from(from);
+                LocalDate to = month.atEndOfMonth();
+
                 if (isInterrupted()) {
                     return null;
                 }
                 logger.info("Building stats for mediacenter " + mediacenter);
                 Date startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
                 Date endDate = Date.from(to.atTime(23, 59).toInstant(ZoneOffset.UTC));
-                generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
-                generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
-
+                if (generateMonthly) {
+                    generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
+                    generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
+                }
                 if (generateYearly && localDate.getMonthValue() == 1) {
                     from = localDate.minusYears(1).withDayOfMonth(1);
                     startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
@@ -317,7 +321,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             case Quarterly:
                 sb.append(startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(("yyyy"))));
                 sb.append("-Q");
-                sb.append(endDate.getMonth()/3);
+                sb.append((endDate.getMonth() + 1) / 3);
                 break;
 
             default:

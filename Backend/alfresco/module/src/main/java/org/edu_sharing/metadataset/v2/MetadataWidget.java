@@ -1,14 +1,7 @@
 package org.edu_sharing.metadataset.v2;
 
-import com.google.gson.internal.LinkedHashTreeMap;
-import com.google.gson.internal.LinkedTreeMap;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.edu_sharing.utils.TreeNode;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.*;

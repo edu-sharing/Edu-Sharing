@@ -501,6 +501,20 @@
         "CC0_INFO": "Ich halte Urheberrechte und verzichte <i>unwiderruflich</i> darauf",
         "PDM": "Public Domain Mark",
         "PDM_INFO": "Das Werk ist frei von bekannten Urheberrechts-Bedingungen"
+      },
+      "AI": {
+        "TITLE": "Informationen zur KI-Herkunft & -Nutzung",
+        "USE_FOR_TRAINING": "Für Training verwendbar",
+        "USE_FOR_TRAINING_INFO": "Dieses Element darf für Training von KI-Netzen benutzt werden (dies ist grundsätzlich der Fall, sofern es nicht explizit ausgeschlossen wird)",
+        "GENERATED": "Durch KI generiert",
+        "GENERATED_INFO": "Dieses Element wurde mit Hilfe einer KI generiert",
+        "TOOL": "Tool",
+        "TOOL_INFO": "Welches Tool/Modell wurde zum Generieren verwendet",
+        "TOOL_CUSTOM": "Anderes Tool",
+        "TOOL_CUSTOM_NAME": "Tool-Name",
+        "TOOL_NO_INFO": "Keine Angabe / Unbekannt",
+        "MANUALLY_MODIFIED": "Wurde nachbearbeitet",
+        "MANUALLY_MODIFIED_INFO": "Das Element wurde nach der Generierung noch manuell bearbeitet oder in relevantem Umfang verändert"
       }
     },
     "FILE_CHOOSER": {

@@ -12,6 +12,9 @@ public class SearchLogger {
     static Logger logger = Logger.getLogger(SearchLogger.class);
     public static void logSearch(SearchToken searchToken, SearchResultNodeRef result){
         try {
+            if(searchToken.getSearchCriterias() == null) {
+                return;
+            }
             logger.info(
                     new JSONObject()
                     .put("metadataset",

@@ -89,6 +89,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class NodeDao {
     private static Logger logger = Logger.getLogger(NodeDao.class);
@@ -208,10 +209,21 @@ public class NodeDao {
         props.remove(CCConstants.getValidLocalName(CCConstants.CM_NAME));
         try {
             MetadataSet mds = MetadataHelper.getMetadataset(new NodeRef(repoDao, getId()));
-            HashSet<String> defaultProps = mds.getWidgetsByNode(getType(), getAspectsNative(), false).stream().map(MetadataWidget::getId).collect(Collectors.toCollection(HashSet::new));
-            defaultProps.addAll(mds.getWidgetsByNode(getType(), getAspectsNative(), false).stream().map(MetadataWidget::getSuggestDisplayProperty).filter(Objects::nonNull).collect(Collectors.toSet()));
+            HashSet<String> defaultProps = mds.getWidgetsByNode(this.type, getAspectsNative(), false).stream().map(MetadataWidget::getId).collect(Collectors.toCollection(HashSet::new));
+            defaultProps.addAll(mds.getWidgetsByNode(this.type, getAspectsNative(), false).stream().map(MetadataWidget::getSuggestDisplayProperty).filter(Objects::nonNull).collect(Collectors.toSet()));
             defaultProps.addAll(Arrays.stream(NodeCustomizationPolicies.SAFE_PROPS).map(CCConstants::getValidLocalName).collect(Collectors.toList()));
             defaultProps.addAll(Arrays.stream(NodeCustomizationPolicies.LICENSE_PROPS).map(CCConstants::getValidLocalName).collect(Collectors.toList()));
+
+            // don't remove published only properties
+            Stream.of(
+                            CCConstants.CCM_PROP_PUBLISHED_DOI_ID,
+                            CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID,
+                            CCConstants.CCM_PROP_PUBLISHED_DATE,
+                            CCConstants.CCM_PROP_IO_PUBLISHED_ORIGINAL
+                    )
+                    .map(CCConstants::getValidLocalName)
+                    .forEach(defaultProps::remove);
+
             for (String prop : defaultProps) {
                 if (!props.containsKey(prop) && CCConstants.getValidGlobalName(prop) != null) {
                     // delete removed properties
@@ -227,6 +239,12 @@ public class NodeDao {
                         false);
             }
 
+            // fix duplicate child name issues in publishing folder
+            props.remove(CCConstants.getValidLocalName(CCConstants.CM_NAME));
+
+            // fix published mode only for original
+            props.remove(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_PUBLISHED_MODE));
+
             return changeProperties(props);
         } catch (Throwable t) {
             throw DAOException.mapping(t);
@@ -237,7 +255,7 @@ public class NodeDao {
         try {
             NodeServiceFactory.getLocalService().revokeNode(storeProtocol, storeId, getId(), details);
             return getNode(repoDao, getId(), filter);
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             throw DAOException.mapping(t);
         }
     }
@@ -645,9 +663,12 @@ public class NodeDao {
         node.setPreview(new Preview());
         // allow fetching as admin to properly resolve the url
         AuthenticationUtil.runAsSystem(() -> {
-            node.getPreview().setUrl(
-                    URLTool.getPreviewServletUrl(nodeRef.getId(), StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier())
-            );
+            try {
+                node.getPreview().setUrl(
+                        URLTool.getPreviewServletUrl(nodeRef.getId(), StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier())
+                );
+            } catch (Throwable ignored) {
+            }
             return null;
         });
         return node;
@@ -883,13 +904,13 @@ public class NodeDao {
             this.isPublic = nodeRef.getPublic();
         } else {
             GuestConfig guestConfig = guestService.getCurrentGuestConfig();
-            if(guestConfig != null && guestConfig.isEnabled()) {
+            if (guestConfig != null && guestConfig.isEnabled()) {
                 try {
                     this.isPublic = usedPermissionService.hasPermission(
                             storeProtocol,
                             storeId,
                             nodeId,
-                        guestConfig.getUsername(),
+                            guestConfig.getUsername(),
                             CCConstants.PERMISSION_READ_ALL
                     );
                 } catch (Throwable t) {
@@ -922,11 +943,8 @@ public class NodeDao {
     ) throws DAOException {
 
         NodeEntries result = new NodeEntries();
-        List<NodeRef> slice = new ArrayList<>();
+        List<NodeRef> slice = children.subList(skipCount, Math.min(children.size(), skipCount + maxItems));
 
-        for (int i = skipCount; i < Math.min(children.size(), (long) skipCount + maxItems); i++) {
-            slice.add(children.get(i));
-        }
         List<Node> nodes = convertToRest(repoDao, slice, propFilter, transform);
         int removedNodes = slice.size() - nodes.size();
         Pagination pagination = new Pagination();
@@ -1084,7 +1102,7 @@ public class NodeDao {
 
         try {
             org.alfresco.service.cmr.repository.NodeRef newNode = nodeService.copyNode(sourceId, nodeId, withChildren);
-            permissionService.createNotifyObject(newNode.getId(),AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+            permissionService.createNotifyObject(newNode.getId(), AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
             return new NodeDao(repoDao, newNode.getId(), Filter.createShowAllFilter());
 
         } catch (Throwable t) {
@@ -1689,22 +1707,20 @@ public class NodeDao {
             }
 
 
+            for (TimedPermissionAuthority entry : authPerm) {
+                ACE ace = getACEAsSystem(entry.getAuthority());
+                ace.setPermissions(new ArrayList<>(entry.getPermissions()));
+                ace.setFrom(entry.getFrom());
+                ace.setTo(entry.getTo());
+                ace.setEditable(entry.getAuthority().isEditable());
+                result.getLocalPermissions().getPermissions().add(ace);
+            }
 
-                for (TimedPermissionAuthority entry : authPerm) {
-                    ACE ace = getACEAsSystem(entry.getAuthority());
-                    ace.setPermissions(new ArrayList<>(entry.getPermissions()));
-                    ace.setFrom(entry.getFrom());
-                    ace.setTo(entry.getTo());
-                    ace.setEditable(entry.getAuthority().isEditable());
-                    result.getLocalPermissions().getPermissions().add(ace);
-                }
-
-                for (Map.Entry<Authority, List<String>> entry : authPermInherited.entrySet()) {
-                    ACE ace = getACEAsSystem(entry.getKey());
-                    ace.setPermissions(entry.getValue());
-                    result.getInheritedPermissions().add(ace);
-                }
-
+            for (Map.Entry<Authority, List<String>> entry : authPermInherited.entrySet()) {
+                ACE ace = getACEAsSystem(entry.getKey());
+                ace.setPermissions(entry.getValue());
+                result.getInheritedPermissions().add(ace);
+            }
 
 
             return result;
@@ -2737,7 +2753,7 @@ public class NodeDao {
             RunAsWork<NodeDao> work = () -> {
                 try {
                     org.alfresco.service.cmr.repository.NodeRef newNode = nodeService.copyNode(source[0], nodeId, false);
-                    permissionService.createNotifyObject(newNode.getId(),AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
+                    permissionService.createNotifyObject(newNode.getId(), AuthenticationUtil.getFullyAuthenticatedUser(), CCConstants.CCM_VALUE_NOTIFY_ACTION_PERMISSION_ADD);
                     nodeService.addAspect(newNode.getId(), CCConstants.CCM_ASPECT_FORKED);
                     nodeService.setProperty(newNode.getStoreRef().getProtocol(), newNode.getStoreRef().getIdentifier(), newNode.getId(), CCConstants.CCM_PROP_FORKED_ORIGIN,
                             new org.alfresco.service.cmr.repository.NodeRef(storeProtocol, storeId, source[0]), false);

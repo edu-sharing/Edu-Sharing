@@ -6,6 +6,7 @@
       [class.wrapper-edit]="isUserAllowedToEdit(collection)"
     >
       <es-node-entries-wrapper
+        #listCollections
         [dataSource]="dataSourceCollections"
         [elementInteractionType]="interactionType"
         [columns]="collectionsColumns"

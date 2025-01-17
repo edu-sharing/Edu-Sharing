@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 
 import java.io.IOException;
 
+import static org.edu_sharing.spring.security.openid.SecurityConfigurationOpenIdConnect.DEFAULT_REGISTRATION_ID;
+
 public class SSORegistrationsDispatcherServlet extends HttpServlet {
 
     Logger logger = Logger.getLogger(SSORegistrationsDispatcherServlet.class);
@@ -26,10 +28,16 @@ public class SSORegistrationsDispatcherServlet extends HttpServlet {
 
         String registrationId = NodeCustomizationPolicies.getEduSharingContext();
         if(StringUtils.isEmpty(registrationId) || registrationId.equals(CCConstants.EDUCONTEXT_DEFAULT)){
-            registrationId = SecurityConfigurationOpenIdConnect.DEFAULT_REGISTRATION_ID;
+            registrationId = DEFAULT_REGISTRATION_ID;
         }
 
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
+
+        if(clientRegistration == null){
+            logger.warn("Client registration not found:" + registrationId +". trying to resolve with default id:" + DEFAULT_REGISTRATION_ID);
+            clientRegistration = clientRegistrationRepository.findByRegistrationId(DEFAULT_REGISTRATION_ID);
+        }
+
         if(clientRegistration == null){
             String message = "Client registration not found:" + registrationId +". check lightbend context config.";
             logger.warn(message);

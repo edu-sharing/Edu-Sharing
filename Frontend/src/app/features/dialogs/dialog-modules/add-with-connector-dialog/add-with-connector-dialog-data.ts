@@ -9,5 +9,6 @@ export class AddWithConnectorDialogData {
 export interface AddWithConnectorDialogResult {
     name: string;
     type: ConnectorFileType;
+    window: Window;
     data: { [key in string]: string[] };
 }

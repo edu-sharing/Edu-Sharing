@@ -71,7 +71,7 @@ public class MediacenterServiceImpl implements MediacenterService {
     public static String getAuthorityScope(String mediacenter) throws Exception {
         String authorityScope = MediacenterServiceFactory.getLocalService().getMediacenterProxyGroup(mediacenter);
         if (authorityScope == null) {
-            throw new Exception("No mediacenter proxy group found.");
+            throw new Exception("No mediacenter proxy group found for " + mediacenter);
         }
         return authorityScope;
     }

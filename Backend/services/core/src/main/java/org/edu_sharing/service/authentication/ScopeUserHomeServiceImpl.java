@@ -252,4 +252,9 @@ public class ScopeUserHomeServiceImpl implements ScopeUserHomeService{
 	public void setManageEduGroupFolders(boolean manageEduGroupFolders) {
 		this.manageEduGroupFolders = manageEduGroupFolders;
 	}
+
+	@Override
+	public boolean isManageEduGroupFolders() {
+		return manageEduGroupFolders;
+	}
 }

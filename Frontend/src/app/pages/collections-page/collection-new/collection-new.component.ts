@@ -54,7 +54,15 @@ import {
     User,
 } from '../../../core-module/core.module';
 import { Toast } from '../../../services/toast';
-import { Ace, Acl, ConfigService, Group, NodeService } from 'ngx-edu-sharing-api';
+import {
+    Ace,
+    Acl,
+    ConfigService,
+    Group,
+    NodeService,
+    SessionStorageService,
+    Store,
+} from 'ngx-edu-sharing-api';
 import { TranslateService } from '@ngx-translate/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { UIHelper } from '../../../core-ui-module/ui-helper';
@@ -237,6 +245,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         private toast: Toast,
         private bridge: BridgeService,
         private temporaryStorage: TemporaryStorageService,
+        private sessionStorageService: SessionStorageService,
         private zone: NgZone,
         private sanitizer: DomSanitizer,
         private configLegacy: ConfigurationService,
@@ -905,7 +914,18 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         }
     }
 
-    private save4(collection: EduData.Node) {
+    private async save4(collection: EduData.Node) {
+        if (this.parentId === RestConstants.ROOT) {
+            const collections = await this.sessionStorageService
+                .get(SessionStorageService.KEY_ROOT_COLLECTIONS, [], Store.Session)
+                .toPromise();
+            collections.push(collection);
+            await this.sessionStorageService.set(
+                SessionStorageService.KEY_ROOT_COLLECTIONS,
+                collections,
+                Store.Session,
+            );
+        }
         // check if there are any nodes that should be added to this collection
         const add: { nodes: EduData.Node[]; callback: EventEmitter<any> } =
             this.temporaryStorage.pop(TemporaryStorageService.COLLECTION_ADD_NODES);

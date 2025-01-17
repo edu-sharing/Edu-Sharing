@@ -194,6 +194,7 @@ export enum Scope {
 
     MediacenterNodesList = 'MediacenterNodesList',
     Admin = 'Admin', // Admin Tools / Debugging
+    DebugShowAll = 'DebugShowAll', // Full debug mode which enables all options
 }
 export enum ElementType {
     Node,

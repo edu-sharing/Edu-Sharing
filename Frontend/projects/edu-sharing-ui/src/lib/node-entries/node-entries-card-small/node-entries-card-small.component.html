@@ -7,6 +7,8 @@
         ' grid-card-collection-type-' +
         node.collection.type
       : '') +
+    ($any(node).virtual ? ' grid-card-virtual' : '') +
+    ' ' +
     (entriesService.singleClickHint === 'dynamic' ? ' dynamic-single-click' : '')
   "
   [style.background-color]="nodeHelper.isNodeCollection(node) ? node.collection.color : null"

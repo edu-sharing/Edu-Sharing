@@ -163,7 +163,9 @@ public class MimeTypesV2 {
 	public String getIcon(String nodeType,Map<String,Object> properties,List<String> aspects){
 		return getIconPath()+getNodeType(nodeType,properties,aspects)+"."+preferredFormat.getSuffix();
 	}
-	/**
+	public String getDefaultIcon(){
+		return getIconPath()+"file."+preferredFormat.getSuffix();
+	}/**
 	 * Gets a full preview path for a large mime image with background for the given node properties
 	 * @return
 	 */

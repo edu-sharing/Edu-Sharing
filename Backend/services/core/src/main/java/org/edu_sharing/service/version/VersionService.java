@@ -131,6 +131,9 @@ public class VersionService implements ApplicationListener<RefreshScopeRefreshed
             value = getRepositoryVersion();
         } else if (type.equals(Type.RENDERSERVICE)) {
             value = getRenderserviceVersion();
+            if(value == null){
+                return value;
+            }
             // cleanup version and only keep major + minor
             try {
                 Pattern pattern = Pattern.compile("(\\d\\.\\d)\\..*");
@@ -149,7 +152,7 @@ public class VersionService implements ApplicationListener<RefreshScopeRefreshed
 	public void invalidateCache(){
         versionCache.clear();
     }
-	private String getRenderserviceVersion() throws Exception{
+    public String getRenderserviceVersion() throws Exception{
         RenderingVersionInfo version = RenderingServiceFactory.getLocalService().getVersion();
         if (version != null) {
             return version.version;

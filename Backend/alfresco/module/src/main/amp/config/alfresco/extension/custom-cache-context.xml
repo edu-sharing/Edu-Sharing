@@ -54,9 +54,13 @@
         <constructor-arg value="cache.eduSharingConfigCache"/>
     </bean>
 
-  <bean name="eduSharingContextCache" factory-bean="cacheFactory" factory-method="createCache">
-    <constructor-arg value="cache.eduSharingContextCache"/>
-  </bean>
+    <bean name="eduSharingContextCacheByDomain" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.eduSharingContextCacheByDomain"/>
+    </bean>
+
+    <bean name="eduSharingContextCacheById" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.eduSharingContextCacheById"/>
+    </bean>
 
     <bean name="eduSharingVersionCache" factory-bean="cacheFactory" factory-method="createCache">
         <constructor-arg value="cache.eduSharingVersionCache"/>

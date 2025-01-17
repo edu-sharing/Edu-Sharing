@@ -159,6 +159,19 @@
           "DownloadContent": "Télécharger"
         }
       },
+
+      "TIMEBASED": {
+        "TOOLTIP": "Configurer l'autorisation procgrammée",
+        "INVALID_STATE": "Cette autorisation programmée est remplacée par une autre autorisation permanente et n'a aucun effet.",
+        "INVALID_STATE_TITLE": "Paramètres non valides détectés",
+        "INVALID_STATE_DETAILS": "Il existe des autorisations contrôlées par le temps qui sont remplacées par des autorisations permanentes. Modifiez le niveau d'autorisation de l'autorisation contrôlée par le temps ou supprimez-la pour que les valeurs puissent être enregistrées.",
+        "FROM_CHECKBOX": "Définir l'heure de début",
+        "TO_CHECKBOX": "Définir l'heure de fin",
+        "DATE_LABEL": "Date",
+        "TIME_LABEL": "Heure",
+        "INVALID_DATE": "Date non valide"
+      },
+
       "PUBLISH": {
         "OPEN_VERSION": "Afficher la version",
         "NO_LICENSE": "Le matériel actuel n'a pas de licence attribuée. Les matériaux partagés doivent avoir une licence appropriée pour spécifier si et comment le matériau peut être réutilisé.",
@@ -464,6 +477,13 @@
       "PERMISSIONS": "Vous ne disposez pas des autorisations suffisantes pour créer des éléments dans le dossier actuel.",
       "VIRTUAL": "Vous êtes dans un dossier où l'insertion d'éléments n'est pas possible.",
       "GENERAL": "Naviguez vers un autre dossier et créez-y vos éléments."
+    },
+    "COPY_MOVE": {
+      "TITLE": "déplacer/copier des éléments.",
+      "MESSAGE_SINGLE": "Voulez-vous déplacer/copier l'élément \"{{element}}\" de \"{{source}}\" vers \"{{target}}\".?",
+      "MESSAGE_MULTIPLE": "Voulez-vous déplacer/copier {{count}} éléments de \"{{source}}\" vers \"{{target}}\" ?",
+      "MOVE": "déplacer",
+      "COPY": "copier"
     },
     "TOAST": {
       "FOLDER_ADDED": "Dossier ajouté",

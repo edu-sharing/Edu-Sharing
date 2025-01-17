@@ -27,8 +27,8 @@ RUN set -eux \
         tomcat/webapps/alfresco/WEB-INF/lib/juniversalchardet-* \
         tomcat/webapps/alfresco/WEB-INF/lib/jwarc-* \
         tomcat/webapps/alfresco/WEB-INF/lib/poi-* \
-        tomcat/webapps/alfresco/WEB-INF/lib/xmpbox-*
-
+        tomcat/webapps/alfresco/WEB-INF/lib/xmpbox-* \
+        tomcat/webapps/alfresco/WEB-INF/lib/stax2-api-*
 
 COPY --chown=worker:worker artifacts/edu_sharing-community-repository-backend-tomcat-${org.edu_sharing:edu_sharing-community-repository-backend-tomcat:jar.version}.jar tomcat/lib/
 COPY --chown=worker:worker webapp/*.war tomcat/webapps/edu-sharing.war

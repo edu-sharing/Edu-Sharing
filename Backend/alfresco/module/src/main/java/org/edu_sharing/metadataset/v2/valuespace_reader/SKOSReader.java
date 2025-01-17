@@ -1,21 +1,15 @@
 package org.edu_sharing.metadataset.v2.valuespace_reader;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.edu_sharing.metadataset.v2.MetadataKey;
+import org.edu_sharing.metadataset.v2.Source;
 import org.edu_sharing.metadataset.v2.ValuespaceData;
 import org.edu_sharing.metadataset.v2.ValuespaceInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -67,6 +61,7 @@ public class SKOSReader extends ValuespaceReader{
         String de = entry.getJSONObject(labelId).getString("de");
         key.setCaption(de);
         key.setLocale("de");
+        key.setSource(Source.SKOS);
         if(locale != null && !"de_DE".equals(locale)) {
             try {
                 String[] splitted=locale.split("_");

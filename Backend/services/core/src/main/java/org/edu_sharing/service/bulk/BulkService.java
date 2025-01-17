@@ -14,6 +14,8 @@ public interface BulkService {
 
     NodeRef sync(String group, List<String> match, List<String> groupBy, String type, List<String> aspects, Map<String, String[]> properties, boolean forceUpdate) throws Throwable;
 
+    List<NodeRef> list(Map<String, String[]> properties) throws Exception;
+
     NodeRef find(Map<String, String[]> properties) throws Exception;
 
     List<BulkRun> runs(String replicationsource, BulkRun.RunState filterByState) throws DAOException;

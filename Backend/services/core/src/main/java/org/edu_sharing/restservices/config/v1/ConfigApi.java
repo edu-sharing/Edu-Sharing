@@ -54,7 +54,7 @@ public class ConfigApi {
             ConfigService configService = ConfigServiceFactory.getConfigService();
             config.setGlobal(configService.getConfig().values);
             try {
-                Context context = configService.getContext(ConfigServiceFactory.getCurrentDomain());
+                Context context = configService.getContextByDomain(ConfigServiceFactory.getCurrentDomain());
                 if (context != null) {
                     config.setContextId(context.id);
                     config.setCurrent(configService.getConfigByContext(context).values);
