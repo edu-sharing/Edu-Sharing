@@ -20,7 +20,6 @@
 
   <modules>
     <module>common</module>
-    <module>doi</module>
     <module>core</module>
     <module>rest</module>
     <!--module>soap</module-->
