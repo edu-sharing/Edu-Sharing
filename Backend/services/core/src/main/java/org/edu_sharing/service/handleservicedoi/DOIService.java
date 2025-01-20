@@ -70,10 +70,10 @@ public class DOIService implements HandleService {
             DoiConfig doiConfig = beanFactory.getBean(DoiConfig.class);
 
             if(doiConfig.isEnabled()){
-                Objects.requireNonNull(doiConfig.getBaseUrl());
-                Objects.requireNonNull(doiConfig.getAccountId());
-                Objects.requireNonNull(doiConfig.getPrefix());
-                Objects.requireNonNull(doiConfig.getPassword());
+                Objects.requireNonNull(doiConfig.getBaseUrl(), "repository.doiservice.baseUrl not set");
+                Objects.requireNonNull(doiConfig.getAccountId(), "repository.doiservice.accountId not set");
+                Objects.requireNonNull(doiConfig.getPrefix(), "repository.doiservice.prefix not set");
+                Objects.requireNonNull(doiConfig.getPassword(), "repository.doiservice.password not set");
             }
            this.doiConfig = doiConfig;
         }catch (Throwable t){

@@ -95,9 +95,9 @@ public class HandleServiceImpl implements HandleService {
         try {
             HandleConfig handleConfig = beanFactory.getBean(HandleConfig.class);
             if(handleConfig.isEnabled()){
-                Objects.requireNonNull(handleConfig.getPrefix());
-                Objects.requireNonNull(handleConfig.getRepoid());
-                Objects.requireNonNull(handleConfig.getPrivkey());
+                Objects.requireNonNull(handleConfig.getPrefix(),"repository.handleservice.prefix not set");
+                Objects.requireNonNull(handleConfig.getRepoid(), "repository.handleservice.repoid not set");
+                Objects.requireNonNull(handleConfig.getPrivkey(),"repository.handleservice.privkey not set");
             }
             if(StringUtils.isNotBlank(handleConfig.getConfigDir())) {
                 System.setProperty("net.handle.configDir", handleConfig.getConfigDir());
