@@ -8781,12 +8781,12 @@
             }
           },
           {
-            "description": "subObjectHandler",
+            "description": "targetDir",
             "in": "query",
-            "name": "subObjectHandler",
+            "name": "format",
             "required": true,
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -8848,7 +8848,7 @@
             "description": "Fatal error occured."
           }
         },
-        "summary": "Export Nodes with LOM Metadata Format",
+        "summary": "Export Nodes with given Metadata Format",
         "tags": [
           "ADMIN v1"
         ]
