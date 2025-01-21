@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.edu_sharing.restservices.ApiService;
 import org.edu_sharing.restservices.RegisterDao;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 
+@SecurityRequirements
 @Path("/register/v1")
 @Tag(name="REGISTER v1")
 @ApiService(value="REGISTER", major=1, minor=0)

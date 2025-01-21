@@ -108,7 +108,12 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
 
         }
         Config accessConfig = LightbendConfigLoader.get().getConfig("security.access");
-        List<String> AUTHLESS_ENDPOINTS = Arrays.asList("/authentication", "/_about", "/config", "/register", "/sharing",
+        List<String> AUTHLESS_ENDPOINTS = Arrays.asList(
+                "/authentication",
+                "/_about",
+                "/config",
+                "/register",
+                "/sharing",
                 "/lti/v13/oidc/login_initiations",
                 "/lti/v13/lti13",
                 "/lti/v13/registration/dynamic",

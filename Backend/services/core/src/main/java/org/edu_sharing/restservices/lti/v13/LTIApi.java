@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -81,6 +82,7 @@ public class LTIApi {
     RegistrationService registrationService;
 
     @POST
+    @SecurityRequirements
     @Path("/oidc/login_initiations")
     @Operation(summary = "lti authentication process preparation.", description = "preflight phase. prepares lti authentication process. checks it issuer is valid")
     @Consumes({"application/x-www-form-urlencoded"})
@@ -115,6 +117,7 @@ public class LTIApi {
     }
 
     @GET
+    @SecurityRequirements
     @Path("/oidc/login_initiations")
     @Operation(summary = "lti authentication process preparation.", description = "preflight phase. prepares lti authentication process. checks it issuer is valid")
     @Consumes({"application/x-www-form-urlencoded"})
@@ -220,6 +223,7 @@ public class LTIApi {
 
 
     @POST
+    @SecurityRequirements
     @Path("/" + LTIConstants.LTI_TOOL_REDIRECTURL_PATH  )
     @Operation(summary = "lti tool redirect.", description = "lti tool redirect")
 
@@ -246,6 +250,7 @@ public class LTIApi {
     }
 
     @POST
+    @SecurityRequirements
     @Path("/" + LTIConstants.LTI_TOOL_REDIRECTURL_PATH +"/{nodeId}"  )
     @Operation(summary = "lti tool resource link target.", description = "used by some platforms for direct (without oidc login_init) launch requests")
 
@@ -531,6 +536,7 @@ public class LTIApi {
      */
     @GET
     @Path("/jwks")
+    @SecurityRequirements
     @Operation(summary = "LTI - returns repository JSON Web Key Sets")
     @Consumes({ "application/json" })
     @Produces({"application/json"})
@@ -569,6 +575,7 @@ public class LTIApi {
     }
 
     @GET
+    @SecurityRequirements
     @Path("/registration/dynamic/{token}")
     @Operation(summary = "LTI Dynamic Registration - Initiate registration")
     @Consumes({ "text/html" })

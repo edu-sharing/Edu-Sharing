@@ -8,16 +8,15 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import jakarta.annotation.Priority;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.edu_sharing.swagger.SwaggerReader;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -92,6 +91,7 @@ public class ApiApplication extends ResourceConfig {
         oas.servers(Collections.singletonList(new Server().url(url)));
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+                .readerClass(SwaggerReader.class.getName())
                 .openAPI(oas)
                 .prettyPrint(true)
                 .resourcePackages(Stream.of(getClass().getPackage().getName()).collect(Collectors.toSet()));
@@ -103,7 +103,7 @@ public class ApiApplication extends ResourceConfig {
 
 
         try {
-            new JaxrsOpenApiContextBuilder()
+            new JaxrsOpenApiContextBuilder<>()
                     /**
                      * @TODO
                      */

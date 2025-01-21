@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -415,6 +416,7 @@ public class LTIPlatformApi {
 
 
     @GET
+    @SecurityRequirements
     @Path("/openid-configuration")
     @Operation(summary = "LTIPlatform openid configuration")
     @Consumes({"*/*"})
@@ -435,6 +437,7 @@ public class LTIPlatformApi {
 
 
     @POST
+    @SecurityRequirements
     @Path("/openid-registration")
 
     @Operation(summary = "registration endpoint the tool uses to register at platform.", description = "tool registration")
@@ -1062,6 +1065,7 @@ public class LTIPlatformApi {
 
     @POST
     @Path("/content")
+    @SecurityRequirements
     @Consumes({"multipart/form-data"})
     @Produces({"application/json"})
 

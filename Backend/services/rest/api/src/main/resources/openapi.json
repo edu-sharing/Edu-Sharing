@@ -6924,6 +6924,17 @@
         },
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "cookieAuth": {
+        "in": "cookie",
+        "name": "JSESSIONID",
+        "type": "apiKey"
+      }
     }
   },
   "info": {
@@ -6969,6 +6980,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Discover the API.",
         "tags": [
           "ABOUT"
@@ -7001,6 +7013,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "License information.",
         "tags": [
           "ABOUT"
@@ -7096,6 +7109,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "status of repo services",
         "tags": [
           "ABOUT"
@@ -7111,7 +7125,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Application"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -8110,7 +8127,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -8792,12 +8812,12 @@
             }
           },
           {
-            "description": "subObjectHandler",
+            "description": "targetDir",
             "in": "query",
-            "name": "subObjectHandler",
+            "name": "format",
             "required": true,
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -8859,7 +8879,7 @@
             "description": "Fatal error occured."
           }
         },
-        "summary": "Export Nodes with LOM Metadata Format",
+        "summary": "Export Nodes with given Metadata Format",
         "tags": [
           "ADMIN v1"
         ]
@@ -8874,7 +8894,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Group"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -9450,7 +9473,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -9925,7 +9951,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/JobInfo"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -9996,7 +10025,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/JobDescription"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -10832,7 +10864,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/PluginStatus"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -11347,7 +11382,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/ServerUpdateInfo"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -11440,7 +11478,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/ServerUpdateInfo"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -12600,6 +12641,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "authenticate user of an registered application.",
         "tags": [
           "AUTHENTICATION v1"
@@ -12623,6 +12665,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Destroys the current session and logout the user",
         "tags": [
           "AUTHENTICATION v1"
@@ -12657,6 +12700,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Returns true if the current user has access to the given scope",
         "tags": [
           "AUTHENTICATION v1"
@@ -12687,9 +12731,19 @@
                 }
               }
             },
-            "description": "OK."
+            "description": "Successfully authenticated.\n The session ID is returned in a cookie named `JSESSIONID`. You need to include this cookie in subsequent requests.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "example": "JSESSIONID=abcde12345; PATH=/; HttpOnly",
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
           }
         },
+        "security": [],
         "summary": "Validates the Basic Auth Credentials and check if the session is a logged in user",
         "tags": [
           "AUTHENTICATION v1"
@@ -12709,9 +12763,19 @@
                 }
               }
             },
-            "description": "OK."
+            "description": "Successfully authenticated.\n The session ID is returned in a cookie named `JSESSIONID`. You need to include this cookie in subsequent requests.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "example": "JSESSIONID=abcde12345; PATH=/; HttpOnly",
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
           }
         },
+        "security": [],
         "summary": "Validates if an provider (idp) session exists.",
         "tags": [
           "AUTHENTICATION v1"
@@ -12731,9 +12795,19 @@
                 }
               }
             },
-            "description": "OK."
+            "description": "Successfully authenticated.\n The session ID is returned in a cookie named `JSESSIONID`. You need to include this cookie in subsequent requests.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "example": "JSESSIONID=abcde12345; PATH=/; HttpOnly",
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
           }
         },
+        "security": [],
         "summary": "Validates the Basic Auth Credentials and check if the session is a logged in user",
         "tags": [
           "AUTHENTICATION v1"
@@ -12975,7 +13049,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/BulkRun"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -15407,7 +15484,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Context"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -15464,6 +15544,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "get all available repository context objects",
         "tags": [
           "CONFIG v1"
@@ -15542,6 +15623,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Set a context entry (admin rights required)",
         "tags": [
           "CONFIG v1"
@@ -15624,6 +15706,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Delete a context entry by id (admin rights required)",
         "tags": [
           "CONFIG v1"
@@ -15706,6 +15789,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Get a config entry (appropriate rights for the entry are required)",
         "tags": [
           "CONFIG v1"
@@ -15807,6 +15891,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Set a config entry (admin rights required)",
         "tags": [
           "CONFIG v1"
@@ -15879,6 +15964,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "get override strings for the current language",
         "tags": [
           "CONFIG v1"
@@ -15950,6 +16036,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "get all inital language strings for angular",
         "tags": [
           "CONFIG v1"
@@ -16022,6 +16109,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "get repository config values",
         "tags": [
           "CONFIG v1"
@@ -16094,6 +16182,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "get global config variables",
         "tags": [
           "CONFIG v1"
@@ -17769,7 +17858,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -20476,6 +20568,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "LTI - returns repository JSON Web Key Sets",
         "tags": [
           "LTI v13"
@@ -20571,6 +20664,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "lti tool redirect.",
         "tags": [
           "LTI v13"
@@ -20677,6 +20771,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "lti tool resource link target.",
         "tags": [
           "LTI v13"
@@ -20801,6 +20896,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "lti authentication process preparation.",
         "tags": [
           "LTI v13"
@@ -20910,6 +21006,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "lti authentication process preparation.",
         "tags": [
           "LTI v13"
@@ -21009,6 +21106,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "LTI Dynamic Registration - Initiate registration",
         "tags": [
           "LTI v13"
@@ -21598,6 +21696,7 @@
             "content": {
               "*/*": {
                 "schema": {
+                  "format": "byte",
                   "type": "string"
                 }
               }
@@ -23687,7 +23786,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Mediacenter"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -24181,7 +24283,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Group"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -24430,7 +24535,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Group"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -24542,7 +24650,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Group"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -24652,7 +24763,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Group"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -24888,7 +25002,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/StoredService"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -27585,7 +27702,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/NotifyEntry"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -28300,7 +28420,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -29264,7 +29387,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/NodeShare"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -30423,7 +30549,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowHistory"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -31501,7 +31630,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -31800,7 +31932,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/RatingHistory"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -31895,6 +32030,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Activate a new user (by using a supplied key)",
         "tags": [
           "REGISTER v1"
@@ -31937,6 +32073,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Check if the given mail is already successfully registered",
         "tags": [
           "REGISTER v1"
@@ -31975,6 +32112,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Send a mail to recover/reset password",
         "tags": [
           "REGISTER v1"
@@ -32011,6 +32149,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Register a new user",
         "tags": [
           "REGISTER v1"
@@ -32050,6 +32189,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Resend a registration mail for a given mail address",
         "tags": [
           "REGISTER v1"
@@ -32097,6 +32237,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Send a mail to recover/reset password",
         "tags": [
           "REGISTER v1"
@@ -33185,7 +33326,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/SearchVCard"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -34222,6 +34366,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Get general info of a share.",
         "tags": [
           "SHARING v1"
@@ -34374,6 +34519,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Get all children of this share.",
         "tags": [
           "SHARING v1"
@@ -34639,7 +34785,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingNode"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -34723,7 +34872,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -34816,7 +34968,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/NodeData"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -34969,7 +35124,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Tracking"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -36896,7 +37054,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/Collection"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -37285,6 +37446,14 @@
       }
     }
   },
+  "security": [
+    {
+      "cookieAuth": []
+    },
+    {
+      "basicAuth": []
+    }
+  ],
   "servers": [
     {
       "url": "/edu-sharing/rest"
