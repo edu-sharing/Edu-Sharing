@@ -196,7 +196,6 @@ public void setSessionTimeout(int sessionTimeout) {
 }
 /**
    **/
-  @Schema(required = true, description = "")
   @JsonProperty("currentScope")
   public String getCurrentScope() {
     return currentScope;

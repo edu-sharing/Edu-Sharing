@@ -88,7 +88,6 @@ public class Node implements Serializable {
 	}
 
 	
-	@Schema(required = true, description = "")
 	@JsonProperty("collection")
 	public Collection getCollection() {
 		return collection;

@@ -44,6 +44,7 @@
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>7.11.0</version>
         <executions>
           <execution>
             <goals>
@@ -59,286 +60,8 @@
               <!--configHelp>true</configHelp-->
               <configOptions>
                 <useJakartaEe>true</useJakartaEe>
+                <dateLibrary>java8</dateLibrary>
               </configOptions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>replacer</artifactId>
-        <executions>
-          <execution>
-            <id>removeGeneratedAnnotation</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-            <configuration>
-              <basedir>${project.basedir}</basedir>
-              <includes>
-                <include>target/generated-sources/openapi/src/main/java/**/*.java</include>
-              </includes>
-              <regex>true</regex>
-              <replacements>
-                <replacement>
-                  <token>@jakarta.annotation(.)*</token>
-                  <value/>
-                </replacement>
-              </replacements>
-            </configuration>
-          </execution>
-          <execution>
-            <id>fixJobDetail</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-            <configuration>
-              <basedir>${project.basedir}</basedir>
-              <includes>
-                <include>target/generated-sources/openapi/src/main/java/**/JobDetail.java</include>
-              </includes>
-              <regex>false</regex>
-              <replacements>
-                <replacement>
-                  <token><![CDATA[this.jobDataMap = ;]]></token>
-                  <value><![CDATA[this.jobDataMap = new HashMap<String, Object>();]]></value>
-                </replacement>
-              </replacements>
-            </configuration>
-          </execution>
-          <execution>
-            <id>fixJobInfo</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-            <configuration>
-              <basedir>${project.basedir}</basedir>
-              <includes>
-                <include>target/generated-sources/openapi/src/main/java/**/JobInfo.java</include>
-              </includes>
-              <regex>false</regex>
-              <replacements>
-                <replacement>
-                  <token><![CDATA[this.jobDataMap = ;]]></token>
-                  <value><![CDATA[this.jobDataMap = new HashMap<String, Object>();]]></value>
-                </replacement>
-              </replacements>
-            </configuration>
-          </execution>
-          <execution>
-            <id>fixEnums</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-            <configuration>
-              <basedir>${project.basedir}</basedir>
-              <includes>
-                <include>target/generated-sources/openapi/src/main/java/**/*.java</include>
-              </includes>
-              <regex>false</regex>
-              <replacements>
-                <replacement>
-                  <token><![CDATA[ABORTED("Aborted")]]></token>
-                  <value><![CDATA[Aborted("Aborted")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[ACTIVATED("Activated")]]></token>
-                  <value><![CDATA[Activated("Activated")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[ACTIVE("active")]]></token>
-                  <value><![CDATA[active("active")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[ANGULAR("angular")]]></token>
-                  <value><![CDATA[angular("angular")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[ASSIGN("assign")]]></token>
-                  <value><![CDATA[assign("assign")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[BLOCKED("blocked")]]></token>
-                  <value><![CDATA[blocked("blocked")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[CITY("City")]]></token>
-                  <value><![CDATA[City("City")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[COLLECTION("collection")]]></token>
-                  <value><![CDATA[collection("collection")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[COLLECTIONSCOLLECTION("CollectionsCollection")]]></token>
-                  <value><![CDATA[CollectionsCollection("CollectionsCollection")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[COLLECTIONSREFERENCES("CollectionsReferences")]]></token>
-                  <value><![CDATA[CollectionsReferences("CollectionsReferences")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[CONTINENT("Continent")]]></token>
-                  <value><![CDATA[Continent("Continent")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[COUNTRY("Country")]]></token>
-                  <value><![CDATA[Country("Country")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[CREATEMENU("CreateMenu")]]></token>
-                  <value><![CDATA[CreateMenu("CreateMenu")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[DEACTIVATED("Deactivated")]]></token>
-                  <value><![CDATA[Deactivated("Deactivated")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[DELETE("delete")]]></token>
-                  <value><![CDATA[delete("delete")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[DOWNLOADS("downloads")]]></token>
-                  <value><![CDATA[downloads("downloads")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[FAILED("Failed")]]></token>
-                  <value><![CDATA[Failed("Failed")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[FINISHED("Finished")]]></token>
-                  <value><![CDATA[Finished("Finished")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[GENERIC_API("Generic_Api")]]></token>
-                  <value><![CDATA[Generic_Api("Generic_Api")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[IGNORE("ignore")]]></token>
-                  <value><![CDATA[ignore("ignore")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[JSON("Json")]]></token>
-                  <value><![CDATA[Json("Json")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[LEGACY("legacy")]]></token>
-                  <value><![CDATA[legacy("legacy")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[LIST("list")]]></token>
-                  <value><![CDATA[list("list")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[MANDATORY("mandatory")]]></token>
-                  <value><![CDATA[mandatory("mandatory")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[MANDATORYFORPUBLISH("mandatoryForPublish")]]></token>
-                  <value><![CDATA[mandatoryForPublish("mandatoryForPublish")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[MDS("Mds")]]></token>
-                  <value><![CDATA[Mds("Mds")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[NONE("none")]]></token>
-                  <value><![CDATA[none("none")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[OER("Oer")]]></token>
-                  <value><![CDATA[Oer("Oer")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[OPTIONAL("optional")]]></token>
-                  <value><![CDATA[optional("optional")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[ORGANIZATION("Organization")]]></token>
-                  <value><![CDATA[Organization("Organization")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[PASSWORD("password")]]></token>
-                  <value><![CDATA[password("password")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[RATING("rating")]]></token>
-                  <value><![CDATA[rating("rating")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[REMOVE("remove")]]></token>
-                  <value><![CDATA[remove("remove")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[RENDER("Render")]]></token>
-                  <value><![CDATA[Render("Render")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[RUNNING("Running")]]></token>
-                  <value><![CDATA[Running("Running")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[SEARCH("Search")]]></token>
-                  <value><![CDATA[Search("Search")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[SIMPLE("simple")]]></token>
-                  <value><![CDATA[simple("simple")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[SIMPLEEDIT("SimpleEdit")]]></token>
-                  <value><![CDATA[SimpleEdit("SimpleEdit")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[SITEMAP("Sitemap")]]></token>
-                  <value><![CDATA[Sitemap("Sitemap")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[STATE("State")]]></token>
-                  <value><![CDATA[State("State")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[STATISTICS("Statistics")]]></token>
-                  <value><![CDATA[Statistics("Statistics")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[SUGGESTIONS("suggestions")]]></token>
-                  <value><![CDATA[suggestions("suggestions")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[TEXT("Text")]]></token>
-                  <value><![CDATA[Text("Text")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[TODELETE("todelete")]]></token>
-                  <value><![CDATA[todelete("todelete")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[UPDATE("update")]]></token>
-                  <value><![CDATA[update("update")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[VIEWS("views")]]></token>
-                  <value><![CDATA[views("views")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[WORKSPACELIST("WorkspaceList")]]></token>
-                  <value><![CDATA[WorkspaceList("WorkspaceList")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[WORKSPACETREE("WorkspaceTree")]]></token>
-                  <value><![CDATA[WorkspaceTree("WorkspaceTree")]]></value>
-                </replacement>
-                <replacement>
-                  <token><![CDATA[WORLD("World")]]></token>
-                  <value><![CDATA[World("World")]]></value>
-                </replacement>
-              </replacements>
             </configuration>
           </execution>
         </executions>
@@ -368,73 +91,61 @@
 
   <dependencies>
 
-    <!-- provided -->
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>edu_sharing-community-repository-backend-services-rest-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.gsonfire</groupId>
       <artifactId>gson-fire</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.openapitools</groupId>
       <artifactId>jackson-databind-nullable</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>logging-interceptor</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>okhttp</artifactId>
-      <scope>provided</scope>
     </dependency>
-
-<!--    <dependency>-->
-<!--      <groupId>io.swagger.core.v3</groupId>-->
-<!--      <artifactId>swagger-annotations</artifactId>-->
-<!--      <scope>provided</scope>-->
-<!--    </dependency>-->
 
     <dependency>
       <groupId>org.threeten</groupId>
       <artifactId>threetenbp</artifactId>
-      <scope>provided</scope>
+    </dependency>
+
+    <!-- provided -->
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>edu_sharing-community-repository-backend-services-rest-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
-      <scope>provided</scope>
     </dependency>
-
 
     <dependency>
       <groupId>io.swagger.parser.v3</groupId>
       <artifactId>swagger-parser</artifactId>
-      <scope>provided</scope>
     </dependency>
 
   </dependencies>

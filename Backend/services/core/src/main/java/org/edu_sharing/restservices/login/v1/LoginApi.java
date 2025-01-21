@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SecurityRequirements
 @Path("/authentication/v1")
 @Tag(name = "AUTHENTICATION v1")
 @Consumes({"application/json"})
@@ -248,6 +247,7 @@ public class LoginApi {
 
 
     @POST
+    @SecurityRequirements
     @Path("/appauth/{userId}")
     @Operation(summary = "authenticate user of an registered application.", description = "headers must be set: X-Edu-App-Id, X-Edu-App-Sig, X-Edu-App-Signed, X-Edu-App-Ts")
     @ApiResponses(

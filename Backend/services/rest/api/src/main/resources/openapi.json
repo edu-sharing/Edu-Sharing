@@ -2465,7 +2465,6 @@
           }
         },
         "required": [
-          "currentScope",
           "isAdmin",
           "isGuest",
           "isValidLogin",
@@ -3361,7 +3360,6 @@
         },
         "required": [
           "access",
-          "collection",
           "createdAt",
           "createdBy",
           "downloadUrl",
@@ -12665,7 +12663,6 @@
             "description": "Fatal error occured."
           }
         },
-        "security": [],
         "summary": "Destroys the current session and logout the user",
         "tags": [
           "AUTHENTICATION v1"
@@ -12700,7 +12697,6 @@
             "description": "Fatal error occured."
           }
         },
-        "security": [],
         "summary": "Returns true if the current user has access to the given scope",
         "tags": [
           "AUTHENTICATION v1"
@@ -12743,7 +12739,6 @@
             }
           }
         },
-        "security": [],
         "summary": "Validates the Basic Auth Credentials and check if the session is a logged in user",
         "tags": [
           "AUTHENTICATION v1"
@@ -12775,7 +12770,6 @@
             }
           }
         },
-        "security": [],
         "summary": "Validates if an provider (idp) session exists.",
         "tags": [
           "AUTHENTICATION v1"
@@ -12807,7 +12801,6 @@
             }
           }
         },
-        "security": [],
         "summary": "Validates the Basic Auth Credentials and check if the session is a logged in user",
         "tags": [
           "AUTHENTICATION v1"
