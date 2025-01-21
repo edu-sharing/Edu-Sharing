@@ -123,6 +123,11 @@ export class MdsEditorWidgetContainerComponent
     isHidden: boolean;
 
     private readonly destroyed$ = new Subject<void>();
+    /**
+     * optional input function to inform this component whether the wrapped widget has values available
+     * will be used to hide the widget if all details are met
+     */
+    @Input() hasValues: () => boolean;
 
     constructor(
         private elementRef: ElementRef,
@@ -321,5 +326,16 @@ export class MdsEditorWidgetContainerComponent
             this.missingRequired = null;
         }
         this.widget.setStatus(status);
+    }
+
+    isVisible() {
+        if (
+            this.mdsEditorInstance.editorMode === 'search' &&
+            this.widget.definition.hideIfEmpty &&
+            this.hasValues
+        ) {
+            return this.hasValues();
+        }
+        return true;
     }
 }
