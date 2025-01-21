@@ -1501,7 +1501,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
              * collect user addes ace's
              */
             for (Notify notify : notifyList) {
-                log.info("Notify e:" + notify.getNotifyEvent()
+                log.debug("Notify e:" + notify.getNotifyEvent()
                         + " a:" + notify.getNotifyAction()
                         + " u:" + notify.getNotifyUser()
                         + " c:" + notify.getChange()
@@ -1712,7 +1712,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         if (AuthorityType.getAuthorityType(authority).equals(AuthorityType.GROUP)) {
             NodeRef groupNodeRef = serviceRegistry.getAuthorityService().getAuthorityNodeRef(authority);
             if (groupNodeRef == null) {
-                log.warn("authority {} does not exist. will continue", authority);
+                log.debug("authority {} does not exist. will continue", authority);
                 return null;
             }
 
