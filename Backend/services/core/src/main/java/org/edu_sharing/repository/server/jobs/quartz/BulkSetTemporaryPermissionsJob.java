@@ -69,7 +69,12 @@ public class BulkSetTemporaryPermissionsJob extends AbstractJobMapAnnotationPara
 				phe.setImportFolderId(startFolder);
 			}
 			CSVTool.CSVResult csv = CSVTool.readCSV(new BufferedReader(new StringReader(data)), ',');
-			assert csv != null;
+			if(csv == null) {
+				throw new IllegalArgumentException("CSV file required");
+			}
+			if(until == null) {
+				throw new IllegalArgumentException("until required");
+			}
 			if (!csv.getHeaders().contains("identifier")) {
 				throw new IllegalArgumentException("CSV file requires \"identifier\" header");
 			}

@@ -63,7 +63,10 @@ public abstract class AbstractJobMapAnnotationParams extends AbstractJob {
                             }
                         }
                     } else if (field.getType().equals(Date.class) && value != null) {
-                        String formatPattern = "yyyy-MM-dd";
+                        String formatPattern = "yyyy-MM-dd HH:mm:ss";
+                        if(formatPattern.length() != value.toString().length()) {
+                            formatPattern = "yyyy-MM-dd";
+                        }
                         SimpleDateFormat dateFormat = new SimpleDateFormat(formatPattern);
                         field.set(this, dateFormat.parse((String) jobExecutionContext.getJobDetail().getJobDataMap().get(field.getName())));
                     } else if (field.getType().getName().equals(Integer.class.getName())) {
