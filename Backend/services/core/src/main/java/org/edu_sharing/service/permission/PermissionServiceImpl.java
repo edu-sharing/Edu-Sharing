@@ -327,13 +327,14 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
 
             AuthorityType authorityType = AuthorityType.getAuthorityType(authority);
 
-
-            if (AuthorityType.USER.equals(authorityType)) {
-                addToRecent(personService.getPerson(authority));
-            }
-            // send group email notifications
-            if (AuthorityType.GROUP.equals(authorityType)) {
-                addToRecent(authorityService.getAuthorityNodeRef(authority));
+            if(!AuthenticationUtil.isRunAsUserTheSystemUser()) {
+                if (AuthorityType.USER.equals(authorityType)) {
+                    addToRecent(personService.getPerson(authority));
+                }
+                // send group email notifications
+                if (AuthorityType.GROUP.equals(authorityType)) {
+                    addToRecent(authorityService.getAuthorityNodeRef(authority));
+                }
             }
         }
 
