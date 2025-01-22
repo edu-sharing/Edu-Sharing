@@ -264,7 +264,7 @@ public class TrackingServiceImpl extends TrackingServiceDefault {
     }
 
     @NotNull
-    private static Object[] getAuthorityMediacenters() throws Exception {
+    public static Object[] getAuthorityMediacenters() throws Exception {
         if (ContextManagementFilter.accessTool.get() == null || ContextManagementFilter.accessTool.get().getUserId() == null) {
             // use the fully authenticated user since the current runAs user might be system
             HttpSession session = getSession();
@@ -292,7 +292,7 @@ public class TrackingServiceImpl extends TrackingServiceDefault {
     }
 
     @NotNull
-    private static Object[] getAuthorityOrganizations() throws Exception {
+    public static Object[] getAuthorityOrganizations() throws Exception {
         if (ContextManagementFilter.accessTool.get() == null || ContextManagementFilter.accessTool.get().getUserId() == null) {
             // use the fully authenticated user since the current runAs user might be system
             HttpSession session = getSession();
