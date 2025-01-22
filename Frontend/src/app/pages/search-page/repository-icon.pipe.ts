@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Repository } from '../../core-module/core.module';
+import { Repository } from 'ngx-edu-sharing-api';
 import { NodeHelperService } from '../../services/node-helper.service';
 
 @Pipe({
