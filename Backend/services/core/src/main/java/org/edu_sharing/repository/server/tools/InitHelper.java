@@ -9,6 +9,7 @@ import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
@@ -35,6 +36,16 @@ public class InitHelper {
                 if (authorityService.getAuthorityNodeRef(id) == null) {
                     logger.info("Init group " + id);
                     authorityService.createGroup(id, group.getString("displayName"), null);
+                }
+                if(group.hasPath("members")) {
+                    List<String> membersNew = group.getStringList("members");
+                    if (membersNew != null && !membersNew.isEmpty()) {
+                        String[] membersOld = authorityService.getMemberships(id).stream().filter(i -> !i.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)).toArray(String[]::new);
+                        logger.info("Init group " + id + ": Resetting members (" + StringUtils.join(membersOld) + ")");
+                        authorityService.removeMemberships(id, membersOld);
+                        logger.info("Init group " + id + ": Setting new members (" + StringUtils.join(membersNew) + ")");
+                        authorityService.addMemberships(id, membersNew.toArray(String[]::new));
+                    }
                 }
             }
         }
