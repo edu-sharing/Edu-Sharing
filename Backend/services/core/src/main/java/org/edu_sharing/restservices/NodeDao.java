@@ -1461,7 +1461,7 @@ public class NodeDao {
         data.setRemote(getRemote());
 
         data.setType(getType());
-        data.setIsDirectory(isDirectory());
+        data.setDirectory(isDirectory());
         data.setAspects(NameSpaceTool.transFormToShortQName(this.aspects));
 
         data.setName(getName());

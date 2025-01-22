@@ -1,38 +1,10 @@
 package org.edu_sharing.restservices.shared;
 
-import org.edu_sharing.repository.client.rpc.User;
+import lombok.Data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
-
-
-@Schema(description = "")
+@Data
 public class UserStats  {
-  
 	private int nodeCount = 0;
 	private int nodeCountCC = 0;
 	private int collectionCount = 0;
-	
-	public int getNodeCount() {
-		return nodeCount;
-	}
-	public void setNodeCount(int nodeCount) {
-		this.nodeCount = nodeCount;
-	}
-	public int getCollectionCount() {
-		return collectionCount;
-	}
-	public void setCollectionCount(int collectionCount) {
-		this.collectionCount = collectionCount;
-	}
-	public int getNodeCountCC() {
-		return nodeCountCC;
-	}
-	public void setNodeCountCC(int nodeCountCC) {
-		this.nodeCountCC = nodeCountCC;
-	}
-	
-	  
 }

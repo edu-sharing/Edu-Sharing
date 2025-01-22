@@ -1,17 +1,12 @@
 package org.edu_sharing.restservices.admin.v1.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class XMLResult {
-	@JsonProperty
 	private String xml;
-
-	public String getXml() {
-		return xml;
-	}
-
-	public void setXml(String xml) {
-		this.xml = xml;
-	}
-	
 }

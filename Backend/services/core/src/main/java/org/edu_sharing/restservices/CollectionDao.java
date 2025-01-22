@@ -114,7 +114,7 @@ public class CollectionDao {
 				NodeCollectionProposalCount node = new NodeCollectionProposalCount();
 				dao.fetchCounts = fetchCounts;
 				dao.fillNodeObject(node, true, true);
-				node.setProposalCount(data.getProposalCount());
+				node.setProposalCounts(data.getProposalCount());
 				result.add(node);
 			}
 

@@ -2,42 +2,31 @@ package org.edu_sharing.restservices.mds.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import org.edu_sharing.metadataset.v2.MetadataSort;
 import org.edu_sharing.metadataset.v2.MetadataSortColumn;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Schema(description = "")
+@Data
 public class MdsSort {
-	public class MdsSortDefault {
-		private String sortBy;
-		private boolean sortAscending;
 
-		@JsonProperty(required = true)
-		public String getSortBy() {
-			return sortBy;
-		}
-
-		public void setSortBy(String sortBy) {
-			this.sortBy = sortBy;
-		}
-
-		@JsonProperty(required = true)
-		public boolean isSortAscending() {
-			return sortAscending;
-		}
-
-		public void setSortAscending(boolean sortAscending) {
-			this.sortAscending = sortAscending;
-		}
-	}
+	@JsonProperty(required = true)
 	private String id;
-	@JsonProperty(value = "default")
+	@JsonProperty("default")
 	private MdsSortDefault defaultValue;
 	@JsonProperty("defaultSearch")
 	private MdsSortDefault defaultValueSearch;
 	private List<MdsSortColumn> columns;
+
+	@Data
+	public static class MdsSortDefault {
+		@JsonProperty(required = true)
+		private String sortBy;
+		@JsonProperty(required = true)
+		private boolean sortAscending;
+	}
 
 	public MdsSort(){}
 	public MdsSort(MetadataSort sort) {
@@ -60,20 +49,5 @@ public class MdsSort {
 		}
 	}
 
-	@JsonProperty(required = true)
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-	@JsonProperty
-	public List<MdsSortColumn> getColumns() {
-		return columns;
-	}
-	public void setColumns(List<MdsSortColumn> columns) {
-		this.columns = columns;
-	}
 }
 

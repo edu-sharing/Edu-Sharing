@@ -4,18 +4,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.v3.oas.annotations.media.Schema;;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;;
 
+@Data
 public class RestoreResults {
-	List<RestoreResult> results;
-	
-	@Schema(required = true, description = "")
-	@JsonProperty("results")
-	public List<RestoreResult> getResults() {
-		return results;
-	}
-	
-	public void setResults(List<RestoreResult> results) {
-		this.results = results;
-	}
+
+	@JsonProperty(required = true)
+	private List<RestoreResult> results;
 }

@@ -1,8 +1,11 @@
 package org.edu_sharing.restservices.shared;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class Filter {
 	
 	public static final String ALL="-all-";
@@ -22,13 +25,4 @@ public class Filter {
 			setProperties(propertyFilter);
 		}
 	}
-	
-	public List<String> getProperties() {
-		return properties;
-	}
-	
-	public void setProperties(List<String> properties) {		
-		this.properties = properties;
-	}
-
 }

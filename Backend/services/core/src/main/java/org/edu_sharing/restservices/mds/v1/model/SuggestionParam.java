@@ -2,28 +2,11 @@ package org.edu_sharing.restservices.mds.v1.model;
 
 import java.util.List;
 
+import lombok.Data;
 import org.edu_sharing.restservices.shared.MdsQueryCriteria;
 
+@Data
 public class SuggestionParam {
-	ValueParameters valueParameters;
-	
-	List<MdsQueryCriteria> criteria;
-
-	public ValueParameters getValueParameters() {
-		return valueParameters;
-	}
-
-	public void setValueParameters(ValueParameters valueParameters) {
-		this.valueParameters = valueParameters;
-	}
-
-	public List<MdsQueryCriteria> getCriteria() {
-		return criteria;
-	}
-	
-	public void setCriteria(List<MdsQueryCriteria> criteria) {
-		this.criteria = criteria;
-	}
-	
-	
+	private ValueParameters valueParameters;
+	private List<MdsQueryCriteria> criteria;
 }

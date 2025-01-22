@@ -7,35 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-
-@Schema(description = "")
+@Data
 public class ScopeAccess  {
-  
+
+  @JsonProperty(required = true)
   private boolean hasAccess;
 
   
   public ScopeAccess(boolean hasAccess) {
 	this.hasAccess = hasAccess;
-  }
-/**
-   **/
-  @Schema(required = true, description = "")
-  @JsonProperty("hasAccess")
-  public boolean hasAccess() {
-    return hasAccess;
-  }
-  public void setHasAccess(boolean hasAccess) {
-    this.hasAccess = hasAccess;
-  }
-  
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ScopeAccess {\n");
-    
-    sb.append("  hasAccess: ").append(hasAccess).append("\n");
-    sb.append("}\n");
-    return sb.toString();
   }
 }

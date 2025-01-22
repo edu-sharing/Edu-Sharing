@@ -1,15 +1,18 @@
 package org.edu_sharing.restservices.about.v1.model;
 
 
-import lombok.Getter;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Data
 @Component
-@Getter
 public class AboutFeatures {
-    @Autowired(required = false)
-    List<FeatureInfo> featureInfoList;
+    private final List<FeatureInfo> featureInfoList;
+
+    public AboutFeatures(@Autowired(required = false) List<FeatureInfo> featureInfoList) {
+        this.featureInfoList = featureInfoList;
+    }
 }

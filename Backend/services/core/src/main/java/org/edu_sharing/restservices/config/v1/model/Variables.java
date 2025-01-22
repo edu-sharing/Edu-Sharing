@@ -4,25 +4,10 @@ import java.util.Map;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class Variables {
-	@JsonProperty private Map<String,String> global;
-	@JsonProperty private Map<String,String> current;
-
-
-	public Map<String, String> getGlobal() {
-		return global;
-	}
-
-	public void setGlobal(Map<String, String> global) {
-		this.global = global;
-	}
-
-	public Map<String, String> getCurrent() {
-		return current;
-	}
-
-	public void setCurrent(Map<String, String> current) {
-		this.current = current;
-	}	
+	private Map<String,String> global;
+	private Map<String,String> current;
 }

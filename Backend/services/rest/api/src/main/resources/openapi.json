@@ -485,11 +485,9 @@
             "type": "string"
           },
           "fromUser": {
-            "description": "false",
             "type": "boolean"
           },
           "level0": {
-            "description": "false",
             "type": "boolean"
           },
           "orderAscending": {
@@ -497,6 +495,9 @@
           },
           "orderMode": {
             "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
           },
           "pinned": {
             "type": "boolean"
@@ -784,7 +785,6 @@
         },
         "required": [
           "access",
-          "collection",
           "createdAt",
           "createdBy",
           "downloadUrl",
@@ -1094,7 +1094,6 @@
             "type": "array"
           },
           "showNew": {
-            "description": "false",
             "type": "boolean"
           }
         },
@@ -1442,8 +1441,7 @@
             "type": "string"
           },
           "stacktrace": {
-            "type": "string",
-            "writeOnly": true
+            "type": "string"
           },
           "stacktraceArray": {
             "items": {
@@ -1454,8 +1452,7 @@
         },
         "required": [
           "error",
-          "message",
-          "stacktraceArray"
+          "message"
         ],
         "type": "object"
       },
@@ -2528,13 +2525,13 @@
       "ManualRegistrationData": {
         "properties": {
           "clientName": {
-            "description": "Name of the Tool to be presented to the End-User. Localized representations may be included as described in Section 2.1 of the [OIDC-Reg] specification. ",
+            "description": "Name of the Tool to be presented to the End-User. Localized representations may be included as described in Section 2.1 of the [OIDC-Reg] specification",
             "type": "string"
           },
           "customParameters": {
-            "description": "JSON Object where each value is a string. Custom parameters to be included in each launch to this tool. If a custom parameter is also defined at the message level, the message level value takes precedence. The value of the custom parameters may be substitution parameters as described in the LTI Core [LTI-13] specification. ",
+            "description": "JSON Oject where each value is a string. Custom parameters to be included in each launch to this tool. If a custom parameter is also defined at the message level, the message level value takes precedence. The value of the custom parameters may be substitution parameters as described in the LTI Core [LTI-13] specification",
             "items": {
-              "description": "JSON Object where each value is a string. Custom parameters to be included in each launch to this tool. If a custom parameter is also defined at the message level, the message level value takes precedence. The value of the custom parameters may be substitution parameters as described in the LTI Core [LTI-13] specification. ",
+              "description": "JSON Oject where each value is a string. Custom parameters to be included in each launch to this tool. If a custom parameter is also defined at the message level, the message level value takes precedence. The value of the custom parameters may be substitution parameters as described in the LTI Core [LTI-13] specification",
               "type": "string"
             },
             "type": "array"
@@ -2950,17 +2947,6 @@
           },
           "placeholder": {
             "type": "string"
-          },
-          "required": {
-            "enum": [
-              "mandatory",
-              "mandatoryForPublish",
-              "recommended",
-              "optional",
-              "ignore"
-            ],
-            "type": "string",
-            "writeOnly": true
           },
           "step": {
             "format": "int32",
@@ -3467,14 +3453,6 @@
             },
             "type": "object"
           },
-          "proposalCount": {
-            "additionalProperties": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "type": "object",
-            "writeOnly": true
-          },
           "proposalCounts": {
             "additionalProperties": {
               "format": "int32",
@@ -3518,7 +3496,6 @@
         },
         "required": [
           "access",
-          "collection",
           "createdAt",
           "createdBy",
           "downloadUrl",
@@ -4588,7 +4565,6 @@
       "ProfileSettings": {
         "properties": {
           "showEmail": {
-            "description": "false",
             "type": "boolean"
           }
         },
@@ -6300,13 +6276,6 @@
             "nullable": true,
             "type": "array"
           },
-          "type": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "writeOnly": true
-          },
           "types": {
             "items": {
               "type": "string"
@@ -6356,13 +6325,6 @@
             "nullable": true,
             "type": "array"
           },
-          "type": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "writeOnly": true
-          },
           "types": {
             "items": {
               "type": "string"
@@ -6406,13 +6368,6 @@
             },
             "nullable": true,
             "type": "array"
-          },
-          "type": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "writeOnly": true
           },
           "types": {
             "items": {
@@ -15616,7 +15571,6 @@
             "description": "Fatal error occured."
           }
         },
-        "security": [],
         "summary": "Set a context entry (admin rights required)",
         "tags": [
           "CONFIG v1"
@@ -15699,7 +15653,6 @@
             "description": "Fatal error occured."
           }
         },
-        "security": [],
         "summary": "Delete a context entry by id (admin rights required)",
         "tags": [
           "CONFIG v1"
@@ -15884,7 +15837,6 @@
             "description": "Fatal error occured."
           }
         },
-        "security": [],
         "summary": "Set a config entry (admin rights required)",
         "tags": [
           "CONFIG v1"
@@ -21861,6 +21813,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "Custom edu-sharing endpoint to change content of node.",
         "tags": [
           "LTI Platform v13"
@@ -22437,6 +22390,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "LTIPlatform openid configuration",
         "tags": [
           "LTI Platform v13"
@@ -22530,6 +22484,7 @@
             "description": "Fatal error occured."
           }
         },
+        "security": [],
         "summary": "registration endpoint the tool uses to register at platform.",
         "tags": [
           "LTI Platform v13"

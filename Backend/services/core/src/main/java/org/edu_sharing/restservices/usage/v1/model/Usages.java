@@ -8,6 +8,8 @@ import java.util.Objects;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.edu_sharing.restservices.collection.v1.model.Collection;
 import org.edu_sharing.restservices.shared.Node;
 
@@ -15,319 +17,100 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;;
 
+@Data
 public class Usages {
 
-	
-	private List<Usage> usages;
-	
-	public Usages() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public Usages(List<Usage> usages) {
-		this.usages = usages;
-	}
-	
-	public List<Usage> getUsages() {
-		return usages;
-	}
-	
-	public void setUsages(List<Usage> usages) {
-		this.usages = usages;
-	}
-	
-	public static class Usage{
-		private String appUser;
+    private List<Usage> usages;
 
-	    private String appUserMail;
+    public Usages() {
+        // TODO Auto-generated constructor stub
+    }
 
-	    private String courseId;
+    public Usages(List<Usage> usages) {
+        this.usages = usages;
+    }
 
-	    private Integer distinctPersons;
-
-	    private Calendar fromUsed;
-
-	    private String appId;
-
-	    private String nodeId;
-
-	    private Calendar toUsed;
-
-	    private Integer usageCounter;
-
-	    private String parentNodeId;
-
-	    private String usageVersion;
-
-	    private Parameters usageXmlParams;
-	    
-	    private String usageXmlParamsRaw;
-
-	    private String resourceId;
-	    
-	    private String guid;
-		private String appSubtype;
-		private String appType;
-		private String type;
-		
-		private Date created;
-		
-		private Date modified;
+    @Data
+    public static class Usage {
+        @JsonProperty(required = true)
+        private String appUser;
+        @JsonProperty(required = true)
+        private String appUserMail;
+        @JsonProperty(required = true)
+        private String courseId;
+        private Integer distinctPersons;
+        private Calendar fromUsed;
+        @JsonProperty(required = true)
+        private String appId;
+        @JsonProperty(required = true)
+        private String nodeId;
+        private Calendar toUsed;
+        private Integer usageCounter;
+        @JsonProperty(required = true)
+        private String parentNodeId;
+        @JsonProperty(required = true)
+        private String usageVersion;
+        private Parameters usageXmlParams;
+        private String usageXmlParamsRaw;
+        @JsonProperty(required = true)
+        private String resourceId;
+        private String guid;
+        private String appSubtype;
+        private String appType;
+        private String type;
+        private Date created;
+        private Date modified;
 
 
-		@Schema(required = true, description = "")
-		@JsonProperty("appUser")
-		public String getAppUser() {
-			return appUser;
-		}
-
-		public void setAppUser(String appUser) {
-			this.appUser = appUser;
-		}
-
-		
-		@Schema(required = true, description = "")
-		@JsonProperty("appUserMail")
-		public String getAppUserMail() {
-			return appUserMail;
-		}
-
-		public void setAppUserMail(String appUserMail) {
-			this.appUserMail = appUserMail;
-		}
-
-		@Schema(required = true, description = "")
-		@JsonProperty("courseId")
-		public String getCourseId() {
-			return courseId;
-		}
-
-		public void setCourseId(String courseId) {
-			this.courseId = courseId;
-		}
-
-		@Schema(required = false, description = "")
-		@JsonProperty("distinctPersons")
-		public Integer getDistinctPersons() {
-			return distinctPersons;
-		}
-
-		public void setDistinctPersons(Integer distinctPersons) {
-			this.distinctPersons = distinctPersons;
-		}
-
-		
-		public Calendar getFromUsed() {
-			return fromUsed;
-		}
-
-		public void setFromUsed(Calendar fromUsed) {
-			this.fromUsed = fromUsed;
-		}
-
-		@Schema(required = true, description = "")
-		@JsonProperty("appId")
-		public String getAppId() {
-			return appId;
-		}
-		
-		public void setAppId(String appId) {
-			this.appId = appId;
-		}
-
-		@Schema(required = true, description = "")
-		@JsonProperty("nodeId")
-		public String getNodeId() {
-			return nodeId;
-		}
-
-		public void setNodeId(String nodeId) {
-			this.nodeId = nodeId;
-		}
-
-		public Calendar getToUsed() {
-			return toUsed;
-		}
-
-		public void setToUsed(Calendar toUsed) {
-			this.toUsed = toUsed;
-		}
-
-		
-		public Integer getUsageCounter() {
-			return usageCounter;
-		}
-
-		public void setUsageCounter(Integer usageCounter) {
-			this.usageCounter = usageCounter;
-		}
-
-		@Schema(required = true, description = "")
-		@JsonProperty("parentNodeId")
-		public String getParentNodeId() {
-			return parentNodeId;
-		}
-
-		public void setParentNodeId(String parentNodeId) {
-			this.parentNodeId = parentNodeId;
-		}
-
-		@Schema(required = true, description = "")
-		@JsonProperty("usageVersion")
-		public String getUsageVersion() {
-			return usageVersion;
-		}
-
-		public void setUsageVersion(String usageVersion) {
-			this.usageVersion = usageVersion;
-		}
-
-		@Schema(required = false, description = "")
-		@JsonProperty("usageXmlParams")
-		public Parameters getUsageXmlParams() {
-			return usageXmlParams;
-		}
-
-		public void setUsageXmlParams(Parameters usageXmlParams) {
-			this.usageXmlParams = usageXmlParams;
-		}
-
-		@Schema(required = true, description = "")
-		@JsonProperty("resourceId")
-		public String getResourceId() {
-			return resourceId;
-		}
-
-		public void setResourceId(String resourceId) {
-			this.resourceId = resourceId;
-		}
-	    
-		@Schema(required = false, description = "")
-		@JsonProperty("guid")
-		public String getGuid() {
-			return guid;
-		}
-
-		public void setGuid(String guid) {
-			this.guid = guid;
-		}
-
-        public void setAppSubtype(String appSubtype) {
-            this.appSubtype = appSubtype;
-        }
-
-        public String getAppSubtype() {
-            return appSubtype;
-        }
-
-		public void setAppType(String appType) {
-			this.appType = appType;
-		}
-
-		public String getAppType() {
-			return appType;
-		}
-
-		@JsonProperty
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-        
-        public void setCreated(Date created) {
-			this.created = created;
-		}
-        
-        public Date getCreated() {
-			return created;
-		}
-        
-        public void setModified(Date modified) {
-			this.modified = modified;
-		}
-        
-        public Date getModified() {
-			return modified;
-		}
-
+        @Data
         @XmlRootElement(name = "usage")
-		public static class Parameters {
-			@XmlElement public General general;
+        public static class Parameters {
+            @XmlElement
+            public General general;
 
-			public static class General {
-				@XmlElement
-				public String referencedInName;
-				@XmlElement
-				public String referencedInType;
-				@XmlElement
-				public String referencedInInstance;
-			}
-		}
-        
-        public void setUsageXmlParamsRaw(String usageXmlParamsRaw) {
-			this.usageXmlParamsRaw = usageXmlParamsRaw;
-		}
-        
-        @JsonProperty("usageXmlParamsRaw")
-        public String getUsageXmlParamsRaw() {
-			return usageXmlParamsRaw;
-		}
-	}
-	public static class CollectionUsage extends Usage {
-		private Node collection;
-		private CollectionUsageType collectionUsageType;
+            @Data
+            public static class General {
+                @XmlElement
+                public String referencedInName;
+                @XmlElement
+                public String referencedInType;
+                @XmlElement
+                public String referencedInInstance;
+            }
+        }
+    }
 
-		public CollectionUsageType getCollectionUsageType() {
-			return collectionUsageType;
-		}
+    @Data
+    public static class CollectionUsage extends Usage {
+        private Node collection;
+        private CollectionUsageType collectionUsageType;
 
-		public void setCollectionUsageType(CollectionUsageType collectionUsageType) {
-			this.collectionUsageType = collectionUsageType;
-		}
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof CollectionUsage) {
+                CollectionUsage that = (CollectionUsage) obj;
+                return that.collection.getRef().equals(collection.getRef());
+            }
+            return super.equals(obj);
+        }
 
-		public Node getCollection() {
-			return collection;
-		}
+        @Override
+        public int hashCode() {
+            if (collection != null)
+                return Objects.hash(collection.getRef());
+            return super.hashCode();
+        }
+    }
 
-		public void setCollection(Node collection) {
-			this.collection = collection;
-		}
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    public static class NodeUsage extends Usage {
+        private Node node;
+    }
 
-		@Override
-		public boolean equals(Object obj) {
-			if(obj instanceof CollectionUsage){
-				CollectionUsage that= (CollectionUsage) obj;
-				return that.collection.getRef().equals(collection.getRef());
-			}
-			return super.equals(obj);
-		}
-
-		@Override
-		public int hashCode() {
-			if(collection!=null)
-				return Objects.hash(collection.getRef());
-			return super.hashCode();
-		}
-	}
-	
-	public static class NodeUsage extends Usage{
-		private Node node;
-		
-		public Node getNode() {
-			return node;
-		}
-		
-		public void setNode(Node node) {
-			this.node = node;
-		}
-	}
-
-	public enum CollectionUsageType {
-		ACTIVE,
-		PROPOSAL_PENDING,
-		PROPOSAL_DECLINED,
-	}
+    public enum CollectionUsageType {
+        ACTIVE,
+        PROPOSAL_PENDING,
+        PROPOSAL_DECLINED,
+    }
 }

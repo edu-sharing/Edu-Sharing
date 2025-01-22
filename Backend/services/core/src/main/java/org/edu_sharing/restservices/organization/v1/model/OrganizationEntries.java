@@ -2,6 +2,7 @@ package org.edu_sharing.restservices.organization.v1.model;
 
 import java.util.List;
 
+import lombok.Data;
 import org.edu_sharing.restservices.shared.Organization;
 import org.edu_sharing.restservices.shared.Pagination;
 
@@ -11,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema;;
 
 
-@Schema(description = "")
+@Data
 public class OrganizationEntries  {
   
   private List<Organization> list = null;

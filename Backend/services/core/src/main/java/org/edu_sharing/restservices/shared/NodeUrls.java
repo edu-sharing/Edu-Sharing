@@ -1,5 +1,6 @@
 package org.edu_sharing.restservices.shared;
 
+import lombok.Data;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.tools.URLHelper;
@@ -7,8 +8,11 @@ import org.edu_sharing.service.lti13.LTIJWTUtil;
 
 import java.security.GeneralSecurityException;
 
+@Data
 public class NodeUrls {
 
+    private String repositoryBaseUrl;
+    private String generateLtiResourceLink;
 
     public NodeUrls(Node node, String requestedVersion) {
         repositoryBaseUrl = URLHelper.getBaseUrl(true);
@@ -32,7 +36,4 @@ public class NodeUrls {
         }
     }
 
-    String repositoryBaseUrl;
-
-    String generateLtiResourceLink;
 }

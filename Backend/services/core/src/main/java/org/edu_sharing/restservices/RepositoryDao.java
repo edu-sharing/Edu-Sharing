@@ -207,7 +207,7 @@ public class RepositoryDao {
 		repo.setTitle(getCaption());
 		repo.setIcon(getIcon());
 		repo.setLogo(getLogo());
-		repo.setHomeRepo(isHomeRepo());
+		repo.setIsHomeRepo(isHomeRepo());
 		repo.setRepositoryType(getRepositoryType());
 		repo.setRenderingSupported(getRenderingSupported());
 

@@ -101,7 +101,7 @@ public class IamApi {
                 result.add(new PersonDao(repoDao, user).asPersonSimple(true));
             }
             UserEntries response = new UserEntries();
-            response.setList(result);
+            response.setUsers(result);
             response.setPagination(new Pagination(search));
 
 
@@ -814,7 +814,7 @@ public class IamApi {
                 }
             }
             GroupEntries response = new GroupEntries();
-            response.setList(result);
+            response.setGroups(result);
             response.setPagination(new Pagination(search));
 
             return Response.status(Response.Status.OK).entity(response).build();
@@ -1285,7 +1285,7 @@ public class IamApi {
                                 new GroupDao(repoDao, member).asGroup() :
                                 new PersonDao(repoDao, member).asPerson());
             }
-            response.setList(result);
+            response.setAuthorities(result);
             response.setPagination(new Pagination(search));
             return Response.status(Response.Status.OK).entity(response).build();
 
@@ -1480,7 +1480,7 @@ public class IamApi {
                 }
             }
             AuthorityEntries response = new AuthorityEntries();
-            response.setList(result);
+            response.setAuthorities(result);
             response.setPagination(new Pagination(search));
 
 
@@ -1520,7 +1520,7 @@ public class IamApi {
                 result.add(getUserOrGroup(repoDao, user));
             }
             AuthorityEntries response = new AuthorityEntries();
-            response.setList(result);
+            response.setAuthorities(result);
             return Response.status(Response.Status.OK).entity(response).build();
 
 

@@ -1,14 +1,12 @@
 package org.edu_sharing.restservices.shared;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.alfresco.service.cmr.security.PermissionService;;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.alfresco.service.cmr.security.PermissionService;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Schema(description = "")
 public class Mediacenter extends ManagableGroup {
 	public Mediacenter(String authorityName, Type authorityType) {
 		this.setAuthorityName(authorityName);
@@ -16,6 +14,8 @@ public class Mediacenter extends ManagableGroup {
 		this.setGroupName(authorityName.substring(PermissionService.GROUP_PREFIX.length()));
 	}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	public static class Profile extends GroupProfile {
 		private MediacenterProfileExtension mediacenter;
 
@@ -25,94 +25,26 @@ public class Mediacenter extends ManagableGroup {
 		public Profile(GroupProfile profile){
 			super(profile);
 		}
-
-		@JsonProperty
-		public MediacenterProfileExtension getMediacenter() {
-			return mediacenter;
-		}
-
-		public void setMediacenter(MediacenterProfileExtension mediacenter) {
-			this.mediacenter = mediacenter;
-		}
 	}
+
+	@Data
 	public static class MediacenterProfileExtension implements Serializable {
 		// id, Standort, Kreiskürzel, Kurzbezeichnung (not here, equals the displayName), URL/Link zur Startseite / Kataloge (JSON)
-		private String id,location,districtAbbreviation,mainUrl;
+		private String id;
+		private String location;
+		private String districtAbbreviation;
+		private String mainUrl;
 		private List<Catalog> catalogs;
+		private ContentStatus contentStatus;
+
 		public enum ContentStatus{
 			Activated,
 			Deactivated,
-		};
-		private ContentStatus contentStatus;
-
-		@JsonProperty
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-		@JsonProperty
-		public String getLocation() {
-			return location;
-		}
-
-		public void setLocation(String location) {
-			this.location = location;
-		}
-		@JsonProperty
-		public String getDistrictAbbreviation() {
-			return districtAbbreviation;
-		}
-
-		public void setDistrictAbbreviation(String districtAbbreviation) {
-			this.districtAbbreviation = districtAbbreviation;
-		}
-		@JsonProperty
-		public String getMainUrl() {
-			return mainUrl;
-		}
-
-		public void setMainUrl(String mainUrl) {
-			this.mainUrl = mainUrl;
-		}
-		@JsonProperty
-		public List<Catalog> getCatalogs() {
-			return catalogs;
-		}
-
-		public void setCatalogs(List<Catalog> catalogs) {
-			this.catalogs = catalogs;
-		}
-		@JsonProperty
-		public ContentStatus getContentStatus() {
-			return contentStatus;
-		}
-
-		public void setContentStatus(ContentStatus contentStatus) {
-			this.contentStatus = contentStatus;
 		}
 	}
+	@Data
 	public static class Catalog{
-		private String name,url;
-
-		@JsonProperty
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		@JsonProperty
-		public String getUrl() {
-			return url;
-		}
-
-		public void setUrl(String url) {
-			this.url = url;
-		}
+		private String name;
+		private String url;
 	}
 }

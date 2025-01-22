@@ -3,16 +3,16 @@ package org.edu_sharing.restservices.shared;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
-
-@Schema(description = "")
+@Data
 public class ACL {
 
-	private boolean inherited = false;	
+	@JsonProperty(required = true)
+	private boolean inherited = false;
+
+	@JsonProperty(required = true)
 	private List<ACE> permissions = null;
 	
 	public ACL(){}
@@ -37,23 +37,6 @@ public class ACL {
 			
 			permissions.add(new ACE(ace));
 		}
-	}
-	@Schema(required = true, description = "")
-	@JsonProperty("inherited")
-	public boolean isInherited() {
-		return inherited;
-	}
-	public void setInherited(boolean inherited) {
-		this.inherited = inherited;
-	}
-		
-	@Schema(required = true, description = "")
-	@JsonProperty("permissions")
-	public List<ACE> getPermissions() {
-		return permissions;
-	}
-	public void setPermissions(List<ACE> permissions) {
-		this.permissions = permissions;
 	}
 
 }

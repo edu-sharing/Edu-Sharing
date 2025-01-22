@@ -4,14 +4,14 @@ public interface CollectionRef extends NodeRef{
     /**
      * this node contains the relationship, e.g. it can be a proposal or an usage
      */
-    public NodeRef getRelationNode();
+    NodeRef getRelationNode();
 
     /**
      * get information about the relation, e.g. is this a real reference or just a proposal
      */
-    public RelationType getRelationType();
+    RelationType getRelationType();
 
-    public enum RelationType {
+    enum RelationType {
         Usage,
         Proposal,
         Original

@@ -1,24 +1,17 @@
 package org.edu_sharing.restservices.shared;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.codehaus.jackson.annotate.JsonProperty;
+import lombok.*;
 import org.edu_sharing.service.tracking.TrackingService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public interface NodeStatsEntry {
     void setStats(NodeStats stats);
 
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class NodeStats {
-        @JsonProperty
-        @Getter
-        @Setter
+    class NodeStats {
         Map<TrackingService.EventType, Integer> total;
 
     }

@@ -60,7 +60,7 @@ public class NetworkApi {
             }
 
             RepoEntries response = new RepoEntries();
-            response.setList(repos);
+            response.setRepositories(repos);
 
             return Response.status(Response.Status.OK).entity(response).build();
 

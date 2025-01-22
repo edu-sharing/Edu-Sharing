@@ -1,13 +1,10 @@
 package org.edu_sharing.restservices.node.v1.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class NodeTemplateEntry extends NodeEntry {
     private boolean enabled;
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 }

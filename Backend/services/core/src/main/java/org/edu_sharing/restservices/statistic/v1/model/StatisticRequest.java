@@ -5,33 +5,15 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
+import lombok.Data;;
 
-@Schema(description = "settings for statistic request")
+@Data
 public class StatisticRequest {
-	
+
+	@JsonProperty(required = true)
 	Filter filter;
-	
+
+	@JsonProperty(required = true)
 	List<String> properties = new ArrayList<>();
-	
-	@Schema(required = true, description = "")
-	@JsonProperty("filter")
-	public Filter getFilter() {
-		return filter;
-	}
-	public void setFilter(Filter filter) {
-		this.filter = filter;
-	}
-	
-	@Schema(required = true, description = "")
-	@JsonProperty("properties")
-	public List<String> getProperties() {
-		return properties;
-	}
-	
-	public void setProperties(List<String> properties) {
-		this.properties = properties;
-	}
 	
 }

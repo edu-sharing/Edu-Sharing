@@ -1,19 +1,15 @@
 package org.edu_sharing.restservices.search.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-;
-
-@Getter
-@Setter
-@Schema(description = "")
-public class SearchParameters extends SearchParametersFacets{
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SearchParameters extends SearchParametersFacets {
 
 	private List<String> permissions;
 	private boolean resolveCollections = false;
@@ -21,12 +17,9 @@ public class SearchParameters extends SearchParametersFacets{
 	private boolean returnSuggestions = false;
 	private List<String> excludes = new ArrayList<>();
 
-	@JsonProperty
-	public List<String> getPermissions() {
-		return permissions;
+	@Override
+	@JsonProperty(required = false) // explicit set required false
+	public List<String> getFacets() {
+		return super.getFacets();
 	}
-
-	@Schema(required = false, description = "")
-	@JsonProperty("facets")
-	public List<String> getFacets() { return super.getFacets();}
 }

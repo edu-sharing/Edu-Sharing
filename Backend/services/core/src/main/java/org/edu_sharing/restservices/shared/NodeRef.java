@@ -1,8 +1,7 @@
 package org.edu_sharing.restservices.shared;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;;
 
+import lombok.Data;
 import org.edu_sharing.restservices.RepositoryDao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,15 +9,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Schema(description = "")
+@Data
 public class NodeRef implements Serializable, Comparable<NodeRef> {
 
+	@JsonProperty(required = true)
 	private String repo = null;
+
+	@JsonProperty("isHomeRepo")
 	private boolean isHomeRepo = false;
+
+	@JsonProperty(required = true)
 	private String id = null;
-	
+
+	@JsonProperty(required = true)
 	boolean archived = false;
-	
+
 	public NodeRef(){}
 	public NodeRef(String repoId,String nodeId) {
 		repo=repoId;
@@ -30,56 +35,12 @@ public class NodeRef implements Serializable, Comparable<NodeRef> {
 		this.id=nodeId;
 	}
 
-	/**
-   **/
-	@Schema(required = true, description = "")
-	@JsonProperty("repo")
-	public String getRepo() {
-		return repo;
-	}
-
-	public void setRepo(String repo) {
-		this.repo = repo;
-	}
-
-	/**
-   **/
-	@Schema(required = true, description = "")
-	@JsonProperty("id")
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	public void setArchived(boolean archived) {
-		this.archived = archived;
-	}
-	
-	@Schema(required = true, description = "")
-	@JsonProperty("archived")
-	public boolean isArchived() {
-		return archived;
-	}
-
-	@JsonProperty("isHomeRepo")
-	public boolean isHomeRepo() {
-		return isHomeRepo;
-	}
-	public void setHomeRepo(boolean isHomeRepo) {
-		this.isHomeRepo = isHomeRepo;
-	}
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class RepoRef {\n");
-
-		sb.append("  repo: ").append(repo).append("\n");
-		sb.append("  id: ").append(id).append("\n");
-		sb.append("}\n");
-		return sb.toString();
+        return "class RepoRef {\n" +
+                "  repo: " + repo + "\n" +
+                "  id: " + id + "\n" +
+                "}\n";
 	}
 
 	@Override

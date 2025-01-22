@@ -1,16 +1,11 @@
 package org.edu_sharing.restservices.lti.v13.model;
 
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class JWKSResult {
-    List<JWKResult> keys;
-
-    public void setKeys(List<JWKResult> keys) {
-        this.keys = keys;
-    }
-
-    public List<JWKResult> getKeys() {
-        return keys;
-    }
+    private List<JWKResult> keys;
 }

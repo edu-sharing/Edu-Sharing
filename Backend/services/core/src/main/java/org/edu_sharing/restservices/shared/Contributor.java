@@ -1,5 +1,8 @@
 package org.edu_sharing.restservices.shared;
 
+import lombok.Data;
+
+@Data
 public class Contributor{
     String property;
     String firstname;
@@ -7,52 +10,4 @@ public class Contributor{
     String email;
     String vcard;
     String org;
-
-    public String getProperty() {
-        return property;
-    }
-
-    public void setProperty(String property) {
-        this.property = property;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setOrg(String org) {
-        this.org = org;
-    }
-
-    public String getOrg() {
-        return org;
-    }
-
-    public String getVcard() {
-        return vcard;
-    }
-
-    public void setVcard(String vcard) {
-        this.vcard = vcard;
-    }
 }

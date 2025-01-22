@@ -1,15 +1,13 @@
 package org.edu_sharing.restservices.shared;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class UserProfileAppAuth extends UserProfile {
-    Map<String,String[]> extendedAttributes = new HashMap<>();
-
-    @JsonProperty
-    public Map<String, String[]> getExtendedAttributes() {
-        return extendedAttributes;
-    }
+    private Map<String,String[]> extendedAttributes = new HashMap<>();
 }

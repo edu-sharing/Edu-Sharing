@@ -1,15 +1,17 @@
 package org.edu_sharing.restservices.about.v1.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Data
 @Component
-@Getter
 public class AboutPlugins {
-    @Autowired(required = false)
-    private List<PluginInfo> plugins;
+    private final List<PluginInfo> plugins;
+
+    public AboutPlugins(@Autowired(required = false) List<PluginInfo> plugins) {
+        this.plugins = plugins;
+    }
 }
