@@ -32,7 +32,7 @@
       </div>
       <div
         class="affiliation affiliation-group"
-        *ngIf="authority.profile.displayName && authority.properties"
+        *ngIf="authority.profile?.displayName && authority.properties"
       >
         {{
           'AUTHORITY_TYPE_' + (authority.properties['ccm:edu_homedir'] ? 'ORG' : 'GROUP')

@@ -1,5 +1,12 @@
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
-import { ConfigService, FacetsDict, MdsService, MdsViewRelation } from 'ngx-edu-sharing-api';
+import {
+    AuthenticationService,
+    ConfigService,
+    FacetsDict,
+    LoginInfo,
+    MdsService,
+    MdsViewRelation,
+} from 'ngx-edu-sharing-api';
 import {
     BehaviorSubject,
     combineLatest,
@@ -748,6 +755,7 @@ export class MdsEditorInstanceService implements OnDestroy {
     private readonly _new_initializingStateSubject = new BehaviorSubject<
         'new' | 'initializing' | 'failed' | 'complete'
     >('new');
+    private loginInfo: LoginInfo;
 
     constructor(
         private mdsEditorCommonService: MdsEditorCommonService,
@@ -757,10 +765,11 @@ export class MdsEditorInstanceService implements OnDestroy {
         // private suggestionsGQL: SuggestionsGQL,
         private restMdsService: RestMdsService,
         private configService: ConfigurationService,
-        private restConnector: RestConnectorService,
+        private authenticationService: AuthenticationService,
         private config: ConfigService,
     ) {
         this.registerInitMds();
+        this.registerLoginInfo();
         this.register_new_valuesChange();
         this.register_new_inputValuesSubject();
         this.mdsInflated.subscribe((mdsInflated) => (this.mdsInflatedValue = mdsInflated));
@@ -1801,7 +1810,7 @@ export class MdsEditorInstanceService implements OnDestroy {
         } else if (widget.condition.type === 'TOOLPERMISSION') {
             const result =
                 widget.condition.negate ===
-                !this.restConnector.hasToolPermissionInstant(widget.condition.value);
+                !this.loginInfo?.toolPermissions?.includes(widget.condition.value);
             if (!result) {
                 // tslint:disable-next-line:no-console
                 console.debug(
@@ -2064,6 +2073,13 @@ export class MdsEditorInstanceService implements OnDestroy {
         (obj as RangedValueSuggestionData[]).find(
             (s) => s.value.value === (modified.data.value as RangedValue).value,
         ).info.status = modified.status;
+    }
+
+    private registerLoginInfo() {
+        this.authenticationService
+            .observeLoginInfo()
+            .pipe(takeUntil(this.destroyed$))
+            .subscribe((info) => (this.loginInfo = info));
     }
 }
 

@@ -5,7 +5,13 @@ import { VCard } from '../util/VCard';
 @Pipe({ name: 'vcardName' })
 export class VCardNamePipe implements PipeTransform {
     constructor(private translate: TranslateService) {}
-    transform(authority: string, args: string[] = null): string {
+    transform(authority: string | string[], args: string[] = null): string {
+        if (Array.isArray(authority)) {
+            return authority
+                .map((a) => (a ? new VCard(a).getDisplayName() : ''))
+                .filter((s) => !!s)
+                .join(', ');
+        }
         return authority ? new VCard(authority).getDisplayName() : '';
     }
 }

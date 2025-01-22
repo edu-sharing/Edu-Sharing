@@ -61,7 +61,7 @@ public class RenderingServlet extends HttpServlet {
             String response;
             try {
                 response = renderingService.getDetails(ApplicationInfoList.getHomeRepository().getAppId(), node_id, version,DEFAULT_DISPLAY_MODE, params).getDetails();
-                response = response.replace("{{{LMS_INLINE_HELPER_SCRIPT}}}", URLHelper.getNgRenderNodeUrl(node_id,version)+"?");
+                response = response.replace("{{{LMS_INLINE_HELPER_SCRIPT}}}", URLHelper.getNgRenderNodeUrl(node_id,version,true)+"?");
                 TrackingServiceFactory.getTrackingService().trackActivityOnNode(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, node_id), null, TrackingService.EventType.VIEW_MATERIAL_EMBEDDED);
             } catch (Throwable t) {
                 RenderingException exception = RenderingException.fromThrowable(t);
