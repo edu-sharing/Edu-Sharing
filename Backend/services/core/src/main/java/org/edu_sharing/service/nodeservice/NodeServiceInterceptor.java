@@ -271,10 +271,7 @@ public class NodeServiceInterceptor implements MethodInterceptor {
     private static boolean hasSignature(String nodeId) {
         if(Context.getCurrentInstance()==null)
             return false;
-        String authSingleUseNodeId = Context.getCurrentInstance().getSessionAttribute(CCConstants.AUTH_SINGLE_USE_NODEID);
-        if(authSingleUseNodeId==null)
-            return false;
-        return authSingleUseNodeId.equals(nodeId);
+        return Context.getCurrentInstance().isSingleUseNodeId(nodeId);
     }
 
     private static boolean hasUsage(String nodeId) {

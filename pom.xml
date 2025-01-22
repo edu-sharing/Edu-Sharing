@@ -29,8 +29,8 @@
   <properties>
 
     <alfresco.pdf-renderer.version>1.2</alfresco.pdf-renderer.version>
-    <alfresco.platform.version>23.2.0</alfresco.platform.version>
-    <alfresco.share.version>23.2.0</alfresco.share.version>
+    <alfresco.platform.version>23.4.0</alfresco.platform.version>
+    <alfresco.share.version>23.4.0</alfresco.share.version>
     <alfresco.sdk.version>4.7.0</alfresco.sdk.version>
 
     <!-- release-1 -->
@@ -46,9 +46,9 @@
 
     <postgresql.jdbc.version>42.5.6</postgresql.jdbc.version>
     <tomcat.version>10.1.17</tomcat.version>
-    <jackson.version>2.15.2</jackson.version>
+    <jackson.version>2.17.2</jackson.version>
     <mongodb.version>5.1.0</mongodb.version>
-    <spring.version>6.0.14</spring.version>
+    <spring.version>6.1.14</spring.version>
     <!--
       do not update to 6.2.2 cause it breaks openidconnect backchannel logout
       https://github.com/spring-projects/spring-security/issues/14553
@@ -124,7 +124,7 @@
         <plugin>
           <groupId>org.openapitools</groupId>
           <artifactId>openapi-generator-maven-plugin</artifactId>
-          <version>6.6.0</version>
+          <version>7.7.0</version>
         </plugin>
 
       </plugins>
@@ -145,8 +145,8 @@
 
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>5.13.0</version>
+        <artifactId>activemq-client-jakarta</artifactId>
+        <version>5.18.3</version>
       </dependency>
 
       <dependency>
@@ -197,7 +197,7 @@
       <dependency>
         <groupId>org.ow2.asm</groupId>
         <artifactId>asm</artifactId>
-        <version>9.5</version>
+        <version>9.7</version>
       </dependency>
 
       <dependency>
@@ -246,19 +246,19 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.15.1</version>
+        <version>2.17.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.13.0</version>
+        <version>3.17.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>2.9.1</version>
+        <version>2.9.2</version>
       </dependency>
 
       <dependency>
@@ -378,18 +378,6 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>edu_sharing-community-repository-backend-services-xoai</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>edu_sharing-community-repository-backend-services-doi</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>edu_sharing-community-repository-backend-tomcat</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -499,7 +487,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.8.8</version>
+        <version>2.11.0</version>
       </dependency>
 
       <dependency>
@@ -511,7 +499,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>30.1-jre</version>
+        <version>33.3.1-jre</version>
       </dependency>
 
       <dependency>
@@ -650,7 +638,7 @@
       <dependency>
         <groupId>jakarta.annotation</groupId>
         <artifactId>jakarta.annotation-api</artifactId>
-        <version>2.1.1</version>
+        <version>3.0.0</version>
       </dependency>
 
       <dependency>
@@ -711,7 +699,7 @@
       <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>nimbus-jose-jwt</artifactId>
-        <version>9.31</version>
+        <version>9.37.3</version>
       </dependency>
 
       <dependency>
@@ -729,15 +717,9 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
-        <version>2.20.0</version>
+        <version>2.23.1</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-core</artifactId>
-        <version>2.3.0</version>
       </dependency>
 
       <dependency>
@@ -803,13 +785,13 @@
       <dependency>
         <groupId>xalan</groupId>
         <artifactId>serializer</artifactId>
-        <version>2.7.2</version>
+        <version>2.7.3</version>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.9</version>
+        <version>2.0.16</version>
       </dependency>
 
       <dependency>
@@ -960,7 +942,7 @@
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>stax2-api</artifactId>
-        <version>4.2.1</version>
+        <version>4.2.2</version>
       </dependency>
 
       <dependency>
@@ -1023,7 +1005,7 @@
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.5.1</version>
+        <version>7.0.0</version>
       </dependency>
 
       <dependency>
@@ -1033,9 +1015,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.dspace</groupId>
+        <groupId>io.gdcc</groupId>
         <artifactId>xoai-data-provider</artifactId>
-        <version>4.2.0</version>
+        <version>5.2.2</version>
       </dependency>
 
       <dependency>
@@ -1196,19 +1178,19 @@
       <dependency>
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-core</artifactId>
-        <version>1.10.13</version>
+        <version>1.12.11</version>
       </dependency>
 
       <dependency>
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-observation</artifactId>
-        <version>1.10.13</version>
+        <version>1.12.11</version>
       </dependency>
 
       <dependency>
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-commons</artifactId>
-        <version>1.10.13</version>
+        <version>1.12.11</version>
       </dependency>
 
       <dependency>
@@ -1226,7 +1208,7 @@
       <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
-        <version>3.0.3</version>
+        <version>4.0.2</version>
       </dependency>
 
 
@@ -1240,13 +1222,13 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.5</version>
+        <version>2.13.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
       </dependency>
 
       <dependency>

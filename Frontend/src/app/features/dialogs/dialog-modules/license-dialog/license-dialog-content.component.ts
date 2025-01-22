@@ -179,7 +179,7 @@ export class LicenseDialogContentComponent implements OnInit {
             }
         } else {
             // if no version is selected select 4.0 by default
-            if (!this.ccVersion) this.ccVersion = '4.0';
+            if (!['2.0', '3.0', '4.0'].includes(this.ccVersion)) this.ccVersion = '4.0';
         }
         this._primaryType = primaryType;
         this.updateCanSave();
@@ -767,6 +767,7 @@ export class LicenseDialogContentComponent implements OnInit {
             if (this.ccProfileUrl) {
                 prop[RestConstants.CCM_PROP_LICENSE_PROFILE_URL] = [this.ccProfileUrl];
             }
+
             if (this.ccVersion) {
                 prop[RestConstants.CCM_PROP_LICENSE_CC_VERSION] = [this.ccVersion];
                 // make sure v4.0 has no locale

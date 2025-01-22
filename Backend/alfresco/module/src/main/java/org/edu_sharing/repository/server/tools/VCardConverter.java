@@ -28,6 +28,7 @@
 package org.edu_sharing.repository.server.tools;
 
 import net.sourceforge.cardme.engine.VCardEngine;
+import net.sourceforge.cardme.io.FoldingScheme;
 import net.sourceforge.cardme.io.VCardWriter;
 import net.sourceforge.cardme.vcard.VCard;
 import net.sourceforge.cardme.vcard.VCardImpl;
@@ -44,6 +45,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class VCardConverter {
 
@@ -128,29 +130,64 @@ public class VCardConverter {
 	}
 
 	public static String getNameForVCard(String prefix,Map<String,Object> data){
-		if(isPersonVCard(prefix,data)){
-			String name="";
-			if(data.containsKey(prefix+CCConstants.VCARD_TITLE))
-				name+=data.get(prefix+CCConstants.VCARD_TITLE)+" ";
-			if(data.containsKey(prefix+CCConstants.VCARD_GIVENNAME))
-				name+=data.get(prefix+CCConstants.VCARD_GIVENNAME)+" ";
-			if(data.containsKey(prefix+CCConstants.VCARD_SURNAME))
-				name+=data.get(prefix+CCConstants.VCARD_SURNAME)+" ";
-			if(!name.trim().isEmpty())
-				return name.trim();
-		}
-		if(data.containsKey(prefix+CCConstants.VCARD_ORG))
-			return (String) data.get(prefix+CCConstants.VCARD_ORG);
+
+        if(isPersonVCard(prefix,data)){
+            return Stream.of(CCConstants.VCARD_TITLE, CCConstants.VCARD_GIVENNAME, CCConstants.VCARD_SURNAME)
+                    .map(x->prefix+x)
+                    .map(data::get)
+                    .map(Object::toString)
+                    .map(String::trim)
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.joining(", "));
+        }
+
+        if(data.containsKey(prefix+CCConstants.VCARD_ORG)) {
+            return (String) data.get(prefix+CCConstants.VCARD_ORG);
+        }
+
 		return null;
 	}
 
+	public static String getInvertedNameForVCard(String prefix,Map<String,Object> data) {
+		if(isPersonVCard(prefix,data)){
+            return Stream.of(CCConstants.VCARD_SURNAME, CCConstants.VCARD_GIVENNAME)
+                    .map(x->prefix+x)
+                    .map(data::get)
+                    .map(Object::toString)
+                    .map(String::trim)
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.joining(", "));
+		}
+
+		if(data.containsKey(prefix+CCConstants.VCARD_ORG)) {
+			return (String) data.get(prefix+CCConstants.VCARD_ORG);
+        }
+
+		return null;
+	}
+
+
 	public static String getNameForVCardString(String vcardString) {
 		ArrayList<Map<String, Object>> vcard = VCardConverter.vcardToMap(null, vcardString);
-		if (vcard.size() == 0)
+		if (vcard.isEmpty()) {
+            return null;
+        }
+
+		return StringUtils.join(vcard.stream()
+				.map(v -> VCardConverter.getNameForVCard(null, v))
+				.collect(Collectors.toList()), ", ");
+	}
+
+	public static String getInvertedNameForVCardString(String vcardString){
+		ArrayList<Map<String, Object>> vcard = VCardConverter.vcardToMap(null, vcardString);
+		if (vcard.isEmpty()) {
 			return null;
-		return StringUtils.join(vcard.stream().map(v ->
-					VCardConverter.getNameForVCard(null, v)
-		).collect(Collectors.toList()), ", ");
+		}
+
+		return StringUtils.join(vcard.stream()
+				.map(v -> VCardConverter.getInvertedNameForVCard(null, v))
+				.collect(Collectors.toList()), ", ");
+
 	}
 
 
@@ -175,6 +212,7 @@ public class VCardConverter {
 			method.setAccessible(true);
 			return ((List<VCard>) method.invoke(engine, vcardString)).stream().map(cleanup).map((vCard) -> {
 				VCardWriter writer = new VCardWriter();
+				writer.setFoldingScheme(FoldingScheme.NONE);
 				writer.setVCard(vCard);
 				try {
 					return writer.buildVCardString();

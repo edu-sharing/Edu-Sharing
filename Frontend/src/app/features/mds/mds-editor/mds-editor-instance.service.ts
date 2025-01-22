@@ -1,8 +1,10 @@
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import {
+    AuthenticationService,
     AboutService,
     ConfigService,
     FacetsDict,
+    LoginInfo,
     HOME_REPOSITORY,
     MdsService,
     MdsViewRelation,
@@ -42,7 +44,6 @@ import {
     RestConnectorService,
     RestConstants,
     RestMdsService,
-    RestSearchService,
 } from '../../../core-module/core.module';
 import {
     BulkBehavior,
@@ -442,9 +443,11 @@ export class MdsEditorInstanceService implements OnDestroy {
          * whether the field was missing and scrolled into view
          */
         registerShowMissingRequired(f: (shouldScrollIntoView: boolean) => boolean) {
-            if (this.showMissingRequiredFunction) {
-                throw new Error('onShowMissingRequired was called more than once');
-            }
+            // might be called twice since the form control gets initiated more than once
+            // see @MdsEditorWidgetTextComponent
+            /*if (this.showMissingRequiredFunction) {
+                // throw new Error('onShowMissingRequired was called more than once');
+            }*/
             this.showMissingRequiredFunction = f;
         }
 
@@ -712,6 +715,7 @@ export class MdsEditorInstanceService implements OnDestroy {
     private readonly _new_initializingStateSubject = new BehaviorSubject<
         'new' | 'initializing' | 'failed' | 'complete'
     >('new');
+    private loginInfo: LoginInfo;
     suggestionsSupported: boolean;
     private state$ = new BehaviorSubject<MdsState>({ widgets: {} });
 
@@ -721,12 +725,14 @@ export class MdsEditorInstanceService implements OnDestroy {
         private aboutService: AboutService,
         private restMdsService: RestMdsService,
         private configService: ConfigurationService,
+        private authenticationService: AuthenticationService,
         public searchHelperService: SearchHelperService,
         private suggestionsService: SuggestionsV1Service,
         private restConnector: RestConnectorService,
         private config: ConfigService,
     ) {
         this.registerInitMds();
+        this.registerLoginInfo();
         this.register_new_valuesChange();
         this.register_new_inputValuesSubject();
         this.mdsInflated.subscribe((mdsInflated) => (this.mdsInflatedValue = mdsInflated));
@@ -1234,6 +1240,15 @@ export class MdsEditorInstanceService implements OnDestroy {
     }
 
     /**
+     * display an error for all widgets which are required but not filled out
+     */
+    markMissingRequiredWidgets() {
+        for (let w of this.widgets.value) {
+            w.showMissingRequired(false);
+        }
+    }
+
+    /**
      * Shows the required hints of all missing widgets and scrolls widgets into view, rotating
      * through all widgets when called multiple times.
      */
@@ -1704,7 +1719,7 @@ export class MdsEditorInstanceService implements OnDestroy {
         } else if (widget.condition.type === 'TOOLPERMISSION') {
             const result =
                 widget.condition.negate ===
-                !this.restConnector.hasToolPermissionInstant(widget.condition.value);
+                !this.loginInfo?.toolPermissions?.includes(widget.condition.value);
             if (!result) {
                 // tslint:disable-next-line:no-console
                 console.debug(
@@ -2016,6 +2031,13 @@ export class MdsEditorInstanceService implements OnDestroy {
     putWidgetState(widget: string, data: any) {
         this.state$.value.widgets[widget] = Helper.deepCopy(data);
         this.state$.next(this.state$.value);
+    }
+
+    private registerLoginInfo() {
+        this.authenticationService
+            .observeLoginInfo()
+            .pipe(takeUntil(this.destroyed$))
+            .subscribe((info) => (this.loginInfo = info));
     }
 }
 

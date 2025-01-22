@@ -157,7 +157,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
                 logger.info("Building stats for mediacenter " + mediacenter);
                 Date startDate = Date.from(from.atStartOfDay().toInstant(ZoneOffset.UTC));
                 Date endDate = Date.from(to.atTime(23, 59).toInstant(ZoneOffset.UTC));
-                if(generateMonthly) {
+                if (generateMonthly) {
                     generateReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
                     generateSchoolReportByTimeRange(mediacenter, startDate, endDate, ReportType.Monthly);
                 }
@@ -321,7 +321,7 @@ public class MediacenterMonthlyReportsJob extends AbstractJobMapAnnotationParams
             case Quarterly:
                 sb.append(startDate.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(("yyyy"))));
                 sb.append("-Q");
-                sb.append((endDate.getMonth() + 1)/3);
+                sb.append((endDate.getMonth() + 1) / 3);
                 break;
 
             default:

@@ -1,4 +1,12 @@
-<es-actionbar [numberOfAlwaysVisibleOptions]="4"></es-actionbar>
+<div>
+  <span>{{ 'NODE_INFO.CONTEXT_ACTIONS' | translate }}</span>
+  <es-actionbar [numberOfAlwaysVisibleOptions]="4" #contextActionbar></es-actionbar>
+</div>
+<div>
+  <span>{{ 'NODE_INFO.ALL_ACTIONS' | translate }}</span>
+  <es-actionbar [numberOfAlwaysVisibleOptions]="4" #allActionbar></es-actionbar>
+</div>
+
 <div>
   <span>{{ 'NODE.cm:name' | translate }}</span
   ><span *ngFor="let node of _nodes">{{ node.name }}</span>

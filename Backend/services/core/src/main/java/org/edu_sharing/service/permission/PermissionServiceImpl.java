@@ -46,7 +46,6 @@ import org.edu_sharing.service.authority.AuthorityServiceHelper;
 import org.edu_sharing.service.collection.CollectionServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.notification.NotificationServiceFactoryUtility;
-import org.edu_sharing.service.oai.OAIExporterService;
 import org.edu_sharing.service.share.ShareService;
 import org.edu_sharing.service.share.ShareServiceImpl;
 import org.edu_sharing.service.toolpermission.ToolPermissionService;
@@ -260,43 +259,6 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         if (nodeService.hasAspect(nodeRef, QName.createQName(CCConstants.CCM_ASPECT_COLLECTION))) {
             CollectionServiceFactory.getCollectionService(appInfo.getAppId()).updateScope(nodeRef, aces);
         }
-
-
-        OAIExporterService service = new OAIExporterService();
-        if (service.available()) {
-            boolean publishToOAI = false;
-
-            List<String> licenseList = (List<String>) serviceRegistry.getNodeService().getProperty(new NodeRef(MCAlfrescoAPIClient.storeRef, nodeId), QName.createQName(CCConstants.CCM_PROP_IO_COMMONLICENSE_KEY));
-
-            if (licenseList != null) {
-                for (String license : licenseList) {
-                    if (license != null && license.startsWith("CC_")) {
-                        for (ACE ace : acesToAdd) {
-                            if (ace.getAuthorityType().equals(AuthorityType.EVERYONE.toString())) {
-                                publishToOAI = true;
-                            }
-                        }
-
-                        for (ACE ace : acesToUpdate) {
-                            if (ace.getAuthorityType().equals(AuthorityType.EVERYONE.toString())) {
-                                publishToOAI = true;
-                            }
-                        }
-
-                        for (ACE ace : acesNotChanged) {
-                            if (ace.getAuthorityType().equals(AuthorityType.EVERYONE.toString())) {
-                                publishToOAI = true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (publishToOAI) {
-                service.export(nodeId);
-            }
-        }
-
-
     }
 
     @Override
@@ -1539,7 +1501,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
              * collect user addes ace's
              */
             for (Notify notify : notifyList) {
-                log.info("Notify e:" + notify.getNotifyEvent()
+                log.debug("Notify e:" + notify.getNotifyEvent()
                         + " a:" + notify.getNotifyAction()
                         + " u:" + notify.getNotifyUser()
                         + " c:" + notify.getChange()
@@ -1750,7 +1712,7 @@ public class PermissionServiceImpl implements org.edu_sharing.service.permission
         if (AuthorityType.getAuthorityType(authority).equals(AuthorityType.GROUP)) {
             NodeRef groupNodeRef = serviceRegistry.getAuthorityService().getAuthorityNodeRef(authority);
             if (groupNodeRef == null) {
-                log.warn("authority {} does not exist. will continue", authority);
+                log.debug("authority {} does not exist. will continue", authority);
                 return null;
             }
 

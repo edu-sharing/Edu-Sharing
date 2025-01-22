@@ -64,26 +64,45 @@ public class FactualTermDisplayUpdater {
         }
 
         for(NodeRef nodeRef : nodeRefs){
-            List<String> keys = (List<String>) nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD));
-            ArrayList<String> displays = new ArrayList<>();
-            for(String k : keys){
-                List<? extends Suggestion> suggestions = MetadataSearchHelper.getSuggestions(appId, mds, "ngsearch",
-                        CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD), k, null);
-                displays.add(suggestions.get(0).getDisplayString());
-            }
-            logger.info("updateing;"+nodeRef+";"+ key);
-            serviceRegistry.getRetryingTransactionHelper().doInTransaction(()->{
-                try {
-
-                    policyBehaviourFilter.disableBehaviour(nodeRef);
-                    setProperty(nodeRef,QName.createQName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD_DISPLAY),displays);
-                    new RepositoryCache().remove(nodeRef.getId());
-                }finally {
-                    policyBehaviourFilter.enableBehaviour(nodeRef);
-                }
-                return null;
-            });
+            resetDisplayProperty(key, nodeRef);
         }
+    }
+
+    public void resetDisplayProperty(NodeRef nodeRef){
+        resetDisplayProperty(null, nodeRef);
+    }
+
+    private void resetDisplayProperty(String key, NodeRef nodeRef) {
+        List<String> keys = (List<String>) nodeService.getProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD));
+        if(keys == null || keys.size() == 0){
+            return;
+        }
+        ArrayList<String> displays = new ArrayList<>();
+        for(String k : keys){
+            List<? extends Suggestion> suggestions = MetadataSearchHelper.getSuggestions(appId, mds, "ngsearch",
+                    CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD), k, null);
+            if(suggestions == null || suggestions.size() == 0){
+                logger.info("no caption value found for key: " + k +" nodeRef:"+nodeRef);
+                continue;
+            }
+            displays.add(suggestions.get(0).getDisplayString());
+        }
+        if(displays.size() == 0){
+            logger.info("no caption values found nodeRef:" + nodeRef);
+            return;
+        }
+        logger.info("updateing;"+ nodeRef +";"+ key);
+        serviceRegistry.getRetryingTransactionHelper().doInTransaction(()->{
+            try {
+
+                policyBehaviourFilter.disableBehaviour(nodeRef);
+                setProperty(nodeRef,QName.createQName(CCConstants.CCM_PROP_IO_REPL_CLASSIFICATION_KEYWORD_DISPLAY),displays);
+                new RepositoryCache().remove(nodeRef.getId());
+            }finally {
+                policyBehaviourFilter.enableBehaviour(nodeRef);
+            }
+            return null;
+        });
     }
 
     private void setProperty(NodeRef nodeRef, QName qName, Serializable serializable){
@@ -93,5 +112,4 @@ public class FactualTermDisplayUpdater {
             nodeService.setProperty(nodeRef, qnameV, serializable);
         }
     }
-
 }

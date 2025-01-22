@@ -325,7 +325,9 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
                         : (d as User).authorityName === (v as User).authorityName,
                 );
             if (contains) {
-                this.updateNodes([v]);
+                if ((v as VirtualNode).override !== false) {
+                    this.updateNodes([v]);
+                }
             } else {
                 this.dataSource.appendData([v], 'before');
             }

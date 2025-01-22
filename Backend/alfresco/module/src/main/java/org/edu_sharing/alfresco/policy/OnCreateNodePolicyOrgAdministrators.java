@@ -1,9 +1,5 @@
 package org.edu_sharing.alfresco.policy;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -18,8 +14,14 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
+import org.apache.log4j.Logger;
+import org.edu_sharing.alfresco.service.AuthorityService;
 import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.repository.client.tools.CCConstants;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class OnCreateNodePolicyOrgAdministrators implements OnCreateNodePolicy, OnMoveNodePolicy {
 
@@ -86,15 +88,24 @@ public class OnCreateNodePolicyOrgAdministrators implements OnCreateNodePolicy, 
 		}
 		
 		if(organisationNode != null){
-			NodeRef orgNodeRef = (NodeRef)nodeService.getProperty(organisationNode,OrganisationService.PROP_EDUGROUP_FOLDER_ORGANISATION);
-			Map<QName, Serializable> eduGroupProps = nodeService.getProperties(orgNodeRef);
-			NodeRef eduGroupNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, (String)eduGroupProps.get(ContentModel.PROP_NODE_UUID));
-			List<ChildAssociationRef> childGroups = nodeService.getChildAssocs(eduGroupNodeRef);
-			for(ChildAssociationRef childGroup : childGroups){
-				String grouptype = (String)nodeService.getProperty(childGroup.getChildRef(), QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
-				if(CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(grouptype)){
-					String authorityName = (String)nodeService.getProperty(childGroup.getChildRef(), QName.createQName(CCConstants.CM_PROP_AUTHORITY_AUTHORITYNAME));
-					return authorityName;
+            NodeRef orgNodeRef = (NodeRef)nodeService.getProperty(organisationNode,OrganisationService.PROP_EDUGROUP_FOLDER_ORGANISATION);
+            Map<QName, Serializable> eduGroupProps = nodeService.getProperties(orgNodeRef);
+            NodeRef eduGroupNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, (String) eduGroupProps.get(ContentModel.PROP_NODE_UUID));
+			try {
+				String name = PermissionService.GROUP_PREFIX + AuthorityService.getGroupName(AuthorityService.ADMINISTRATORS_GROUP, (String) eduGroupProps.get(ContentModel.PROP_AUTHORITY_NAME));
+				String grouptype = (String)nodeService.getProperty(serviceRegistry.getAuthorityService().getAuthorityNodeRef(name), QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
+				if(CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(grouptype)) {
+					return name;
+				}
+			} catch (Throwable t) {
+				Logger.getLogger(OnCreateNodePolicyOrgAdministrators.class).warn(t);
+				// this is much, much slower
+				List<ChildAssociationRef> childGroups = nodeService.getChildAssocs(eduGroupNodeRef);
+				for(ChildAssociationRef childGroup : childGroups){
+					String grouptype = (String)nodeService.getProperty(childGroup.getChildRef(), QName.createQName(CCConstants.CCM_PROP_GROUPEXTENSION_GROUPTYPE));
+					if(CCConstants.ADMINISTRATORS_GROUP_TYPE.equals(grouptype)){
+                        return (String)nodeService.getProperty(childGroup.getChildRef(), QName.createQName(CCConstants.CM_PROP_AUTHORITY_AUTHORITYNAME));
+					}
 				}
 			}
 		}

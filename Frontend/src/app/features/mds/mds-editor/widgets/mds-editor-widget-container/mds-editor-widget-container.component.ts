@@ -123,6 +123,11 @@ export class MdsEditorWidgetContainerComponent
     isHidden: boolean;
 
     private readonly destroyed$ = new Subject<void>();
+    /**
+     * optional input function to inform this component whether the wrapped widget has values available
+     * will be used to hide the widget if all details are met
+     */
+    @Input() hasValues: () => boolean;
 
     constructor(
         private elementRef: ElementRef,
@@ -154,6 +159,9 @@ export class MdsEditorWidgetContainerComponent
     ngOnChanges(changes: SimpleChanges): void {
         if (changes.widget) {
             this.registerIsHidden();
+        }
+        if (changes.control) {
+            this.initFormControl(this.control);
         }
     }
 
@@ -201,7 +209,7 @@ export class MdsEditorWidgetContainerComponent
 
     private registerIsHidden(): void {
         const shouldShowFactors = [this.widget.meetsDynamicCondition];
-        if (this.widget.definition.isExtended) {
+        if (this.widget.definition.isExtended && this.mdsEditorInstance.editorMode !== 'viewer') {
             shouldShowFactors.push(this.mdsEditorInstance.shouldShowExtendedWidgets$);
         }
         combineLatest(shouldShowFactors)
@@ -259,15 +267,29 @@ export class MdsEditorWidgetContainerComponent
     }
 
     private scrollIntoViewAndFocus(): void {
-        new Promise((resolve) => {
-            // Expand section (view) if needed.
-            if (this.viewInstance.isExpanded$.value) {
-                resolve(null);
-            } else {
-                this.viewInstance.isExpanded$.next(true);
-                setTimeout(() => resolve(null));
-            }
-        }).then(async () => {
+        Promise.all([
+            new Promise((resolve) => {
+                // Expand section (view) if needed.
+                if (this.viewInstance.isExpanded$.value) {
+                    resolve(null);
+                } else {
+                    this.viewInstance.isExpanded$.next(true);
+                    setTimeout(() => resolve(null));
+                }
+            }),
+            new Promise((resolve) => {
+                // Show extended widgets if needed.
+                if (
+                    !this.widget.definition.isExtended ||
+                    this.mdsEditorInstance.shouldShowExtendedWidgets$.value
+                ) {
+                    resolve(null);
+                } else {
+                    this.mdsEditorInstance.shouldShowExtendedWidgets$.next(true);
+                    setTimeout(() => resolve(null));
+                }
+            }),
+        ]).then(async () => {
             await this.uiService.scrollSmoothElementToChild(this.elementRef.nativeElement);
             /*this.elementRef.nativeElement.scrollIntoView({
                 behavior: 'smooth',
@@ -281,9 +303,13 @@ export class MdsEditorWidgetContainerComponent
     private setDisabled(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
         if (isDisabled) {
-            this.control.disable();
+            if (!this.control.disabled) {
+                this.control.disable();
+            }
         } else {
-            this.control.enable();
+            if (this.control.disabled) {
+                this.control.enable();
+            }
         }
     }
 
@@ -300,5 +326,16 @@ export class MdsEditorWidgetContainerComponent
             this.missingRequired = null;
         }
         this.widget.setStatus(status);
+    }
+
+    isVisible() {
+        if (
+            this.mdsEditorInstance.editorMode === 'search' &&
+            this.widget.definition.hideIfEmpty &&
+            this.hasValues
+        ) {
+            return this.hasValues();
+        }
+        return true;
     }
 }

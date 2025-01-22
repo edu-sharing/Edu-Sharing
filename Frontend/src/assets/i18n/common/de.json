@@ -171,7 +171,10 @@
     "TOOLPERMISSION_SIGNUP_GROUP": "Zu einer Organisation/Gruppe einschreiben (gilt nur für seperat dafür freigegebene Organisationen/Gruppen)",
     "TOOLPERMISSION_COLLECTION_PROPOSAL": "Vorschlagen von Materialien für Sammlungen, für welche die nutzende Person keine Schreibrechte hat",
     "TOOLPERMISSION_RATE": "Die Berechtigung zum Bewerten von Materialien",
-    "TOOLPERMISSION_MANAGE_RELATIONS": "Verwalten und erstellen von Beziehungen zwischen Elementen"
+    "TOOLPERMISSION_MANAGE_RELATIONS": "Verwalten und erstellen von Beziehungen zwischen Elementen",
+    "TOOLPERMISSION_INVITE_TIMEBASED": "Zeitlich beschränkte Freigaben erstellen",
+    "TOOLPERMISSION_SUGGESTION_READ": "Vorschläge für Metadaten an Elementen abrufen",
+    "TOOLPERMISSION_SUGGESTION_WRITE": "Vorschläge für Metadaten an Elementen erstellen"
   },
   "NO_WRITE_PERMISSIONS": "Keine Rechte für diesen Vorgang",
   "NODE_SEARCH": "Elemente suchen...",
@@ -227,7 +230,9 @@
     "CHILDREN": "Children",
     "CHILDREN_NONE": "Dieses Element besitzt keine Child Objekte",
     "CUSTOM_PROPERTY_NAME": "Eigene Property eingeben",
-    "CUSTOM_PROPERTY_VALUE": "Wert für Property eingeben"
+    "CUSTOM_PROPERTY_VALUE": "Wert für Property eingeben",
+    "CONTEXT_ACTIONS": "Aktionen für diesen Element-Typ",
+    "ALL_ACTIONS": "Alle Aktionen (ggf. nicht mit diesen Typ kompatibel!)"
   },
   "SIDEBAR": {
     "WORKSPACE": "Workspace",
@@ -735,8 +740,8 @@
     "DIFFERENT_VALUES": "(Verschiedene Werte)",
     "HAS_CHANGES": "geändert",
     "TITLE": "Infos bearbeiten",
-    "SHOW_EXTENDED_FALSE": "Erweitere Infos ausgeblendet",
-    "SHOW_EXTENDED_TRUE": "Erweitere Infos eingeblendet",
+    "SHOW_EXTENDED_FALSE": "Erweiterte Infos ausgeblendet",
+    "SHOW_EXTENDED_TRUE": "Erweiterte Infos eingeblendet",
     "SHOW_EXTENDED_SEARCH": "Weitere Filter anzeigen",
     "AUTHOR_LABEL": "Urheber{{GENDER_SEPARATOR}}in-Angaben",
     "AUTHOR_FREETEXT": "Freie Urheber{{GENDER_SEPARATOR}}in-Angabe",

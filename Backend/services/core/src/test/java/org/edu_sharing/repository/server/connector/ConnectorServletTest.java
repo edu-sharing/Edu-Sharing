@@ -1,9 +1,9 @@
 package org.edu_sharing.repository.server.connector;
 
 import com.github.davidmoten.guavamini.Maps;
-import com.lyncode.test.check.Assert;
 import org.edu_sharing.alfresco.service.connector.SimpleConnector;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.SimpleErrorWithDetailsException;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -14,6 +14,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 class ConnectorServletTest {
 
@@ -26,7 +28,7 @@ class ConnectorServletTest {
 
     @Test
     @Disabled
-    void handleSimpleConnectorTestOauthFormCurriculum() throws UnsupportedEncodingException {
+    void handleSimpleConnectorTestOauthFormCurriculum() throws UnsupportedEncodingException, SimpleErrorWithDetailsException {
         SimpleConnector connector = new SimpleConnector();
         SimpleConnector.SimpleConnectorApi api = new SimpleConnector.SimpleConnectorApi();
         connector.setApi(api);
@@ -53,6 +55,6 @@ class ConnectorServletTest {
         );
         connector.setId("test");
         HashMap<String, Serializable> result = underTest.handleSimpleConnector(Maps.empty(), connector, null);
-        Assert.assertThat(result.get(CCConstants.CCM_PROP_IO_WWWURL).toString(), CoreMatchers.containsString("https://curriculum-dev.schulcampus-rlp.de/kanbans/"));
+        assertThat(result.get(CCConstants.CCM_PROP_IO_WWWURL).toString(), CoreMatchers.containsString("https://curriculum-dev.schulcampus-rlp.de/kanbans/"));
     }
 }

@@ -94,7 +94,9 @@ public void setAvatar(String avatar) {
 	public void setAbout(String about) {
 		this.about = about;
 	}
-	@JsonProperty
+
+    @JsonProperty
+    @Schema(description = "",nullable = true)
 	public String[] getSkills() {
 		return skills;
 	}

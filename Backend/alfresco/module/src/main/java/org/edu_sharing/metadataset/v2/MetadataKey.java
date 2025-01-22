@@ -3,11 +3,10 @@ package org.edu_sharing.metadataset.v2;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ public class MetadataKey extends MetadataTranslatable {
         }
 
     }
+
     @JacksonXmlText
     private String key;
     @JacksonXmlProperty(isAttribute = true, localName = "cap")
@@ -54,7 +54,7 @@ public class MetadataKey extends MetadataTranslatable {
     private String parent;
 
     // Hint if the given key shall be removed. Use in conjunction with @MetadataWidget.ValuespaceMerge
-    private  Boolean delete =false;
+    private Boolean delete = false;
     @JacksonXmlProperty(isAttribute = true)
     private String locale;
     /**
@@ -64,6 +64,7 @@ public class MetadataKey extends MetadataTranslatable {
     private final List<MetadataKeyRelated> related = new ArrayList<>();
     private List<String> alternativeKeys;
     private String url;
+    private Source source = Source.Internal;
 
     public void setParent(String parent) {
         if (StringUtils.isBlank(parent)) {
@@ -75,6 +76,38 @@ public class MetadataKey extends MetadataTranslatable {
 
     public void addRelated(MetadataKeyRelated related) {
         this.related.add(related);
+    }
+
+
+    /**
+     * @return an uri or literal value that identifies the subject.
+     * This is mainly used for oai dublin core export and its customizations,
+     * to provide an identifiable resource, in case of a skos values or other internal value spaces.
+     * </br>
+     * </br>
+     * e.g. for OaiDublinCoreMetadataFormatWriter customizations:
+     *
+     * <pre>
+     *     {@code
+     *     MetadataWidget generalKeyWordWidget = context.getMetadataSet().findWidget(CCConstants.getValidLocalName(CCConstants.LOM_PROP_GENERAL_KEYWORD));
+     *     context.createAndAppendElement("dc:subject", root, propertyMapper.getStringList(CCConstants.LOM_PROP_GENERAL_KEYWORD)
+     *         .stream()
+     *         .map(x-> generalKeyWordWidget.getValuesAsMap().get(x))
+     *         .filter(Objects::nonNull)
+     *         .map(MetadataKey::getIdentifiableValue)
+     *         .collect(Collectors.toList()));
+     *     }
+     * </pre>
+     */
+    public String getIdentifiableValue() {
+        switch (source) {
+            case Internal:
+                return getCaption();
+            case SKOS:
+                return getKey();
+            default:
+                throw new NotImplementedException(source.name());
+        }
     }
 
 

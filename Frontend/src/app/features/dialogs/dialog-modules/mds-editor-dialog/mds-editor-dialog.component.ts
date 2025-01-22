@@ -57,7 +57,8 @@ export class MdsEditorDialogComponent implements OnInit, AfterViewInit {
         this.mdsEditorInstance.mdsInflated.pipe(first(), delay(0)).subscribe(() => {
             this.dialogRef.patchState({ isLoading: false });
             if (this.data.immediatelyShowMissingRequiredWidgets) {
-                this.mdsEditorInstance.showMissingRequiredWidgets(false);
+                this.mdsEditorInstance.markMissingRequiredWidgets();
+                this.mdsEditorInstance.showMissingRequiredWidgets(true);
             }
         });
     }

@@ -1005,28 +1005,32 @@ public class SearchServiceElastic extends SearchServiceImpl {
         eduNodeRef.setPublic(false);
         Map<String, List<String>> permissionsElastic = (Map) sourceAsMap.get("permissions");
         String owner = (String) sourceAsMap.get("owner");
-        for (Map.Entry<String, List<String>> entry : permissionsElastic.entrySet()) {
-            if ("read".equals(entry.getKey())) {
-                continue;
-            }
-            if (!eduNodeRef.getPublic() && guestConfig != null && guestConfig.isEnabled() && entry.getValue().contains(CCConstants.AUTHORITY_GROUP_EVERYONE)) {
-                PermissionReference pr = permissionModel.getPermissionReference(null, entry.getKey());
-                Set<PermissionReference> granteePermissions = permissionModel.getGranteePermissions(pr);
-                eduNodeRef.setPublic(granteePermissions.stream().anyMatch(p -> p.getName().equals(CCConstants.PERMISSION_READ_ALL)));
-            }
-            if (authorities.stream().anyMatch(s -> entry.getValue().contains(s))
-                    || entry.getValue().contains(user)) {
-                //get fine grained permissions
-                PermissionReference pr = permissionModel.getPermissionReference(null, entry.getKey());
-                Set<PermissionReference> granteePermissions = permissionModel.getGranteePermissions(pr);
-                for (String perm : PermissionServiceHelper.PERMISSIONS) {
-                    for (PermissionReference pRef : granteePermissions) {
-                        if (pRef.getName().equals(perm)) {
-                            permissions.put(perm, true);
+        if(permissionsElastic != null) {
+            for (Map.Entry<String, List<String>> entry : permissionsElastic.entrySet()) {
+                if ("read".equals(entry.getKey())) {
+                    continue;
+                }
+                if (!eduNodeRef.getPublic() && guestConfig != null && guestConfig.isEnabled() && entry.getValue().contains(CCConstants.AUTHORITY_GROUP_EVERYONE)) {
+                    PermissionReference pr = permissionModel.getPermissionReference(null, entry.getKey());
+                    Set<PermissionReference> granteePermissions = permissionModel.getGranteePermissions(pr);
+                    eduNodeRef.setPublic(granteePermissions.stream().anyMatch(p -> p.getName().equals(CCConstants.PERMISSION_READ_ALL)));
+                }
+                if (authorities.stream().anyMatch(s -> entry.getValue().contains(s))
+                        || entry.getValue().contains(user)) {
+                    //get fine grained permissions
+                    PermissionReference pr = permissionModel.getPermissionReference(null, entry.getKey());
+                    Set<PermissionReference> granteePermissions = permissionModel.getGranteePermissions(pr);
+                    for (String perm : PermissionServiceHelper.PERMISSIONS) {
+                        for (PermissionReference pRef : granteePermissions) {
+                            if (pRef.getName().equals(perm)) {
+                                permissions.put(perm, true);
+                            }
                         }
                     }
                 }
             }
+        } else {
+            logger.warn("permissionsElastic is null for " + identifier);
         }
 
         // @TODO: remove all of this from/to multivalue

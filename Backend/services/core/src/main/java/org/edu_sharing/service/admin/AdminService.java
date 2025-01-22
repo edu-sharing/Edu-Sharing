@@ -81,7 +81,7 @@ public interface AdminService {
 
 	void updatePropertiesXML(String xmlFile,Map<String, String> properties) throws Exception;
 	
-	public void exportLom(String filterQuery,String targetDir, boolean subobjectHandler) throws Exception;
+	public void exportLom(String filterQuery, String targetDir, String format) throws Exception;
 
 	int getActiveSessions() throws Exception;
 

@@ -133,11 +133,9 @@ public class CCConstants {
 	public final static String AUTH_HEADER_EDU_TICKET = "EDU-TICKET";
 
 	/**
-	 * access on a node validated by lms
+	 * access on nodes that was validated by lms
 	 */
-	public final static String AUTH_SINGLE_USE_NODEID = "AUTH_SINGLE_USE_NODEID";
-
-	public final static String AUTH_SINGLE_USE_TIMESTAMP = "AUTH_SINGLE_USE_TIMESTAMP";
+	public final static String AUTH_SINGLE_USE_NODEIDS = "AUTH_SINGLE_USE_NODEIDS";
 
 	public final static String REPOSITORY_ID = "REPOSITORY_ID";
 
@@ -1387,6 +1385,8 @@ public class CCConstants {
 
 	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_VALUESPACE = "EDUSYSTEM_VALUESPACE";
 
+	public final static String CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_ORG_DELETE_PROTOCOL = "EDUSYSTEM_ORG_DELETE_PROTOCOL";
+
 
 	public final static String CCM_ASPECT_GROUP_SIGNUP = "{http://www.campuscontent.de/model/1.0}group_signup";
 
@@ -1619,6 +1619,8 @@ public class CCConstants {
 	public final static String I18n_SYSTEMFOLDER_SERVICE = "systemfolder_service";
 
 	public final static String I18n_SYSTEMFOLDER_VALUESPACE = "systemfolder_valuespace";
+
+	public final static String I18n_SYSTEMFOLDER_ORG_DELETE_PROTOCOL = "systemfolder_org_delete_protocol";
 
 
 	//Gruppen root Folder
@@ -2138,14 +2140,14 @@ public class CCConstants {
 
 	public static final String CC_CACHE_MILLISECONDS_KEY = "CC_CACHE_MILLISECONDS_KEY";
 
-	private static final Map<String, String> nameSpaceMap = Map.of(
+	private static final Map<String, String> nameSpaceMap = new HashMap<>(Map.of(
 			NAMESPACE_CCM, NAMESPACE_SHORT_CCM,
 			NAMESPACE_CM, NAMESPACE_SHORT_CM,
 			NAMESPACE_LOM, NAMESPACE_SHORT_LOM,
 			NAMESPACE_SYS,  NAMESPACE_SHORT_SYS,
 			NAMESPACE_VIRTUAL, NAMESPACE_SHORT_VIRTUAL,
 			NAMESPACE_EXIF, NAMESPACE_SHORT_EXIF
-	);
+	));
 
     /**
 	 * @return <namespace,localnamespace>
@@ -2178,6 +2180,10 @@ public class CCConstants {
 	 * @return
 	 */
 	public static String getValidGlobalName(String value){
+		if(value == null){
+			return null;
+		}
+
 		for(Map.Entry<String,String> entry: getNameSpaceMap().entrySet()){
 			if(value.startsWith(entry.getValue())){
 				return "{" + entry.getKey() + "}" + value.substring(entry.getValue().length() + 1);

@@ -18,11 +18,13 @@
     "SSO_UNKNOWN_ERROR": "Login nicht möglich",
     "MISSING_PARAM": "Login nicht möglich",
     "SSO_REQ_ATT_NOT_MATCHES": "Login nicht möglich",
+    "SSO_SAML_IDP_LOGOUT_UNDEFINED": "Single Logout nicht möglich",
     "INVALID_AUTHENTICATION_METHOD": "SSO Authentifizierung ist nicht konfiguriert",
     "DETAILS": {
       "403": "Der Zugriff auf den gewünschten Bereich bzw. die gewünschte Ressource ist leider nicht möglich",
       "404": "Fehler 404",
       "500": "Fehler 500",
+      "OTHER": "Unbekannter Fehler",
       "share_expired": "Die Linkfreigabe ist abgelaufen oder wurde vom Besitzer des Materials beendet",
       "share_file_deleted": "Die Linkfreigabe zeigt auf eine bereits gelöschte Datei. Bitte kontaktieren Sie den/die Autor{{GENDER_SEPARATOR}}in",
       "invalid_share": "Der angegebene Link ist ungültig",
@@ -37,6 +39,7 @@
       "SSO_UNKNOWN_ERROR": "unbekannter Fehler",
       "MISSING_PARAM": "unvollständige Benutzerinformationen",
       "SSO_REQ_ATT_NOT_MATCHES": "falsche Nutzerinformationen",
+      "SSO_SAML_IDP_LOGOUT_UNDEFINED": "Der Authentication Provider bietet keinen Service für einen globalen logout. Bitte beenden Sie ihren Browser um den Logout Prozess abzuschließen.",
       "INVALID_AUTHENTICATION_METHOD": "Bitte wenden Sie sich an einen Administrator"
     }
   }

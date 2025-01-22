@@ -58,6 +58,8 @@ public class Values implements Serializable {
 	@XmlElement	public LicenseAgreement licenseAgreement;
 	@XmlElement	public Services services;
 	@XmlElement	public HelpMenuOptions[] helpMenuOptions;
+	@XmlElement	public String favicon;
+	@XmlElement	public String appleTouchIcon;
 	@XmlElement	public Image[] images;
 	@XmlElement	public FontIcon[] icons;
 	@XmlElement	public Stream stream;

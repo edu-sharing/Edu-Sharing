@@ -87,7 +87,7 @@ public class PermissionsGet extends DeclarativeWebScript {
             acl.setAces(aces);
             for(AccessControlEntry entry : accessControlList.getEntries()){
                 Ace ace = new Ace();
-                ace.setAuthority(entry.getAuthority());
+                ace.setAuthority(entry.getAuthority().trim());
                 ace.setPermission(entry.getPermission().getName());
                 aces.add(ace);
                 Set<String> subPermissions = new HashSet<>();

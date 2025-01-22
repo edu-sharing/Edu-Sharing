@@ -1,6 +1,8 @@
 package org.edu_sharing.repository.server;
 
 import com.google.gson.Gson;
+import lombok.Getter;
+import org.apache.axis.utils.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.server.rendering.RenderingException;
@@ -14,14 +16,19 @@ import org.edu_sharing.restservices.shared.ErrorResponse;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.util.Optional;
 
 
 public class ErrorFilter implements Filter {
+	/**
+	 * more specific error that can handle more details to be shown to the client
+	 */
 	public static class ErrorFilterException extends ServletException {
-		private int statusCode;
+		private String details;
+		@Getter
+        private int statusCode;
 		public ErrorFilterException(Throwable t) {
 			super(t);
 			this.statusCode = mapStatusCode(t);
@@ -29,6 +36,11 @@ public class ErrorFilter implements Filter {
 		public ErrorFilterException(int statusCode) {
 			super();
 			this.statusCode = statusCode;
+		}
+
+		public ErrorFilterException(int statusCode, String details) {
+			this(statusCode);
+			this.details = details;
 		}
 
 		private int mapStatusCode(Throwable t) {
@@ -45,12 +57,12 @@ public class ErrorFilter implements Filter {
 			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
-		public int getStatusCode() {
-			return statusCode;
+		public String getAngularServletMessage() {
+			return StringUtils.isEmpty(details) ? getStatusCode() + "" : getAngularServletMessageGroup() + "/" + details;
 		}
 
-		public void setStatusCode(int statusCode) {
-			this.statusCode = statusCode;
+		protected String getAngularServletMessageGroup() {
+			return "OTHER";
 		}
 	}
 
@@ -115,7 +127,10 @@ public class ErrorFilter implements Filter {
 			resp.setStatus(statusCode);
 			if (accept!=null && accept.toLowerCase().contains("text/html")) {
 				resp.setContentType("text/html");
-				resp.getWriter().print("<head><script nonce=\"" + SecurityHeadersFilter.ngCspNonce.get() + "\">window.location.href=\"" + URLTool.getNgErrorUrl(statusCode + "") + "\";</script></head>");
+				resp.getWriter().print("<head><script nonce=\"" + SecurityHeadersFilter.ngCspNonce.get() + "\">window.location.href=\"" + URLTool.getNgErrorUrl(
+						(t instanceof ErrorFilterException) ? ((ErrorFilterException)t).getAngularServletMessage() :
+						statusCode + ""
+				) + "\";</script></head>");
 			} else if(accept!=null && accept.toLowerCase().contains("application/json")) {
 				resp.setHeader("Content-Type", "application/json");
 				resp.getWriter().print(new Gson().toJson(response));

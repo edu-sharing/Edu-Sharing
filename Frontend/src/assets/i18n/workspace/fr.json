@@ -172,7 +172,6 @@
         "INVALID_DATE": "Date non valide"
       },
 
-
       "PUBLISH": {
         "OPEN_VERSION": "Afficher la version",
         "NO_LICENSE": "Le matériel actuel n'a pas de licence attribuée. Les matériaux partagés doivent avoir une licence appropriée pour spécifier si et comment le matériau peut être réutilisé.",
@@ -478,6 +477,13 @@
       "PERMISSIONS": "Vous ne disposez pas des autorisations suffisantes pour créer des éléments dans le dossier actuel.",
       "VIRTUAL": "Vous êtes dans un dossier où l'insertion d'éléments n'est pas possible.",
       "GENERAL": "Naviguez vers un autre dossier et créez-y vos éléments."
+    },
+    "COPY_MOVE": {
+      "TITLE": "déplacer/copier des éléments.",
+      "MESSAGE_SINGLE": "Voulez-vous déplacer/copier l'élément \"{{element}}\" de \"{{source}}\" vers \"{{target}}\".?",
+      "MESSAGE_MULTIPLE": "Voulez-vous déplacer/copier {{count}} éléments de \"{{source}}\" vers \"{{target}}\" ?",
+      "MOVE": "déplacer",
+      "COPY": "copier"
     },
     "TOAST": {
       "FOLDER_ADDED": "Dossier ajouté",

@@ -8,6 +8,7 @@ import { MdsIdentifier, MdsService } from './mds.service';
 export interface LabeledValue {
     value: string;
     label: string;
+    mdsValue?: MdsValue;
 }
 
 export type LabeledValuesDict = { [property: string]: LabeledValue[] };
@@ -59,15 +60,24 @@ export class MdsLabelService {
         }
         return rxjs.forkJoin(
             values.map((value) =>
-                this.getLabel(mdsId, property, value).pipe(map((label) => ({ value, label }))),
+                this.getLabel(mdsId, property, value).pipe(map((label) => ({ value, ...label }))),
             ),
         );
     }
 
     /** Gets a label for a single value. */
-    getLabel(mdsId: MdsIdentifier, property: string, value: string): Observable<string> {
+    getLabel(
+        mdsId: MdsIdentifier,
+        property: string,
+        value: string,
+    ): Observable<{
+        mdsValue: MdsValue | undefined;
+        label: string;
+    }> {
         return this.findValueById(mdsId, property, value).pipe(
-            map((msdValue) => msdValue?.caption ?? value),
+            map((mdsValue) => {
+                return { label: mdsValue?.caption ?? value, mdsValue };
+            }),
         );
     }
 

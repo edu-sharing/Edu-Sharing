@@ -48,6 +48,12 @@ export class MdsEditorWidgetFacetListComponent
     private readonly destroyed$ = new Subject<void>();
     filter = new UntypedFormControl('');
     isInitState$ = new BehaviorSubject<boolean>(true);
+    /**
+     * return true if values/facettes are available, false otherwise
+     */
+    hasValues = () => {
+        return !this.filter.value && this.facetAggregationSubject.value?.values?.length > 0;
+    };
 
     constructor(
         mdsEditorInstance: MdsEditorInstanceService,

@@ -2,7 +2,7 @@
   {{ widget.definition.id }}: {{ widget.getInternalError() }}
 </div>
 <mat-expansion-panel
-  *ngIf="(expandedState$ | async) !== 'disabled'"
+  *ngIf="(expandedState$ | async) !== 'disabled' && isVisible()"
   [expanded]="(expandedState$ | async) === 'expanded'"
   class="mat-elevation-z0"
 >

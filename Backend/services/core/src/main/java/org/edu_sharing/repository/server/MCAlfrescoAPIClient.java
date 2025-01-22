@@ -2140,9 +2140,8 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
     @Override
     public String getHomeFolderID(String username) throws Exception {
-
         if (NodeServiceInterceptor.getEduSharingScope() == null || StringUtils.isBlank(NodeServiceInterceptor.getEduSharingScope())) {
-            NodeRef person = serviceRegistry.getPersonService().getPerson(username, false);
+            NodeRef person = serviceRegistry.getPersonService().getPersonOrNull(username);
             if (person != null) {
                 NodeRef homfolder = (NodeRef) nodeService.getProperty(person, QName.createQName(CCConstants.CM_PROP_PERSON_HOME_FOLDER));
                 return (homfolder != null) ? homfolder.getId() : null;
