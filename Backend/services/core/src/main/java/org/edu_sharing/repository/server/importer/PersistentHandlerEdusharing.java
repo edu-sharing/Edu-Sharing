@@ -47,7 +47,6 @@ import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
 import org.edu_sharing.repository.server.jobs.quartz.AbstractJob;
 import org.edu_sharing.repository.server.jobs.quartz.OAIConst;
-import org.edu_sharing.service.bulk.BulkServiceImpl;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.nodeservice.RecurseMode;
@@ -321,7 +320,7 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 			List<NodeRef> result = CMISSearchHelper.fetchNodesByTypeAndFilters(CCConstants.CCM_TYPE_IO, filter, data);
 			int previousSize = result.size();
 			getLogger().info("CMIS result for " + filter.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID) + ": " + StringUtils.join(result.stream().map(NodeRef::getId).collect(Collectors.toList()), " / "));
-			result = BulkServiceImpl.filterCMISResult(result, new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, importFolderId));
+			result = CMISSearchHelper.filterCMISResult(result, new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, importFolderId));
 			if(result.size() != previousSize) {
 				getLogger().info(filter.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID) + ": Parent filter for id " + importFolderId + " reduced nodes to " + StringUtils.join(result.stream().map(NodeRef::getId).collect(Collectors.toList()), " / "));
 			}

@@ -369,7 +369,7 @@ public class BulkServiceImpl implements BulkService, ApplicationListener<Refresh
 				NodeServiceHelper.getPropertiesSinglevalue(
 						NodeServiceHelper.transformShortToLongProperties(properties)
 				),data);
-		return filterCMISResult(result, primaryFolder);
+		return CMISSearchHelper.filterCMISResult(result, primaryFolder);
 	}
 	@Override
 	public NodeRef find(Map<String, String[]> properties) throws Exception {
@@ -416,22 +416,6 @@ public class BulkServiceImpl implements BulkService, ApplicationListener<Refresh
 					}
 				}
 		).filter(Objects::nonNull).collect(Collectors.toList());
-	}
-
-	public static List<NodeRef> filterCMISResult(List<NodeRef> result, NodeRef primaryFolder){
-		NodeService dbNodeService = (NodeService)AlfAppContextGate.getApplicationContext().getBean("alfrescoDefaultDbNodeService");
-		return result.stream().filter((r) -> {
-			Path path = dbNodeService.getPath(r);
-			for (Path.Element p : path) {
-				if (p instanceof Path.ChildAssocElement) {
-					NodeRef ref = ((Path.ChildAssocElement) p).getRef().getParentRef();
-					if (primaryFolder.equals(ref)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}).collect(Collectors.toList());
 	}
 
 }

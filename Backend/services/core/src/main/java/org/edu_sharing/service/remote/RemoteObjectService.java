@@ -14,6 +14,7 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
+import org.edu_sharing.repository.server.importer.PersistentHandlerEdusharing;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.nodeservice.NodeService;
@@ -201,15 +202,13 @@ public class RemoteObjectService {
                 // allow everyone to cc publish from this folder
                 PermissionServiceFactory.getLocalService().setPermissions(root, CCConstants.AUTHORITY_GROUP_EVERYONE,
                         new String[]{CCConstants.PERMISSION_CONSUMER, CCConstants.PERMISSION_CC_PUBLISH}, false);
-                List<NodeRef> nodes = NodeServiceHelper.findNodeByPropertiesRecursive(
-                        new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
-                                root),
-                        Collections.singletonList(CCConstants.CCM_TYPE_IO),
-                        searchProps);
-                if (nodes.size() > 1) {
+                PersistentHandlerEdusharing phe = new PersistentHandlerEdusharing(null, null, false);
+                phe.setImportFolderId(root);
+                NodeRef node = phe.getNodeIfExists(searchProps);
+                /*if (nodes.size() > 1) {
                     throw new Exception("For remote node " + originalNodeId + " where found " + nodes.size() + " local objects, invalid state!");
-                }
-                if (nodes.size() == 0) {
+                }*/
+                if (node == null) {
                     // create
                     ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
                     ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
@@ -231,8 +230,8 @@ public class RemoteObjectService {
                     });
                 } else {
                     // update in case metadata of remote source have changed
-                    nodeService.updateNodeNative(nodes.get(0).getId(), props);
-                    return nodes.get(0).getId();
+                    nodeService.updateNodeNative(node.getId(), props);
+                    return node.getId();
                 }
             } catch (Throwable t) {
                 throw new RuntimeException(t);
