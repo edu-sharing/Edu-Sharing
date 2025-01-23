@@ -61,6 +61,7 @@ import org.edu_sharing.service.search.model.SearchToken;
 import org.edu_sharing.service.search.model.SortDefinition;
 import org.edu_sharing.service.version.RepositoryVersionInfo;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -246,20 +247,7 @@ public class AdminApi {
             for (ApplicationInfo appInfo : ApplicationInfoList.getRepositoryInfosOrdered()) {
                 if (appInfo.ishomeNode())
                     continue;
-                Application entry = new Application();
-                entry.setId(appInfo.getAppId());
-                entry.setTitle(appInfo.getAppCaption());
-                entry.setWebserverUrl(appInfo.getWebServerUrl());
-                entry.setContentUrl(appInfo.getContentUrl());
-                entry.setClientBaseUrl(appInfo.getClientBaseUrl());
-                entry.setType(appInfo.getType());
-                entry.setRepositoryType(appInfo.getRepositoryType());
-                entry.setSubtype(appInfo.getSubtype());
-                entry.setXml(appInfo.getXml());
-                entry.setFile(appInfo.getAppFileName());
-                if (ApplicationInfo.TYPE_RENDERSERVICE.equals(entry.getType()) && entry.getContentUrl() != null) {
-                    entry.setConfigUrl(appInfo.getContentUrl().replace("/application/esmain/index.php", "/admin"));
-                }
+                Application entry = mapToApplications(appInfo);
                 result.add(entry);
             }
             return Response.ok().entity(result).build();
@@ -267,6 +255,26 @@ public class AdminApi {
             return ErrorResponse.createResponse(t);
         }
     }
+
+    @NotNull
+    private static Application mapToApplications(ApplicationInfo appInfo) {
+        Application entry = new Application();
+        entry.setId(appInfo.getAppId());
+        entry.setTitle(appInfo.getAppCaption());
+        entry.setWebserverUrl(appInfo.getWebServerUrl());
+        entry.setContentUrl(appInfo.getContentUrl());
+        entry.setClientBaseUrl(appInfo.getClientBaseUrl());
+        entry.setType(appInfo.getType());
+        entry.setRepositoryType(appInfo.getRepositoryType());
+        entry.setSubtype(appInfo.getSubtype());
+        entry.setXml(appInfo.getXml());
+        entry.setFile(appInfo.getAppFileName());
+        if (ApplicationInfo.TYPE_RENDERSERVICE.equals(entry.getType()) && entry.getContentUrl() != null) {
+            entry.setConfigUrl(appInfo.getContentUrl().replace("/application/esmain/index.php", "/admin"));
+        }
+        return entry;
+    }
+
     @GET
     @Path("/jobs")
 
@@ -443,7 +451,7 @@ public class AdminApi {
     @Path("/applications/xml")
     @Consumes({"multipart/form-data"})
     @Operation(summary = "register/add an application via xml file", description = "register the xml file provided.")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = HashMap.class))),
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Application.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -453,7 +461,7 @@ public class AdminApi {
             @Parameter(description = "XML file for app to register", schema = @Schema(type = "string", format = "binary"), required = true) @FormDataParam("xml") InputStream is,
             @Context HttpServletRequest req) {
         try {
-            Map<String, String> result = AdminServiceFactory.getInstance().addApplicationFromStream(is);
+            Application result = mapToApplications(AdminServiceFactory.getInstance().addApplicationFromStream(is));
             return Response.ok().entity(result).build();
         } catch (Throwable t) {
             return ErrorResponse.createResponse(t);
@@ -465,7 +473,7 @@ public class AdminApi {
 
     @Operation(summary = "register/add an application", description = "register the specified application.")
 
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = HashMap.class))),
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Application.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -475,7 +483,7 @@ public class AdminApi {
             @Parameter(description = "Remote application metadata url", required = true) @QueryParam("url") String url,
             @Context HttpServletRequest req) {
         try {
-            Map<String, String> result = AdminServiceFactory.getInstance().addApplication(url);
+            Application result = mapToApplications(AdminServiceFactory.getInstance().addApplication(url));
             return Response.ok().entity(result).build();
         } catch (Throwable t) {
             return ErrorResponse.createResponse(t);

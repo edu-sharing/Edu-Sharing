@@ -31,7 +31,7 @@ public interface AdminService {
 
 	void refreshApplicationInfo();
 
-	Map<String, String> addApplication(String appMetadataUrl) throws Exception;
+	ApplicationInfo addApplication(String appMetadataUrl) throws Exception;
 
 	List<ServerUpdateInfo> getServerUpdateInfos();
 
@@ -71,9 +71,9 @@ public interface AdminService {
 
 	void removeApplication(ApplicationInfo info) throws Exception;
 
-	Map<String, String> addApplicationFromStream(InputStream is) throws Exception;
+	ApplicationInfo addApplicationFromStream(InputStream is) throws Exception;
 
-	public Map<String, String> addApplication(Map<String,String> properties) throws Exception;
+	ApplicationInfo addApplication(Map<String,String> properties) throws Exception;
 
 	int importExcel(String parent, InputStream csv, Boolean addToCollection) throws Exception;
 

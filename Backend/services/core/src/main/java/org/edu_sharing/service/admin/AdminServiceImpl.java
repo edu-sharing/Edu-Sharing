@@ -47,6 +47,7 @@ import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.repository.update.Protocol;
 import org.edu_sharing.restservices.GroupDao;
 import org.edu_sharing.restservices.RepositoryDao;
+import org.edu_sharing.restservices.admin.v1.Application;
 import org.edu_sharing.restservices.admin.v1.model.PluginStatus;
 import org.edu_sharing.restservices.shared.Group;
 import org.edu_sharing.service.admin.model.GlobalGroup;
@@ -469,7 +470,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Map<String, String> addApplication(String appMetadataUrl) throws Exception {
+    public ApplicationInfo addApplication(String appMetadataUrl) throws Exception {
 
         HttpQueryTool httpQuery = new HttpQueryTool();
         String httpQueryResult = httpQuery.query(appMetadataUrl);
@@ -482,7 +483,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Map<String, String> addApplicationFromStream(InputStream is) throws Exception {
+    public ApplicationInfo addApplicationFromStream(InputStream is) throws Exception {
 
         Properties props = new SortedProperties();
         props.loadFromXML(is);
@@ -495,7 +496,7 @@ public class AdminServiceImpl implements AdminService {
         return storeProperties(appId, props);
     }
 
-    public Map<String, String> addApplication(Map<String, String> properties) throws Exception {
+    public ApplicationInfo addApplication(Map<String, String> properties) throws Exception {
         if (properties == null) {
             throw new Exception("no properties provided");
         }
@@ -534,9 +535,9 @@ public class AdminServiceImpl implements AdminService {
         return storeProperties(appId, props);
     }
 
-    private Map<String, String> storeProperties(String appId, Properties props) throws Exception {
+    private ApplicationInfo storeProperties(String appId, Properties props) throws Exception {
         String fileNamePart = appId.replaceAll("[/:]", "");
-        String filename = "app-" + fileNamePart + ".properties.xml";
+        final String filename = "app-" + fileNamePart + ".properties.xml";
 
         //check if appID already exists
 //        if (ApplicationInfoList.getApplicationInfos().containsKey(appId)) {
@@ -604,12 +605,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         ContextRefreshUtils.refreshContext();
-
-        Map<String, String> result = new HashMap<>();
-        for (Object key : props.keySet()) {
-            result.put((String) key, props.getProperty((String) key));
-        }
-        return result;
+        return new ApplicationInfo(filename);
     }
 
     @Override
