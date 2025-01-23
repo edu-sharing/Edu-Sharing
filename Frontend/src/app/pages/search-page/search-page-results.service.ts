@@ -256,8 +256,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                         first(),
                     )
                     .subscribe((searchString) => {
-                        const state = searchString ? sorts.defaultSearch : sorts.default;
-                        console.log(searchString, mds, state);
+                        const state =
+                            (searchString ? sorts.defaultSearch : sorts.default) || sorts.default;
                         let config: Partial<ListSortConfig> = {
                             allowed: true,
                             columns: sorts.columns?.map(
@@ -293,7 +293,8 @@ export class SearchPageResultsService implements SearchPageResults, OnDestroy {
                         skip(1),
                     )
                     .subscribe((searchString) => {
-                        const state = searchString ? sorts.defaultSearch : sorts.default;
+                        const state =
+                            (searchString ? sorts.defaultSearch : sorts.default) || sorts.default;
                         this.resultsDataSource.sortPanel.active = state.sortBy;
                         this.resultsDataSource.sortPanel.direction = state.sortAscending
                             ? 'asc'
