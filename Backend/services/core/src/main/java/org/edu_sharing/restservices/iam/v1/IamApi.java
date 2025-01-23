@@ -637,7 +637,7 @@ public class IamApi {
     public Response changeUserAvatar(
             @Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue = "-home-")) @PathParam("repository") String repository,
             @Parameter(description = "username (or \"-me-\" for current user)", required = true, schema = @Schema(defaultValue = "-me-")) @PathParam("person") String person,
-            @Parameter(description = "avatar image", required = true) @FormDataParam("avatar") InputStream avatar,
+            @Parameter(description = "avatar image", schema = @Schema(type="string", format = "binary"), required = true) @FormDataParam("avatar") InputStream avatar,
             @Context HttpServletRequest req) {
 
         try {

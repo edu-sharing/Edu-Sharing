@@ -681,7 +681,7 @@ public class CollectionApi {
 			@Parameter(description = "ID of repository (or \"-home-\" for home repository)", required = true, schema = @Schema(defaultValue="-home-")) @PathParam("repository") String repository,
 			@Parameter(description = "ID of collection", required = true) @PathParam("collection") String collectionId,
 			@Parameter(description = "MIME-Type", required=true ) @QueryParam("mimetype")  String mimetype,
-		    @FormDataParam("file") InputStream inputStream,
+		    @Parameter(schema = @Schema(type="string", format = "binary")) @FormDataParam("file") InputStream inputStream,
 			@Context HttpServletRequest req) {
 
 			try {

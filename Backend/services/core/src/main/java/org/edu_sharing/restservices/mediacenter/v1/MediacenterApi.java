@@ -466,7 +466,7 @@ public class MediacenterApi {
 			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
-	public Response importMediacenters(@Parameter(description = "Mediacenters csv to import", required = true) @FormDataParam("mediacenters") InputStream is,
+	public Response importMediacenters(@Parameter(description = "Mediacenters csv to import", schema = @Schema(type = "string", format = "binary"), required = true) @FormDataParam("mediacenters") InputStream is,
 			@Context HttpServletRequest req) {
 		try {
 
@@ -496,7 +496,7 @@ public class MediacenterApi {
 			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
-	public Response importOrganisations(@Parameter(description = "Organisations csv to import", required = true) @FormDataParam("organisations") InputStream is,
+	public Response importOrganisations(@Parameter(description = "Organisations csv to import" ,schema = @Schema(type = "string", format = "binary"), required = true) @FormDataParam("organisations") InputStream is,
 									   @Context HttpServletRequest req) {
 		try {
 
@@ -524,7 +524,7 @@ public class MediacenterApi {
 			@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
-	public Response importMcOrgConnections(@Parameter(description = "Mediacenter Organisation Connection csv to import", required = true) @FormDataParam("mcOrgs") InputStream is,
+	public Response importMcOrgConnections(@Parameter(description = "Mediacenter Organisation Connection csv to import", schema = @Schema(type = "string", format = "binary"), required = true) @FormDataParam("mcOrgs") InputStream is,
 										@Parameter(description = "removeSchoolsFromMC" , schema = @Schema(defaultValue="false")) @QueryParam("removeSchoolsFromMC") boolean removeSchoolsFromMC,
 										@Context HttpServletRequest req) {
 		try {

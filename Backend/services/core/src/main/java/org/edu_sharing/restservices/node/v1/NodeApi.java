@@ -1520,7 +1520,7 @@ public class NodeApi  {
     public Response changePreview(
     	@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
 	    @Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
-	    @FormDataParam("image") InputStream inputStream,
+	    @Parameter(schema = @Schema(type = "string", format = "binary")) @FormDataParam("image") InputStream inputStream,
 	    @Parameter(description = "MIME-Type", required=true ) @QueryParam("mimetype")  String mimetype,
 		@Parameter(description = "create a node version", required = false, schema = @Schema(defaultValue="true")) @QueryParam("createVersion") Boolean createVersion,
 		@Context HttpServletRequest req) {
