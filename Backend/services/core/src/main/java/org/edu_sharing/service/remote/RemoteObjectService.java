@@ -51,14 +51,15 @@ public class RemoteObjectService {
 
                     org.edu_sharing.service.permission.PermissionService permissionService = PermissionServiceFactory
                             .getPermissionService(ApplicationInfoList.getHomeRepository().getAppId());
-                    String remoteObjectFolderId = null;
-                    remoteObjectFolderId = getRemoteObjectsFolder();
+                    String remoteObjectFolderId = getRemoteObjectsFolder();
 
-                    // check for existing remote object
-                    NodeRef existing = NodeServiceFactory.getLocalService().getChild(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
-                            remoteObjectFolderId, CCConstants.CCM_TYPE_REMOTEOBJECT, CCConstants.CCM_PROP_REMOTEOBJECT_NODEID, nodeId);
-						 /*Map<String, Object> remoteObjectProps = mcAlfrescoBaseClient.getChild(remoteObjectFolderId,
-								CCConstants.CCM_TYPE_REMOTEOBJECT, CCConstants.CCM_PROP_REMOTEOBJECT_NODEID, nodeId);*/
+
+                    Map<String, Object> searchProps = new HashMap<>();
+                    searchProps.put(CCConstants.CCM_PROP_REMOTEOBJECT_NODEID, nodeId);
+                    searchProps.put(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORYID, repInfo.getAppId());
+                    PersistentHandlerEdusharing phe = new PersistentHandlerEdusharing(null, null, false);
+                    phe.setImportFolderId(remoteObjectFolderId);
+                    NodeRef existing = phe.getNodeIfExists(CCConstants.CCM_TYPE_REMOTEOBJECT, searchProps);
                     Map<String, Object> remoteObjectProps;
                     String remoteObjectNodeId;
                     if (existing == null) {
@@ -69,8 +70,8 @@ public class RemoteObjectService {
                         remoteObjectProps.put(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORY_TYPE,
                                 repInfo.getRepositoryType());
                         remoteObjectProps.put(CCConstants.CCM_PROP_REMOTEOBJECT_REPOSITORYID, repInfo.getAppId());
-
-                        remoteObjectNodeId = NodeServiceFactory.getLocalService().createNodeBasic(remoteObjectFolderId,
+                        String containerId = NodeServiceHelper.getContainerId(remoteObjectFolderId, "yyyy/MM/dd");
+                        remoteObjectNodeId = NodeServiceFactory.getLocalService().createNodeBasic(containerId,
                                 CCConstants.CCM_TYPE_REMOTEOBJECT, remoteObjectProps);
                         NodeService nodeService = NodeServiceFactory.getNodeService(repInfo.getAppId());
                         InputStream content = nodeService.getContent(StoreRef.PROTOCOL_WORKSPACE,

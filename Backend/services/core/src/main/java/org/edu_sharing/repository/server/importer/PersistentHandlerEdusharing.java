@@ -313,11 +313,13 @@ public class PersistentHandlerEdusharing implements PersistentHandlerInterface {
 			}
 		}
 	}
-
 	public NodeRef getNodeIfExists(Map<String, Object> filter) {
+		return getNodeIfExists(CCConstants.CCM_TYPE_IO, filter);
+	}
+	public NodeRef getNodeIfExists(String type, Map<String, Object> filter) {
 		if(!hasTimestampMap) {
 			CMISSearchHelper.CMISSearchData data = new CMISSearchHelper.CMISSearchData();
-			List<NodeRef> result = CMISSearchHelper.fetchNodesByTypeAndFilters(CCConstants.CCM_TYPE_IO, filter, data);
+			List<NodeRef> result = CMISSearchHelper.fetchNodesByTypeAndFilters(type, filter, data);
 			int previousSize = result.size();
 			getLogger().info("CMIS result for " + filter.get(CCConstants.CCM_PROP_IO_REPLICATIONSOURCEID) + ": " + StringUtils.join(result.stream().map(NodeRef::getId).collect(Collectors.toList()), " / "));
 			result = CMISSearchHelper.filterCMISResult(result, new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, importFolderId));
