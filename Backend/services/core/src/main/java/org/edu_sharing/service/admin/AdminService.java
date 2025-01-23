@@ -123,7 +123,7 @@ public interface AdminService {
 
 	void switchAuthentication(String authorityName);
 
-    Object getLightbendConfig();
+    Map<String, Object> getLightbendConfig();
 
 	Collection<PluginStatus> getPlugins();
 

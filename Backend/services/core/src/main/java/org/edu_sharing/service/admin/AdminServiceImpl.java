@@ -47,7 +47,6 @@ import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.repository.update.Protocol;
 import org.edu_sharing.restservices.GroupDao;
 import org.edu_sharing.restservices.RepositoryDao;
-import org.edu_sharing.restservices.admin.v1.Application;
 import org.edu_sharing.restservices.admin.v1.model.PluginStatus;
 import org.edu_sharing.restservices.shared.Group;
 import org.edu_sharing.service.admin.model.GlobalGroup;
@@ -1114,7 +1113,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Object getLightbendConfig() {
+    public Map<String, Object> getLightbendConfig() {
         return LightbendConfigLoader.get().root().unwrapped();
     }
 

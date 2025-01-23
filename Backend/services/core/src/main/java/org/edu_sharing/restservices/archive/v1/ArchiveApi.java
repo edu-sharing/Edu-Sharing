@@ -167,7 +167,7 @@ public class ArchiveApi {
 	@Operation(summary = "Searches for archive nodes.", description = "Searches for archive nodes.")
 	
 	@ApiResponses(value = {
-			@ApiResponse(responseCode="200", description="OK.", content = @Content(schema = @Schema(implementation = String.class))),
+			@ApiResponse(responseCode="200", description="OK."),
 	        @ApiResponse(responseCode="400", description="Preconditions are not present.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),        
 	        @ApiResponse(responseCode="401", description="Authorization failed.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),        
 	        @ApiResponse(responseCode="403", description="Session user has insufficient rights to perform this operation.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),        

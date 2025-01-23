@@ -34,7 +34,7 @@ public class RatingApi {
 	@Path("/ratings/{repository}/{node}")
 	@Operation(summary = "create or update a rating", description = "Adds the rating. If the current user already rated that element, the rating will be altered")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Void.class))),
+			@ApiResponse(responseCode="200", description=RestConstants.HTTP_200),
 	        @ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),        
 	        @ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),        
 	        @ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),        

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.StringToClassMapItem;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
 import org.alfresco.service.ServiceRegistry;
@@ -111,7 +113,7 @@ public class AdminApi {
     @Operation(summary = "get detailed version information", description = "detailed information about the running system version")
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(type ="object", additionalPropertiesSchema = RepositoryVersionInfo.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -132,7 +134,8 @@ public class AdminApi {
     @Operation(summary = "get all toolpermissions for an authority", description = "Returns explicit (rights set for this authority) + effective (resulting rights for this authority) toolpermission")
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Map.class))),
+//            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(array = @ArraySchema(schema = @Schema(type="object", properties = {@StringToClassMapItem(key="<*>", value = ToolPermission.class)})))),
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(type="object", additionalPropertiesSchema = ToolPermission.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -155,7 +158,7 @@ public class AdminApi {
     @Operation(summary = "set toolpermissions for an authority", description = "If a toolpermission has status UNDEFINED, it will remove explicit permissions for the authority")
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(type="object", additionalPropertiesSchema = ToolPermission.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -376,7 +379,7 @@ public class AdminApi {
 
     @Operation(summary = "list any xml properties (like from homeApplication.properties.xml)", description = "list any xml properties (like from homeApplication.properties.xml)")
 
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Map.class))),
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(type = "object", additionalPropertiesSchema = String.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -619,7 +622,7 @@ public class AdminApi {
 
     @Operation(summary = "Get entries of a cache", description = "Get entries of a cache.")
 
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Map.class))),
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(type= "object",  additionalPropertiesSchema = Object.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -960,7 +963,8 @@ public class AdminApi {
 
     @Operation(summary = "Get a Mds Valuespace for all values of the given properties", description = "Get a Mds Valuespace for all values of the given properties.")
 
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = String.class))),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -1297,7 +1301,8 @@ public class AdminApi {
 
     @Operation(summary = "Search for custom lucene query and choose specific properties to load", description = "e.g. @cm\\:name:\"*\"")
 
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = List.class))),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(array = @ArraySchema(schema = @Schema(type="object", additionalPropertiesSchema = Objects.class)))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -1577,7 +1582,7 @@ public class AdminApi {
     @Path("/configFile")
     @Operation(summary = "get a base system config file (e.g. edu-sharing.conf)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(mediaType = MediaType.TEXT_PLAIN, schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -1618,7 +1623,7 @@ public class AdminApi {
     @Path("/config/merged")
     @Operation(description = "Get the fully merged & parsed (lightbend) backend config")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = Object.class))),
+            @ApiResponse(responseCode = "200", description = RestConstants.HTTP_200, content = @Content(schema = @Schema(type = "object", additionalPropertiesSchema = Object.class))),
             @ApiResponse(responseCode = "400", description = RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

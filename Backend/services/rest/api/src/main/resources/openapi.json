@@ -3768,6 +3768,90 @@
         },
         "type": "object"
       },
+      "NodeUsage": {
+        "properties": {
+          "appId": {
+            "type": "string"
+          },
+          "appSubtype": {
+            "type": "string"
+          },
+          "appType": {
+            "type": "string"
+          },
+          "appUser": {
+            "type": "string"
+          },
+          "appUserMail": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "distinctPersons": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "fromUsed": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "guid": {
+            "type": "string"
+          },
+          "modified": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "node": {
+            "$ref": "#/components/schemas/Node"
+          },
+          "nodeId": {
+            "type": "string"
+          },
+          "parentNodeId": {
+            "type": "string"
+          },
+          "resourceId": {
+            "type": "string"
+          },
+          "toUsed": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "usageCounter": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "usageVersion": {
+            "type": "string"
+          },
+          "usageXmlParams": {
+            "$ref": "#/components/schemas/Parameters"
+          },
+          "usageXmlParamsRaw": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "appId",
+          "appUser",
+          "appUserMail",
+          "courseId",
+          "nodeId",
+          "parentNodeId",
+          "resourceId",
+          "usageVersion"
+        ],
+        "type": "object"
+      },
       "NodeVersion": {
         "properties": {
           "comment": {
@@ -4952,6 +5036,23 @@
         },
         "type": "object"
       },
+      "RepositoryVersionInfo": {
+        "properties": {
+          "build": {
+            "$ref": "#/components/schemas/VersionBuild"
+          },
+          "git": {
+            "$ref": "#/components/schemas/VersionGit"
+          },
+          "repository": {
+            "type": "string"
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          }
+        },
+        "type": "object"
+      },
       "RestoreResult": {
         "properties": {
           "archiveNodeId": {
@@ -5916,6 +6017,36 @@
         },
         "type": "object"
       },
+      "ToolPermission": {
+        "properties": {
+          "effective": {
+            "enum": [
+              "ALLOWED",
+              "DENIED",
+              "UNDEFINED"
+            ],
+            "type": "string"
+          },
+          "effectiveSource": {
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "type": "array"
+          },
+          "explicit": {
+            "enum": [
+              "ALLOWED",
+              "DENIED",
+              "UNDEFINED"
+            ],
+            "type": "string"
+          },
+          "systemManaged": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "Tools": {
         "properties": {
           "tools": {
@@ -6791,6 +6922,67 @@
         },
         "type": "object"
       },
+      "Version": {
+        "properties": {
+          "build": {
+            "type": "string"
+          },
+          "full": {
+            "type": "string"
+          },
+          "major": {
+            "type": "string"
+          },
+          "minor": {
+            "type": "string"
+          },
+          "patch": {
+            "type": "string"
+          },
+          "qualifier": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "VersionBuild": {
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "VersionGit": {
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "commit": {
+            "$ref": "#/components/schemas/VersionGitCommit"
+          }
+        },
+        "type": "object"
+      },
+      "VersionGitCommit": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "$ref": "#/components/schemas/VersionTimestamp"
+          }
+        },
+        "type": "object"
+      },
+      "VersionTimestamp": {
+        "properties": {
+          "datetime": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "WebsiteInformation": {
         "properties": {
           "description": {
@@ -7162,7 +7354,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/Application"
                 }
               }
             },
@@ -7236,7 +7428,8 @@
                 "properties": {
                   "xml": {
                     "description": "XML file for app to register",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -7252,7 +7445,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/Application"
                 }
               }
             },
@@ -7414,7 +7607,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
                 }
               }
             },
@@ -7760,7 +7956,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "additionalProperties": {
+                    "type": "object"
+                  },
+                  "type": "object"
                 }
               }
             },
@@ -8299,6 +8498,9 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "additionalProperties": {
+                    "type": "object"
+                  },
                   "type": "object"
                 }
               }
@@ -8396,7 +8598,7 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
+              "text/plain": {
                 "schema": {
                   "type": "string"
                 }
@@ -8934,7 +9136,8 @@
                 "properties": {
                   "xml": {
                     "description": "XML file to parse (or zip file containing exactly 1 xml file to parse)",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -9045,7 +9248,8 @@
                 "properties": {
                   "excel": {
                     "description": "Excel file to import",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -9520,7 +9724,8 @@
               "schema": {
                 "properties": {
                   "xml": {
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -10571,7 +10776,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "items": {
+                    "additionalProperties": {
+                      "type": "object"
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
                 }
               }
             },
@@ -11671,7 +11882,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ToolPermission"
+                  },
+                  "type": "object"
                 }
               }
             },
@@ -11769,7 +11983,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ToolPermission"
+                  },
+                  "type": "object"
                 }
               }
             },
@@ -11854,7 +12071,8 @@
                 "properties": {
                   "file": {
                     "description": "file to upload",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -11942,7 +12160,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/RepositoryVersionInfo"
+                  },
+                  "type": "object"
                 }
               }
             },
@@ -12035,13 +12256,6 @@
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
             "description": "OK."
           },
           "400": {
@@ -14625,7 +14839,8 @@
               "schema": {
                 "properties": {
                   "file": {
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -15924,7 +16139,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object"
                 }
               }
             },
@@ -17905,13 +18120,6 @@
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
             "description": "OK."
           },
           "400": {
@@ -18005,13 +18213,6 @@
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
             "description": "OK."
           },
           "400": {
@@ -18769,7 +18970,8 @@
                 "properties": {
                   "avatar": {
                     "description": "avatar image",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -23454,7 +23656,8 @@
                 "properties": {
                   "mcOrgs": {
                     "description": "Mediacenter Organisation Connection csv to import",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -23544,7 +23747,8 @@
                 "properties": {
                   "mediacenters": {
                     "description": "Mediacenters csv to import",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -23634,7 +23838,8 @@
                 "properties": {
                   "organisations": {
                     "description": "Organisations csv to import",
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -28666,7 +28871,8 @@
               "schema": {
                 "properties": {
                   "image": {
-                    "type": "object"
+                    "format": "binary",
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -31779,9 +31985,6 @@
         },
         "responses": {
           "200": {
-            "content": {
-              "application/json": {}
-            },
             "description": "OK."
           },
           "400": {
@@ -35443,7 +35646,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "type": "object"
                 }
               }
             },
@@ -36964,7 +37170,7 @@
                 }
               }
             },
-            "description": "Ressources are not found."
+            "description": "Resources are not found."
           },
           "500": {
             "content": {
@@ -36974,7 +37180,7 @@
                 }
               }
             },
-            "description": "Fatal error occured."
+            "description": "Fatal error occurred."
           }
         },
         "summary": "Get all usages of an node.",
@@ -37049,7 +37255,7 @@
                 }
               }
             },
-            "description": "Ressources are not found."
+            "description": "Resources are not found."
           },
           "500": {
             "content": {
@@ -37059,7 +37265,7 @@
                 }
               }
             },
-            "description": "Fatal error occured."
+            "description": "Fatal error occurred."
           }
         },
         "summary": "Get all collections where this node is used.",
@@ -37140,7 +37346,7 @@
                 }
               }
             },
-            "description": "Ressources are not found."
+            "description": "Resources are not found."
           },
           "500": {
             "content": {
@@ -37150,7 +37356,7 @@
                 }
               }
             },
-            "description": "Fatal error occured."
+            "description": "Fatal error occurred."
           }
         },
         "summary": "Delete an usage of a node.",
@@ -37298,11 +37504,68 @@
           }
         ],
         "responses": {
-          "default": {
+          "200": {
             "content": {
-              "application/json": {}
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NodeUsage"
+                  },
+                  "type": "array"
+                }
+              }
             },
-            "description": "default response"
+            "description": "OK."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Preconditions are not present."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authorization failed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Session user has insufficient rights to perform this operation."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Resources are not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Fatal error occurred."
           }
         },
         "tags": [
