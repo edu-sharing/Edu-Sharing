@@ -61,7 +61,7 @@ public class URLHelper {
     }
 
     public static String getNgRenderNodeUrl(String domain, String nodeId, String version) {
-        return getNgRenderNodeUrl(domain, nodeId, version, null);
+        return getNgRenderNodeUrl(getNgComponentsUrl(domain), nodeId, version, null);
     }
 
     private static String getNgRenderNodeUrl(@NonNull String domain, @NonNull String nodeId, String version, String repository) {
@@ -82,6 +82,7 @@ public class URLHelper {
 
         return sb.toString();
     }
+
 
     public static String getBaseUrl(String repositoryId) {
         ApplicationInfo repository = ApplicationInfoList.getRepositoryInfoById(repositoryId);
@@ -111,7 +112,11 @@ public class URLHelper {
         return getNgComponentsUrl(true);
     }
 
+    public static String getNgComponentsUrl(String baseUrl) {
+        return baseUrl.replaceAll("/$","") + "/components/";
+    }
+
     public static String getNgComponentsUrl(boolean dynamic) {
-        return getBaseUrl(dynamic) + "/components/";
+        return getNgComponentsUrl(getBaseUrl(dynamic));
     }
 }
