@@ -41,10 +41,14 @@ public class InitHelper {
                     List<String> membersNew = group.getStringList("members");
                     if (membersNew != null && !membersNew.isEmpty()) {
                         String[] membersOld = authorityService.getMembershipsOfGroup(id);
-                        logger.info("Init group " + id + ": Resetting members (" + StringUtils.join(membersOld) + ")");
-                        authorityService.removeMemberships(id, membersOld);
-                        logger.info("Init group " + id + ": Setting new members (" + StringUtils.join(membersNew) + ")");
-                        authorityService.addMemberships(id, membersNew.toArray(String[]::new));
+                        if(!Arrays.equals(membersNew.toArray(String[]::new), membersOld)) {
+                            logger.info("Init group " + id + ": Resetting members (" + StringUtils.join(membersOld) + ")");
+                            authorityService.removeMemberships(id, membersOld);
+                            logger.info("Init group " + id + ": Setting new members (" + StringUtils.join(membersNew) + ")");
+                            authorityService.addMemberships(id, membersNew.toArray(String[]::new));
+                        } else {
+                            logger.info("Init group " + id + ": Is already initialized correctly (" + StringUtils.join(membersOld) + ")");
+                        }
                     }
                 }
             }
