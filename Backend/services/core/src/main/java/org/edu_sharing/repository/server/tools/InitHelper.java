@@ -20,6 +20,7 @@ import org.edu_sharing.service.authority.AuthorityServiceImpl;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InitHelper {
     static Logger logger = Logger.getLogger(InitHelper.class);
@@ -38,10 +39,10 @@ public class InitHelper {
                     authorityService.createGroup(id, group.getString("displayName"), null);
                 }
                 if(group.hasPath("members")) {
-                    List<String> membersNew = group.getStringList("members");
+                    Set<String> membersNew = group.getStringList("members");
                     if (membersNew != null && !membersNew.isEmpty()) {
-                        String[] membersOld = authorityService.getMembershipsOfGroup(id);
-                        if(!Arrays.equals(membersNew.toArray(String[]::new), membersOld)) {
+                        Set<String> membersOld = Arrays.stream(authorityService.getMembershipsOfGroup(id)).collect(Collectors.toSet());
+                        if(!new HashSet<>(membersNew).equals(membersNew)) {
                             logger.info("Init group " + id + ": Resetting members (" + StringUtils.join(membersOld) + ")");
                             authorityService.removeMemberships(id, membersOld);
                             logger.info("Init group " + id + ": Setting new members (" + StringUtils.join(membersNew) + ")");
