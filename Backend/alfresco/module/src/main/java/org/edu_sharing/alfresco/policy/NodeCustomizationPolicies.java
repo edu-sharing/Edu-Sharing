@@ -224,6 +224,9 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
 
     // org.springframework.dao.ConcurrencyFailureException: Unexpected: current version does not appear to be 1st version in the list
     public static void repairNodeVersion(NodeService nodeService, VersionHistory history, Map<String, Serializable> transFormedProps, NodeRef nodeRef) {
+        if(history == null) {
+            return;
+        }
         Collection<Version> versions = history.getAllVersions();
         if(versions != null) {
             Optional<ComparableVersion> highestVersions = versions.stream().map(v -> new ComparableVersion(v.getVersionLabel())).max(ComparableVersion::compareTo);
