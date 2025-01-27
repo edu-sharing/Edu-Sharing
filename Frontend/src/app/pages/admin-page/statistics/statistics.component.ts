@@ -1033,8 +1033,8 @@ export class AdminStatisticsComponent implements OnInit {
         this.archivedNodesDataSource.isLoading = true;
         const result = await this.searchService
             .search({
-                sortProperties: [RestConstants.CM_PROP_C_CREATED],
-                sortAscending: [true],
+                sortProperties: [RestConstants.CM_NAME],
+                sortAscending: [false],
                 repository: HOME_REPOSITORY,
                 contentType: 'FILES',
                 maxItems: 100,
