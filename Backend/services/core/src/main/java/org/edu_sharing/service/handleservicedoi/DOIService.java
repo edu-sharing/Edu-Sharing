@@ -68,7 +68,9 @@ public class DOIService implements HandleService {
             accountId = config.getString("accountId");
             prefix = config.getString("prefix");
             password = config.getString("password");
-            repoUrl = config.getString("repoUrl");
+            if(config.hasPath("repoUrl")) {
+                repoUrl = config.getString("repoUrl");
+            }
         }
     }
 
