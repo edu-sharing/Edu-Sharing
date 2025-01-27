@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ConnectorService, LtiPlatformService, Tool, Tools } from 'ngx-edu-sharing-api';
+import { ConnectorService, Node, LtiPlatformService, Tool, Tools } from 'ngx-edu-sharing-api';
 import {
     Constrain,
     DateHelper,
@@ -31,8 +31,6 @@ import {
     Connector,
     Filetype,
     FrameEventsService,
-    Node,
-    NodeWrapper,
     RestConnectorService,
     RestConnectorsService,
     RestConstants,
@@ -371,7 +369,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                 properties,
             )
             .subscribe(
-                (data: NodeWrapper) => {
+                (data) => {
                     this.toast.closeProgressSpinner();
                     this.onCreate.emit([data.node]);
                     this.toast.toast('WORKSPACE.TOAST.FOLDER_ADDED');
@@ -505,7 +503,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
         this.nodeService
             .createNode((await this.getParent()).ref.id, RestConstants.CCM_TYPE_IO, [], prop, false)
             .subscribe(
-                (data: NodeWrapper) => {
+                (data) => {
                     this.editConnector(
                         data.node,
                         event.type as Filetype,
@@ -557,7 +555,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             this.nodeService
                 .createNode(parent.ref.id, RestConstants.CCM_TYPE_IO, [], properties)
                 .subscribe(
-                    (data: NodeWrapper) => {
+                    (data) => {
                         this.ltiPlatformService
                             .convertToLtiResourceLink(data.node.ref.id, this.createToolType.appId)
                             .subscribe(
@@ -591,7 +589,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                 } else {
                     const prop = RestHelper.createNameProperty(n.name);
                     this.nodeService.editNodeMetadata(n.ref.id, prop).subscribe(
-                        (data: NodeWrapper) => {
+                        (data) => {
                             this.onCreate.emit([data.node]);
                             this.createToolType = null;
                         },
@@ -614,7 +612,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
         if (nodes) {
             nodes.forEach((n) => {
                 this.nodeService.deleteNode(n.ref.id, false).subscribe(
-                    (data: NodeWrapper) => {},
+                    (data) => {},
                     (error) => {
                         this.nodeHelper.handleNodeError(n.name, error);
                     },

@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import {
     InteractionType,
     ListItem,
+    MdsHelperService,
     NodeDataSource,
     NodeEntriesDisplayType,
     NodeEntriesWrapperComponent,
@@ -13,8 +14,7 @@ import {
     RestMdsService,
     RestNodeService,
 } from '../../../core-module/core.module';
-import { Node } from '../../../core-module/rest/data-object';
-import { MdsHelperService } from 'ngx-edu-sharing-ui';
+import { Node } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 import { ConfigurationService } from '../../../core-module/rest/services/configuration.service';
 import { RestAdminService } from '../../../core-module/rest/services/rest-admin.service';

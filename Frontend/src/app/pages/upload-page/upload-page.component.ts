@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslationsService } from 'ngx-edu-sharing-ui';
+import { Node } from 'ngx-edu-sharing-api';
 import {
     FrameEventsService,
-    Node,
     RestConnectorService,
     RestConstants,
 } from '../../core-module/core.module';

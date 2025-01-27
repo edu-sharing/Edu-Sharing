@@ -3,12 +3,12 @@ import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { LocalEventsService, UIAnimation, UIConstants } from 'ngx-edu-sharing-ui';
 import {
-    Node,
     NodeVersions,
     RestConstants,
     RestNodeService,
     Version,
 } from '../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { Toast } from '../../../services/toast';
 import { YES_OR_NO } from '../../../features/dialogs/dialog-modules/generic-dialog/generic-dialog-data';
 import { DialogsService } from '../../../features/dialogs/dialogs.service';
@@ -102,8 +102,12 @@ export class MetadataSidebarComponent {
     }
 
     goToNode(node: Node) {
-        if (node.version) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id, node.version]);
+        if (node.content.version) {
+            this.router.navigate([
+                UIConstants.ROUTER_PREFIX + 'render',
+                node.ref.id,
+                node.content.version,
+            ]);
         } else {
             this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id]);
         }

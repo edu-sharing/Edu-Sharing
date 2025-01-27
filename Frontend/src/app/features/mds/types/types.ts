@@ -1,8 +1,7 @@
 import { Type } from '@angular/core';
 import { MdsEditorWidgetBase } from '../mds-editor/widgets/mds-editor-widget-base';
-import { MdsWidget } from 'ngx-edu-sharing-api';
+import { MdsWidget, Node } from 'ngx-edu-sharing-api';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Node } from '../../../core-module/rest/data-object';
 
 export {
     MdsDefinition,

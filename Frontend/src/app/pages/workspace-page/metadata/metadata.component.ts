@@ -9,7 +9,13 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfigService, NodeService, NodeVersion, NodeVersionEntries } from 'ngx-edu-sharing-api';
+import {
+    ConfigService,
+    Node,
+    NodeService,
+    NodeVersion,
+    NodeVersionEntries,
+} from 'ngx-edu-sharing-api';
 import {
     DurationHelper,
     FormatDatePipe,
@@ -26,7 +32,6 @@ import { distinctUntilChanged, filter } from 'rxjs/operators';
 import {
     ConfigurationHelper,
     IamUser,
-    Node,
     NodePermissions,
     Permission,
     RestConstants,
@@ -259,7 +264,7 @@ export class WorkspaceMetadataComponent implements OnInit {
     }
 
     display(version: string = null) {
-        this.nodeObject.version = version;
+        this.nodeObject.content.version = version;
         this.onDisplay.emit(this.nodeObject);
     }
 

@@ -1,21 +1,7 @@
-import {
-    ApplicationRef,
-    Component,
-    EventEmitter,
-    Input,
-    NgZone,
-    OnInit,
-    Output,
-} from '@angular/core';
-import { LtiPlatformService, Tool } from 'ngx-edu-sharing-api';
+import { Component, EventEmitter, Input, NgZone, OnInit, Output } from '@angular/core';
+import { LtiPlatformService, Node, Tool } from 'ngx-edu-sharing-api';
 import { DialogButton } from '../../../util/dialog-button';
-import {
-    Node,
-    NodeWrapper,
-    RestConstants,
-    RestHelper,
-    RestNodeService,
-} from '../../../core-module/core.module';
+import { RestNodeService } from '../../../core-module/core.module';
 import { NodeHelperService } from '../../../services/node-helper.service';
 
 @Component({
@@ -102,10 +88,10 @@ export class CreateLtitoolComponent implements OnInit {
 
         let idx = 0;
         nodeIds.forEach((nodeId) => {
-            let node = new Node();
-            node.ref.id = nodeId;
-            node.name = titles[idx];
-            this.nodes[idx] = node;
+            let node = (this.nodes[idx] = {
+                ref: { id: nodeId },
+                name: titles[idx],
+            } as Node);
             idx++;
         });
         console.log(this.nodes);

@@ -1,10 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { NodePermissions, NodeService, SessionStorageService, Store } from 'ngx-edu-sharing-api';
+import {
+    NodePermissions,
+    Node,
+    NodeService,
+    SessionStorageService,
+    Store,
+} from 'ngx-edu-sharing-api';
 import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import {
     DialogButton,
-    Node,
     RestConnectorService,
     RestConstants,
     RestHelper,

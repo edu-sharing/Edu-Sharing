@@ -21,12 +21,12 @@ import {
 } from 'ngx-edu-sharing-ui';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
+import { Node } from 'ngx-edu-sharing-api';
 import * as EduData from '../../core-module/core.module';
 import {
     ConfigurationService,
     DialogButton,
     Mediacenter,
-    Node,
     NodeRef,
     RestCollectionService,
     RestConnectorService,
@@ -487,7 +487,7 @@ export class CollectionsPageComponent implements OnDestroy {
     }
 
     private setCollectionId(id: string) {
-        this.collection = new Node();
+        this.collection = {} as Node;
         this.collection.ref = { id } as NodeRef;
         this.collection.aspects = [RestConstants.CCM_ASPECT_COLLECTION];
     }

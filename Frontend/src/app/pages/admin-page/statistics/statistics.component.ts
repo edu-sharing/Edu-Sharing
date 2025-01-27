@@ -11,7 +11,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { DEFAULT, HOME_REPOSITORY, SearchService } from 'ngx-edu-sharing-api';
+import { DEFAULT, HOME_REPOSITORY, Node, SearchService } from 'ngx-edu-sharing-api';
 import {
     FormatDatePipe,
     InteractionType,
@@ -23,7 +23,7 @@ import {
     UIAnimation,
 } from 'ngx-edu-sharing-ui';
 import { CsvHelper } from '../../../core-module/csv.helper';
-import { Node, NodeStatistics, Statistics } from '../../../core-module/rest/data-object';
+import { NodeStatistics, Statistics } from '../../../core-module/rest/data-object';
 import { Helper } from '../../../core-module/rest/helper';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 import { RestHelper } from '../../../core-module/rest/rest-helper';

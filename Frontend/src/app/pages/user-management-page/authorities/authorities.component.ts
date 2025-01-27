@@ -13,7 +13,14 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { GenericAuthority, Group, User, GroupProfile, UserProfileEdit } from 'ngx-edu-sharing-api';
+import {
+    GenericAuthority,
+    Node,
+    Group,
+    User,
+    GroupProfile,
+    UserProfileEdit,
+} from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     Constrain,
@@ -44,7 +51,6 @@ import {
     IamAuthorities,
     IamGroups,
     IamUsers,
-    Node,
     NodeList,
     Organization,
     OrganizationOrganizations,

@@ -1,7 +1,12 @@
 import { EventEmitter, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { LtiPlatformService, NodeListErrorResponses, NodeListService } from 'ngx-edu-sharing-api';
+import {
+    LtiPlatformService,
+    NodeListErrorResponses,
+    NodeListService,
+    Node,
+} from 'ngx-edu-sharing-api';
 import {
     ClipboardObject,
     Constrain,
@@ -34,7 +39,6 @@ import { catchError, filter, first, map, switchMap, takeUntil, tap } from 'rxjs/
 import {
     ConfigurationService,
     FrameEventsService,
-    Node,
     RestCollectionService,
     RestConnectorService,
     RestHelper,
@@ -648,7 +652,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                         RestConstants.CCM_PROP_PUBLISHED_ORIGINAL
                     ][0],
                 );
-                UIHelper.goToNode(this.router, new Node(nodeId));
+                UIHelper.goToNode(this.router, { ref: { id: nodeId } } as Node);
             },
         );
         openOriginalNode.constrains = [

@@ -14,8 +14,6 @@ import {
     Connector,
     ConnectorList,
     FrameEventsService,
-    Node,
-    NodeWrapper,
     ParentList,
     RestCollectionService,
     RestConnectorService,
@@ -27,6 +25,7 @@ import {
 } from '../../core-module/core.module';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
+import { Node } from 'ngx-edu-sharing-api';
 import { Component } from '@angular/core';
 import { Helper } from '../../core-module/rest/helper';
 import { CordovaService, OnBackBehaviour } from '../../services/cordova.service';
@@ -147,7 +146,7 @@ export class AppSharePageComponent {
                     true,
                     RestConstants.COMMENT_MAIN_FILE_UPLOAD,
                 )
-                .subscribe((data: NodeWrapper) => {
+                .subscribe((data) => {
                     callback(data.node);
                 });
         } else {
@@ -161,7 +160,7 @@ export class AppSharePageComponent {
             this.node
                 .createNode(this.inbox.ref.id, RestConstants.CCM_TYPE_IO, [], prop, true)
                 .subscribe(
-                    (data: NodeWrapper) => {
+                    (data) => {
                         this.node
                             .uploadNodeContent(
                                 data.node.ref.id,

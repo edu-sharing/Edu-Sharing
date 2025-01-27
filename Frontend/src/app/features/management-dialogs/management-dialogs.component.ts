@@ -9,7 +9,7 @@ import {
     TemplateRef,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { CollectionProposalStatus, ProposalNode } from 'ngx-edu-sharing-api';
+import { CollectionProposalStatus, Node, ProposalNode } from 'ngx-edu-sharing-api';
 import {
     LocalEventsService,
     TemporaryStorageService,
@@ -19,7 +19,6 @@ import {
 import { forkJoin as observableForkJoin } from 'rxjs';
 import {
     CollectionReference,
-    Node,
     RestCollectionService,
     RestConstants,
     RestHelper,

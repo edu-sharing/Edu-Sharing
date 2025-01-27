@@ -7,6 +7,7 @@ import { BridgeService } from '../../services/bridge.service';
 import {
     ConfigurationService,
     FrameEventsService,
+    Mediacenter,
     OrganizationOrganizations,
     RestConnectorService,
     RestConstants,
@@ -59,7 +60,7 @@ export class MainMenuEntriesService {
     // Conditionally initialized on update.
     private hasAccessToSafeScope: boolean;
     private organizations: OrganizationOrganizations;
-    private mediaCenters: { administrationAccess: boolean }[];
+    private mediaCenters: Mediacenter[];
 
     private readonly defaultEntryDefinitions: EntryDefinition[] = [
         {

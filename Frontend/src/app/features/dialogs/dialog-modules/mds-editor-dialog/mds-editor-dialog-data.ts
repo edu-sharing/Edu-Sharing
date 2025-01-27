@@ -1,4 +1,5 @@
-import { Node, RestConstants } from '../../../../core-module/core.module';
+import { RestConstants } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { BulkBehavior, EditorMode, Values } from '../../../mds/types/types';
 
 class SharedData {

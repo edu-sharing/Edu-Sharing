@@ -284,7 +284,7 @@ export class AdminMediacenterComponent {
                 (result) => {
                     RestHelper.waitForResult(
                         () => this.mediacenterServiceLegacy.getMediacenters(),
-                        (list: Mediacenter[]) => {
+                        (list) => {
                             return (
                                 list.filter((r) => r.authorityName === result.authorityName)
                                     .length === 1

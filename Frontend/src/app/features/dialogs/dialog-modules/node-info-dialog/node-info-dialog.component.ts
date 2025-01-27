@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Ace, Acl, ConfigService, NodeServiceUnwrapped, Person } from 'ngx-edu-sharing-api';
+import { ConfigService, Node, NodeServiceUnwrapped } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     OptionsHelperDataService,
@@ -11,12 +11,9 @@ import {
 import { forkJoin } from 'rxjs';
 import {
     ConfigurationHelper,
-    Node,
     NodeList,
-    Permissions,
     RestConstants,
     RestNodeService,
-    UserProfile,
 } from '../../../../core-module/core.module';
 import { Toast } from '../../../../services/toast';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';

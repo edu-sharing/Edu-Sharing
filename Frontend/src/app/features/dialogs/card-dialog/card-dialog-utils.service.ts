@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CardDialogConfig } from './card-dialog-config';
-import { RestHelper, Node } from '../../../core-module/core.module';
+import { RestHelper } from '../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { RepoUrlService } from 'ngx-edu-sharing-ui';
 import { TranslateService } from '@ngx-translate/core';
 

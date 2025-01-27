@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
     ConfigurationHelper,
-    Node,
     NodePermissions,
     Permission,
     RestConnectorService,
@@ -9,6 +8,7 @@ import {
     RestNodeService,
 } from '../../../core-module/core.module';
 import { TranslateService } from '@ngx-translate/core';
+import { Node } from 'ngx-edu-sharing-api';
 import { DurationHelper, FormatDatePipe, NodeImageSizePipe, VCard } from 'ngx-edu-sharing-ui';
 import { NodeHelperService } from '../../../services/node-helper.service';
 import { ConfigService } from 'ngx-edu-sharing-api';
@@ -55,7 +55,7 @@ export class WorkspaceMetadataBlockComponent {
         );
         data.createDate = new FormatDatePipe(this.translate).transform(node.createdAt);
         data.duration = DurationHelper.getDurationFormatted(
-            node.properties[RestConstants.LOM_PROP_TECHNICAL_DURATION],
+            node.properties[RestConstants.LOM_PROP_TECHNICAL_DURATION]?.[0],
         );
         data.author = this.toVCards(
             node.properties[RestConstants.CCM_PROP_LIFECYCLECONTRIBUTER_AUTHOR],

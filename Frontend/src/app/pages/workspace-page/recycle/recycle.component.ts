@@ -8,7 +8,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { GenericAuthority } from 'ngx-edu-sharing-api';
+import { GenericAuthority, Node } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     CustomOptions,
@@ -30,7 +30,6 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
     ArchiveRestore,
-    Node,
     RestArchiveService,
     RestConstants,
     RestoreResult,

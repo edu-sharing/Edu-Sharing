@@ -3,7 +3,7 @@ import { PlatformLocation } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { AboutService, NetworkService, Store } from 'ngx-edu-sharing-api';
+import { AboutService, NetworkService, Store, Node } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     DateHelper,
@@ -27,9 +27,7 @@ import {
     DialogButton,
     JobDescription,
     LoginResult,
-    Node,
     NodeListElastic,
-    NodeWrapper,
     RestAdminService,
     RestConnectorService,
     RestConstants,
@@ -863,7 +861,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
                     true,
                 )
                 .subscribe(
-                    (data: NodeWrapper) => {
+                    (data) => {
                         this.node
                             .uploadNodeContent(
                                 data.node.ref.id,

@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-    Node,
     RestCollectionService,
     RestConnectorService,
     RestConstants,
@@ -19,6 +18,7 @@ import {
 } from '../../../core-module/core.module';
 import {
     DEFAULT,
+    Node,
     GenericAuthority,
     HOME_REPOSITORY,
     PROPERTY_FILTER_ALL,

@@ -21,7 +21,6 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { filter, first, map, take, takeUntil } from 'rxjs/operators';
-import { Node } from '../../../../core-module/core.module';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';
 import { JUMP_MARK_POSTFIX } from '../../../dialogs/card-dialog/card-dialog-container/jump-marks-handler.directive';
 import { MdsWidgetComponent } from '../../mds-viewer/widget/mds-widget.component';
@@ -36,6 +35,7 @@ import {
     NativeWidgetType,
     Values,
 } from '../../types/types';
+import { Node } from 'ngx-edu-sharing-api';
 import { MdsEditorCoreComponent } from '../mds-editor-core/mds-editor-core.component';
 import { MdsEditorInstanceService, Widget } from '../mds-editor-instance.service';
 import { Attributes, getAttributesArray } from '../util/parse-attributes';

@@ -2,7 +2,7 @@ import { trigger } from '@angular/animations';
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router, RoutesRecognized } from '@angular/router';
 import * as moment from 'moment';
-import { StreamEntry, StreamV1Service } from 'ngx-edu-sharing-api';
+import { Node, StreamEntry, StreamV1Service } from 'ngx-edu-sharing-api';
 import {
     CustomOptions,
     DefaultGroups,
@@ -24,8 +24,6 @@ import {
     ConnectorList,
     Filetype,
     FrameEventsService,
-    Node,
-    NodeWrapper,
     RequestObject,
     RestCollectionService,
     RestConnectorService,
@@ -414,7 +412,7 @@ export class StreamPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.nodeService
             .createNode(RestConstants.INBOX, RestConstants.CCM_TYPE_IO, [], prop, false)
             .subscribe(
-                (data: NodeWrapper) => {
+                (data) => {
                     this.editConnector(data.node, event.type as Filetype, event.window, connector);
                     UIHelper.goToWorkspaceFolder(
                         this.nodeService,

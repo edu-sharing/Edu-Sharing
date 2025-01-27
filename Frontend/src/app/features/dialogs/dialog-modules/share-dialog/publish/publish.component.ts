@@ -11,23 +11,11 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import {
-    About,
-    AboutService,
-    HandleParam,
-    NodeService,
-    FeatureInfo,
-    Ace,
-} from 'ngx-edu-sharing-api';
+import { About, AboutService, Ace, HandleParam, Node, NodeService } from 'ngx-edu-sharing-api';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { BridgeService } from '../../../../../services/bridge.service';
-import {
-    ConfigurationService,
-    DialogButton,
-    UIConstants,
-} from '../../../../../core-module/core.module';
-import { Node, Permission } from '../../../../../core-module/rest/data-object';
+import { ConfigurationService, UIConstants } from '../../../../../core-module/core.module';
 import { Helper } from '../../../../../core-module/rest/helper';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
 import { RestHelper } from '../../../../../core-module/rest/rest-helper';

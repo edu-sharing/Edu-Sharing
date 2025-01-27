@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { Node } from '../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import {
     CanDrop,
     DragData,

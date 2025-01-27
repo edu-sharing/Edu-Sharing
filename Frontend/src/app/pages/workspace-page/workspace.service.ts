@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { Node } from '../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 
 /**
  * Passes on workspace properties and functions for outside use.

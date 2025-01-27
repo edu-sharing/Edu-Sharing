@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import {
     ConfigService,
     HOME_REPOSITORY,
+    Node,
     MdsDefinition,
     MdsService,
     UserService,
@@ -40,9 +41,7 @@ import {
     Filetype,
     FrameEventsService,
     IamUser,
-    Node,
     NodeList,
-    NodeWrapper,
     RestConnectorService,
     RestConnectorsService,
     RestConstants,
@@ -74,6 +73,8 @@ import { WorkspaceService } from './workspace.service';
 import { ThemeService } from '../../services/theme.service';
 import { RecycleMainComponent } from './recycle/recycle.component';
 import { DialogsService } from 'src/app/features/dialogs/dialogs.service';
+
+type NodeWrapper = { node: Node };
 
 @Component({
     selector: 'es-workspace-page',
@@ -401,7 +402,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
         this.node
             .moveNode((target as Node).ref?.id || RestConstants.USERHOME, source[position].ref.id)
             .subscribe(
-                (data: NodeWrapper) => {
+                (data: { node: Node }) => {
                     this.moveNode(target, source, position + 1);
                 },
                 (error: any) => {
@@ -664,7 +665,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
                 [
                     UIConstants.ROUTER_PREFIX + 'render',
                     list[0].ref.id,
-                    list[0].version ? list[0].version : '',
+                    // list[0].content.version ? list[0].content.version : '',
                 ],
                 {
                     state: {

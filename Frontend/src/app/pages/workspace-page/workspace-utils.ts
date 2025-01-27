@@ -1,4 +1,5 @@
-import { Node, RestConstants } from '../../core-module/core.module';
+import { RestConstants } from '../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { CanDrop, DragData } from 'ngx-edu-sharing-ui';
 
 export function canDropOnNode(dragData: DragData<Node>): CanDrop {

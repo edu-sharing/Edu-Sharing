@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Ace, LoginInfo } from 'ngx-edu-sharing-api';
+import { Ace, LoginInfo, Node } from 'ngx-edu-sharing-api';
 import { ListItem, OPEN_URL_MODE, UIConstants } from 'ngx-edu-sharing-ui';
 import { Observable, Observer, forkJoin as observableForkJoin, of } from 'rxjs';
 import { catchError, first, take } from 'rxjs/operators';
@@ -21,7 +21,6 @@ import {
     Connector,
     Filetype,
     MdsInfo,
-    Node,
     NodeLock,
     NodeWrapper,
     ParentList,
@@ -306,7 +305,7 @@ export class UIHelper {
 
     static convertSearchParameters(node: Node) {
         let parameters = JSON.parse(
-            node.properties[RestConstants.CCM_PROP_SAVED_SEARCH_PARAMETERS],
+            node.properties[RestConstants.CCM_PROP_SAVED_SEARCH_PARAMETERS]?.[0],
         );
         let result: any = { parameters: {}, query: null };
         for (let parameter of parameters) {
@@ -416,7 +415,7 @@ export class UIHelper {
                     .pipe(catchError((error) => of({ error, node }))),
             ),
         ).subscribe(async (results) => {
-            const success: NodeWrapper[] = results.filter((r) => !(r as any).error);
+            const success: { node: Node }[] = results.filter((r) => !(r as any).error);
             const failed: { node: Node; error: any }[] = results.filter(
                 (r) => !!(r as any).error,
             ) as { node: Node; error: any }[];

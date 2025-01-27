@@ -11,11 +11,11 @@ import { LicenseDialogData, LicenseDialogResult } from './license-dialog-data';
 
 import { TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
+import { Node } from 'ngx-edu-sharing-api';
 import { map } from 'rxjs/operators';
 import {
     ConfigurationService,
     DialogButton,
-    Node,
     Properties,
     RestConnectorService,
     RestConstants,

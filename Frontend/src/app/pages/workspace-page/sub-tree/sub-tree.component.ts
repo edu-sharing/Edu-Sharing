@@ -12,6 +12,7 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import * as rxjs from 'rxjs';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Node } from 'ngx-edu-sharing-api';
 import {
     DragData,
     DropdownComponent,
@@ -25,7 +26,6 @@ import {
     UIAnimation,
 } from 'ngx-edu-sharing-ui';
 import {
-    Node,
     NodeList,
     RestConstants,
     RestNodeService,

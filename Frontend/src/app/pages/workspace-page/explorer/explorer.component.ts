@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import {
     ConfigurationService,
-    Node,
     NodeList,
     RestConnectorService,
     RestConstants,
@@ -40,6 +39,7 @@ import {
     NodeRoot,
     Scope,
     TemporaryStorageService,
+    VirtualNode,
 } from 'ngx-edu-sharing-ui';
 import { canDropOnNode } from '../workspace-utils';
 import { BehaviorSubject, combineLatest, Observable, of, ReplaySubject, Subject } from 'rxjs';
@@ -55,6 +55,7 @@ import {
     DEFAULT,
     HOME_REPOSITORY,
     NodeService,
+    Node,
     PROPERTY_FILTER_ALL,
     SearchResults,
     SearchService,
@@ -455,7 +456,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
     };
 
     private getRealNodeCount() {
-        return this.dataSource?.getData().filter((n) => !n.virtual).length;
+        return this.dataSource?.getData().filter((n) => !(n as VirtualNode).virtual).length;
     }
 
     initColumns() {
@@ -506,7 +507,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
     }
 
     syncTreeViewOnAdd(nodes: Node[]) {
-        if (nodes.filter((n) => n.virtual && n.isDirectory).length) {
+        if (nodes.filter((n) => (n as VirtualNode).virtual && n.isDirectory).length) {
             this.refreshTree.emit();
         }
     }
