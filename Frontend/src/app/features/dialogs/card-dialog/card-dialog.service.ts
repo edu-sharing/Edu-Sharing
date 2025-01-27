@@ -32,6 +32,9 @@ export class CardDialogService {
     get openDialogs(): readonly CardDialogRef[] {
         return this.openDialogsSubject.value;
     }
+    get openDialogs$() {
+        return this.openDialogsSubject;
+    }
     private readonly viewModeSubject = new BehaviorSubject<ViewMode>('default');
 
     constructor(
