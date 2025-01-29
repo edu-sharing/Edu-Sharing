@@ -9,8 +9,8 @@
   *ngIf="chooseCollection"
   [@fromRight]="chooseCollection"
   title="WORKSPACE.SELECT_COLLECTION"
-  (onCancel)="chooseCollection = false"
-  (onChoose)="setCollection($event)"
+  (cancel)="chooseCollection = false"
+  (choose)="setCollection($event)"
 ></es-collection-chooser>
 <div class="frontpage" *ngIf="configService.get('frontpage.enabled', true) | async">
   <form *ngIf="config" [formGroup]="form">

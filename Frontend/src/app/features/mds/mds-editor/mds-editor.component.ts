@@ -58,7 +58,7 @@ export class MdsEditorComponent implements OnInit {
 
     private init(info: Partial<InitInfo>): void {
         if (info.repository && info.metadataSet && info.group) {
-            this.mdsEditorInstance.initWithoutNodes(
+            void this.mdsEditorInstance.initWithoutNodes(
                 info.group,
                 info.metadataSet,
                 info.repository,

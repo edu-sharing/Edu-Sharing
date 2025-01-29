@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {
-    NodePermissions,
     Node,
+    NodePermissions,
     NodeService,
     SessionStorageService,
     Store,
@@ -122,7 +122,7 @@ export class DeleteNodesDialogComponent implements OnInit {
 
     private onConfirm(): void {
         this.dialogRef.patchState({ isLoading: true });
-        this.removeTemporaryCollections(this.data.nodes);
+        void this.removeTemporaryCollections(this.data.nodes);
         forkJoinWithErrors(this.data.nodes.map((node) => this.processNode(node))).subscribe(
             ({ successes: processedNodes, errors }) => {
                 if (errors.length === 0) {

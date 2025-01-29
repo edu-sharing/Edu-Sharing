@@ -326,7 +326,7 @@ export class AppSharePageComponent {
                             },
                         );
                     } else {
-                        this.router.navigate([
+                        void this.router.navigate([
                             UIConstants.ROUTER_PREFIX,
                             'messages',
                             'SHARING_ERROR',

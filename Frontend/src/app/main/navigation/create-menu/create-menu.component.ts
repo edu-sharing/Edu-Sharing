@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ConnectorService, Node, LtiPlatformService, Tool, Tools } from 'ngx-edu-sharing-api';
+import { ConnectorService, LtiPlatformService, Node, Tool, Tools } from 'ngx-edu-sharing-api';
 import {
     Constrain,
     DateHelper,
@@ -83,7 +83,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     @Input() set parent(parent: Node) {
         this._parent = parent;
         this.showPicker = parent == null || this.nodeHelper.isNodeCollection(parent);
-        this.updateOptions();
+        void this.updateOptions();
     }
 
     /**
@@ -133,7 +133,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     ) {
         this.route.queryParams.subscribe((params) => {
             this.params = params;
-            this.updateOptions();
+            void this.updateOptions();
         });
         this.connectorApi
             .observeConnectorList()
@@ -142,7 +142,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                 this.connectorList = this.connectors
                     .filterConnectors(list?.connectors)
                     .concat(this.connectors.filterConnectors(list?.simpleConnectors));
-                this.updateOptions();
+                void this.updateOptions();
             });
         this.connector.isLoggedIn(false).subscribe((login) => {
             if (login.statusCode === RestConstants.STATUS_CODE_OK) {
@@ -154,11 +154,11 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroyed))
             .subscribe((config) => {
                 this.mainNavConfig = config;
-                this.updateOptions();
+                void this.updateOptions();
             });
         this.ltiPlatformService.getTools().subscribe((t) => {
             this.tools = t;
-            this.updateOptions();
+            void this.updateOptions();
         });
     }
 
@@ -329,7 +329,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.addFolder(result);
+                void this.addFolder(result);
             }
         });
     }
@@ -492,7 +492,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     pickMaterialFromSearch() {
         UIHelper.getCommonParameters(this.route).subscribe((params) => {
             params.addToCollection = this._parent.ref.id;
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], {
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], {
                 queryParams: params,
             });
         });
@@ -551,7 +551,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             return;
         }
         const properties = RestHelper.createNameProperty(name);
-        this.getParent().then((parent) => {
+        void this.getParent().then((parent) => {
             this.nodeService
                 .createNode(parent.ref.id, RestConstants.CCM_TYPE_IO, [], properties)
                 .subscribe(

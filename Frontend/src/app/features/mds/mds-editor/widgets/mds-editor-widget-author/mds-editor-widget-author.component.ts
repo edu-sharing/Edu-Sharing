@@ -55,10 +55,10 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
 
     ngOnInit(): void {
         this.mdsEditorValues.nodes$.pipe(filter((n) => n != null)).subscribe((nodes) => {
-            this.updateValues(nodes);
+            void this.updateValues(nodes);
         });
         this.mdsEditorValues.values$.pipe(filter((v) => v != null)).subscribe((values) => {
-            this.updateValues([{ properties: values }] as Node[]);
+            void this.updateValues([{ properties: values }] as Node[]);
         });
     }
     onChange(): void {
@@ -124,7 +124,7 @@ export class MdsEditorWidgetAuthorComponent implements OnInit, NativeWidgetCompo
             return;
         }
         this._nodes = nodes;
-        this.refreshTabs();
+        void this.refreshTabs();
     }
 
     public async refreshTabs() {

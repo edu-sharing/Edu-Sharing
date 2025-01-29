@@ -98,7 +98,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
         // TODO: Make sure that inputs are ready when this component is initialized and remove calls
         // to `loadMds()`.
         if (this.graphqlIds || this.nodes || this.currentValues) {
-            this.init();
+            void this.init();
         }
         this.mdsEditorInstance.values.subscribe((values) => (this.values = values));
 
@@ -187,7 +187,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
                 // Don't need to re-init
                 this.loadMdsAfterInit(onlyLegacy);
             } else {
-                this.init().then(() => {
+                void this.init().then(() => {
                     this.loadMdsAfterInit(onlyLegacy);
                 });
             }

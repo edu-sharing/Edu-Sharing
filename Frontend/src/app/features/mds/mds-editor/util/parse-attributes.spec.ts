@@ -37,7 +37,7 @@ describe('parseAttributes', () => {
             id: 'ccm:foo',
         };
         const modifiedDefinition = parseAttributes('<ccm:foo>', originalDefinition);
-        expect(modifiedDefinition).toEqual(originalDefinition);
+        void expect(modifiedDefinition).toEqual(originalDefinition);
     });
 
     it('should throw an error on missing widget', () => {
@@ -45,7 +45,7 @@ describe('parseAttributes', () => {
             ...definitionBoilerplate,
             id: 'ccm:foo',
         };
-        expect(() => parseAttributes('<ccm:bar>', originalDefinition)).toThrowError(
+        void expect(() => parseAttributes('<ccm:bar>', originalDefinition)).toThrowError(
             /widget not found .* ccm:foo/,
         );
     });
@@ -59,7 +59,7 @@ describe('parseAttributes', () => {
             '<ccm:foo bottomCaption="bar">',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({ ...originalDefinition, bottomCaption: 'bar' });
+        void expect(modifiedDefinition).toEqual({ ...originalDefinition, bottomCaption: 'bar' });
     });
 
     it('should leave original definition unmodified', () => {
@@ -71,7 +71,7 @@ describe('parseAttributes', () => {
             '<ccm:foo bottomCaption="bar">',
             originalDefinition,
         );
-        expect(modifiedDefinition).not.toEqual(originalDefinition);
+        void expect(modifiedDefinition).not.toEqual(originalDefinition);
     });
 
     it('should handle other widgets', () => {
@@ -83,7 +83,7 @@ describe('parseAttributes', () => {
             '<ccm:bar bottomCaption="bar">' + '<ccm:foo bottomCaption="foo">',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({ ...originalDefinition, bottomCaption: 'foo' });
+        void expect(modifiedDefinition).toEqual({ ...originalDefinition, bottomCaption: 'foo' });
     });
 
     it('should read multiple attributes', () => {
@@ -95,7 +95,7 @@ describe('parseAttributes', () => {
             '<ccm:foo caption="foo" hideIfEmpty="true" maxlength="42">',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({
+        void expect(modifiedDefinition).toEqual({
             ...originalDefinition,
             caption: 'foo',
             hideIfEmpty: true,
@@ -112,7 +112,7 @@ describe('parseAttributes', () => {
             '<ccm:foo values=\'[{"id": "foo", "caption": "Foo"}]\'>',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({
+        void expect(modifiedDefinition).toEqual({
             ...originalDefinition,
             values: [{ id: 'foo', caption: 'Foo' }],
         });
@@ -136,7 +136,7 @@ describe('parseAttributes', () => {
                 'anotherstring="baz">',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({
+        void expect(modifiedDefinition).toEqual({
             ...originalDefinition,
             madeUpNumber: 42,
             madeUpBoolean: true,
@@ -154,7 +154,7 @@ describe('parseAttributes', () => {
             '<ccm:foo caption="foo" hideIfEmpty="true" maxlength="42">',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({
+        void expect(modifiedDefinition).toEqual({
             ...originalDefinition,
             caption: 'foo',
             hideIfEmpty: true,
@@ -171,7 +171,7 @@ describe('parseAttributes', () => {
             '<ccm:foo required="mandatory">',
             originalDefinition,
         );
-        expect(modifiedDefinition).toEqual({
+        void expect(modifiedDefinition).toEqual({
             ...originalDefinition,
             isRequired: RequiredMode.Mandatory,
         });
@@ -183,7 +183,7 @@ describe('parseAttributes', () => {
             id: 'ccm:foo',
         };
         const modifiedDefinition = parseAttributes('<ccm:foo extended="true">', originalDefinition);
-        expect(modifiedDefinition).toEqual({
+        void expect(modifiedDefinition).toEqual({
             ...originalDefinition,
             isExtended: true,
         });

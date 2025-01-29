@@ -4,7 +4,7 @@
   width="normal"
   height="xlarge"
   [buttons]="buttons"
-  (onCancel)="cancel()"
+  (cancel)="cancel()"
 >
   <div class="wrapper">
     <div class="audience">
@@ -32,7 +32,7 @@
         <div class="search">
           <es-authority-search-input
             [globalSearchAllowed]="false"
-            (onChooseAuthority)="addInvite($event)"
+            (chooseAuthority)="addInvite($event)"
           ></es-authority-search-input>
         </div>
         <mat-chip-listbox class="toInvite">

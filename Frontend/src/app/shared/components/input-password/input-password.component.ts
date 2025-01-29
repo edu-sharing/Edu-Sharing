@@ -27,8 +27,11 @@ export class InputPasswordComponent {
     }
 
     @Output() valueChange = new EventEmitter();
+    // eslint-disable-next-line @angular-eslint/no-output-native
     @Output() change = new EventEmitter();
+    // eslint-disable-next-line @angular-eslint/no-output-native
     @Output() keydown = new EventEmitter();
+    // eslint-disable-next-line @angular-eslint/no-output-native
     @Output() keyup = new EventEmitter();
     @Output() ngModelChange = new EventEmitter();
 

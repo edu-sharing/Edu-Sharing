@@ -313,7 +313,7 @@ export class SearchPageService implements OnDestroy {
 
     private getAddToCollectionOptions(collection: Node): CustomOptions {
         const addTo = new OptionItem('SEARCH.ADD_INTO_COLLECTION_SHORT', 'layers', (_, nodes) => {
-            this.mainNavService.getDialogs().addToCollectionList(collection, nodes, true, () =>
+            void this.mainNavService.getDialogs().addToCollectionList(collection, nodes, true, () =>
                 this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
                     queryParams: { id: collection.ref.id },
                 }),

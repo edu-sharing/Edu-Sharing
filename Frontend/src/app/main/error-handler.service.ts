@@ -16,7 +16,7 @@ export class ErrorHandlerService {
 
     constructor(private injector: Injector, private location: Location) {
         // Prevent circular dependency.
-        Promise.resolve().then(() => {
+        void Promise.resolve().then(() => {
             this.toast = this.injector.get(Toast);
             this.dialogs = this.injector.get(DialogsService);
         });
@@ -35,7 +35,7 @@ export class ErrorHandlerService {
                 req.url === this.getApiUrl('/authentication/v1/validateSession') ||
                 req.url === this.getApiUrl('/iam/v1/people/-home-/-me-'))
         ) {
-            this.showReloadNotice();
+            void this.showReloadNotice();
         } else if (this.injector.get(CordovaService).isRunningCordova()) {
             console.info('corodva api error received', error);
             if (error.status === RestConstants.HTTP_UNAUTHORIZED) {

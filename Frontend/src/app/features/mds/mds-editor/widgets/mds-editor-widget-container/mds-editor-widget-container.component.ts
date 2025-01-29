@@ -262,7 +262,7 @@ export class MdsEditorWidgetContainerComponent
     }
 
     private scrollIntoViewAndFocus(): void {
-        Promise.all([
+        void Promise.all([
             new Promise((resolve) => {
                 // Expand section (view) if needed.
                 if (this.viewInstance.isExpanded$.value) {

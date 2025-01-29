@@ -15,7 +15,7 @@ export interface Options {
     readAs?: string;
 }
 
-@Directive({ selector: '[fileDrop]' })
+@Directive({ selector: '[esFileDrop]' })
 export class FileDropDirective implements OnInit, OnDestroy {
     @Input() options: Options;
     /**
@@ -24,7 +24,7 @@ export class FileDropDirective implements OnInit, OnDestroy {
     @Input() window = false;
 
     @Output() fileOver: EventEmitter<boolean> = new EventEmitter<boolean>();
-    @Output() onFileDrop: EventEmitter<FileList> = new EventEmitter<FileList>();
+    @Output() fileDrop: EventEmitter<FileList> = new EventEmitter<FileList>();
 
     /**
      * Sometimes browsers fire a dragenter event before the dragleave event. When the cursor moves
@@ -141,7 +141,7 @@ export class FileDropDirective implements OnInit, OnDestroy {
 
     private emitFileDrop(file: FileList): void {
         this.ngZone.run(() => {
-            this.onFileDrop.emit(file);
+            this.fileDrop.emit(file);
         });
     }
 

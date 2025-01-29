@@ -45,7 +45,7 @@ describe('MdsEditorWidgetFacetList', () => {
 
     it('should be created', () => {
         setUp();
-        expect(component).toBeTruthy();
+        void expect(component).toBeTruthy();
     });
 
     it('Filter disabled', () => {

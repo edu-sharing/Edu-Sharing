@@ -6,7 +6,7 @@
         [globalSearchAllowed]="globalAllowed"
         [groupType]="TYPE_EDITORIAL"
         [showRecent]="false"
-        (onChooseAuthority)="addSuggestion($event)"
+        (chooseAuthority)="addSuggestion($event)"
         [placeholder]="'WORKSPACE.WORKFLOW.RECEIVERS'"
         hint="{{ 'WORKSPACE.WORKFLOW.RECEIVERS_HINT' | translate }}"
       ></es-authority-search-input>

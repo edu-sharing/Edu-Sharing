@@ -251,7 +251,7 @@ export class SearchFieldComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onInputFocus(): void {
-        Promise.resolve().then(() => (this.inputHasFocus = true));
+        void Promise.resolve().then(() => (this.inputHasFocus = true));
         if (!this.inhibitOverlay) {
             this.showOverlay.next(true);
         }

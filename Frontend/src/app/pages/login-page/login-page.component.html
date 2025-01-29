@@ -129,7 +129,7 @@
           </form>
           <div class="useUrl" *ngIf="config.loginUrl && !showProviders && !isSafeLogin">
             <div>{{ 'LOGIN.USE_URL_TEXT' | translate }}</div>
-            <es-mat-link (click)="openLoginUrl()" class="goto">
+            <es-mat-link (clickOnLink)="openLoginUrl()" class="goto">
               <span>{{ 'LOGIN.USE_URL_LINK' | translate }}</span>
               <i class="material-icons">arrow_forward</i>
             </es-mat-link>

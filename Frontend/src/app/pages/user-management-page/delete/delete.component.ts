@@ -227,7 +227,7 @@ export class PermissionsDeleteComponent implements OnInit, AfterViewInit {
             this.options.receiver = this.receiver.authorityName;
             this.options.receiverGroup = this.receiverGroup.authorityName;
         }
-        this.storage.set('delete_users_options', this.options);
+        void this.storage.set('delete_users_options', this.options);
         const submit = Helper.deepCopy(this.options);
         delete submit.version;
         this.admin

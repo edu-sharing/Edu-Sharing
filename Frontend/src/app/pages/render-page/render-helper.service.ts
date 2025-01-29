@@ -153,7 +153,7 @@ export class RenderHelperService {
                     node,
                 },
             );
-            component.instance.ngOnChanges();
+            void component.instance.ngOnChanges();
             return component;
         }
         return null;

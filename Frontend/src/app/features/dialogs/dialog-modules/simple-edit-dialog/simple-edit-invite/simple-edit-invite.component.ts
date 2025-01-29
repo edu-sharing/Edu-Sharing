@@ -312,10 +312,10 @@ export class SimpleEditInviteComponent {
                             }),
                         ).subscribe((o) => {
                             this.organizations = o;
-                            this.detectPermissionState();
+                            void this.detectPermissionState();
                         });
                     } else {
-                        this.detectPermissionState();
+                        void this.detectPermissionState();
                     }
                 });
             },

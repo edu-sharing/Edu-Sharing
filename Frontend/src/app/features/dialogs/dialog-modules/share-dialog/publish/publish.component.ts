@@ -214,7 +214,7 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
             direct: this.shareModeDirect,
         };
         if (this.node.ref?.id) {
-            this.mdsService.initWithNodes([this.node]);
+            void this.mdsService.initWithNodes([this.node]);
         }
         this.updatePublishedVersions();
     }
@@ -458,7 +458,7 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                 action: {
                     label: this.translate.instant('WORKSPACE.SHARE.DOI_METADATA'),
                     callback: () => {
-                        this.openMetadata();
+                        void this.openMetadata();
                     },
                 },
             });

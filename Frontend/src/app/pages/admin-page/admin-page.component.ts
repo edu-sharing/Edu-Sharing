@@ -3,7 +3,7 @@ import { PlatformLocation } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { AboutService, NetworkService, Store, Node } from 'ngx-edu-sharing-api';
+import { AboutService, NetworkService, Node, Store } from 'ngx-edu-sharing-api';
 import {
     ActionbarComponent,
     DateHelper,
@@ -47,14 +47,13 @@ import { Closable } from '../../features/dialogs/card-dialog/card-dialog-config'
 import {
     DELETE_OR_CANCEL,
     OK_OR_CANCEL,
-    YES_OR_NO,
 } from '../../features/dialogs/dialog-modules/generic-dialog/generic-dialog-data';
 import { XmlAppPropertiesDialogData } from '../../features/dialogs/dialog-modules/xml-app-properties-dialog/xml-app-properties-dialog-data';
 import { DialogsService } from '../../features/dialogs/dialogs.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
 import { AuthoritySearchMode } from '../../shared/components/authority-search-input/authority-search-input.component';
 import { WorkspaceExplorerComponent } from '../workspace-page/explorer/explorer.component';
-import { delay, filter, repeat, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { delay, repeat, takeUntil, tap } from 'rxjs/operators';
 
 type LuceneData = {
     mode: 'NODEREF' | 'SOLR' | 'ELASTIC';
@@ -210,7 +209,10 @@ export class AdminPageComponent implements OnInit, OnDestroy {
     @ViewChild('templateSelect') templateSelect: ElementRef;
     @ViewChild('dynamic') dynamicComponent: any;
 
-    buttons: any[] = [];
+    buttons: {
+        id: string;
+        icon: string;
+    }[] = [];
     availableJobs: JobDescription[];
     excelFile: File;
     collectionsFile: File;
@@ -265,7 +267,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
     }
 
     public startJob() {
-        this.storage.set('admin_job', this.job);
+        void this.storage.set('admin_job', this.job);
         this.globalProgress = true;
         try {
             this.admin
@@ -287,14 +289,14 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             this.globalProgress = false;
         }
     }
-    public debugNode(node: Node) {
-        this.dialogs.openNodeInfoDialog({ nodes: [node] });
+    public async debugNode(node: Node) {
+        await this.dialogs.openNodeInfoDialog({ nodes: [node] });
     }
     public getModeButton(mode = this.mode): any {
         return this.buttons[Helper.indexOfObjectArray(this.buttons, 'id', mode)];
     }
     public searchNoderef() {
-        this.storage.set('admin_lucene', this.lucene);
+        void this.storage.set('admin_lucene', this.lucene);
         this.globalProgress = true;
         this.node.getNodeMetadata(this.lucene.noderef, [RestConstants.ALL]).subscribe(
             (node) => {
@@ -312,7 +314,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
         );
     }
     public async searchNodes() {
-        this.storage.set('admin_lucene', this.lucene);
+        void this.storage.set('admin_lucene', this.lucene);
         const authorities = [];
         if (this.lucene.authorities) {
             for (const auth of this.lucene.authorities) {
@@ -502,7 +504,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
         });
     }
     public setMode(mode: string, skipLocationChange = false) {
-        this.router.navigate(['./'], {
+        void this.router.navigate(['./'], {
             queryParams: { mode },
             relativeTo: this.route,
             skipLocationChange: skipLocationChange,
@@ -625,7 +627,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
         if (!this.oaiPreconditions()) return;
         this.globalProgress = true;
         if (this.oaiSave) {
-            this.storage.set('admin_oai', this.oai);
+            void this.storage.set('admin_oai', this.oai);
         }
         if (this.uploadOaiFile) {
             this.admin
@@ -636,7 +638,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
                 )
                 .subscribe(
                     (node) => {
-                        this.debugNode(node);
+                        void this.debugNode(node);
                         this.globalProgress = false;
                     },
                     (error) => {
@@ -925,7 +927,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
 
     public gotoFoldertemplateFolder() {
         this.getTemplateFolderId().subscribe((id) => {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'workspace'], {
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'workspace'], {
                 queryParams: { id },
             });
         });
@@ -1225,7 +1227,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             this.toast.error(null, 'ADMIN.BROWSER.LUCENE_PROPERTIES_REQUIRED');
             return;
         }
-        this.storage.set('admin_lucene', this.lucene);
+        void this.storage.set('admin_lucene', this.lucene);
         this.globalProgress = true;
         const props = this.lucene.properties.split('\n');
         this.admin
@@ -1494,7 +1496,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             if (this.buttons.filter((b) => b.id === mode).length === 1) {
                 return true;
             }
-            this.router.navigate([UIConstants.ROUTER_PREFIX, 'workspace']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX, 'workspace']);
         }
         return false;
     }

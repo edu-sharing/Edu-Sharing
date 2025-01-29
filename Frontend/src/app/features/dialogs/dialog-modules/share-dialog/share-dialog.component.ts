@@ -740,7 +740,7 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                     : RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH,
             )
             .subscribe((has: boolean) => (this.globalAllowed = has));
-        this.authenticationService
+        void this.authenticationService
             .hasToolpermission(
                 this.isSafe
                     ? this.isSharedScope
@@ -751,13 +751,13 @@ export class ShareDialogComponent implements OnInit, AfterViewInit {
                     : RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH,
             )
             .then((has: boolean) => (this.globalAllowed = has));
-        this.authenticationService
+        void this.authenticationService
             .hasToolpermission(RestConstants.TOOLPERMISSION_GLOBAL_AUTHORITY_SEARCH_FUZZY)
             .then((has: boolean) => (this.fuzzyAllowed = has));
-        this.authenticationService
+        void this.authenticationService
             .hasToolpermission(RestConstants.TOOLPERMISSION_INVITE_ALLAUTHORITIES)
             .then((has: boolean) => (this.publishPermission = has));
-        this.authenticationService
+        void this.authenticationService
             .hasToolpermission(RestConstants.TOOLPERMISSION_CONTROL_RESTRICTED_ACCESS)
             .then((has: boolean) => (this.restrictedAccessPermission = has));
     }

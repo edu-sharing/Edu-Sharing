@@ -112,7 +112,7 @@ export class SharingPageComponent {
                         this.loading = false;
                         this.sharingInfo = result;
                         if (result.expired) {
-                            this.router.navigate([
+                            void this.router.navigate([
                                 UIConstants.ROUTER_PREFIX,
                                 'messages',
                                 'share_expired',
@@ -123,7 +123,7 @@ export class SharingPageComponent {
                     },
                     (error) => {
                         console.warn(error);
-                        this.router.navigate([
+                        void this.router.navigate([
                             UIConstants.ROUTER_PREFIX,
                             'messages',
                             'share_expired',

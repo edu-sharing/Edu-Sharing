@@ -25,7 +25,6 @@ import { Helper } from '../../core-module/rest/helper';
 import { LoadingScreenService } from '../../main/loading-screen/loading-screen.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
 import { take, takeUntil } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'es-profile-page',
@@ -120,7 +119,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
                     if (!this.loadingTask.isDone) {
                         this.loadingTask.done();
                     }
-                    this.iamService.getCurrentUserAsync().then((me) => {
+                    void this.iamService.getCurrentUserAsync().then((me) => {
                         this.isMe = profile.person.authorityName === me.person.authorityName;
                         if (this.isMe && login.isGuest) {
                             RestHelper.goToLogin(this.router, this.config);

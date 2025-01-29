@@ -30,7 +30,7 @@
       class="breadcrumbFrame"
       *ngIf="!searchMode"
       [createLink]="false"
-      (onClick)="selectBreadcrumb($event)"
+      (clickBreadcrumb)="selectBreadcrumb($event)"
       [home]="homeOverride ? homeOverride.label : (label | translate)"
       [homeIcon]="homeOverride ? homeOverride.icon : homeIcon"
     ></es-breadcrumbs>

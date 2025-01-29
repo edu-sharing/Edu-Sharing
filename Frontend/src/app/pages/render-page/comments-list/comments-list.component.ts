@@ -45,7 +45,7 @@ export class CommentsListComponent {
 
     @Input() set node(node: Node) {
         this._node = node;
-        this.refresh();
+        void this.refresh();
     }
     @Output() onCancel = new EventEmitter();
     @Output() onLoading = new EventEmitter();
@@ -67,7 +67,7 @@ export class CommentsListComponent {
         this.connector.isLoggedIn(false).subscribe((data: LoginResult) => {
             this.isGuest = data.isGuest;
             if (!data.isGuest) {
-                this.iam.getCurrentUserAsync().then((data) => {
+                void this.iam.getCurrentUserAsync().then((data) => {
                     this.user = data.person;
                     this.hasPermission = this.connector.hasToolPermissionInstant(
                         RestConstants.TOOLPERMISSION_COMMENT_WRITE,
@@ -85,7 +85,7 @@ export class CommentsListComponent {
                     this.onLoading.emit(false);
                     this.onChange.emit();
                     this.editComment = null;
-                    this.refresh();
+                    void this.refresh();
                 },
                 (error: any) => {
                     this.toast.error(error);
@@ -118,7 +118,7 @@ export class CommentsListComponent {
                             this.toast.closeProgressSpinner();
                             this.commentsApi.deleteComment(comment.ref.id).subscribe(
                                 () => {
-                                    this.refresh();
+                                    void this.refresh();
                                     this.onChange.emit();
                                     this.onLoading.emit(false);
                                 },
@@ -151,7 +151,7 @@ export class CommentsListComponent {
                 this.onLoading.emit(false);
                 this.onChange.emit();
                 this.newComment = '';
-                this.refresh();
+                void this.refresh();
             },
             (error: any) => {
                 this.sending = false;

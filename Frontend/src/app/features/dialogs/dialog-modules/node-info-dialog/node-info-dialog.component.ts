@@ -74,7 +74,7 @@ export class NodeInfoDialogComponent implements OnInit, AfterViewInit {
     ) {}
 
     async ngAfterViewInit() {
-        this.updateOptions();
+        void this.updateOptions();
     }
 
     ngOnInit(): void {
@@ -145,7 +145,7 @@ export class NodeInfoDialogComponent implements OnInit, AfterViewInit {
                     });
             }
         }
-        this.updateOptions();
+        void this.updateOptions();
     }
 
     openNodes(nodes: Node[]) {
@@ -154,7 +154,7 @@ export class NodeInfoDialogComponent implements OnInit, AfterViewInit {
         this.setNodes(nodes);
     }
     openNodeWorkspace(node: Node) {
-        this.router.navigate([UIConstants.ROUTER_PREFIX, 'workspace'], {
+        void this.router.navigate([UIConstants.ROUTER_PREFIX, 'workspace'], {
             queryParams: { id: node.parent.id, file: node.ref.id },
         });
         this.dialogRef.close();

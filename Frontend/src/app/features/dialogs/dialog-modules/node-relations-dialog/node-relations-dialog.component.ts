@@ -73,7 +73,7 @@ export class NodeRelationsDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.dialogRef.patchConfig({ buttons: this.buttons });
-        this.initNode(this.data.node);
+        void this.initNode(this.data.node);
         this.updateButtons();
     }
 

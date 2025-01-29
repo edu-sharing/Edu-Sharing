@@ -9,7 +9,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { User, Node } from 'ngx-edu-sharing-api';
+import { Node, User } from 'ngx-edu-sharing-api';
 import { Observable } from 'rxjs';
 import { ConfigurationService, RestConnectorService } from '../../../core-module/core.module';
 import { OptionItem } from 'ngx-edu-sharing-ui';
@@ -89,7 +89,7 @@ export class TopBarComponent {
         this.createMenuX = x;
         this.createMenuY = y;
 
-        this.createMenu.updateOptions();
+        void this.createMenu.updateOptions();
         this.createMenuTrigger.openMenu();
         this.createMenuTrigger.onMenuClose;
     }

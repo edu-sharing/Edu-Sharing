@@ -12,7 +12,7 @@ export class ViewMaterialFeedbackComponent {
     @Input()
     set node(node: Node) {
         this._node = node;
-        this.fetch();
+        void this.fetch();
     }
     @Output() onClose = new EventEmitter<void>();
     _node: Node;

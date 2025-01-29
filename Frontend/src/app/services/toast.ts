@@ -14,7 +14,7 @@ import {
 } from 'ngx-edu-sharing-ui';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DialogButton, RestConnectorService } from '../core-module/core.module';
+import { RestConnectorService } from '../core-module/core.module';
 import { RestConstants } from '../core-module/rest/rest-constants';
 import { CardDialogRef } from '../features/dialogs/card-dialog/card-dialog-ref';
 import {
@@ -177,7 +177,7 @@ export class Toast extends ToastAbstract implements OnDestroy {
         }
         this.lastToastMessage = message;
         this.lastToastMessageTime = Date.now();
-        this.showToast({
+        void this.showToast({
             message,
             type: 'info',
             toastMessage,
@@ -243,7 +243,7 @@ export class Toast extends ToastAbstract implements OnDestroy {
             toastMessage.subtype =
                 message === 'COMMON_API_ERROR' ? ToastType.ErrorGeneric : ToastType.ErrorSpecific;
         }
-        this.showToast({
+        void this.showToast({
             message,
             type: 'error',
             toastMessage,
@@ -255,7 +255,7 @@ export class Toast extends ToastAbstract implements OnDestroy {
     }
 
     goToLogin() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'login'], {
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'login'], {
             queryParams: { next: window.location },
         });
     }

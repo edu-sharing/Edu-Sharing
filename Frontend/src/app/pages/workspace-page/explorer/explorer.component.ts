@@ -54,8 +54,8 @@ import {
 import {
     DEFAULT,
     HOME_REPOSITORY,
-    NodeService,
     Node,
+    NodeService,
     PROPERTY_FILTER_ALL,
     SearchResults,
     SearchService,
@@ -234,7 +234,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
             this.sort.active = RestConstants.CM_NAME;
             this.sort.direction = 'asc';
             // set sorting will reinit everything
-            this.setSorting(this.sort);
+            void this.setSorting(this.sort);
             return;
         }
         if (event?.reset) {
@@ -434,7 +434,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
         }
         if (Helper.objectEquals(this.node$.value, current)) return;
         this.node$.next(current);
-        this.initOptions();
+        void this.initOptions();
     }
 
     private setSearchQuery(query: any) {
@@ -495,7 +495,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
     }
 
     saveColumns(columns: ListItem[]) {
-        this.storage.set('workspaceColumns', columns);
+        void this.storage.set('workspaceColumns', columns);
     }
 
     clickItem(event: NodeClickEvent<NodeEntriesDataType>) {

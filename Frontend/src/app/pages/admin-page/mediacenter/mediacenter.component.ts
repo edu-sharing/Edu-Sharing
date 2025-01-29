@@ -7,6 +7,7 @@ import {
     InteractionType,
     ListItem,
     ListSortConfig,
+    MdsHelperService,
     NodeDataSource,
     NodeEntriesDisplayType,
     NodeEntriesWrapperComponent,
@@ -21,11 +22,9 @@ import {
     RestConnectorService,
     RestMdsService,
     RestMediacenterService,
-    RestSearchService,
 } from '../../../core-module/core.module';
 import { CsvHelper } from '../../../core-module/csv.helper';
 import { Helper } from '../../../core-module/rest/helper';
-import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 import { RestHelper } from '../../../core-module/rest/rest-helper';
 import { Toast } from '../../../services/toast';
@@ -482,7 +481,7 @@ export class AdminMediacenterComponent {
     setMediacenterNodesSort(sort: ListSortConfig) {
         this.mediacenterNodesSort = sort;
         this.resetMediacenterNodes();
-        this.loadMediacenterNodes();
+        void this.loadMediacenterNodes();
     }
 
     private resetMediacenterNodes() {

@@ -63,7 +63,7 @@ export class AppLoginPageComponent implements OnInit {
 
         // WHEN RUNNING ON DESKTOP --> FORWARD TO BASIC LOGIN PAGE
         if (!this.cordova.isRunningCordova()) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'login']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'login']);
             return;
         }
 
@@ -91,7 +91,7 @@ export class AppLoginPageComponent implements OnInit {
     }
     private recoverPassword() {
         if (this.config.register.local) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'register', 'request']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'register', 'request']);
         } else {
             window.location.href = this.config.register.recoverUrl;
         }
@@ -199,13 +199,13 @@ export class AppLoginPageComponent implements OnInit {
                 }
                 this.isLoading = false;
 
-                this.handleCurrentState();
+                void this.handleCurrentState();
             });
         });
     }
     register() {
         if (this.config.register.local) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
         } else {
             UIHelper.openUrl(
                 this.config.register.registerUrl,

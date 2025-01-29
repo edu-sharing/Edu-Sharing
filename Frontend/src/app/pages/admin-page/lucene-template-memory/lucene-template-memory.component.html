@@ -11,7 +11,7 @@
 <es-card
   *ngIf="isNewTemplateDialogVisible"
   title="{{ 'ADMIN.BROWSER.LUCENE_TEMPLATE_MEMORY.NEW_BUTTON' | translate }}"
-  (onCancel)="closeNewTemplateDialog()"
+  (cancel)="closeNewTemplateDialog()"
   [buttons]="newTemplateDialogButtons"
   height="auto"
 >

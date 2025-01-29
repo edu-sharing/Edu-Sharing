@@ -1,10 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import {
-    ConfigurationService,
-    RestConnectorService,
-    RestLocatorService,
-    RestRegisterService,
-} from '../../../core-module/core.module';
+import { ConfigurationService, RestLocatorService } from '../../../core-module/core.module';
 import { Toast } from '../../../services/toast';
 import { PlatformLocation } from '@angular/common';
 import { Router } from '@angular/router';
@@ -93,7 +88,7 @@ export class RegisterDoneComponent {
         this.register.mailExists(this.email).subscribe(
             (status) => {
                 if (status.exists) {
-                    this.router.navigate([UIConstants.ROUTER_PREFIX, 'login'], {
+                    void this.router.navigate([UIConstants.ROUTER_PREFIX, 'login'], {
                         queryParams: { username: this.email },
                     });
                     return;
@@ -144,7 +139,7 @@ export class RegisterDoneComponent {
                 },
             );
         } else {
-            this.router.navigate([
+            void this.router.navigate([
                 UIConstants.ROUTER_PREFIX,
                 'register',
                 'reset-password',

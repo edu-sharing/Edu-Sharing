@@ -30,7 +30,7 @@
   height="auto"
   [isCancelable]="true"
   [buttons]="editStatusButtons"
-  (onCancel)="editStatus = null"
+  (cancel)="editStatus = null"
 >
   <div class="card-content-padding card-status">
     <mat-form-field floatLabel="always" *ngIf="isAdmin">
@@ -62,7 +62,7 @@
   height="auto"
   [isCancelable]="true"
   [buttons]="resetPasswordButtons"
-  (onCancel)="resetPassword = null"
+  (cancel)="resetPassword = null"
 >
   <div class="card-content-padding card-reset-password">
     <es-input-password
@@ -80,7 +80,7 @@
   [node]="groupSignup"
   [isCancelable]="true"
   [buttons]="signupButtons"
-  (onCancel)="groupSignupDetails = null"
+  (cancel)="groupSignupDetails = null"
 >
   <div class="card-content-padding org-signup">
     <es-info-message mode="warning" class="warning-email" *ngIf="!groupSignup.profile.groupEmail">
@@ -125,7 +125,7 @@
   [node]="groupSignup"
   [isCancelable]="true"
   [buttons]="signupListButtons"
-  (onCancel)="groupSignupListShown = false"
+  (cancel)="groupSignupListShown = false"
 >
   <div class="card-content-padding org-signup-list">
     <div class="actionbar">
@@ -165,7 +165,7 @@
   "
   [buttons]="editButtons"
   height="xlarge"
-  (onCancel)="cancelEdit()"
+  (cancel)="cancelEdit()"
 >
   <div class="card-content-padding card-edit">
     <form>
@@ -341,8 +341,8 @@
   width="xlarge"
   height="xlarge"
   [buttons]="memberButtons"
-  (onScrolled)="refreshMemberList()"
-  (onCancel)="cancelEditMembers()"
+  (scrolled)="refreshMemberList()"
+  (cancel)="cancelEditMembers()"
 >
   <div class="card-content-padding">
     <div class="memberActions">

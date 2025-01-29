@@ -10,14 +10,14 @@
   <div
     class="dropArea"
     [class.dropActive]="isFileOver"
-    fileDrop
-    (onFileDrop)="setFilesByFileList($event)"
+    esFileDrop
+    (fileDrop)="setFilesByFileList($event)"
     (click)="link ? null : fileSelect.click()"
     (fileOver)="isFileOver = $event"
   >
     <div *ngIf="selectedFiles.value?.length > 0">
       <div class="filename"><mat-icon>description</mat-icon> {{ selectedFiles.value[0].name }}</div>
-      <es-mat-link (click)="clearFile()">{{
+      <es-mat-link (clickOnLink)="clearFile()">{{
         'WORKSPACE.ADD_OBJECT_RESET' | translate
       }}</es-mat-link>
     </div>
@@ -25,7 +25,7 @@
       <div><i esIcon="cloud_upload"></i></div>
       <div *ngIf="supportsDrop">
         {{ 'WORKSPACE.ADD_OBJECT_MESSAGE' | translate }}
-        <es-mat-link (click)="fileSelect.click()">{{
+        <es-mat-link (clickOnLink)="fileSelect.click()">{{
           'WORKSPACE.ADD_OBJECT_BROWSE' | translate
         }}</es-mat-link>
       </div>

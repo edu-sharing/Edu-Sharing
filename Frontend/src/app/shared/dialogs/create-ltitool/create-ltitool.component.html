@@ -8,10 +8,10 @@
     [icon]="'create'"
     [buttons]="buttons"
     [isCancelable]="true"
-    (onCancel)="cancel()"
+    (cancel)="doCancel()"
   >
     <div class="card-content-padding">
-      <form (ngSubmit)="create()">
+      <form (ngSubmit)="doCreate()">
         <ul>
           <li *ngFor="let el of nodes; let i = index">
             <mat-form-field style="width: 100%">
@@ -30,7 +30,7 @@
         </ul>
         <mat-form-field
           style="width: 100%"
-          *ngIf="_tool.customContentOption && (!nodes || nodes.length == 0)"
+          *ngIf="_tool.customContentOption && (!nodes || nodes.length === 0)"
         >
           <mat-label>{{ 'NODE.cm:name' | translate }} </mat-label>
           <input

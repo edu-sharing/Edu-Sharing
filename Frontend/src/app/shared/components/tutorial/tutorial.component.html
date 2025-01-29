@@ -3,7 +3,7 @@
   *ngIf="show"
   [@fade]="show"
   [style.background]="background"
-  (click)="next()"
+  (click)="doNext()"
   cdkTrapFocus
 >
   <div
@@ -23,11 +23,17 @@
         color="primary"
         class="skip"
         *ngIf="showSkip"
-        (click)="skip()"
+        (click)="doSkip()"
       >
         {{ 'SKIP' | translate }}
       </button>
-      <button cdkMonitorElementFocus mat-flat-button color="primary" (click)="next()" class="next">
+      <button
+        cdkMonitorElementFocus
+        mat-flat-button
+        color="primary"
+        (click)="doNext()"
+        class="next"
+      >
         {{ 'NEXT' | translate }}
       </button>
     </div>

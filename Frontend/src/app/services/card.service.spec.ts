@@ -10,12 +10,12 @@ describe('CardService', () => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(CardService);
         scheduler = new TestScheduler((actual, expected) => {
-            expect(actual).toEqual(expected);
+            void expect(actual).toEqual(expected);
         });
     });
 
     it('should be created', () => {
-        expect(service).toBeTruthy();
+        void expect(service).toBeTruthy();
     });
 
     describe('hasOpenModals', () => {

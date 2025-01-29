@@ -20,7 +20,7 @@
       <div class="group groupInvite">
         <es-authority-search-input
           [globalSearchAllowed]="globalAllowed"
-          (onChooseAuthority)="addSuggestion($event)"
+          (chooseAuthority)="addSuggestion($event)"
         ></es-authority-search-input>
         <div class="hintNoFuzzy" *ngIf="globalSearch && !fuzzyAllowed">
           {{ 'WORKSPACE.SHARE.NO_FUZZY' | translate }}
@@ -180,7 +180,7 @@
       <es-mat-link
         *ngIf="_nodes && _nodes[0].ref.id"
         class="history uppercase"
-        (click)="showHistory()"
+        (clickOnLink)="showHistory()"
         >{{ 'WORKSPACE.SHARE.SHOW_HISTORY' | translate }} <i esIcon="arrow_forward"></i
       ></es-mat-link>
       <div class="groupName" *ngIf="owner">{{ 'WORKSPACE.SHARE.GROUP_OWNER' | translate }}</div>
@@ -273,7 +273,7 @@
 
       <ng-container *ngIf="showLink && link">
         <div class="groupName">{{ 'WORKSPACE.SHARE.LINK' | translate }}</div>
-        <es-mat-link class="manageLink uppercase" (click)="openShareLinkDialog()">{{
+        <es-mat-link class="manageLink uppercase" (clickOnLink)="openShareLinkDialog()">{{
           'WORKSPACE.SHARE.MANAGE_LINK' | translate
         }}</es-mat-link>
         <es-share-dialog-permission
@@ -296,7 +296,7 @@
         <es-mat-link
           class="manageLink uppercase"
           *ngIf="publishPermission && !isBulk() && !isSafe"
-          (click)="tab = 2"
+          (clickOnLink)="tab = 2"
         >
           {{ 'WORKSPACE.SHARE.MANAGE_PUBLISH' | translate }}</es-mat-link
         >

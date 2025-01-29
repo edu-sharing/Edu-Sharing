@@ -10,17 +10,17 @@
   *ngIf="createToolType != null"
   [tool]="createToolType"
   [parent]="_parent"
-  (onCancel)="cancelLtiTool($event)"
-  (onCreate)="createLtiTool($event)"
+  (cancel)="cancelLtiTool($event)"
+  (create)="createLtiTool($event)"
 >
 </es-create-ltitool>
 
 <div
   *ngIf="!(cardHasOpenModals$ | async)"
-  fileDrop
+  esFileDrop
   [window]="true"
   (fileOver)="fileIsOver = $event"
-  (onFileDrop)="onFileDrop($event)"
+  (fileDrop)="onFileDrop($event)"
 ></div>
 <div class="dialog darken drop-zone" *ngIf="fileIsOver">
   <div>

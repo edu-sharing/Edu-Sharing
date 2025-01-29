@@ -19,7 +19,7 @@ import {
     TranslationsService,
     UIConstants,
 } from 'ngx-edu-sharing-ui';
-import { Subject, combineLatest } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Node } from 'ngx-edu-sharing-api';
 import * as EduData from '../../core-module/core.module';
@@ -46,10 +46,7 @@ import { Toast } from '../../services/toast';
 import { BreadcrumbsService } from '../../shared/components/breadcrumbs/breadcrumbs.service';
 import { CollectionContentComponent } from './collection-content/collection-content.component';
 import { CollectionInfoBarComponent } from './collection-info-bar/collection-info-bar.component';
-import {
-    GlobalCollectionsPageService,
-    GlobalCollectionsPageServiceInternal,
-} from './global-collections-page.service';
+import { GlobalCollectionsPageServiceInternal } from './global-collections-page.service';
 
 // component class
 @Component({
@@ -246,7 +243,7 @@ export class CollectionsPageComponent implements OnDestroy {
             if (addToOther) {
                 params.addToOther = addToOther;
             }
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
                 queryParams: params,
             });
         });
@@ -301,7 +298,7 @@ export class CollectionsPageComponent implements OnDestroy {
 
     navigateToSearch() {
         UIHelper.getCommonParameters(this.route).subscribe((params) => {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], {
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], {
                 queryParams: params,
             });
         });
@@ -320,7 +317,7 @@ export class CollectionsPageComponent implements OnDestroy {
 
     collectionEdit(): void {
         if (this.isAllowedToEditCollection()) {
-            this.router.navigate(
+            void this.router.navigate(
                 [
                     UIConstants.ROUTER_PREFIX + 'collections/collection',
                     'edit',
@@ -338,7 +335,7 @@ export class CollectionsPageComponent implements OnDestroy {
 
     onCreateCollection() {
         UIHelper.getCommonParameters(this.route).subscribe((params) => {
-            this.router.navigate(
+            void this.router.navigate(
                 [
                     UIConstants.ROUTER_PREFIX + 'collections/collection',
                     'new',
@@ -360,7 +357,7 @@ export class CollectionsPageComponent implements OnDestroy {
     }
 
     refreshAll() {
-        this.displayCollectionById(this.collection.ref.id);
+        void this.displayCollectionById(this.collection.ref.id);
     }
 
     async displayCollectionById(id: string) {

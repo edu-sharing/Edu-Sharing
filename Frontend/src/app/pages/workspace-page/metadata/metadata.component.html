@@ -2,7 +2,7 @@
   <div class="header">
     <div class="name" data-test="workspace-sidebar-element-name">{{ data.name }}</div>
     <div class="close">
-      <button mat-icon-button (click)="close()"><i class="material-icons">close</i></button>
+      <button mat-icon-button (click)="doClose()"><i class="material-icons">close</i></button>
     </div>
   </div>
   <es-spinner *ngIf="loading"></es-spinner>
@@ -35,7 +35,7 @@
       <es-workspace-metadata-block
         class="content"
         [node]="nodeObject"
-        (onDisplay)="display()"
+        (onDisplay)="doDisplay()"
         (onEditMetadata)="edit()"
       ></es-workspace-metadata-block>
     </ng-template>

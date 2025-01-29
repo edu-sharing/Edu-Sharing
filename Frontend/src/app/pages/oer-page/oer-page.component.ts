@@ -1,7 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ListItem, OptionItem, Scope, TranslationsService, UIConstants } from 'ngx-edu-sharing-ui';
+import {
+    ListItem,
+    MdsHelperService,
+    OptionItem,
+    Scope,
+    TranslationsService,
+    UIConstants,
+} from 'ngx-edu-sharing-ui';
 import {
     NodeList,
     RestConnectorService,
@@ -12,7 +19,6 @@ import {
     TemporaryStorageService,
 } from '../../core-module/core.module';
 import { MainNavService } from '../../main/navigation/main-nav.service';
-import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import { Helper } from '../../core-module/rest/helper';
 import { NodeHelperService } from '../../services/node-helper.service';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -106,7 +112,7 @@ export class OerPageComponent implements OnInit, OnDestroy {
                 this.hasMore[i] = false;
             }
 
-            this.route.queryParams.forEach((params: Params) => {
+            void this.route.queryParams.forEach((params: Params) => {
                 for (let i = 0; i < this.TYPE_COUNT; i++) {
                     this.showMore[i] = params['showMore' + i] == 'true';
                 }
@@ -156,16 +162,16 @@ export class OerPageComponent implements OnInit, OnDestroy {
     }
 
     goToCollections() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
             queryParams: { mainnav: true },
         });
     }
     goToSearch() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'search']);
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'search']);
     }
     public routeSearch(query = this.currentQuery) {
         if (query) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], {
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'search'], {
                 queryParams: { query },
             });
             return;
@@ -174,7 +180,7 @@ export class OerPageComponent implements OnInit, OnDestroy {
         for (let i = 0; i < this.TYPE_COUNT; i++) {
             queryParams['showMore' + i] = this.showMore[i];
         }
-        this.router.navigate(['./'], { queryParams, relativeTo: this.route });
+        void this.router.navigate(['./'], { queryParams, relativeTo: this.route });
     }
     private checkMore() {}
     private search(string: string) {
@@ -262,7 +268,7 @@ export class OerPageComponent implements OnInit, OnDestroy {
     }
     loadMore(mode: number) {}
     private openNode(node: Node) {
-        this.router.navigate([this.nodeHelper.getNodeLink('routerLink', node)], {
+        void this.router.navigate([this.nodeHelper.getNodeLink('routerLink', node)], {
             queryParams: this.nodeHelper.getNodeLink('queryParams', node) as any,
         });
     }

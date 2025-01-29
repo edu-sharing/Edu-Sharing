@@ -15,10 +15,10 @@
   *ngIf="addToCollection"
   [@fromRight]="addToCollection"
   [title]="'WORKSPACE.SELECT_COLLECTION'"
-  (onCancel)="cancelAddToCollection()"
-  (onDrop)="addToCollectionList($event.target, $event.source, false)"
-  (onCreateCollection)="addToCollectionCreate($event)"
-  (onChoose)="addToCollectionList($event)"
+  (cancel)="cancelAddToCollection()"
+  (dropElement)="addToCollectionList($event.target, $event.source, false)"
+  (createCollection)="addToCollectionCreate($event)"
+  (choose)="addToCollectionList($event)"
 >
   <ng-template #beforeRecent let-currentRoot>
     <ng-container

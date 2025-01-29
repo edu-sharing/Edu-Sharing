@@ -1440,7 +1440,7 @@ export class CordovaService extends AppServiceAbstract {
 
     private goToLogin(next: string) {
         console.info('navigating to app login', next);
-        this.router.navigate([UIConstants.ROUTER_PREFIX, 'app'], {
+        void this.router.navigate([UIConstants.ROUTER_PREFIX, 'app'], {
             replaceUrl: true,
             queryParams: { next },
         });

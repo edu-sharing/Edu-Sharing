@@ -129,7 +129,7 @@ export class WorkspaceManagementDialogsComponent {
             nodes: this.addToCollection,
             callback: this.onStoredAddToCollection,
         });
-        this.router.navigate([
+        void this.router.navigate([
             UIConstants.ROUTER_PREFIX,
             'collections',
             'collection',
@@ -220,7 +220,7 @@ export class WorkspaceManagementDialogsComponent {
     }
 
     declineProposals(nodes: ProposalNode[]) {
-        this.errorProcessing
+        void this.errorProcessing
             .handleRestRequest(
                 observableForkJoin(
                     nodes.map((n) =>
@@ -242,7 +242,7 @@ export class WorkspaceManagementDialogsComponent {
     }
 
     addProposalsToCollection(nodes: ProposalNode[]) {
-        this.errorProcessing
+        void this.errorProcessing
             .handleRestRequest(
                 observableForkJoin(
                     nodes.map((n) =>
@@ -258,7 +258,7 @@ export class WorkspaceManagementDialogsComponent {
                 ),
             )
             .then(() => {
-                this.errorProcessing
+                void this.errorProcessing
                     .handleRestRequest(
                         observableForkJoin(
                             nodes.map((n) =>

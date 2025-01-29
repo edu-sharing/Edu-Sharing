@@ -115,7 +115,9 @@
             [homeRouterLink]="{ routerLink: ['.'], queryParams: { scope: tabSelected } }"
             [invisibleDescription]="true"
             [canDropNodes]="collectionContentComponent.canDropOnCollectionBreadcrumbs"
-            (onDrop)="collectionContentComponent.dropOnCollection($event.target, $event.source)"
+            (dropElement)="
+              collectionContentComponent.dropOnCollection($event.target, $event.source)
+            "
           ></es-breadcrumbs>
         </div>
         <es-collection-content

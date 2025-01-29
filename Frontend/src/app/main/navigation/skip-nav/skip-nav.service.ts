@@ -94,6 +94,6 @@ export class SkipNavService {
                 availableTargets.push(target);
             }
         }
-        Promise.resolve().then(() => this.availableTargetsSubject.next(availableTargets));
+        void Promise.resolve().then(() => this.availableTargetsSubject.next(availableTargets));
     }
 }

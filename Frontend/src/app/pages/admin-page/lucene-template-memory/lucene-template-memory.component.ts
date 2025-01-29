@@ -143,7 +143,7 @@ export class LuceneTemplateMemoryComponent implements OnInit {
                 );
                 return;
             }
-            this.confirmUpdateTemplate(this.newTemplateName).then((isUpdated) => {
+            void this.confirmUpdateTemplate(this.newTemplateName).then((isUpdated) => {
                 if (isUpdated) {
                     this.closeNewTemplateDialog();
                 }
@@ -233,6 +233,6 @@ export class LuceneTemplateMemoryComponent implements OnInit {
         Object.keys(this.templates)
             .filter((t) => !this.templates[t].isDefault)
             .forEach((t) => (storeTemplates[t] = this.templates[t]));
-        this.storage.set(LuceneTemplateMemoryComponent.STORAGE_KEY, storeTemplates);
+        void this.storage.set(LuceneTemplateMemoryComponent.STORAGE_KEY, storeTemplates);
     }
 }

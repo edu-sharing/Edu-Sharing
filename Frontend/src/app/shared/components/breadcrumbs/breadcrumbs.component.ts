@@ -77,11 +77,11 @@ export class BreadcrumbsComponent {
      *
      * Passes the index **starting at 1** of the clicked breadcrumb, or 0 for the root element.
      */
-    @Output() onClick = new EventEmitter<number>();
+    @Output() clickBreadcrumb = new EventEmitter<number>();
     /**
      * Called when an item is dropped on the breadcrumbs.
      */
-    @Output() onDrop = new EventEmitter<{ target: Node | 'HOME'; source: DropSource<Node> }>();
+    @Output() dropElement = new EventEmitter<{ target: Node | 'HOME'; source: DropSource<Node> }>();
 
     readonly HOME = 'HOME' as 'HOME';
     nodes: Node[] = [];
@@ -103,7 +103,7 @@ export class BreadcrumbsComponent {
     }
 
     openBreadcrumb(position: number) {
-        this.onClick.emit(position);
+        this.clickBreadcrumb.emit(position);
     }
 
     private addSearch() {
@@ -128,7 +128,7 @@ export class BreadcrumbsComponent {
     }
 
     onDropped(dragData: DragData<'HOME' | Node>) {
-        this.onDrop.emit({
+        this.dropElement.emit({
             target: dragData.target,
             source: {
                 element: dragData.draggedNodes,

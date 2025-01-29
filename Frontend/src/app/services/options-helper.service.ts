@@ -3,9 +3,9 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import {
     LtiPlatformService,
+    Node,
     NodeListErrorResponses,
     NodeListService,
-    Node,
 } from 'ngx-edu-sharing-api';
 import {
     ClipboardObject,
@@ -347,7 +347,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
 
         options = this.applyExternalOptions(options, data);
         const custom = this.configService.instant<ConfigOptionItem[]>('customOptions');
-        this.nodeHelper.applyCustomNodeOptions(custom, data.allObjects, objects, options);
+        void this.nodeHelper.applyCustomNodeOptions(custom, data.allObjects, objects, options);
         // do pre-handle callback options for dropdown + actionbar
         options = await this.filterOptions(options, target, data, objects);
         if (target !== Target.Actionbar) {
@@ -559,7 +559,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
                     console.warn(e);
                 }
             }
-            this.dialogs.openNodeInfoDialog({ nodes });
+            void this.dialogs.openNodeInfoDialog({ nodes });
         });
         debugNode.elementType = [
             ElementType.Node,
@@ -727,7 +727,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         openNode.priority = 30;
 
         const editConnectorNode = new OptionItem('OPTIONS.OPEN', 'launch', (node) => {
-            this.editConnector(this.getObjects(node, data)[0]);
+            void this.editConnector(this.getObjects(node, data)[0]);
         });
         editConnectorNode.customShowCallback = async (nodes) => {
             let n = nodes ? nodes[0] : null;
@@ -802,7 +802,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
 
         const addNodeToLTIPlatform = new OptionItem('OPTIONS.LTI', 'input', (object) => {
             const nodes: Node[] = this.getObjects(object, data);
-            this.nodeHelper.addNodesToLTIPlatform(nodes);
+            void this.nodeHelper.addNodesToLTIPlatform(nodes);
         });
         addNodeToLTIPlatform.elementType = OptionsHelperService.ElementTypesAddToCollection;
         addNodeToLTIPlatform.permissions = [RestConstants.ACCESS_CC_PUBLISH];
@@ -1266,7 +1266,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
 
         const qrCodeNode = new OptionItem('OPTIONS.QR_CODE', 'edu-qr_code', (node) => {
             node = this.getObjects(node, data)[0];
-            this.dialogs.openQrDialog({ node });
+            void this.dialogs.openQrDialog({ node });
         });
         qrCodeNode.constrains = [Constrain.NoBulk];
         qrCodeNode.scopes = [Scope.Render, Scope.CollectionsCollection];
@@ -1275,7 +1275,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
 
         const embedNode = new OptionItem('OPTIONS.EMBED', 'perm_media', (node) => {
             node = this.getObjects(node, data)[0];
-            this.dialogs.openNodeEmbedDialog({ node });
+            void this.dialogs.openNodeEmbedDialog({ node });
         });
         embedNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         embedNode.constrains = [Constrain.NoBulk, Constrain.HomeRepository];

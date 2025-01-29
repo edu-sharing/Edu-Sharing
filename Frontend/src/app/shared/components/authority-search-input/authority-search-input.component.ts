@@ -71,7 +71,7 @@ export class AuthoritySearchInputComponent {
     @Input() placeholder = 'WORKSPACE.INVITE_FIELD';
     @Input() hint = '';
 
-    @Output() onChooseAuthority = new EventEmitter<Authority | any>();
+    @Output() chooseAuthority = new EventEmitter<Authority | any>();
 
     input = new UntypedFormControl('');
     suggestionGroups$: Observable<SuggestionResult>;
@@ -102,14 +102,14 @@ export class AuthoritySearchInputComponent {
     }
 
     addSuggestion(data: any) {
-        this.onChooseAuthority.emit(data.originalObject);
+        this.chooseAuthority.emit(data.originalObject);
     }
 
     addAny(data: string) {
         const authority = new Authority();
         authority.authorityName = data;
         authority.authorityType = RestConstants.AUTHORITY_TYPE_UNKNOWN;
-        this.onChooseAuthority.emit(authority);
+        this.chooseAuthority.emit(authority);
     }
 
     onSubmit() {

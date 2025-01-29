@@ -36,10 +36,10 @@ export class TutorialComponent {
     @Input() description: string;
     config: ConfigTutorial;
     @Input() set element(element: ElementRef) {
-        this.setElement(element);
+        void this.setElement(element);
     }
-    @Output() onNext = new EventEmitter();
-    @Output() onSkip = new EventEmitter();
+    @Output() next = new EventEmitter<void>();
+    @Output() skip = new EventEmitter<void>();
 
     background: SafeStyle;
     show = false;
@@ -60,7 +60,7 @@ export class TutorialComponent {
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.key === 'Escape' && this.show) {
-            this.next();
+            this.doNext();
             event.preventDefault();
             event.stopPropagation();
         }
@@ -82,14 +82,14 @@ export class TutorialComponent {
         TutorialComponent.activeTutorial = null;
     }
 
-    skip() {
+    doSkip() {
         this.finish();
-        this.onSkip.emit();
+        this.skip.emit();
     }
 
-    next() {
+    doNext() {
         this.finish();
-        this.onNext.emit();
+        this.next.emit();
     }
 
     private async setElement(element: ElementRef) {
