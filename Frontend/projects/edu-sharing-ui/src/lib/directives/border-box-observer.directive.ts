@@ -1,5 +1,5 @@
 import { Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { ReplaySubject, Observable } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 interface BorderBox {
@@ -41,7 +41,7 @@ export class BorderBoxObserverDirective implements OnInit, OnDestroy {
         this.registerEventEmitter();
         this.registerObserver();
         // Can cause changed-after-checked errors if done synchronously.
-        Promise.resolve().then(() => this.setInitialValue());
+        void Promise.resolve().then(() => this.setInitialValue());
     }
 
     ngOnDestroy(): void {

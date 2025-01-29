@@ -177,6 +177,6 @@
     [columns]="columns"
     [sortBy]="sortInfo.name"
     [sortAscending]="sortInfo.ascending"
-    (onSort)="callback.emit($event)"
+    (sort)="callback.emit($event)"
   ></es-sort-dropdown>
 </ng-template>

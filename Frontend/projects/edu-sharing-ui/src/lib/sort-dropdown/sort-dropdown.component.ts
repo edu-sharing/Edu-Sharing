@@ -17,7 +17,7 @@ export class SortDropdownComponent {
     @Input() sortBy: string;
     @Input() sortAscending: boolean;
 
-    @Output() onSort = new EventEmitter<SortEvent>();
+    @Output() sort = new EventEmitter<SortEvent>();
 
     constructor() {}
 
@@ -37,6 +37,6 @@ export class SortDropdownComponent {
             ascending = itemAscending;
         }
         (item as SortEvent).ascending = ascending;
-        this.onSort.emit(item);
+        this.sort.emit(item);
     }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Target } from '../../types/option-item';
 import { ClickSource, InteractionType } from '../entries-model';
 
@@ -12,7 +12,7 @@ import { Node } from 'ngx-edu-sharing-api';
     templateUrl: 'node-entries-card-small.component.html',
     styleUrls: ['node-entries-card-small.component.scss'],
 })
-export class NodeEntriesCardSmallComponent<T extends Node> implements OnChanges {
+export class NodeEntriesCardSmallComponent<T extends Node> {
     readonly ClickSource = ClickSource;
     readonly InteractionType = InteractionType;
     readonly Target = Target;
@@ -23,7 +23,6 @@ export class NodeEntriesCardSmallComponent<T extends Node> implements OnChanges 
         public templatesService: NodeEntriesTemplatesService,
     ) {}
 
-    ngOnChanges(changes: SimpleChanges): void {}
     optionsOnCard() {
         const options = this.entriesService.options[Target.List];
         const always = options.filter((o) => o.showAlways);
