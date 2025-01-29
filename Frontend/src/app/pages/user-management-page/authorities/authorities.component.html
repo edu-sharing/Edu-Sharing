@@ -450,3 +450,45 @@
     </h5>
   </ng-template>
 </es-node-entries-wrapper>
+<ng-template #exclude>
+  <form [formGroup]="excludeForm" class="exclude-form" *ngIf="isAdmin">
+    <es-info-message mode="info" class="description">{{
+      'PERMISSIONS.EXCLUDE.DESCRIPTION' | translate
+    }}</es-info-message>
+    <mat-form-field>
+      <mat-label>{{ 'PERMISSIONS.EXCLUDE.MODE_LABEL' | translate }}</mat-label>
+      <mat-select formControlName="mode">
+        <mat-option value="none">{{ 'PERMISSIONS.EXCLUDE.MODE.NONE' | translate }}</mat-option>
+        <mat-option value="assign">{{ 'PERMISSIONS.EXCLUDE.MODE.ASSIGN' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <ng-container *ngIf="excludeForm.get('mode').value === 'assign'">
+      <es-authority-search-input
+        [mode]="AuthoritySearchMode.Users"
+        label="{{ 'PERMISSIONS.EXCLUDE.ASSIGN_USER' | translate }}"
+        placeholder="{{ 'PERMISSIONS.EXCLUDE.ASSIGN_USER_PLACEHOLDER' | translate }}"
+        [showRecent]="false"
+        (onChooseAuthority)="setExcludeReceiver($event)"
+      ></es-authority-search-input>
+      <mat-chip-listbox>
+        <mat-chip-option
+          [selectable]="false"
+          *ngIf="excludeReceiver"
+          (removed)="excludeReceiver = null"
+        >
+          <span>{{ excludeReceiver | authorityName }}</span>
+          <i matChipRemove esIcon="cancel"></i>
+        </mat-chip-option>
+      </mat-chip-listbox>
+      <es-info-message
+        *ngIf="excludeReceiver && !receiverIsMemberOfOrg"
+        class="wrong-user"
+        mode="warning"
+        >{{
+          'PERMISSIONS.EXCLUDE.ASSIGN_USER_NOT_ORG_MEMBER'
+            | translate : { user: excludeReceiver | authorityName, org: org | authorityName }
+        }}</es-info-message
+      >
+    </ng-container>
+  </form>
+</ng-template>

@@ -148,6 +148,19 @@
         "ADD_LABEL": "Toolpermission-Name"
       }
     },
+    "EXCLUDE": {
+      "TITLE": "Person aus Organisation ausschließen",
+      "DESCRIPTION": "Durch das Ausschließen verliert die gewählte Person Zugriff auf den Organisationsordner in \"Gemeinsame Inhalte\" und Freigaben an diese Organisation. Eventuell explizite Freigaben an die Person bleiben weiterhin für die Person zugreifbar.\n\nIm Modus \"Inhalte an andere Person zuweisen\" werden alle Inhalte, die diese Person innerhalb des Organisationsordners angelegt hat, einer anderen Person mit vollständigen Rechten zugewiesen.",
+      "MODE_LABEL": "Modus für Elemente der Person",
+      "MODE": {
+        "NONE": "Elemente nicht verändern",
+        "ASSIGN": "Inhalte an andere Person zuweisen"
+      },
+      "ASSIGN_USER": "Empfänger der Elemente",
+      "ASSIGN_USER_PLACEHOLDER": "Person suchen...",
+      "ERROR_MISSING_RECEIVER": "Bitte geben Sie einen Empfänger an",
+      "ASSIGN_USER_NOT_ORG_MEMBER": "Die gewählte Person \"{{user}}\" ist kein Mitglied der Organisation \"{{org}}\". Prüfen Sie bitte sorgfältig, ob die gewählte Person dennoch als Empfänger verwendet werden soll."
+    },
     "DELETE": {
       "MAIN_HEADING": "Nutzer{{GENDER_SEPARATOR}}in & Daten löschen",
       "USER_LIST": "Vorgang für folgende Benutzer & deren Daten durchführen",

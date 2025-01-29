@@ -232,3 +232,21 @@ label.search {
 #groupType {
     margin-bottom: 20px;
 }
+.exclude-form {
+    display: flex;
+    flex-direction: column;
+    es-info-message {
+        &.description {
+            padding-bottom: 20px;
+            ::ng-deep .message-container {
+                white-space: pre-line;
+            }
+        }
+        &.wrong-user {
+            padding-top: 20px;
+        }
+    }
+    mat-form-field {
+        width: 100%;
+    }
+}

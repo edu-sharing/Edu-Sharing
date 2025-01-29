@@ -44,6 +44,8 @@ export {
     TrackingV1Service,
     NotificationV1Service,
     FeedbackV1Service,
+    IamV1Service,
+    OrganizationV1Service,
     NodeV1Service as NodeServiceUnwrapped,
     SuggestionsV1Service,
     LtiPlatformV13Service,

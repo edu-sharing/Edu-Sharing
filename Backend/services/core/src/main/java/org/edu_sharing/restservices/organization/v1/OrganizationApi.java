@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.apache.log4j.Logger;
 import org.edu_sharing.repository.client.rpc.EduGroup;
@@ -17,6 +21,7 @@ import org.edu_sharing.restservices.OrganizationDao;
 import org.edu_sharing.restservices.RepositoryDao;
 import org.edu_sharing.restservices.RestConstants;
 import org.edu_sharing.restservices.organization.v1.model.OrganizationEntries;
+import org.edu_sharing.restservices.organization.v1.model.OrganizationUserDeprovisioning;
 import org.edu_sharing.restservices.shared.ErrorResponse;
 import org.edu_sharing.restservices.shared.NodeRef;
 import org.edu_sharing.restservices.shared.Organization;
@@ -27,10 +32,6 @@ import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.service.search.model.SearchResult;
 import org.edu_sharing.service.search.model.SortDefinition;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -224,7 +225,7 @@ public class OrganizationApi  {
     @DELETE
     @Path("/organizations/{repository}/{organization}/member/{member}")
         
-    @Operation(summary = "Remove member from organization.", description = "Remove member from organization.")
+    @Operation(summary = "Remove member from organization.", description = "Remove member from organization. Requires at least admin permissions for the organization. For mode assign, full admin rights are required")
     
     @ApiResponses(
     	value = { 
@@ -239,13 +240,14 @@ public class OrganizationApi  {
     		@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
     		@Parameter(description = "groupname",required=true) @PathParam("organization") String organization,
     		@Parameter(description = "authorityName of member",required=true ) @PathParam("member") String member,
+    		@Parameter(description = "deprovisioning details") OrganizationUserDeprovisioning deprovisioning,
     		@Context HttpServletRequest req) {
 
     	try {
     		
 	    	RepositoryDao repoDao = RepositoryDao.getRepository(repository);
 	    	OrganizationDao organizationDao = OrganizationDao.getInstant(repoDao, organization);
-	    	organizationDao.removeMember(member);
+	    	organizationDao.removeMember(member, deprovisioning);
 	    	return Response.status(Response.Status.OK).build();
 	    	
     	}  catch (Throwable t) {

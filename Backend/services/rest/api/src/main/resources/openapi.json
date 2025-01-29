@@ -4299,6 +4299,23 @@
         ],
         "type": "object"
       },
+      "OrganizationUserDeprovisioning": {
+        "properties": {
+          "mode": {
+            "description": "Shall the user data within this organization be cleaned up",
+            "enum": [
+              "none",
+              "assign"
+            ],
+            "type": "string"
+          },
+          "receiver": {
+            "description": "Receiver authority if mode == assign",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Pageable": {
         "properties": {
           "offset": {
@@ -31301,6 +31318,16 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationUserDeprovisioning"
+              }
+            }
+          },
+          "description": "deprovisioning details"
+        },
         "responses": {
           "200": {
             "content": {
