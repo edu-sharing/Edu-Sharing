@@ -11,7 +11,7 @@
       "parserOptions": {
         "project": [
           "projects/edu-sharing-ui/tsconfig.lib.json",
-          "projects/edu-sharing-ui/tsconfig.spec.json"
+          "projects/edu-sharing-ui/tsconfig.lint.json"
         ],
         "createDefaultProgram": true
       },

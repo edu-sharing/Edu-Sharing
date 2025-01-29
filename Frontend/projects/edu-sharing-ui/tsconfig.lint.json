@@ -14,10 +14,9 @@
     }
   },
   "files": [
-    "src/test.ts",
+    "src/test.ts"
   ],
   "include": [
-    "**/*.spec.ts",
-    "**/*.d.ts"
+    "**/*.ts"
   ]
 }
