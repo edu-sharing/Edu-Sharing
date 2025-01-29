@@ -6,15 +6,14 @@ import {
     DialogButton,
     MdsInfo,
     MdsMetadatasets,
-    Node,
     RestConstants,
     RestMdsService,
 } from '../../../../core-module/core.module';
+import { ConfigService, Node } from 'ngx-edu-sharing-api';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';
 import { CARD_DIALOG_DATA } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { AddFolderDialogData, AddFolderDialogResult } from './add-folder-dialog-data';
-import { ConfigService } from 'ngx-edu-sharing-api';
 
 @Component({
     selector: 'es-add-folder-dialog',

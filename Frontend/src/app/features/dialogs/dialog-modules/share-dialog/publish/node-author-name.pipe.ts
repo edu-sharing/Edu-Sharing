@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
-import { Node } from '../../../../../core-module/rest/data-object';
+import { Node } from 'ngx-edu-sharing-api';
 import { VCard } from 'ngx-edu-sharing-ui';
 
 /**

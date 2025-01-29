@@ -3,15 +3,14 @@ import { Component, Inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {
     DialogButton,
-    Node,
     NodeList,
-    NodeWrapper,
     RestCollectionService,
     RestConstants,
     RestHelper,
     RestNodeService,
     RestSearchService,
 } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { Helper } from '../../../../core-module/rest/helper';
 import { Toast } from '../../../../services/toast';
 import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config';
@@ -76,14 +75,12 @@ export class PinnedCollectionsDialogComponent {
                         return;
                     }
                 }
-                this.node
-                    .getNodeMetadata(this.data.collection.ref.id)
-                    .subscribe((add: NodeWrapper) => {
-                        this.pinnedCollections.splice(0, 0, add.node);
-                        this.updateSubtitle();
-                        this.dialogRef.patchState({ isLoading: false });
-                        this.setAllChecked();
-                    });
+                this.node.getNodeMetadata(this.data.collection.ref.id).subscribe((add) => {
+                    this.pinnedCollections.splice(0, 0, add.node);
+                    this.updateSubtitle();
+                    this.dialogRef.patchState({ isLoading: false });
+                    this.setAllChecked();
+                });
             });
     }
 

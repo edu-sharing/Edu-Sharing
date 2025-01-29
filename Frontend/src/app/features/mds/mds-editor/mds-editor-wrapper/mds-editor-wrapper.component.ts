@@ -1,17 +1,8 @@
-import {
-    Component,
-    EventEmitter,
-    Input,
-    OnDestroy,
-    OnInit,
-    Output,
-    ViewChild,
-} from '@angular/core';
-import { FacetAggregation, SearchService } from 'ngx-edu-sharing-api';
-import * as rxjs from 'rxjs';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Node, SearchService } from 'ngx-edu-sharing-api';
 import { Subject } from 'rxjs';
-import { first, map, switchMap, takeUntil } from 'rxjs/operators';
-import { Node, RestConstants } from '../../../../core-module/core.module';
+import { first } from 'rxjs/operators';
+import { RestConstants } from '../../../../core-module/core.module';
 import { Toast } from '../../../../services/toast';
 import { MdsEditorInstanceService } from '../mds-editor-instance.service';
 import {
@@ -19,7 +10,6 @@ import {
     EditorMode,
     EditorType,
     MdsWidget,
-    MdsWidgetValue,
     UserPresentableError,
     Values,
 } from '../../types/types';

@@ -1,5 +1,4 @@
-import { Acl } from 'ngx-edu-sharing-api';
-import { Node } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { ExtendedAcl } from './share-dialog.component';
 
 export class ShareDialogData {

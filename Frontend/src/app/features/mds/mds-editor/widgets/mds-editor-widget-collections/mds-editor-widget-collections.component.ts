@@ -1,17 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { distinctUntilChanged, filter } from 'rxjs/operators';
-import { Collection, Node } from '../../../../../core-module/rest/data-object';
+import { Node, RestConstants, UsageV1Service } from 'ngx-edu-sharing-api';
 import { MdsEditorInstanceService } from '../../mds-editor-instance.service';
 import { NativeWidgetComponent } from '../../mds-editor-view/mds-editor-view.component';
-import { NodeEntries, UsageV1Service } from 'ngx-edu-sharing-api';
 import {
     InteractionType,
     ListItem,
     NodeDataSource,
     NodeEntriesDisplayType,
 } from 'ngx-edu-sharing-ui';
-import { RestConstants } from 'ngx-edu-sharing-api';
 
 @Component({
     selector: 'es-mds-editor-widget-collections',

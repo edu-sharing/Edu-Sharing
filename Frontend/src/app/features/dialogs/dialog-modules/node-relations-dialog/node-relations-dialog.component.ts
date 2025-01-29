@@ -6,14 +6,13 @@ import {
     OnInit,
 } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { NodeService, RelationData, RelationService, UserService } from 'ngx-edu-sharing-api';
+import { Node, NodeService, RelationData, RelationService, UserService } from 'ngx-edu-sharing-api';
 import { forkJoin } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { UniversalNode } from '../../../../core-module/rest/definitions';
 import { BridgeService } from '../../../../services/bridge.service';
 import {
     DialogButton,
-    Node,
     RestConstants,
     RestHelper,
     SearchRequestCriteria,

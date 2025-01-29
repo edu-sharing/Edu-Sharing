@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DialogButton, Node, RestConstants } from '../../../core-module/core.module';
+import { DialogButton, RestConstants } from '../../../core-module/core.module';
 import { Toast } from '../../../services/toast';
-import { FeedbackData, FeedbackV1Service } from 'ngx-edu-sharing-api';
+import { FeedbackData, FeedbackV1Service, Node } from 'ngx-edu-sharing-api';
 
 @Component({
     selector: 'es-view-material-feedback',

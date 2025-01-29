@@ -6,7 +6,6 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
     DialogButton,
-    Node,
     NodeList,
     RestCollectionService,
     RestConnectorService,
@@ -14,6 +13,7 @@ import {
     RestNodeService,
 } from '../../../../core-module/core.module';
 import { Toast } from '../../../../services/toast';
+import { Node } from 'ngx-edu-sharing-api';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';
 import { WorkspaceExplorerComponent } from '../../../../pages/workspace-page/explorer/explorer.component';
 import { CARD_DIALOG_DATA, CardDialogConfig } from '../../card-dialog/card-dialog-config';
@@ -379,7 +379,7 @@ export class FileChooserDialogComponent implements OnInit, AfterViewInit {
             } else {
                 return this.nodeApi
                     .getNodeMetadata(this.homeDirectory)
-                    .pipe(map((nodeWrapper) => nodeWrapper.node));
+                    .pipe(map((nodeWrapper) => nodeWrapper.node as Node));
             }
         })().subscribe((node) => {
             if (this.data.collections) {

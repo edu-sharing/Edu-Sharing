@@ -2,11 +2,11 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {
     DialogButton,
-    Node,
     NodeShare,
     RestConstants,
     RestNodeService,
 } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { DateHelper } from 'ngx-edu-sharing-ui';
 import { Toast } from '../../../../services/toast';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';

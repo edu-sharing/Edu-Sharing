@@ -14,12 +14,18 @@ import { UntypedFormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
 import { RestSearchService } from '../../../../../core-module/rest/services/rest-search.service';
-import { Node, SearchRequestCriteria } from '../../../../../core-module/rest/data-object';
+import { SearchRequestCriteria } from '../../../../../core-module/rest/data-object';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
-import { MdsHelperService, SearchHelperService } from 'ngx-edu-sharing-ui';
+import {
+    ListItem,
+    MdsHelperService,
+    NodesRightMode,
+    SearchHelperService,
+    UIAnimation,
+} from 'ngx-edu-sharing-ui';
 import { RestMdsService } from '../../../../../core-module/rest/services/rest-mds.service';
 import { TranslateService } from '@ngx-translate/core';
-import { ListItem, NodesRightMode, UIAnimation } from 'ngx-edu-sharing-ui';
+import { Node } from 'ngx-edu-sharing-api';
 import { NodeHelperService } from '../../../../../services/node-helper.service';
 import { trigger } from '@angular/animations';
 import { MdsEditorWrapperComponent } from '../../../../mds/mds-editor/mds-editor-wrapper/mds-editor-wrapper.component';

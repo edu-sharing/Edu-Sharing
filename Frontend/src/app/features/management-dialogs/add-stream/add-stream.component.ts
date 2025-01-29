@@ -1,21 +1,18 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
     AuthorityProfile,
-    ConfigurationService,
     DialogButton,
     LoginResult,
-    Node,
     RestConnectorService,
     RestConstants,
     RestHelper,
-    RestIamService,
-    RestNodeService,
     RestStreamService,
     STREAM_STATUS,
 } from '../../../core-module/core.module';
 import { Toast } from '../../../services/toast';
 import { trigger } from '@angular/animations';
 import { Helper } from '../../../core-module/rest/helper';
+import { Node } from 'ngx-edu-sharing-api';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
 
 @Component({

@@ -1,13 +1,14 @@
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import {
-    AuthenticationService,
     AboutService,
+    AuthenticationService,
     ConfigService,
     FacetsDict,
-    LoginInfo,
     HOME_REPOSITORY,
+    LoginInfo,
     MdsService,
     MdsViewRelation,
+    Node,
     NodeSuggestionResponseDto,
     SuggestionResponseDto,
     SuggestionsV1Service,
@@ -40,7 +41,6 @@ import {
     ConfigurationHelper,
     ConfigurationService,
     MdsValueList,
-    Node,
     RestConnectorService,
     RestConstants,
     RestMdsService,
@@ -1701,7 +1701,7 @@ export class MdsEditorInstanceService implements OnDestroy {
                 const condition = widget.condition;
                 const pattern = condition.pattern ? new RegExp(`^(?:${condition.pattern})$`) : null;
                 return nodes
-                    ? nodes.some((n) => pattern.test(n.properties[condition.value])) !==
+                    ? nodes.some((n) => pattern.test(n.properties[condition.value]?.join(', '))) !==
                           condition.negate
                     : values
                     ? widget.condition.negate === !values[widget.condition.value]

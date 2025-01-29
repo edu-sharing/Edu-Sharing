@@ -1,15 +1,11 @@
 import { Injectable } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-    Node,
-    RestConstants,
-    RestMdsService,
-    RestNodeService,
-} from '../../../core-module/core.module';
+import { RestConstants, RestMdsService, RestNodeService } from '../../../core-module/core.module';
 import { MdsType, Values } from '../types/types';
 import {
     HOME_REPOSITORY,
+    Node,
     NodeSuggestionResponseDto,
     SuggestionsV1Service,
 } from 'ngx-edu-sharing-api';

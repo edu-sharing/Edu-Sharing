@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
-import { Node } from '../../../../../core-module/rest/data-object';
+import { Node } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
 import { RestConnectorService } from '../../../../../core-module/rest/services/rest-connector.service';
 import { NodeHelperService } from '../../../../../services/node-helper.service';

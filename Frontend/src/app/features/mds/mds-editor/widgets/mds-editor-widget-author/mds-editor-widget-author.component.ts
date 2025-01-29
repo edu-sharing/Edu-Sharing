@@ -1,8 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 import { BehaviorSubject } from 'rxjs';
-import { filter, first, tap } from 'rxjs/operators';
-import { Node } from '../../../../../core-module/rest/data-object';
+import { filter, tap } from 'rxjs/operators';
+import { Node } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
 import { RestIamService } from '../../../../../core-module/rest/services/rest-iam.service';
 import { UIService } from '../../../../../core-module/rest/services/ui.service';

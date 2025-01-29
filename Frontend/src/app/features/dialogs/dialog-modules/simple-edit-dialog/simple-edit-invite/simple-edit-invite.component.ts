@@ -1,14 +1,13 @@
 import { trigger } from '@angular/animations';
 import { ApplicationRef, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatButtonToggleGroup } from '@angular/material/button-toggle';
-import { Ace, Acl, AuthenticationService, NodeService } from 'ngx-edu-sharing-api';
+import { Ace, Acl, AuthenticationService, Node, NodeService } from 'ngx-edu-sharing-api';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
 import { forkJoin, Observable } from 'rxjs';
 import {
     AuthorityProfile,
     ConfigurationService,
     Group,
-    Node,
     Organization,
     RestConnectorService,
     RestConstants,

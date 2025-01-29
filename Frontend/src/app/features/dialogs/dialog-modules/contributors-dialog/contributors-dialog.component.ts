@@ -1,11 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
-import {
-    DialogButton,
-    Node,
-    RestConstants,
-    RestNodeService,
-} from '../../../../core-module/core.module';
+import { DialogButton, RestConstants, RestNodeService } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { LocalEventsService, VCard } from 'ngx-edu-sharing-ui';
 import { Toast } from '../../../../services/toast';
 import { CARD_DIALOG_DATA, CardDialogConfig, Closable } from '../../card-dialog/card-dialog-config';

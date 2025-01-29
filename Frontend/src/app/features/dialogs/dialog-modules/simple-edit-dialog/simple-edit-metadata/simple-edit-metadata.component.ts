@@ -1,10 +1,11 @@
 import { trigger } from '@angular/animations';
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
-import { Observable, forkJoin, from, of } from 'rxjs';
+import { forkJoin, from, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { Node, RestConstants, RestNodeService } from '../../../../../core-module/core.module';
+import { RestConstants, RestNodeService } from '../../../../../core-module/core.module';
 import { Toast } from '../../../../../services/toast';
+import { Node } from 'ngx-edu-sharing-api';
 import { MdsEditorWrapperComponent } from '../../../../../features/mds/mds-editor/mds-editor-wrapper/mds-editor-wrapper.component';
 import { BulkBehavior } from '../../../../../features/mds/types/types';
 

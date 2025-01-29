@@ -6,7 +6,6 @@ import {
     Connector,
     DialogButton,
     FrameEventsService,
-    Node,
     RestConnectorService,
     RestConnectorsService,
     RestConstants,
@@ -14,6 +13,7 @@ import {
     RestIamService,
     RestNodeService,
 } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { NodeHelperService } from '../../../../services/node-helper.service';
 import { Toast } from '../../../../services/toast';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';

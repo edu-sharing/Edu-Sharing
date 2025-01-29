@@ -1,4 +1,4 @@
-import { Node } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 
 export interface ContributorsDialogData {
     /** Provide either a node object or the node id. */

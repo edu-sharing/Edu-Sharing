@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { NodeService } from 'ngx-edu-sharing-api';
-import { Node } from '../../../../../core-module/rest/data-object';
+import { Node, NodeService } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../../../core-module/rest/rest-constants';
 
 @Component({

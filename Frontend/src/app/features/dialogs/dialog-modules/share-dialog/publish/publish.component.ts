@@ -33,9 +33,9 @@ import { OPEN_URL_MODE } from 'ngx-edu-sharing-ui';
 import { YES_OR_NO } from '../../generic-dialog/generic-dialog-data';
 import { ExtendedAce } from '../share-dialog.component';
 
-class PublishedNode extends Node {
+type PublishedNode = Node & {
     status?: 'new' | 'update' | null; // flag if this node is manually added later and didn't came from the repo
-}
+};
 
 @Component({
     selector: 'es-share-dialog-publish',

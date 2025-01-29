@@ -11,7 +11,7 @@ import { LicenseDialogData, LicenseDialogResult } from './license-dialog-data';
 
 import { TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
-import { Node } from 'ngx-edu-sharing-api';
+import { Acl, MdsWidget, Node, NodeService } from 'ngx-edu-sharing-api';
 import { map } from 'rxjs/operators';
 import {
     ConfigurationService,
@@ -30,7 +30,6 @@ import { UserPresentableError } from '../../../../features/mds/mds-editor/mds-ed
 import { MdsEditorInstanceService } from '../../../../features/mds/mds-editor/mds-editor-instance.service';
 import { ViewInstanceService } from '../../../../features/mds/mds-editor/mds-editor-view/view-instance.service';
 import { MdsEditorWidgetAuthorComponent } from '../../../../features/mds/mds-editor/widgets/mds-editor-widget-author/mds-editor-widget-author.component';
-import { NodeService, MdsWidget, MdsValue, Acl } from 'ngx-edu-sharing-api';
 import { trigger } from '@angular/animations';
 import { UIAnimation } from 'ngx-edu-sharing-ui';
 import { MdsWidgetValue } from '../../../mds/types/types';

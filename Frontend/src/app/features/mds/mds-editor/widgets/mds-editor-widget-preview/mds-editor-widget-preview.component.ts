@@ -5,7 +5,7 @@ import { RepoUrlService } from 'ngx-edu-sharing-ui';
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, forkJoin, forkJoin as observableForkJoin, of } from 'rxjs';
 import { catchError, map, take, takeWhile } from 'rxjs/operators';
-import { Node } from '../../../../../core-module/rest/data-object';
+import { Node } from 'ngx-edu-sharing-api';
 import { RestNodeService } from '../../../../../core-module/rest/services/rest-node.service';
 import { Toast } from '../../../../../services/toast';
 import { Constraints, NativeWidgetComponent } from '../../../types/types';

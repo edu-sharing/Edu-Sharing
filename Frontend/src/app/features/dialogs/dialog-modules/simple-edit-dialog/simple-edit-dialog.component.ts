@@ -5,12 +5,11 @@ import { Observable } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import {
     DialogButton,
-    Node,
-    NodeWrapper,
     RestConnectorService,
     RestConstants,
     RestNodeService,
 } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { Toast } from '../../../../services/toast';
 import { CARD_DIALOG_DATA } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
@@ -112,7 +111,7 @@ export class SimpleEditDialogComponent {
         this.dialogRef.patchState({ isLoading: true });
         rxjs.forkJoin(
             this._nodes.map((n) => this.nodeApi.getNodeMetadata(n.ref.id, [RestConstants.ALL])),
-        ).subscribe((nodes: NodeWrapper[]) => {
+        ).subscribe((nodes) => {
             this._nodes = nodes.map((n) => n.node);
             this.dialogRef.patchState({ isLoading: false });
         });

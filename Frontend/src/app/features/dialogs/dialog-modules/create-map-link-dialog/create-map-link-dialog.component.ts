@@ -2,12 +2,12 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
     DialogButton,
-    Node,
     RestConnectorService,
     RestConstants,
     RestHelper,
     RestNodeService,
 } from '../../../../core-module/core.module';
+import { Node } from 'ngx-edu-sharing-api';
 import { Toast } from '../../../../services/toast';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';
 import { DialogsService } from '../../dialogs.service';
@@ -15,6 +15,7 @@ import { BreadcrumbsService } from '../../../../shared/components/breadcrumbs/br
 import { CARD_DIALOG_DATA } from '../../card-dialog/card-dialog-config';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { CreateMapLinkDialogData, CreateMapLinkDialogResult } from './create-map-link-dialog-data';
+
 @Component({
     selector: 'es-create-map-link-dialog',
     templateUrl: './create-map-link-dialog.component.html',

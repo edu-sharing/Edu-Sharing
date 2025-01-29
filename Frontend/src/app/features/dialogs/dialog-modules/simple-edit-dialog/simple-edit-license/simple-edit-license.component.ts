@@ -2,11 +2,11 @@ import { trigger } from '@angular/animations';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { UIAnimation, VCard } from 'ngx-edu-sharing-ui';
-import { Observable, forkJoin, from } from 'rxjs';
+import { Node } from 'ngx-edu-sharing-api';
+import { forkJoin, from, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
     ConfigurationService,
-    Node,
     RestConnectorService,
     RestConstants,
     RestIamService,
@@ -15,7 +15,7 @@ import {
 } from '../../../../../core-module/core.module';
 import { NodeHelperService } from '../../../../../services/node-helper.service';
 import { Toast } from '../../../../../services/toast';
-import { Values } from '../../../../../features/mds/types/types';
+import { Values } from '../../../../mds/types/types';
 
 @Component({
     selector: 'es-simple-edit-license',

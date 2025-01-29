@@ -1,4 +1,4 @@
-import { Node } from 'ngx-edu-sharing-api';
+import { Node } from '../models';
 
 export type CollectionProposalStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
 export interface ProposalNode extends Node {
