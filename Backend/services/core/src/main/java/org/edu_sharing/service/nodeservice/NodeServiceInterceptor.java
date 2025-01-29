@@ -193,7 +193,7 @@ public class NodeServiceInterceptor implements MethodInterceptor {
                     return invocation.proceed();
                 } catch (Throwable t) {
                     logger.error(t.getMessage(), t);
-                    return null;
+                    throw new RuntimeException(t);
                 }
             });
         }
