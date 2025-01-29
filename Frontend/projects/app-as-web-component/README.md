@@ -47,6 +47,8 @@ For testing, you can proxy requests to the URL given in the file `.env` by setti
 
 3. Make an html file that looks like this
 
+(Vendor refers to the location where the `ngx-edu-sharing-app-as-web-component` was fetched to, usually in `node_modules`).
+
 ```html
 <html class="no-js" lang="">
     <base href="/" />

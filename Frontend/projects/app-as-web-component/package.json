@@ -18,6 +18,6 @@
     "publish": "(cp {package.json,README.md} ../../dist/app-as-web-component || true) && cd ../../dist/app-as-web-component && npm publish"
   },
   "devDependencies": {
-    "@angular/elements": "^16.2.12"
+    "@angular/elements": "^18.2.12"
   }
 }
