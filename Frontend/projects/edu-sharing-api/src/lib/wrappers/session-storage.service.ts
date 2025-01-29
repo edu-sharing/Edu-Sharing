@@ -146,7 +146,7 @@ export class SessionStorageService {
             return this.setToUserProfile(values);
         } else {
             for (const [key, value] of Object.entries(values)) {
-                this.set(key, value, store);
+                void this.set(key, value, store);
             }
         }
     }
