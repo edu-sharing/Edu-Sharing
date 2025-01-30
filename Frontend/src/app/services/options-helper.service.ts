@@ -1100,7 +1100,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         cutNodes.elementType = [ElementType.Node, ElementType.SavedSearch, ElementType.MapRef];
         cutNodes.constrains = [Constrain.HomeRepository, Constrain.User];
         cutNodes.scopes = [Scope.WorkspaceList, Scope.WorkspaceTree];
-        cutNodes.permissions = [RestConstants.ACCESS_WRITE];
+        cutNodes.permissions = [RestConstants.ACCESS_DELETE];
         cutNodes.permissionsMode = HideMode.Disable;
         cutNodes.keyboardShortcut = {
             keyCode: 'KeyX',
