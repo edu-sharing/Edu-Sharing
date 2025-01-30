@@ -31286,7 +31286,7 @@
     },
     "/organization/v1/organizations/{repository}/{organization}/member/{member}": {
       "delete": {
-        "description": "Remove member from organization.",
+        "description": "Remove member from organization. Requires at least admin permissions for the organization. For mode assign, full admin rights are required",
         "operationId": "removeFromOrganization",
         "parameters": [
           {
