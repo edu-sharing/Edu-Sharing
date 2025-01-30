@@ -1243,8 +1243,9 @@ public class NodeApi  {
 	    @Parameter(description = "aspects of node" ) @QueryParam("aspects") List<String> aspects,
 	    @Parameter(description = "rename if the same node name exists", required = false, schema = @Schema(defaultValue="false")) @QueryParam("renameIfExists") Boolean renameIfExists,
 	    @Parameter(description = "comment, leave empty = no inital version", required=false ) @QueryParam("versionComment")  String versionComment,
-	    @Parameter(description = "properties, example: {\"{http://www.alfresco.org/model/content/1.0}name\": [\"test\"]}" , required=true ) HashMap<String, String[]> properties,	    
-	    @Parameter(description = "Association type, can be empty" , required=false ) @QueryParam("assocType") String assocType,
+	    @Parameter(description = "properties, example: {\"{http://www.alfresco.org/model/content/1.0}name\": [\"test\"]}" , required=true ) HashMap<String, String[]> properties,
+		@Parameter(description = "Association type, can be empty" , required=false ) @QueryParam("assocType") String assocType,
+		@Parameter(description = "accept only properties from the specific mds set" , required=false, schema = @Schema(defaultValue="true") ) @QueryParam("obeyMds") boolean obeyMds,
 		@Context HttpServletRequest req) {
 
     	try {
@@ -1255,8 +1256,8 @@ public class NodeApi  {
 			NodeDao nodeDao = NodeDao.getNode(repoDao, node);
 	    	resolveURLTitle(properties);
 	    	NodeDao child = nodeDao.createChild(type, aspects, properties,
-	    			renameIfExists==null ? false : renameIfExists.booleanValue(),
-					assocType!=null && !assocType.trim().isEmpty() ? assocType : null);
+                    renameIfExists != null && renameIfExists,
+					assocType!=null && !assocType.trim().isEmpty() ? assocType : null, obeyMds);
 
 			if(versionComment!=null && !versionComment.isEmpty()){
 				child.createVersion(versionComment);

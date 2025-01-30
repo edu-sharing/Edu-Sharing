@@ -243,7 +243,7 @@ public class NodeServiceAdapter implements NodeService {
 	}
 
 	@Override
-	public String createNode(String parentId, String nodeType, Map<String, String[]> props, String childAssociation)
+	public String createNode(String parentId, String nodeType, Map<String, String[]> props, String childAssociation, boolean obeyMds)
 			throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
