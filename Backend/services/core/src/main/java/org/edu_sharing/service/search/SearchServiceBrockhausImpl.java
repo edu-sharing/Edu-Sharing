@@ -16,7 +16,6 @@ import org.edu_sharing.service.search.model.SearchToken;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.extensions.surf.util.URLEncoder;
-import org.springframework.util.StreamUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +45,15 @@ public class SearchServiceBrockhausImpl extends SearchServiceAdapter{
 		headers.put("Accept","application/json");
 		JSONObject result = new JSONObject(query.query(url,headers,null));
 		result=result.getJSONObject("result");
-		JSONArray documents=result.getJSONArray("document");
-
 		SearchResultNodeRef searchResultNodeRef = new SearchResultNodeRef();
 		List<NodeRef> data=new ArrayList<>();
-		searchResultNodeRef.setNodeCount(result.getInt("numFound"));
 		searchResultNodeRef.setData(data);
+		if(!result.has("document")) {
+			searchResultNodeRef.setNodeCount(0);
+			return searchResultNodeRef;
+		}
+		JSONArray documents=result.getJSONArray("document");
+		searchResultNodeRef.setNodeCount(result.getInt("numFound"));
 		for(int i=0;i<documents.length();i++){
 			JSONObject document=documents.getJSONObject(i);
 

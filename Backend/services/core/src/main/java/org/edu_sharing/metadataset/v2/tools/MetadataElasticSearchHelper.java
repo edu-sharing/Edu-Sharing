@@ -3,7 +3,6 @@ package org.edu_sharing.metadataset.v2.tools;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.MultiTermLookup;
-import co.elastic.clients.elasticsearch._types.aggregations.NestedAggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.json.JsonData;
@@ -225,6 +224,9 @@ public class MetadataElasticSearchHelper extends MetadataSearchHelper {
         String[] words = value.split(" ");
         final BoolQuery.Builder boolQuery = new BoolQuery.Builder();
         for (String word : words) {
+            if(word.length() == 1 && !Character.isLetterOrDigit(word.charAt(0))) {
+                continue;
+            }
             //String statement = parameter.getStatement(value).replace("${value}", QueryParser.escape(word));
             String statement = QueryUtils.replacerFromSyntax(parameter.getSyntax()).replaceString(
                     parameter.getStatement(word),
