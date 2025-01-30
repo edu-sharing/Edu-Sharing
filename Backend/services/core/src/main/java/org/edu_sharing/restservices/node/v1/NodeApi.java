@@ -1245,7 +1245,7 @@ public class NodeApi  {
 	    @Parameter(description = "comment, leave empty = no inital version", required=false ) @QueryParam("versionComment")  String versionComment,
 	    @Parameter(description = "properties, example: {\"{http://www.alfresco.org/model/content/1.0}name\": [\"test\"]}" , required=true ) HashMap<String, String[]> properties,
 		@Parameter(description = "Association type, can be empty" , required=false ) @QueryParam("assocType") String assocType,
-		@Parameter(description = "accept only properties from the specific mds set" , required=false, schema = @Schema(defaultValue="true") ) @QueryParam("obeyMds") boolean obeyMds,
+		@Parameter(description = "accept only properties from the specific mds set" , required=false, schema = @Schema(defaultValue="true") ) @QueryParam("obeyMds") Boolean obeyMds,
 		@Context HttpServletRequest req) {
 
     	try {
@@ -1257,7 +1257,7 @@ public class NodeApi  {
 	    	resolveURLTitle(properties);
 	    	NodeDao child = nodeDao.createChild(type, aspects, properties,
                     renameIfExists != null && renameIfExists,
-					assocType!=null && !assocType.trim().isEmpty() ? assocType : null, obeyMds);
+					assocType!=null && !assocType.trim().isEmpty() ? assocType : null, obeyMds == null || obeyMds);
 
 			if(versionComment!=null && !versionComment.isEmpty()){
 				child.createVersion(versionComment);
