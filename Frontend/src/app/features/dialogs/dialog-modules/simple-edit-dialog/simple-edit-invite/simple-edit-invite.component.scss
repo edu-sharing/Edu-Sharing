@@ -56,6 +56,13 @@ mat-button-toggle-group {
         padding-bottom: 7px;
         font-weight: bold;
     }
+    ::ng-deep {
+        .mat-button-toggle-label-content {
+            > mat-pseudo-checkbox {
+                display: none;
+            }
+        }
+    }
 }
 @media screen and (max-width: (map-get($widths,'normal'))) {
     .tiles {
