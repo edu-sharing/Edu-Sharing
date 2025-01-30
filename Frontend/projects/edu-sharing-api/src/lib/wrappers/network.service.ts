@@ -7,16 +7,9 @@ import { HOME_REPOSITORY } from '../constants';
 import { Node } from '../models';
 import { shareReplayReturnValue } from '../utils/decorators/share-replay-return-value';
 import { AuthenticationService } from './authentication.service';
+import { Repo } from '../api/models/repo';
 
-interface Repository {
-    id: string;
-    title: string;
-    icon: string;
-    logo: string;
-    isHomeRepo: boolean;
-    repositoryType: string;
-    renderingSupported: boolean;
-}
+type Repository = Repo;
 
 interface NetworkRepositories {
     repositories: Repository[];
@@ -36,7 +29,7 @@ export class NetworkService {
         return this.authentication.observeLoginInfo().pipe(
             first((login) => login.isValidLogin),
             switchMap(() => this.networkV1.getRepositories()),
-            map((repos) => (repos as unknown as NetworkRepositories).repositories),
+            map((repos) => repos.repositories),
         );
     }
 

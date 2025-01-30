@@ -9,6 +9,8 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.PermissionEvaluationMode;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -23,6 +25,7 @@ import org.springframework.context.ApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CMISSearchHelper {
 
@@ -163,6 +166,26 @@ public class CMISSearchHelper {
 
         sb.append('\'');
         return sb.toString();
+    }
+
+    /**
+     * filter refs which are contained within the given folder
+     * @return
+     */
+    public static List<NodeRef> filterCMISResult(List<NodeRef> result, NodeRef primaryFolder){
+        NodeService dbNodeService = (NodeService)AlfAppContextGate.getApplicationContext().getBean("alfrescoDefaultDbNodeService");
+        return result.stream().filter((r) -> {
+            Path path = dbNodeService.getPath(r);
+            for (Path.Element p : path) {
+                if (p instanceof Path.ChildAssocElement) {
+                    NodeRef ref = ((Path.ChildAssocElement) p).getRef().getParentRef();
+                    if (primaryFolder.equals(ref)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).collect(Collectors.toList());
     }
 
     @AllArgsConstructor

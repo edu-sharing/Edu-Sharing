@@ -7,11 +7,12 @@ import {
     Node,
     SearchService,
     MdsSortDefault,
+    Repository,
 } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Repository, RestConstants } from '../../core-module/core.module';
+import { RestConstants } from '../../core-module/core.module';
 import { MdsHelperService } from 'ngx-edu-sharing-ui';
 import {
     fromSearchResults,

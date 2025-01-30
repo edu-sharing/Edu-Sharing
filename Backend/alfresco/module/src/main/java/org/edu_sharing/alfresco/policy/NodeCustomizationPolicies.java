@@ -21,6 +21,8 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.NamespaceService;
@@ -32,6 +34,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -198,6 +201,25 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
         eduSharingContext.set(context);
     }
 
+    // org.springframework.dao.ConcurrencyFailureException: Unexpected: current version does not appear to be 1st version in the list
+    public static void repairNodeVersion(NodeService nodeService, VersionHistory history, Map<String, Serializable> transFormedProps, NodeRef nodeRef) {
+        if(history == null) {
+            return;
+        }
+        Collection<Version> versions = history.getAllVersions();
+        if(versions != null) {
+            Optional<ComparableVersion> highestVersions = versions.stream().map(v -> new ComparableVersion(v.getVersionLabel())).max(ComparableVersion::compareTo);
+            if (highestVersions.isPresent()) {
+                Serializable currentVersion = transFormedProps.get(CCConstants.CM_PROP_VERSIONABLELABEL);
+                if (!Objects.equals(currentVersion, highestVersions.get().toString())) {
+                    Logger.getLogger(NodeCustomizationPolicies.class).warn("Node " + nodeRef + " has wrong version: " + currentVersion + ", highest is: " + highestVersions.get());
+                    nodeService.setProperty(nodeRef, QName.createQName(CCConstants.CM_PROP_VERSIONABLELABEL), highestVersions.get().toString());
+                    transFormedProps.put(CCConstants.CM_PROP_VERSIONABLELABEL, highestVersions.get().toString());
+                }
+            }
+        }
+    }
+
     public void init() {
 
         policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode"));
@@ -301,12 +323,13 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
             //only create version when content is there, cause else in webdav for one file it goes twice here
             //when metadata changes the servlet does version creation
             if (createVersion && (reader != null) && (reader.getContentData() != null) && reader.getContentData().getSize() > 0) {
+                VersionHistory history = versionService.getVersionHistory(nodeRef);
+                Map<String, Serializable> transFormedProps = transformQNameKeyToString(nodeService.getProperties(nodeRef));
                 if (versionService.getVersionHistory(nodeRef) == null) {
-                    Map<String, Serializable> transFormedProps = transformQNameKeyToString(nodeService.getProperties(nodeRef));
-
                     //see https://issues.alfresco.com/jira/browse/ALF-12815
                     //alfresco-4.0.d fix version should start with 1.0 not with 0.1
                     transFormedProps.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
+                    repairNodeVersion(nodeService, history, transFormedProps, nodeRef);
                     versionService.createVersion(nodeRef, transFormedProps);
                 } else {
 
@@ -314,7 +337,8 @@ public class NodeCustomizationPolicies implements OnContentUpdatePolicy, OnCreat
                     if (!this.policyBehaviourFilter.isEnabled(nodeRef, ContentModel.ASPECT_VERSIONABLE)) {
                         logger.debug(ContentModel.ASPECT_VERSIONABLE + " is not enabled on " + nodeRef);
                     } else {
-                        versionService.createVersion(nodeRef, transformQNameKeyToString(nodeService.getProperties(nodeRef)));
+                        repairNodeVersion(nodeService, history, transFormedProps, nodeRef);
+                        versionService.createVersion(nodeRef, transFormedProps);
                     }
 
                 }

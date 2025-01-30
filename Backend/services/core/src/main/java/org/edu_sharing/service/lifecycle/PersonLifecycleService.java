@@ -23,7 +23,6 @@ import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.tools.VCardConverter;
 import org.edu_sharing.repository.server.tools.cache.RepositoryCache;
-import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authentication.ScopeUserHomeService;
 import org.edu_sharing.service.authentication.ScopeUserHomeServiceFactory;
 import org.edu_sharing.service.feedback.FeedbackServiceFactory;
@@ -31,7 +30,6 @@ import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.nodeservice.RecurseMode;
 import org.edu_sharing.service.permission.PermissionServiceFactory;
-import org.edu_sharing.service.permission.PermissionServiceHelper;
 import org.edu_sharing.service.rating.RatingServiceFactory;
 import org.edu_sharing.service.stream.StreamServiceFactory;
 import org.edu_sharing.service.tracking.TrackingServiceFactory;
@@ -784,7 +782,8 @@ public class PersonLifecycleService {
 				org.edu_sharing.alfresco.service.AuthorityService.ADMINISTRATORS_GROUP, options.receiverGroup
 		);
 	}
-	private void setOwnerAndPermissions(List<NodeRef> children, String userName, PersonDeleteOptions options) {
+	public void setOwnerAndPermissions(List<NodeRef> children, String userName, PersonDeleteOptions options) {
+		RepositoryCache cache = new RepositoryCache();
 		String adminGroup = getAdminGroup(options);
 		RetryingTransactionHelper rth = transactionService.getRetryingTransactionHelper();
 		rth.doInTransaction((RetryingTransactionHelper.RetryingTransactionCallback<Void>) () -> {
@@ -794,6 +793,7 @@ public class PersonLifecycleService {
 				policyBehaviourFilter.disableBehaviour(ref);
 
 				permissionService.setPermission(ref, adminGroup, CCConstants.PERMISSION_COORDINATOR, true);
+				cache.remove(ref.getId());
 				policyBehaviourFilter.enableBehaviour(ref);
 				logger.debug("setOwnerAndPermissions for " + ref);
 			});

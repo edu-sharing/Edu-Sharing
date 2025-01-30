@@ -9,11 +9,12 @@ import {
     MetadataSetInfo,
     NetworkService,
     Node,
+    Repository,
 } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Repository, RestConstants, UIConstants } from '../../core-module/core.module';
+import { RestConstants, UIConstants } from '../../core-module/core.module';
 import {
     CustomOptions,
     DefaultGroups,

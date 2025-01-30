@@ -36,7 +36,7 @@ export class CollectionService {
         // wrong api data
         return this.collectionV1.getCollectionsSubcollections(
             params,
-        ) as unknown as Observable<CollectionEntries>;
+        ) as Observable<CollectionEntries>;
     }
 
     @cachedShareReplay(CollectionService.collectionCache, getCacheKey)

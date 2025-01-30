@@ -148,6 +148,19 @@
         "ADD_LABEL": "Toolpermission name"
       }
     },
+    "EXCLUDE": {
+      "TITLE": "Exclude person from organization",
+      "DESCRIPTION": "By excluding the person will not have access on the organisational folder in \"Shared content\". and any invitations to the organization. Any explicit invitations for this person will still be accessible..\n\nWhen using the mode \"Assign elements to other person\", all elements this person has created in the organisational folder will be assigned to the selected receiver including full access.",
+      "MODE_LABEL": "Mode for elements of person",
+      "MODE": {
+        "NONE": "Do not change elements",
+        "ASSIGN": "Assign elements to other person"
+      },
+      "ASSIGN_USER": "Receiver of elements",
+      "ASSIGN_USER_PLACEHOLDER": "Search person...",
+      "ERROR_MISSING_RECEIVER": "Please enter a receiver",
+      "ASSIGN_USER_NOT_ORG_MEMBER": "The chosen person \"{{user}}\" is not a member of the organization \"{{org}}\". Please check carefully if this person should still be used as the receiver of the elements."
+    },
     "DELETE": {
       "MAIN_HEADING": "Delete users & data",
       "USER_LIST": "Perform process for the following users & their data",

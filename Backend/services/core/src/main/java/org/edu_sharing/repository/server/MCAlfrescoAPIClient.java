@@ -57,7 +57,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.edu_sharing.alfresco.HasPermissionsWork;
-import org.edu_sharing.alfresco.fixes.VirtualEduGroupFolderTool;
+import org.edu_sharing.alfresco.policy.NodeCustomizationPolicies;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.connector.ConnectorService;
 import org.edu_sharing.alfresco.service.guest.GuestService;
@@ -2164,11 +2164,14 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
         VersionService versionService = serviceRegistry.getVersionService();
         NodeRef nodeRef = new NodeRef(storeRef, nodeId);
         Map<String, Serializable> transFormedProps = transformQNameKeyToString(nodeService.getProperties(nodeRef));
-        if (versionService.getVersionHistory(nodeRef) == null) {
+        VersionHistory history = versionService.getVersionHistory(nodeRef);
+        if (history == null) {
 
             // see https://issues.alfresco.com/jira/browse/ALF-12815
             // alfresco-4.0.d fix version should start with 1.0 not with 0.1
             transFormedProps.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
+        } else {
+            NodeCustomizationPolicies.repairNodeVersion(nodeService, history, transFormedProps, nodeRef);
         }
         versionService.createVersion(nodeRef, transFormedProps);
 

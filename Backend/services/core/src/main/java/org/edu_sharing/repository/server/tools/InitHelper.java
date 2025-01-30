@@ -9,6 +9,7 @@ import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
@@ -19,6 +20,7 @@ import org.edu_sharing.service.authority.AuthorityServiceImpl;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InitHelper {
     static Logger logger = Logger.getLogger(InitHelper.class);
@@ -35,6 +37,20 @@ public class InitHelper {
                 if (authorityService.getAuthorityNodeRef(id) == null) {
                     logger.info("Init group " + id);
                     authorityService.createGroup(id, group.getString("displayName"), null);
+                }
+                if(group.hasPath("members")) {
+                    List<String> membersNew = group.getStringList("members");
+                    if (membersNew != null && !membersNew.isEmpty()) {
+                        Set<String> membersOld = Arrays.stream(authorityService.getMembershipsOfGroup(id)).collect(Collectors.toSet());
+                        if(!new HashSet<>(membersNew).equals(membersNew)) {
+                            logger.info("Init group " + id + ": Resetting members (" + StringUtils.join(membersOld) + ")");
+                            authorityService.removeMemberships(id, authorityService.getMembershipsOfGroup(id));
+                            logger.info("Init group " + id + ": Setting new members (" + StringUtils.join(membersNew) + ")");
+                            authorityService.addMemberships(id, membersNew.toArray(String[]::new));
+                        } else {
+                            logger.info("Init group " + id + ": Is already initialized correctly (" + StringUtils.join(membersOld) + ")");
+                        }
+                    }
                 }
             }
         }
