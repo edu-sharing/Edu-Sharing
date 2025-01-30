@@ -42,7 +42,7 @@ public class InitHelper {
                     List<String> membersNew = group.getStringList("members");
                     if (membersNew != null && !membersNew.isEmpty()) {
                         Set<String> membersOld = Arrays.stream(authorityService.getMembershipsOfGroup(id)).collect(Collectors.toSet());
-                        if(!new HashSet<>(membersNew).equals(membersNew)) {
+                        if(!new HashSet<>(membersNew).equals(membersOld)) {
                             logger.info("Init group " + id + ": Resetting members (" + StringUtils.join(membersOld) + ")");
                             authorityService.removeMemberships(id, authorityService.getMembershipsOfGroup(id));
                             logger.info("Init group " + id + ": Setting new members (" + StringUtils.join(membersNew) + ")");

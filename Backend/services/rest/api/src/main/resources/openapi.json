@@ -25909,6 +25909,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "accept only properties from the specific mds set",
+            "in": "query",
+            "name": "obeyMds",
+            "schema": {
+              "default": true,
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {

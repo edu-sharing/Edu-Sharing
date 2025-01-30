@@ -1,15 +1,9 @@
 package org.edu_sharing.restservices;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.edu_sharing.service.permission.HandleMode;
-import org.edu_sharing.repository.client.rpc.ACE;
+import org.apache.commons.lang3.StringUtils;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.NameSpaceTool;
 import org.edu_sharing.restservices.node.v1.NodeApi;
@@ -18,6 +12,11 @@ import org.edu_sharing.restservices.shared.NodeRef;
 import org.edu_sharing.service.nodeservice.NodeService;
 import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.edu_sharing.service.permission.PermissionServiceFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class ToolDao {
 	
@@ -89,12 +88,12 @@ public class ToolDao {
 			new NodeApi().resolveURLTitle(properties);
 
 			List<String> aspects = new ArrayList<>();
-			if (aspect != null && !aspect.trim().equals("")) {
+			if (StringUtils.isNotBlank(aspect)) {
 				aspects.add(aspect);
 			}
 
 			NodeDao child = nodeDao.createChild(type, aspects, properties,
-					renameIfExists == null ? false : renameIfExists.booleanValue(), childAssoc);
+                    renameIfExists != null && renameIfExists, childAssoc, true);
 
 			if (versionComment != null && !versionComment.isEmpty()) {
 				child.createVersion(versionComment);

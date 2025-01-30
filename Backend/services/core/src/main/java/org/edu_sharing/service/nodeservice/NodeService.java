@@ -14,10 +14,7 @@ import org.edu_sharing.service.search.model.SortDefinition;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface NodeService {
 
@@ -27,8 +24,12 @@ public interface NodeService {
 	public void createAssoc(String parentId,String childId,String assocName);
 
 	public String createNode(String parentId, String nodeType, Map<String, String[]> props)throws Throwable;
-	
-	public String createNode(String parentId, String nodeType, Map<String, String[]> props, String childAssociation) throws Throwable;
+
+	default String createNode(String parentId, String nodeType, HashMap<String, String[]> props, String childAssociation)throws Throwable {
+		return createNode(parentId, nodeType, props, childAssociation, true);
+	}
+
+	public String createNode(String parentId, String nodeType, Map<String, String[]> props, String childAssociation, boolean obeyMds) throws Throwable;
 	
 	public String createNodeBasic(String parentID, String nodeTypeString, Map<String, ?> _props);
 
@@ -239,4 +240,5 @@ public interface NodeService {
 	 * @param details
 	 */
     void revokeNode(String storeProtocol, String storeId, String id, RevokeDetails details) throws Throwable;
+
 }

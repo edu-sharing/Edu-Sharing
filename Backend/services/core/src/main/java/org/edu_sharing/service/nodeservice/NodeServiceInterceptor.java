@@ -15,14 +15,11 @@ import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
-import org.edu_sharing.repository.server.AuthenticationToolAPI;
-import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.authentication.ContextManagementFilter;
 import org.edu_sharing.repository.server.tools.ApplicationInfo;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.InsufficientPermissionException;
 import org.edu_sharing.service.authority.AuthorityServiceFactory;
-import org.edu_sharing.service.collection.DuplicateNodeException;
 import org.edu_sharing.service.provider.ElasticSearchProvider;
 import org.edu_sharing.service.provider.Provider;
 import org.edu_sharing.service.provider.ProviderHelper;
@@ -33,7 +30,9 @@ import org.edu_sharing.service.toolpermission.ToolPermissionHelper;
 import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -54,10 +53,6 @@ public class NodeServiceInterceptor implements MethodInterceptor {
     public Object invoke(MethodInvocation invocation) throws Throwable {
 
         String methodName = invocation.getMethod().getName();
-
-        if (Objects.equals("createNode", methodName)) {
-            checkReservedNames((String) invocation.getArguments()[0], (String) invocation.getArguments()[1], (Map<String, String[]>) invocation.getArguments()[2], invocation);
-        }
 
         int argumentId = -1;
         if (methodName.equals("getProperty") ||
@@ -100,37 +95,6 @@ public class NodeServiceInterceptor implements MethodInterceptor {
 
 
         return handleInvocation(nodeId, invocation, true);
-    }
-
-
-    private void checkReservedNames(String parentId, String nodeType, Map<String, String[]> props, MethodInvocation invocation) throws Throwable {
-        try {
-            if (!nodeType.equals(CCConstants.CM_TYPE_FOLDER)) {
-                return;
-            }
-
-
-            String userName = new AuthenticationToolAPI().getAuthentication(Context.getCurrentInstance().getRequest().getSession()).get(CCConstants.AUTH_USERNAME);
-            MCAlfrescoAPIClient baseClient = new MCAlfrescoAPIClient();
-            String homeFolderID = baseClient.getHomeFolderID(userName);
-            if (!parentId.equals(homeFolderID)) {
-                return;
-            }
-
-            String name = props.get(CCConstants.CM_NAME)[0];
-            if (List.of("inbox", "savedsearch").contains(name.trim().toLowerCase())) {
-
-                throw new DuplicateNodeException(CCConstants.getValidLocalName(CCConstants.CM_NAME) + ": " + name + " is a reserved folder name");
-            }
-
-        }catch (DuplicateNodeException ex){
-            throw ex;
-        }
-        catch (Exception ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw ex;
-        }
-
     }
 
     private void checkReadMetadataPermissions(String nodeId, MethodInvocation invocation) {

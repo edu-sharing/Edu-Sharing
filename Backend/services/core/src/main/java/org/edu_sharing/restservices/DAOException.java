@@ -22,137 +22,174 @@ import org.edu_sharing.service.NotAnAdminException;
 import org.edu_sharing.service.collection.DuplicateNodeException;
 import org.edu_sharing.service.handleservicedoi.DOIServiceException;
 import org.edu_sharing.service.permission.PermissionException;
-import org.edu_sharing.alfresco.service.toolpermission.ToolPermissionException;
-import org.edu_sharing.alfresco.RestrictedAccessException;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.NoSuchFileException;
 import java.security.InvalidKeyException;
-
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collections;
 import java.util.Map;
 
 public class DAOException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
-	private String nodeId;
+    private static final long serialVersionUID = 1L;
+    private String nodeId;
 
-	public DAOException(Throwable t, String nodeId) {
-		super(t);
-		this.nodeId=nodeId;
-	}
+    public DAOException(Throwable t, String nodeId) {
+        super(t);
+        this.nodeId = nodeId;
+    }
 
-	/**
-	 * custom data to send to the client
-	 */
-	public Map<String, Serializable> getDetails() {
-		return Collections.emptyMap();
-	}
+    /**
+     * custom data to send to the client
+     */
+    public Map<String, Serializable> getDetails() {
+        return Collections.emptyMap();
+    }
 
 
-	@Override
-	public String toString() {
-		return super.toString()+addNodeId();
-	}
-	private String addNodeId() {
-		return (nodeId==null ? "" : " at node "+nodeId);
-	}
-	
-	@Override
-	public String getMessage() {
-		return super.getMessage();
-	}
-	
-	public static DAOException mapping(Throwable t,String nodeId) {
-		// de-capsulate previously capsulated runtime throwables
-		if(t instanceof RuntimeException && (t.getCause() instanceof RestrictedAccessException || (t.getMessage() != null && t.getMessage().contains("Error during run as.")))) {
-			t = t.getCause();
-		}
-		// these exceptions come from annotated permissions checks
-		if(t instanceof UndeclaredThrowableException) {
-			t = t.getCause();
-		}
-		if (t instanceof DAOException) {
-			
-			return (DAOException) t;
-		}
-		
-		if (   t instanceof AccessDeniedException
-				|| t instanceof AuthenticationException || t instanceof PermissionException
-				|| t instanceof InsufficientPermissionException || t instanceof NotAnAdminException) {
-			
-			return new DAOSecurityException(t,nodeId); 
-		}
-		if (t instanceof ContentQuotaException){
-			return new DAOQuotaException(t,nodeId);
-		}
-		if(t instanceof InvalidKeyException) {
-			return new DAOInvalidKeyException(t);
-		}
-		if(t instanceof AlfrescoRuntimeException
-				&& t.getCause() != null
-				&& t.getCause().getClass().getName().contains("VirusDetectedException")){
-			return new DAOVirusDetectedException(t.getCause(),nodeId);
-		}
-		if(t instanceof AlfrescoRuntimeException
-				&& t.getCause() != null
-				&& t.getCause().getClass().getName().contains("VirusScanFailedException")
-		){
-			return new DAOVirusScanFailedException(t.getCause(),nodeId);
-		}
-		if(t instanceof AlfrescoRuntimeException
-				&& t.getCause() != null
-				&& t.getCause() instanceof DOIServiceException
-		){
-			return DAODOIException.instance((DOIServiceException)t.getCause(),nodeId);
-		}
-		if(t instanceof ElasticsearchException) {
-			Logger.getLogger(DAOException.class).info("Elasticsearch error details: " + ((ElasticsearchException)t).response());
-		}
-		if (t instanceof NodeExistsException) {
-			
-			return new DAOValidationException(t,nodeId); 
-		}
-		if (t instanceof NodeMimetypeValidationException ||
-				t instanceof ContentIOException && t.getCause() instanceof NodeMimetypeValidationException) {
-			return new DAOMimetypeVerificationException(t,nodeId);
-		}
-		if (t instanceof NodeFileSizeExceededException) {
-			return new DAONodeFileSizeExceededException((NodeFileSizeExceededException) t,nodeId);
-		}
-		if(t instanceof ContentIOException && t.getCause() instanceof NodeFileSizeExceededException) {
-			return new DAONodeFileSizeExceededException((NodeFileSizeExceededException) t.getCause(),nodeId);
-		}
-		if (t instanceof NodeFileExtensionValidationException ||
-				t instanceof ContentIOException && t.getCause() instanceof NodeFileExtensionValidationException) {
-			return new DAOFileExtensionVerificationException(t,nodeId);
-		}
-		if(t instanceof ToolPermissionException){
-			return new DAOToolPermissionException(t);
-		}
-		if(t instanceof RestrictedAccessException){
-			return new DAORestrictedAccessException(t,nodeId);
-		}
-		if(t instanceof DuplicateChildNodeNameException || t instanceof DuplicateNodeException){
-			return new DAODuplicateNodeNameException(t,nodeId);
-		}
+    @Override
+    public String toString() {
+        return super.toString() + addNodeId();
+    }
 
-		if (   t instanceof NoSuchPersonException
-			|| t instanceof InvalidStoreRefException
-			|| t instanceof FileNotFoundException
-			|| t instanceof NoSuchFileException
-			|| t instanceof InvalidNodeRefException) {
-			
-			return new DAOMissingException(t,nodeId); 
-		}
-		
-		return new DAOException(t,nodeId);
-	}
+    private String addNodeId() {
+        return (nodeId == null ? "" : " at node " + nodeId);
+    }
 
-	public static DAOException mapping(Throwable t) {
-		return mapping(t,null);
-	}
+    @Override
+    public String getMessage() {
+        return super.getMessage();
+    }
+
+    /**
+     * Recursively unwraps nested {@link RuntimeException}s to extract the original exception.
+     *
+     * <p>This method is useful when dealing with frameworks or libraries that wrap checked exceptions
+     * inside {@code RuntimeException}. It traverses the exception chain and returns the first non-generic
+     * {@code RuntimeException} or the original wrapped exception.</p>
+     *
+     * <p>Example usage:</p>
+     * <pre>
+     * try {
+     *     someMethod();
+     * } catch (RuntimeException ex) {
+     *     Exception rootCause = unwrapRuntimeExceptions(ex);
+     *     // Handle root cause
+     * }
+     * </pre>
+     *
+     * @param ex the {@code RuntimeException} to unwrap
+     * @return the original exception if unwrapping is possible, otherwise the provided {@code RuntimeException}
+     */
+    private static Throwable unwrapRuntimeExceptions(RuntimeException ex) {
+        if (ex.getCause() == null) {
+            return ex;
+        }
+
+        if (ex.getClass() != RuntimeException.class) {
+            return ex;
+        }
+
+        if (ex.getCause() instanceof RuntimeException) {
+            return unwrapRuntimeExceptions((RuntimeException) ex.getCause());
+        }
+
+        if (ex.getCause() != null) {
+            return ex.getCause();
+        }
+
+        return ex;
+    }
+
+    public static DAOException mapping(Throwable t, String nodeId) {
+        // de-capsulate previously capsulated runtime throwables
+        if (t instanceof RuntimeException) {
+            t = unwrapRuntimeExceptions((RuntimeException) t);
+        }
+        // these exceptions come from annotated permissions checks
+        if (t instanceof UndeclaredThrowableException) {
+            t = t.getCause();
+        }
+        if (t instanceof DAOException) {
+
+            return (DAOException) t;
+        }
+
+        if (t instanceof AccessDeniedException
+                || t instanceof AuthenticationException || t instanceof PermissionException
+                || t instanceof InsufficientPermissionException || t instanceof NotAnAdminException) {
+
+            return new DAOSecurityException(t, nodeId);
+        }
+        if (t instanceof ContentQuotaException) {
+            return new DAOQuotaException(t, nodeId);
+        }
+        if (t instanceof InvalidKeyException) {
+            return new DAOInvalidKeyException(t);
+        }
+        if (t instanceof AlfrescoRuntimeException
+                && t.getCause() != null
+                && t.getCause().getClass().getName().contains("VirusDetectedException")) {
+            return new DAOVirusDetectedException(t.getCause(), nodeId);
+        }
+        if (t instanceof AlfrescoRuntimeException
+                && t.getCause() != null
+                && t.getCause().getClass().getName().contains("VirusScanFailedException")
+        ) {
+            return new DAOVirusScanFailedException(t.getCause(), nodeId);
+        }
+        if (t instanceof AlfrescoRuntimeException
+                && t.getCause() != null
+                && t.getCause() instanceof DOIServiceException
+        ) {
+            return DAODOIException.instance((DOIServiceException) t.getCause(), nodeId);
+        }
+        if (t instanceof ElasticsearchException) {
+            Logger.getLogger(DAOException.class).info("Elasticsearch error details: " + ((ElasticsearchException) t).response());
+        }
+        if (t instanceof NodeExistsException) {
+
+            return new DAOValidationException(t, nodeId);
+        }
+        if (t instanceof NodeMimetypeValidationException ||
+                t instanceof ContentIOException && t.getCause() instanceof NodeMimetypeValidationException) {
+            return new DAOMimetypeVerificationException(t, nodeId);
+        }
+        if (t instanceof NodeFileSizeExceededException) {
+            return new DAONodeFileSizeExceededException((NodeFileSizeExceededException) t, nodeId);
+        }
+        if (t instanceof ContentIOException && t.getCause() instanceof NodeFileSizeExceededException) {
+            return new DAONodeFileSizeExceededException((NodeFileSizeExceededException) t.getCause(), nodeId);
+        }
+        if (t instanceof NodeFileExtensionValidationException ||
+                t instanceof ContentIOException && t.getCause() instanceof NodeFileExtensionValidationException) {
+            return new DAOFileExtensionVerificationException(t, nodeId);
+        }
+        if (t instanceof ToolPermissionException) {
+            return new DAOToolPermissionException(t);
+        }
+        if (t instanceof RestrictedAccessException) {
+            return new DAORestrictedAccessException(t, nodeId);
+        }
+        if (t instanceof DuplicateChildNodeNameException || t instanceof DuplicateNodeException) {
+            return new DAODuplicateNodeNameException(t, nodeId);
+        }
+
+        if (t instanceof NoSuchPersonException
+                || t instanceof InvalidStoreRefException
+                || t instanceof FileNotFoundException
+                || t instanceof NoSuchFileException
+                || t instanceof InvalidNodeRefException) {
+
+            return new DAOMissingException(t, nodeId);
+        }
+
+        return new DAOException(t, nodeId);
+    }
+
+    public static DAOException mapping(Throwable t) {
+        return mapping(t, null);
+    }
 }

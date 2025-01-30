@@ -1021,22 +1021,22 @@ public class NodeDao {
 
     public NodeDao createChild(String type, List<String> aspects,
                                Map<String, String[]> properties, boolean renameIfExists) throws DAOException {
-        return this.createChild(type, aspects, properties, renameIfExists, null);
+        return this.createChild(type, aspects, properties, renameIfExists, null, true);
     }
 
     public NodeDao createChild(String type, List<String> aspects,
-                               Map<String, String[]> properties, boolean renameIfExists, String childAssoc) throws DAOException {
+                               Map<String, String[]> properties, boolean renameIfExists, String childAssoc, boolean obeyMds) throws DAOException {
 
         try {
-            NameSpaceTool<String> nameSpaceTool = new NameSpaceTool<String>();
-            type = nameSpaceTool.transformToLongQName(type);
-            if (childAssoc != null)
+            type = NameSpaceTool.transformToLongQName(type);
+            if (childAssoc != null) {
                 childAssoc = CCConstants.getValidGlobalName(childAssoc);
+            }
             Map<String, String[]> props = transformProperties(properties);
             String childId;
 
-            String originalNameArr[] = props.get(CCConstants.CM_NAME);
-            String originalName = (originalNameArr != null && originalNameArr.length > 0) ? originalNameArr[0] : null;
+            String[] originalNameArray = props.get(CCConstants.CM_NAME);
+            String originalName = (originalNameArray != null && originalNameArray.length > 0) ? originalNameArray[0] : null;
             if (originalName == null) throw new Exception("missing name");
 
             // escape invalid characters of the name
@@ -1046,7 +1046,7 @@ public class NodeDao {
             int i = 2;
             while (true) {
                 try {
-                    childId = this.nodeService.createNode(nodeId, type, props, childAssoc);
+                    childId = this.nodeService.createNode(nodeId, type, props, childAssoc, obeyMds);
                     break;
                 } catch (DuplicateChildNodeNameException e) {
                     if (renameIfExists) {
