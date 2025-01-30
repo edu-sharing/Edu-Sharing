@@ -1,14 +1,14 @@
 <es-add-stream
   *ngIf="addNodesStream"
   [nodes]="addNodesStream"
-  (onLoading)="globalProgress = $event"
-  (onCancel)="closeStream()"
-  (onDone)="closeStream()"
+  (loading)="globalProgress = $event"
+  (cancelStream)="closeStream()"
+  (done)="closeStream()"
 ></es-add-stream>
 <es-view-material-feedback
   *ngIf="materialViewFeedback"
   [node]="materialViewFeedback"
-  (onClose)="closeMaterialViewFeedback()"
+  (closeFeedback)="closeMaterialViewFeedback()"
 ></es-view-material-feedback>
 <es-collection-chooser
   class="dialog-right"

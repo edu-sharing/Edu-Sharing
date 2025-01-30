@@ -1,4 +1,4 @@
-import { AfterViewInit, ApplicationRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ApplicationRef, Component, OnInit, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { User } from 'ngx-edu-sharing-api';
 import {
@@ -30,7 +30,7 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: 'delete.component.html',
     styleUrls: ['delete.component.scss'],
 })
-export class PermissionsDeleteComponent implements OnInit, AfterViewInit {
+export class PermissionsDeleteComponent implements OnInit {
     readonly DisplayType = NodeEntriesDisplayType;
     readonly InteractionType = InteractionType;
     readonly AuthoritySearchMode = AuthoritySearchMode;
@@ -273,6 +273,4 @@ export class PermissionsDeleteComponent implements OnInit, AfterViewInit {
             this.options.homeFolder.keepFolderStructure = false;
         }
     }
-
-    ngAfterViewInit() {}
 }

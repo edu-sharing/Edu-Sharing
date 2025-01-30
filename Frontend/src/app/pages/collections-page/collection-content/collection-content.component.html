@@ -79,7 +79,7 @@
     <es-collection-proposals
       [collection]="collection"
       [canEdit]="isAllowedToEditCollection()"
-      (onContentClick)="onContentClick($any($event))"
+      (contentClick)="onContentClick($any($event))"
     ></es-collection-proposals>
     <section class="collections-cards-div" *ngIf="!isRootLevel">
       <es-actionbar

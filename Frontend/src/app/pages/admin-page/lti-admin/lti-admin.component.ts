@@ -12,7 +12,7 @@ import { DialogsService } from '../../../features/dialogs/dialogs.service';
     styleUrls: ['./lti-admin.component.scss'],
 })
 export class LtiAdminComponent implements OnInit {
-    @Output() onRefreshAppList = new EventEmitter<void>();
+    @Output() refreshAppList = new EventEmitter<void>();
 
     /**
      * dynamic
@@ -86,7 +86,7 @@ export class LtiAdminComponent implements OnInit {
                 (t: void) => {
                     this.toast.toast('ADMIN.LTI.DATA.CREATED', null);
                     this.toast.closeProgressSpinner();
-                    this.onRefreshAppList.emit();
+                    this.refreshAppList.emit();
                 },
                 (error: any) => {
                     this.toast.error(error);

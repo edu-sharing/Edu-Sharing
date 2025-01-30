@@ -203,7 +203,7 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
         this.collectionsColumns.push(new ListItem('COLLECTION', 'info'));
         this.collectionsColumns.push(new ListItem('COLLECTION', 'scope'));
 
-        this.mainNavService.getDialogs().onEvent.subscribe((event: ManagementEvent) => {
+        this.mainNavService.getDialogs().eventTriggered.subscribe((event: ManagementEvent) => {
             if (event.event === ManagementEventType.AddCollectionNodes) {
                 if (event.data.collection.ref.id === this.collection.ref.id) {
                     this.listReferences.addVirtualNodes(event.data.references);

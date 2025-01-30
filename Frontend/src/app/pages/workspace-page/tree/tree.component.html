@@ -21,7 +21,7 @@
   <i class="material-icons" *ngIf="root === SHARED_FILES">keyboard_arrow_down</i>
   <i class="arrow" class="material-icons" *ngIf="root !== SHARED_FILES">keyboard_arrow_right</i>
 </div>
-<div class="tree" *ngIf="root == SHARED_FILES">
+<div class="tree" *ngIf="root === SHARED_FILES">
   <es-workspace-sub-tree
     [node]="'-shared_files-'"
     [currentPath]="currentPath"

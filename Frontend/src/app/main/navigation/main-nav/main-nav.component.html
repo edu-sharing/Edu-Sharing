@@ -1,6 +1,6 @@
 <ng-container *ngIf="visible">
   <es-skip-nav></es-skip-nav>
-  <es-banner [scope]="mainNavConfig.currentScope" (onUpdate)="refreshBanner()"></es-banner>
+  <es-banner [scope]="mainNavConfig.currentScope" (update)="refreshBanner()"></es-banner>
 
   <div
     *ngIf="mainNavConfig.showNavigation"
@@ -8,7 +8,7 @@
     role="navigation"
     [attr.aria-label]="'NAV.MAIN' | translate"
   >
-    <es-user-profile *ngIf="showProfile" (onCancel)="showProfile = false"></es-user-profile>
+    <es-user-profile *ngIf="showProfile" (cancelProfile)="showProfile = false"></es-user-profile>
 
     <es-global-progress *ngIf="globalProgress"></es-global-progress>
     <es-tutorial

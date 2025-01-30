@@ -54,7 +54,7 @@
             [attr.aria-expanded]="showChooseType || null"
             [attr.aria-controls]="showChooseType ? 'es-share-dialog-choose-type-menu' : null"
           >
-            <ng-container *ngIf="currentType.length == 0">
+            <ng-container *ngIf="currentType.length === 0">
               <i esIcon="help_outline"></i>
               <span>{{ 'WORKSPACE.SHARE.TYPE_UNKNOWN' | translate }}</span>
               <i aria-hidden="true" esIcon="keyboard_arrow_down"></i
@@ -90,8 +90,8 @@
           [selected]="currentType"
           [isDirectory]="_nodes[0].isDirectory"
           [canPublish]="!isSafe"
-          (onCancel)="showChooseType = false"
-          (onType)="setType($event)"
+          (cancelType)="showChooseType = false"
+          (typeChosen)="setType($event)"
         ></es-share-dialog-choose-type>
       </div>
 
@@ -243,8 +243,8 @@
             [isDeleted]="isDeleted(permission)"
             [isDirectory]="_nodes[0].isDirectory"
             [canPublish]="!isSafe"
-            (onRemove)="removePermission(permission)"
-            (onType)="permission.permissions = $event.permissions; updatePermissionInfo()"
+            (removePermission)="removePermission(permission)"
+            (changeType)="permission.permissions = $event.permissions; updatePermissionInfo()"
           ></es-share-dialog-permission>
         </div>
       </div>
@@ -265,8 +265,8 @@
             [isDeleted]="isDeleted(permission)"
             [isDirectory]="_nodes[0].isDirectory"
             [canPublish]="!isSafe"
-            (onRemove)="removePermission(permission)"
-            (onType)="permission.permissions = $event.permissions; updatePermissionInfo()"
+            (removePermission)="removePermission(permission)"
+            (changeType)="permission.permissions = $event.permissions; updatePermissionInfo()"
           ></es-share-dialog-permission>
         </div>
       </div>
@@ -358,10 +358,10 @@
         [node]="_nodes[0]"
         [permissions]="permissions"
         [inherited]="getPublishInherit()"
-        (onInitCompleted)="setInitialState()"
+        (initCompleted)="setInitialState()"
         [isAuthorEmpty]="isAuthorRequired() ? isAuthorEmpty() : false"
         [isLicenseEmpty]="isLicenseMandatory() ? isLicenseEmpty() : false"
-        (onDisableInherit)="inherited = false"
+        (disableInherit)="inherited = false"
       ></es-share-dialog-publish>
     </div>
   </mat-tab>
@@ -380,7 +380,7 @@
       <span class="tab-label">{{ 'WORKSPACE.TAB_ADVANCED' | translate }}</span>
     </ng-template>
     <div class="advanced">
-      <h4 class="mat-heading-4" *ngIf="permissionsUser.length + permissionsGroup.length == 0">
+      <h4 class="mat-heading-4" *ngIf="permissionsUser.length + permissionsGroup.length === 0">
         {{ 'WORKSPACE.SHARE.NO_PERMISSIONS' | translate }}
       </h4>
       <div *ngFor="let permission of permissionsGroup.concat(permissionsUser)">

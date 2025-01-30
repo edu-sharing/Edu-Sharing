@@ -22,8 +22,8 @@ import { RegisterService } from 'ngx-edu-sharing-api';
     styleUrls: ['register-form.component.scss'],
 })
 export class RegisterFormComponent implements OnDestroy {
-    @Output() onRegisterDone = new EventEmitter();
-    @Output() onStateChanged = new EventEmitter<void>();
+    @Output() registerDone = new EventEmitter<void>();
+    @Output() stateChanged = new EventEmitter<void>();
     password: string;
     registerForm: UntypedFormGroup;
     private destroyed$: ReplaySubject<void> = new ReplaySubject(1);
@@ -48,7 +48,7 @@ export class RegisterFormComponent implements OnDestroy {
         this.registerService.register(this.info).subscribe(
             () => {
                 this.toast.closeProgressSpinner();
-                this.onRegisterDone.emit();
+                this.registerDone.emit();
                 // this.toast.toast("REGISTER.TOAST");
             },
             (error) => {
@@ -113,7 +113,7 @@ export class RegisterFormComponent implements OnDestroy {
             });
             this.registerForm.statusChanges
                 .pipe(takeUntil(this.destroyed$))
-                .subscribe(() => this.onStateChanged.emit());
+                .subscribe(() => this.stateChanged.emit());
         });
     }
     ngOnDestroy() {

@@ -62,7 +62,7 @@
           mat-button
           color="primary"
           (click)="openContributorDialog()"
-          *ngIf="_nodes && _nodes.length == 1 && !ui.isMobile()"
+          *ngIf="_nodes?.length === 1 && !ui.isMobile()"
         >
           {{ 'MDS.CONTRIBUTOR_LINK' | translate }} <i esIcon="arrow_forward"></i>
         </button>

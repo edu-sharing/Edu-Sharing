@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Ace, AuthenticationService } from 'ngx-edu-sharing-api';
+import { AuthenticationService } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../../../core-module/core.module';
 import { ExtendedAce } from '../share-dialog.component';
 import { TypeResult } from '../choose-type/choose-type.component';
@@ -57,22 +57,22 @@ export class ShareDialogPermissionComponent implements OnInit {
     @Input() canPublish = true;
     @Input() timebasedAllowed = true;
     @Input() timebasedInvalid = false;
-    @Output() onRemove = new EventEmitter();
-    @Output() onType = new EventEmitter<TypeResult>();
+    @Output() removePermission = new EventEmitter<void>();
+    @Output() changeType = new EventEmitter<TypeResult>();
 
     public showChooseType = false;
     timebasedOpen = false;
     currentDate = new Date().getTime();
 
     public remove() {
-        if (this.showDelete) this.onRemove.emit();
+        if (this.showDelete) this.removePermission.emit();
     }
     public chooseType() {
         if (this.isEditable !== true || this.isEveryone) return;
         this.showChooseType = true;
     }
-    changeType(type: TypeResult) {
-        this.onType.emit(type);
+    doChangeType(type: TypeResult) {
+        this.changeType.emit(type);
         if (type.wasMain) this.showChooseType = false;
     }
 

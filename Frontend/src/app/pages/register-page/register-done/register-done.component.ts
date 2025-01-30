@@ -14,8 +14,8 @@ import { RegisterService } from 'ngx-edu-sharing-api';
     styleUrls: ['register-done.component.scss'],
 })
 export class RegisterDoneComponent {
-    @Output() onModify = new EventEmitter<void>();
-    @Output() onStateChanged = new EventEmitter<void>();
+    @Output() modify = new EventEmitter<void>();
+    @Output() stateChanged = new EventEmitter<void>();
     @Input() inputState: string;
     loading = false;
     email = '';
@@ -33,7 +33,7 @@ export class RegisterDoneComponent {
     }
 
     public editMail() {
-        this.onModify.emit();
+        this.modify.emit();
     }
     public sendMail() {
         this.loading = true;

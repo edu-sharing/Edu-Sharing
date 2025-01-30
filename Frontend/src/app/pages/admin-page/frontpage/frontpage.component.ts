@@ -34,7 +34,7 @@ export class AdminFrontpageComponent implements AfterViewInit {
 
     @ViewChild(NodeEntriesWrapperComponent) nodeEntries: NodeEntriesWrapperComponent<Node>;
 
-    @Output() onOpenNode = new EventEmitter();
+    @Output() openNode = new EventEmitter<Node>();
     previewLoading = true;
     config: any;
     modes = ['collection', 'rating', 'views', 'downloads'];
@@ -175,8 +175,8 @@ export class AdminFrontpageComponent implements AfterViewInit {
                 },
             );
     }
-    openNode(node: any) {
-        this.onOpenNode.emit(node.node);
+    doOpenNode(node: { node: Node }) {
+        this.openNode.emit(node.node);
     }
 
     setCollection(collection: Node) {

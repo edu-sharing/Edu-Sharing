@@ -50,7 +50,7 @@ export class AdminMediacenterComponent {
     @ViewChild('mediacenterMds') mediacenterMds: MdsEditorWrapperComponent;
     @ViewChild('nodeEntriesTable') nodeEntriesTable: NodeEntriesWrapperComponent<Node>;
     @ViewChild('groupEntriesTable') groupEntriesTable: NodeEntriesWrapperComponent<Node>;
-    @Output() onOpenNode = new EventEmitter<Node>();
+    @Output() openNode = new EventEmitter<Node>();
     // @TODO: declare the mediacenter type when it is finalized in backend
     mediacenters: any[];
     // original link to mediacenter object (contained in mediacenters[])

@@ -27,7 +27,7 @@
     [required]="true"
     (keydown.enter)="register()"
     [(value)]="password"
-    (valueChange)="onStateChanged.emit()"
+    (valueChange)="stateChanged.emit()"
   ></es-input-password>
   <mat-form-field class="organization">
     <mat-label>{{ 'REGISTER.ORGANIZATION' | translate }}</mat-label>

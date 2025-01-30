@@ -108,7 +108,7 @@ export class AdminStatisticsComponent implements OnInit {
         this._mediacenter = mediacenter;
         this.refresh();
     }
-    @Output() onOpenNode = new EventEmitter();
+    @Output() openNode = new EventEmitter<Node>();
     static DAY_OFFSET = 1000 * 60 * 60 * 24;
     static DEFAULT_OFFSET = AdminStatisticsComponent.DAY_OFFSET * 7; // 7 days
     static DEFAULT_OFFSET_SINGLE = AdminStatisticsComponent.DAY_OFFSET * 3; // 3 days

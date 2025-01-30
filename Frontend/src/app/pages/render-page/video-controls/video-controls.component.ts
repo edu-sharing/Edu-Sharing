@@ -91,7 +91,7 @@ export class VideoControlsComponent implements OnInit, OnDestroy {
             this.mainNav.getDialogs().addToCollection = [this.node];
             this.mainNav
                 .getDialogs()
-                .onStoredAddToCollection.pipe(first())
+                .storedAddToCollection.pipe(first())
                 .pipe
                 // takeUntil(this.destroyed$)
                 ()

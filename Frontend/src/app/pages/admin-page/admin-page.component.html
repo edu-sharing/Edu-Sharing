@@ -190,19 +190,19 @@
       </div>
     </div>
     <div *ngIf="modeIsActive('STATISTICS')" class="content statistics">
-      <es-admin-statistics (onOpenNode)="openNodeRender($event)"></es-admin-statistics>
+      <es-admin-statistics (openNode)="openNodeRender($event)"></es-admin-statistics>
     </div>
     <div *ngIf="modeIsActive('MEDIACENTER')" class="content mediacenter">
-      <es-admin-mediacenter (onOpenNode)="openNodeRender($event)"></es-admin-mediacenter>
+      <es-admin-mediacenter (openNode)="openNodeRender($event)"></es-admin-mediacenter>
     </div>
     <div *ngIf="modeIsActive('FRONTPAGE')" class="content frontpage">
-      <es-admin-frontpage (onOpenNode)="openNodeRender($event)"></es-admin-frontpage>
+      <es-admin-frontpage (openNode)="openNodeRender($event)"></es-admin-frontpage>
     </div>
     <div *ngIf="modeIsActive('GLOBAL_CONFIG')" class="content global-config">
       <es-admin-config></es-admin-config>
     </div>
     <div *ngIf="modeIsActive('PLUGINS')" class="content plugins">
-      <app-admin-plugins></app-admin-plugins>
+      <es-admin-plugins></es-admin-plugins>
     </div>
     <div *ngIf="modeIsActive('APPLICATIONS')" class="content applications">
       <input
@@ -267,11 +267,11 @@
       <h4 class="mat-heading-4 mat-heading-underline">
         <span>{{ 'ADMIN.LTI.HEADER' | translate }}</span>
       </h4>
-      <es-lti-admin (onRefreshAppList)="refreshAppList()"></es-lti-admin>
+      <es-lti-admin (refreshAppList)="refreshAppList()"></es-lti-admin>
       <h4 class="mat-heading-4 mat-heading-underline">
         <span>{{ 'ADMIN.LTITOOL.HEADER' | translate }}</span>
       </h4>
-      <es-ltitool-admin (onRefreshAppList)="refreshAppList()"></es-ltitool-admin>
+      <es-ltitool-admin (refreshAppList)="refreshAppList()"></es-ltitool-admin>
       <h4 class="mat-heading-4 mat-heading-underline">
         <span>{{ 'ADMIN.APPLICATIONS.LIST' | translate }}</span>
       </h4>

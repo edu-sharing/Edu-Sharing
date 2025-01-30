@@ -37,9 +37,9 @@ export class AddStreamComponent {
     @Input() set nodes(nodes: Node[]) {
         this._nodes = nodes;
     }
-    @Output() onCancel = new EventEmitter();
-    @Output() onLoading = new EventEmitter();
-    @Output() onDone = new EventEmitter();
+    @Output() cancelStream = new EventEmitter<void>();
+    @Output() loading = new EventEmitter<boolean>();
+    @Output() done = new EventEmitter<void>();
     constructor(
         private connector: RestConnectorService,
         private streamApi: RestStreamService,
@@ -52,10 +52,10 @@ export class AddStreamComponent {
         this.connector.isLoggedIn(false).subscribe((data: LoginResult) => {});
     }
     public cancel() {
-        this.onCancel.emit();
+        this.cancelStream.emit();
     }
-    public done() {
-        this.onDone.emit();
+    public triggerDone() {
+        this.done.emit();
     }
     public addInvite(event: AuthorityProfile) {
         if (Helper.indexOfObjectArray(this.invite, 'authorityName', event.authorityName) == -1)
@@ -73,7 +73,7 @@ export class AddStreamComponent {
             this.toast.error(null, 'ADD_TO_STREAM.ERROR.NO_PERSON_INVITED');
             return;
         }
-        this.onLoading.emit(true);
+        this.loading.emit(true);
         this.streamEntry.title = values['add_to_stream_title'][0];
         this.streamEntry.priority = 5; //values['add_to_stream_priority'][0];
         this.streamEntry.description = values['add_to_stream_description']
@@ -88,8 +88,8 @@ export class AddStreamComponent {
                     this.streamApi
                         .updateStatus(id, RestConstants.AUTHORITY_EVERYONE, STREAM_STATUS.OPEN)
                         .subscribe(() => {
-                            this.onLoading.emit(false);
-                            this.onDone.emit();
+                            this.loading.emit(false);
+                            this.done.emit();
                             this.toast.toast('ADD_TO_STREAM.SUCCESSFUL');
                         });
                 } else {
@@ -97,7 +97,7 @@ export class AddStreamComponent {
                 }
             },
             (error: any) => {
-                this.onLoading.emit(false);
+                this.loading.emit(false);
                 this.toast.error(error);
             },
         );
@@ -105,8 +105,8 @@ export class AddStreamComponent {
 
     private invitePersons(id: string, position = 0) {
         if (position == this.invite.length) {
-            this.onLoading.emit(false);
-            this.onDone.emit();
+            this.loading.emit(false);
+            this.done.emit();
             return;
         }
         this.streamApi

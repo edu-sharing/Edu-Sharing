@@ -24,8 +24,8 @@ export class WorkspaceMetadataBlockComponent {
     @Input() set node(node: Node) {
         void this.load(node);
     }
-    @Output() onEditMetadata = new EventEmitter();
-    @Output() onDisplay = new EventEmitter();
+    @Output() editMetadata = new EventEmitter();
+    @Output() display = new EventEmitter();
     permissions: any;
     data: any;
     _node: Node;

@@ -21,7 +21,7 @@
     <li *ngFor="let suggestion of _suggestions">
       <a
         (click)="handleSuggestClick(suggestion)"
-        [class.activeItem]="activeItem == suggestion.index"
+        [class.activeItem]="activeItem === suggestion.index"
         title="{{ 'SUGGESTION' | translate }} {{ suggestion.title }}"
       >
         <div *ngIf="contentRef">

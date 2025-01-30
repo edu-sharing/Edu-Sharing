@@ -13,7 +13,7 @@
           <es-permissions-authorities
             [mode]="'ORG'"
             [searchQuery]="searchQuery"
-            (onSelection)="selected = $event ? $any($event[0]) : null"
+            (selection)="selected = $event ? $any($event[0]) : null"
           ></es-permissions-authorities>
         </ng-template>
       </mat-tab>
@@ -28,7 +28,7 @@
             [mode]="'GROUP'"
             [searchQuery]="searchQuery"
             [org]="selected"
-            (onDeselectOrg)="selected = null"
+            (deselectOrg)="selected = null"
             (setTab)="setTab($event)"
           ></es-permissions-authorities>
         </ng-template>
@@ -44,7 +44,7 @@
             [mode]="'USER'"
             [searchQuery]="searchQuery"
             [org]="selected"
-            (onDeselectOrg)="selected = null"
+            (deselectOrg)="selected = null"
             (setTab)="setTab($event)"
           ></es-permissions-authorities>
         </ng-template>

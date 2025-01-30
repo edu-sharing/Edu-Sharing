@@ -19,7 +19,7 @@
     [columnsIds]="'relationNodes'"
     [permissions]="permissions"
     [criteria]="getCriteria()"
-    (onSelect)="target = $event; updateButtons()"
+    (selectNode)="target = $event; updateButtons()"
     label="{{ 'NODE_RELATIONS.RELATION_SEARCH_LABEL' | translate }}"
   >
     <ng-template #noPermissions>

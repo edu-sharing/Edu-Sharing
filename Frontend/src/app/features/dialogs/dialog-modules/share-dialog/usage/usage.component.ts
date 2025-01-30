@@ -19,8 +19,6 @@ export class ShareDialogUsageComponent {
     @Input() deleteList: any[];
     @Output() deleteListChange = new EventEmitter();
     @Input() showDelete = true;
-    @Output() onRemoveAll = new EventEmitter();
-    @Output() onRemove = new EventEmitter();
     showAll = false;
     isDeleted(usage: any) {
         return this.deleteList.indexOf(usage) != -1;

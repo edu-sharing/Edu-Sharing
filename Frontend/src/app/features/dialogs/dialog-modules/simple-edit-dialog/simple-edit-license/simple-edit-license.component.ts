@@ -30,8 +30,8 @@ export class SimpleEditLicenseComponent implements OnInit {
     @ViewChild('modeGroup') modeGroup: MatButtonToggleGroup;
     @ViewChild('licenseGroup') licenseGroup: MatButtonToggleGroup;
     @Input() fromUpload: boolean;
-    @Output() onInitFinished = new EventEmitter<void>();
-    @Output() onError = new EventEmitter<any>();
+    @Output() initFinished = new EventEmitter<void>();
+    @Output() errorEvent = new EventEmitter<any>();
 
     _nodes: Node[];
     allowedLicenses: string[];
@@ -199,10 +199,10 @@ export class SimpleEditLicenseComponent implements OnInit {
                             }
                         }
                     }
-                    this.onInitFinished.emit();
+                    this.initFinished.emit();
                 });
             },
-            (error) => this.onError.emit(error),
+            (error) => this.errorEvent.emit(error),
         );
     }
 

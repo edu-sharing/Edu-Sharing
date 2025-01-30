@@ -1,13 +1,13 @@
 <ng-container *ngIf="data">
   <img
     class="preview clickable"
-    (click)="onDisplay.emit(_node)"
+    (click)="display.emit(_node)"
     [src]="
       _node | esNodeImage : (isAnimated() ? {} : { crop: true, width: 600, height: 450 }) | async
     "
   />
   <div class="metadata-container">
-    <button mat-icon-button class="edit" (click)="onEditMetadata.emit(_node)" *ngIf="canEdit()">
+    <button mat-icon-button class="edit" (click)="editMetadata.emit(_node)" *ngIf="canEdit()">
       <i class="material-icons">edit</i>
     </button>
     <div class="metadata">
@@ -47,7 +47,7 @@
         <span *ngIf="data.isCollection">{{ 'MEDIATYPE.collection' | translate }}</span>
         <span
           class="mimetype"
-          *ngIf="data.mimetype && data.mediatype != data.mimetype && !data.isDirectory"
+          *ngIf="data.mimetype && data.mediatype !== data.mimetype && !data.isDirectory"
           >({{ data.mimetype }})</span
         >
       </div>

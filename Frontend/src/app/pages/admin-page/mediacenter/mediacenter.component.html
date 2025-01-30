@@ -187,7 +187,7 @@
             mode="search"
             editorMode="search"
             [currentValues]="{}"
-            (onMdsLoaded)="searchMediaCenterNodes()"
+            (mdsLoaded)="searchMediaCenterNodes()"
             groupId="mediacenter_filter"
           ></es-mds-editor-wrapper>
           <mat-form-field class="searchword">
@@ -207,7 +207,7 @@
             [columns]="nodeColumns"
             [configureColumns]="true"
             [sort]="mediacenterNodesSort"
-            (clickItem)="onOpenNode.emit($event.element)"
+            (clickItem)="openNode.emit($event.element)"
             (sortChange)="setMediacenterNodesSort($event)"
             (fetchData)="loadMediacenterNodes()"
           ></es-node-entries-wrapper>
@@ -218,7 +218,7 @@
         <es-admin-statistics
           *ngIf="currentTab === 3 && currentMediacenter"
           [mediacenter]="currentMediacenter"
-          (onOpenNode)="onOpenNode.emit($event)"
+          (openNode)="openNode.emit($event)"
         ></es-admin-statistics>
       </mat-tab>
     </mat-tab-group>

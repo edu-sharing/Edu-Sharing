@@ -49,8 +49,8 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
     @Input() inherited: boolean;
     @Input() isAuthorEmpty: boolean;
     @Input() isLicenseEmpty: boolean;
-    @Output() onDisableInherit = new EventEmitter<void>();
-    @Output() onInitCompleted = new EventEmitter<void>();
+    @Output() disableInherit = new EventEmitter<void>();
+    @Output() initCompleted = new EventEmitter<void>();
     @ViewChild('shareModeCopyRef') shareModeCopyRef: any;
     @ViewChild('shareModeDirectRef') shareModeDirectRef: any;
     handlePermission: boolean;
@@ -129,8 +129,8 @@ export class ShareDialogPublishComponent implements OnChanges, OnInit, OnDestroy
                 ).node;
             }
             this.refresh();
-            this.onInitCompleted.emit();
-            this.onInitCompleted.complete();
+            this.initCompleted.emit();
+            this.initCompleted.complete();
         }
     }
 

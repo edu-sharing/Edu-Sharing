@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
 import { TranslateService } from '@ngx-translate/core';
@@ -22,7 +22,7 @@ import { CardDialogService } from '../../../../dialogs/card-dialog/card-dialog.s
         },
     ],
 })
-export class MdsEditorWidgetTinyMCE extends MdsEditorWidgetBase implements OnInit, AfterViewInit {
+export class MdsEditorWidgetTinyMCEComponent extends MdsEditorWidgetBase implements AfterViewInit {
     @ViewChild(EditorComponent) editorComponent: EditorComponent;
     @ViewChild(MdsEditorWidgetContainerComponent)
     containerComponent: MdsEditorWidgetContainerComponent;
@@ -57,7 +57,6 @@ export class MdsEditorWidgetTinyMCE extends MdsEditorWidgetBase implements OnIni
     ) {
         super(mdsEditorInstance, translate);
     }
-    ngOnInit(): void {}
 
     onIndeterminateChange(isIndeterminate: boolean): void {
         this.setIndeterminateValues(isIndeterminate);

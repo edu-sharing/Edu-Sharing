@@ -76,7 +76,7 @@
             <mat-radio-button
               *ngFor="let group of customGroups"
               value="{{ group }}"
-              [disabled]="group == customGroup"
+              [disabled]="group === customGroup"
               >{{ 'ADMIN.STATISTICS.HEADERS.' + group | translate }}</mat-radio-button
             >
           </mat-radio-group>
@@ -117,10 +117,10 @@
       >
         <ng-container *ngFor="let key of customGroupRows" [matColumnDef]="key">
           <mat-header-cell *matHeaderCellDef>
-            <span *ngIf="key === 'action' || key === 'count' || key == customGroup">{{
+            <span *ngIf="key === 'action' || key === 'count' || key === customGroup">{{
               'ADMIN.STATISTICS.HEADERS.' + key | translate
             }}</span>
-            <span *ngIf="!(key === 'action' || key === 'count' || key == customGroup)">{{
+            <span *ngIf="!(key === 'action' || key === 'count' || key === customGroup)">{{
               customGroupLabels[key] || key
             }}</span>
           </mat-header-cell>
@@ -129,8 +129,8 @@
               'ADMIN.STATISTICS.ACTIONS.' + element[key] | translate
             }}</span>
             <span *ngIf="key === 'count'">{{ element[key] }}</span>
-            <span *ngIf="key == customGroup">{{ element.displayValue }}</span>
-            <span *ngIf="!(key === 'action' || key === 'count' || key == customGroup)">{{
+            <span *ngIf="key === customGroup">{{ element.displayValue }}</span>
+            <span *ngIf="!(key === 'action' || key === 'count' || key === customGroup)">{{
               element.entry.groups[element['action']]
                 ? element.entry.groups[element['action']][customUnfold][key]
                 : 0
@@ -219,7 +219,7 @@
         [checkbox]="false"
         [displayType]="NodeEntriesDisplayType.Table"
         [columns]="columns"
-        (clickItem)="onOpenNode.emit($event.element)"
+        (clickItem)="openNode.emit($event.element)"
       ></es-node-entries-wrapper>
       <es-info-message *ngIf="!nodesNoData">
         {{ 'ADMIN.STATISTICS.SLICE_INFO_DOWNLOAD' | translate }}

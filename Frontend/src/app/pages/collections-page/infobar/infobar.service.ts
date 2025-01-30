@@ -42,7 +42,7 @@ export class InfobarService {
                     }),
             );
             componentRef.instance.isCancelable = true;
-            componentRef.instance.onCancel.subscribe(() => this.overlayRef.dispose());
+            componentRef.instance.cancelInfobar.subscribe(() => this.overlayRef.dispose());
             componentRef.onDestroy(() => {
                 this.overlayRef = null;
                 resolve(null);

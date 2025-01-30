@@ -43,7 +43,7 @@
         <input
           matInput
           [(ngModel)]="link"
-          (keyup.enter)="setLink()"
+          (keyup.enter)="doSetLink()"
           [disabled]="!!selectedFiles.value"
           placeholder="http://"
         />

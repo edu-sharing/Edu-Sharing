@@ -91,7 +91,7 @@ export class WorkspaceMetadataComponent implements OnInit {
     @Output() editMetadata = new EventEmitter();
     @Output() download = new EventEmitter();
     @Output() display = new EventEmitter<Node>();
-    @Output() close = new EventEmitter<void>();
+    @Output() closeMetadata = new EventEmitter<void>();
     @Output() restore = new EventEmitter();
 
     readonly NodeEntriesDisplayType = NodeEntriesDisplayType;
@@ -334,7 +334,7 @@ export class WorkspaceMetadataComponent implements OnInit {
     }
 
     doClose() {
-        this.close.emit();
+        this.closeMetadata.emit();
     }
 
     edit() {

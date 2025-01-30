@@ -197,7 +197,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     }
 
     ngAfterViewInit(): void {
-        this.mainNavService.getDialogs().onStoredAddToCollection.subscribe((event) => {
+        this.mainNavService.getDialogs().storedAddToCollection.subscribe((event) => {
             this.refresh();
         });
     }
@@ -261,7 +261,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     _node: Node;
     _fromHomeRepository: boolean;
     _nodeId: string;
-    @Output() onClose = new EventEmitter();
+    @Output() closePage = new EventEmitter<void>();
     similarNodeColumns: ListItem[] = [];
 
     @HostListener('window:beforeunload', ['$event'])
@@ -332,7 +332,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                                 this.mainNavService.getMainNav().topBar?.toggleMenuSidebar();
                                 this.mainNavService
                                     .getMainNav()
-                                    .topBar.onCloseScopeSelector.pipe(takeUntil(this.destroyed$))
+                                    .topBar.closeScopeSelector.pipe(takeUntil(this.destroyed$))
                                     .subscribe(() => {
                                         this.mainNavService.patchMainNavConfig({
                                             showNavigation: false,
@@ -343,7 +343,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                     }, 250);
                 }
             }
-        } else this.onClose.emit();
+        } else this.closePage.emit();
     }
 
     showDetails() {
@@ -537,7 +537,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                             nodeRenderContent.html(data.detailsSnippet);
                             this.moveInnerStyleToHead(nodeRenderContent);
                             this.postprocessHtml();
-                            this.handleProposal();
+                            void this.handleProposal();
                             this.renderHelper.doAll(this._node);
                             this.loadNode();
                             // this.loadSimilarNodes();

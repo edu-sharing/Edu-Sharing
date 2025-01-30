@@ -11,7 +11,7 @@ import { RegisterService } from 'ngx-edu-sharing-api';
     styleUrls: ['register-reset-password.component.scss'],
 })
 export class RegisterResetPasswordComponent {
-    @Output() onStateChanged = new EventEmitter<void>();
+    @Output() stateChanged = new EventEmitter<void>();
     public new_password = '';
     @Input() params: Params;
     public buttonCheck() {

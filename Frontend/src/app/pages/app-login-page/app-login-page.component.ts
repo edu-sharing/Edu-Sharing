@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { Toast } from '../../services/toast';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,7 +30,7 @@ enum StateUI {
     styleUrls: ['app-login-page.component.scss'],
 })
 // tslint:disable:no-console
-export class AppLoginPageComponent implements OnInit {
+export class AppLoginPageComponent {
     public isLoading = true;
     public disabled = true;
 
@@ -99,8 +99,6 @@ export class AppLoginPageComponent implements OnInit {
     buttonExitApp(): void {
         this.cordova.exitApp();
     }
-
-    ngOnInit() {}
 
     checkConditions(): void {
         this.disabled = !this.username; // || !this.password;

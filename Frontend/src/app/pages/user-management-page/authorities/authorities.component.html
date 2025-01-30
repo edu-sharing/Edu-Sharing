@@ -10,7 +10,7 @@
           'PERMISSIONS.INFO_ORG_' + _mode | translate : { org: org.profile.displayName }
         }}</span>
         <span *ngIf="isAdmin">
-          <a class="clickable" (click)="deselectOrg()">{{ 'PERMISSIONS.NO_ORG' | translate }}</a>
+          <a class="clickable" (click)="doDeselectOrg()">{{ 'PERMISSIONS.NO_ORG' | translate }}</a>
           <a class="clickable" (click)="setOrgTab()">{{ 'PERMISSIONS.CHOOSE_ORG' | translate }}</a>
         </span>
       </div>
@@ -21,7 +21,7 @@
 <es-toolpermission-manager
   *ngIf="toolpermissionAuthority"
   [authority]="toolpermissionAuthority"
-  (onClose)="toolpermissionAuthority = null"
+  (closeManager)="toolpermissionAuthority = null"
 ></es-toolpermission-manager>
 <es-card
   *ngIf="editStatus"
@@ -155,7 +155,7 @@
 
 <es-card
   *ngIf="edit"
-  title="{{ 'PERMISSIONS.' + (editId == null ? 'CREATE' : 'EDIT') + '_' + _mode | translate }}"
+  title="{{ 'PERMISSIONS.' + (editId === null ? 'CREATE' : 'EDIT') + '_' + _mode | translate }}"
   [subtitle]="
     editId
       ? edit.authorityName
@@ -401,7 +401,7 @@
       [mode]="'GROUP'"
       [org]="org"
       [embedded]="true"
-      (onSelection)="addToSelection = $event"
+      (selection)="addToSelection = $event"
     ></es-permissions-authorities>
   </div>
   <div class="btns">

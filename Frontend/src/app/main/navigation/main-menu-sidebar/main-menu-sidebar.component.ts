@@ -28,7 +28,7 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
     @Input() currentScope: string;
 
     @Output() showLicenses = new EventEmitter<void>();
-    @Output() onClose = new EventEmitter<void>();
+    @Output() closeSidebar = new EventEmitter<void>();
 
     // Internal state
     show = false;
@@ -83,7 +83,7 @@ export class MainMenuSidebarComponent implements OnInit, OnDestroy {
 
     hide() {
         this.show = false;
-        this.onClose.emit();
+        this.closeSidebar.emit();
     }
 
     onShowLicenses() {

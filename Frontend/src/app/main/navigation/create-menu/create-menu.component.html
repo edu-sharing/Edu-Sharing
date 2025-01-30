@@ -7,7 +7,7 @@
 ></es-dropdown>
 
 <es-create-ltitool
-  *ngIf="createToolType != null"
+  *ngIf="createToolType !== null"
   [tool]="createToolType"
   [parent]="_parent"
   (cancel)="cancelLtiTool($event)"
@@ -16,7 +16,7 @@
 </es-create-ltitool>
 
 <div
-  *ngIf="!(cardHasOpenModals$ | async)"
+  *ngIf="(cardHasOpenModals$ | async) === false"
   esFileDrop
   [window]="true"
   (fileOver)="fileIsOver = $event"

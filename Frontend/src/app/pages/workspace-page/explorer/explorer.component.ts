@@ -208,17 +208,17 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
     @Input() set searchQuery(query: any) {
         this.setSearchQuery(query);
     }
-    @Output() onOpenNode = new EventEmitter<NodeEntriesDataType>();
-    @Output() onViewNode = new EventEmitter();
-    @Output() onSelectionChanged = new EventEmitter();
-    @Output() onSelectNode = new EventEmitter<NodeEntriesDataType>();
-    @Output() onSearchGlobal = new EventEmitter();
-    @Output() onDrop = new EventEmitter<{ target: DropTarget; source: DropSource<Node> }>();
-    @Output() onReset = new EventEmitter();
+    @Output() openNode = new EventEmitter<NodeEntriesDataType>();
+    @Output() viewNode = new EventEmitter();
+    @Output() selectionChanged = new EventEmitter<Node[]>();
+    @Output() selectNode = new EventEmitter<NodeEntriesDataType>();
+    @Output() searchGlobal = new EventEmitter<string>();
+    @Output() dropElement = new EventEmitter<{ target: DropTarget; source: DropSource<Node> }>();
+    @Output() resetDataSource = new EventEmitter<void>();
     private path: Node[];
     private destroyed = new Subject<void>();
-    searchGlobal() {
-        this.onSearchGlobal.emit(this.searchQuery$.value);
+    doSearchGlobal() {
+        this.searchGlobal.emit(this.searchQuery$.value);
     }
     public load(event: FetchEvent = null) {
         if (this.node$.value == null && !this.searchQuery$.value) return;
@@ -240,7 +240,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
         if (event?.reset) {
             this.dataSource.reset();
             this.nodeEntries.getSelection().clear();
-            this.onReset.emit();
+            this.resetDataSource.emit();
             if (event.offset === 0) {
                 this.nodeEntries.resetPagination();
             }
@@ -401,7 +401,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
         await this.load({ reset: true, offset: 0 });
     }
     public onSelection(event: Node[]) {
-        this.onSelectionChanged.emit(event);
+        this.selectionChanged.emit(event);
     }
     /*
     private addParentToPath(node : Node,path : string[]) {
@@ -418,7 +418,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
     }
      */
     public doubleClick(node: Node) {
-        this.onOpenNode.emit(node);
+        this.openNode.emit(node);
     }
 
     private setNode(current: Node) {
@@ -449,7 +449,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
     }
     canDrop = canDropOnNode;
     drop = (target: DropTarget, source: DropSource<Node>) => {
-        this.onDrop.emit({
+        this.dropElement.emit({
             target,
             source,
         });
@@ -500,7 +500,7 @@ export class WorkspaceExplorerComponent implements OnDestroy, OnChanges, AfterVi
 
     clickItem(event: NodeClickEvent<NodeEntriesDataType>) {
         if (this.ui.isMobile()) {
-            this.onOpenNode.emit(event.element);
+            this.openNode.emit(event.element);
         } else {
             this.select(event);
         }

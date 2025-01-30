@@ -14,7 +14,7 @@
     [displayType]="NodeEntriesDisplayType.Grid"
     [columns]="proposalColumns"
     [globalOptions]=""
-    (clickItem)="onContentClick.emit($event.element)"
+    (clickItem)="contentClick.emit($event.element)"
     class="no-padding"
   ></es-node-entries-wrapper>
 </section>

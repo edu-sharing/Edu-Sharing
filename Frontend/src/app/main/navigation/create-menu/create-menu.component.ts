@@ -94,7 +94,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     /**
      * Fired when elements are created or uploaded
      */
-    @Output() onCreate = new EventEmitter<Node[]>();
+    @Output() createElement = new EventEmitter<Node[]>();
 
     _parent: Node = null;
 
@@ -103,7 +103,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     cardHasOpenModals$: Observable<boolean>;
     options: OptionItem[];
     tools: Tools;
-    createToolType: Tool;
+    createToolType: Tool = null;
 
     showPicker: boolean; // keep public - used by extensions
     private params: Params;
@@ -165,7 +165,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.optionsService.virtualNodesAdded
             .pipe(takeUntil(this.destroyed))
-            .subscribe((nodes) => this.onCreate.emit(nodes));
+            .subscribe((nodes) => this.createElement.emit(nodes));
         this.paste
             .observeUrlPasteOnPage()
             .pipe(takeUntil(this.destroyed))
@@ -193,7 +193,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             parent: await this.getParent(),
         });
         if (nodes) {
-            this.onCreate.emit(nodes);
+            this.createElement.emit(nodes);
         }
     }
 
@@ -340,7 +340,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             chooseParent: this.showPicker,
         });
         if (nodes && Array.isArray(nodes)) {
-            this.onCreate.emit(nodes);
+            this.createElement.emit(nodes);
         }
     }
 
@@ -371,7 +371,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             .subscribe(
                 (data) => {
                     this.toast.closeProgressSpinner();
-                    this.onCreate.emit([data.node]);
+                    this.createElement.emit([data.node]);
                     this.toast.toast('WORKSPACE.TOAST.FOLDER_ADDED');
                 },
                 (error: any) => {
@@ -415,7 +415,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             if (this.params.reurl) {
                 this.nodeHelper.addNodeToLms(nodes[0], this.params.reurl);
             }
-            this.onCreate.emit(nodes);
+            this.createElement.emit(nodes);
         }
     }
 
@@ -513,7 +513,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                     );
                     const node: VirtualNode = { ...data.node, virtual: true };
                     node.observe = true;
-                    this.onCreate.emit([node]);
+                    this.createElement.emit([node]);
                 },
                 (error: any) => {
                     event.window?.close();
@@ -584,13 +584,13 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
                 if (this.createToolType.customContentOption == true) {
                     UIHelper.openLTIResourceLink(w, n);
 
-                    this.onCreate.emit([n]);
+                    this.createElement.emit([n]);
                     this.createToolType = null;
                 } else {
                     const prop = RestHelper.createNameProperty(n.name);
                     this.nodeService.editNodeMetadata(n.ref.id, prop).subscribe(
                         (data) => {
-                            this.onCreate.emit([data.node]);
+                            this.createElement.emit([data.node]);
                             this.createToolType = null;
                         },
                         (error: any) => {

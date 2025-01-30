@@ -34,7 +34,7 @@
       }}
     </div>
   </div>
-  <div class="comments comments-loading" *ngIf="loading"><es-spinner></es-spinner></div>
+  <div class="comments comments-loading" *ngIf="isLoading"><es-spinner></es-spinner></div>
   <div class="comments" [class.commentsLong]="!canComment()" *ngIf="comments">
     <div *ngIf="comments && !comments.length && canComment()" class="no-comments">
       {{ 'NODE_COMMENTS.NO_COMMENTS' | translate }}
@@ -61,8 +61,8 @@
               ></i>
             </button>
           </div>
-          <div class="commentText" *ngIf="comment != editComment">{{ comment.comment }}</div>
-          <div class="commentTextEdit" *ngIf="comment == editComment">
+          <div class="commentText" *ngIf="comment !== editComment">{{ comment.comment }}</div>
+          <div class="commentTextEdit" *ngIf="comment === editComment">
             <form (ngSubmit)="saveEditComment()">
               <mat-form-field>
                 <textarea
@@ -76,7 +76,7 @@
           </div>
         </div>
       </div>
-      <div class="icons" *ngIf="comment == editComment">
+      <div class="icons" *ngIf="comment === editComment">
         <div
           class="btn-negative"
           tabindex="0"
@@ -94,7 +94,7 @@
           <i esIcon="check"></i>
         </div>
       </div>
-      <div class="date" *ngIf="comment != editComment">{{ comment.created | formatDate }}</div>
+      <div class="date" *ngIf="comment !== editComment">{{ comment.created | formatDate }}</div>
     </div>
   </div>
 </div>

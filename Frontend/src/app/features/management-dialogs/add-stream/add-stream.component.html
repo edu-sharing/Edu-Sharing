@@ -25,10 +25,10 @@
         [(ngModel)]="audienceMode"
         value="1"
       /><label for="audienceTypeCustom">{{ 'ADD_TO_STREAM.AUDIENCE_CUSTOM' | translate }}</label>
-      <div class="audienceEveryone" *ngIf="audienceMode == AUDIENCE_MODE_EVERYONE">
+      <div class="audienceEveryone" *ngIf="audienceMode === AUDIENCE_MODE_EVERYONE">
         {{ 'ADD_TO_STREAM.AUDIENCE_EVERYONE_INFO' | translate }}
       </div>
-      <div class="audienceSearch" *ngIf="audienceMode == AUDIENCE_MODE_CUSTOM">
+      <div class="audienceSearch" *ngIf="audienceMode === AUDIENCE_MODE_CUSTOM">
         <div class="search">
           <es-authority-search-input
             [globalSearchAllowed]="false"

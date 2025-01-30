@@ -13,7 +13,7 @@
     #metadata
     [nodes]="_nodes"
     [fromUpload]="data.fromUpload"
-    (onError)="_handleError($event)"
+    (errorEvent)="_handleError($event)"
   ></es-simple-edit-metadata>
 </div>
 <div class="block">
@@ -36,8 +36,8 @@
     #invite
     [nodes]="_nodes"
     [fromUpload]="data.fromUpload"
-    (onError)="_handleError($event)"
-    (onInitFinished)="_updateInitState('invite')"
+    (errorEvent)="_handleError($event)"
+    (initFinished)="_updateInitState('invite')"
   ></es-simple-edit-invite>
 </div>
 <div class="block">
@@ -55,7 +55,7 @@
     #license
     [nodes]="_nodes"
     [fromUpload]="data.fromUpload"
-    (onError)="_handleError($event)"
-    (onInitFinished)="_updateInitState('license')"
+    (errorEvent)="_handleError($event)"
+    (initFinished)="_updateInitState('license')"
   ></es-simple-edit-license>
 </div>

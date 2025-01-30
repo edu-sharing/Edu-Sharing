@@ -174,7 +174,7 @@
           </ng-container>
         </button>
 
-        <div *ngIf="_permission.permissions.length == 0"></div>
+        <div *ngIf="_permission.permissions.length === 0"></div>
 
         <es-share-dialog-choose-type
           *ngIf="showChooseType"
@@ -185,8 +185,8 @@
           [selected]="_permission.permissions"
           [isDirectory]="isDirectory"
           [canPublish]="canPublish"
-          (onCancel)="showChooseType = false"
-          (onType)="changeType($event)"
+          (cancelType)="showChooseType = false"
+          (typeChosen)="doChangeType($event)"
         ></es-share-dialog-choose-type>
       </div>
     </div>

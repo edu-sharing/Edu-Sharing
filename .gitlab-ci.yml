@@ -70,13 +70,13 @@ deploy:
 
 check formatting:
   <<: *frontend_job
-  allow_failure: true
+  allow_failure: false
   script:
     - npm run check:format
 
 check linting:
   <<: *frontend_job
-  allow_failure: true
+  allow_failure: false
   script:
     - npm run check:lint
 

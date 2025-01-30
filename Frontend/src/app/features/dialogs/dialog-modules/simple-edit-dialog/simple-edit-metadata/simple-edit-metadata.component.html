@@ -6,5 +6,5 @@
   [bulkBehaviour]="fromUpload ? BulkBehaviour.Replace : BulkBehaviour.Default"
   groupId="io_simple"
   [nodes]="nodes"
-  (onCancel)="onError.emit()"
+  (cancelMds)="errorEvent.emit()"
 ></es-mds-editor-wrapper>

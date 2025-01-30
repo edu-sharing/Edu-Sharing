@@ -9,7 +9,7 @@ import { Toast } from '../../../services/toast';
     styleUrls: ['./ltitool-admin.component.scss'],
 })
 export class LtitoolAdminComponent implements OnInit {
-    @Output() onRefreshAppList = new EventEmitter<void>();
+    @Output() refreshAppList = new EventEmitter<void>();
 
     showIframe: boolean = false;
     ltiToolDynRegUrl: string = '';
@@ -33,7 +33,7 @@ export class LtitoolAdminComponent implements OnInit {
             if (event.data.subject == 'org.imsglobal.lti.close') {
                 LtitoolAdminComponent.staticRef.showIframe = false;
                 LtitoolAdminComponent.staticRef.ltiToolDynRegUrlSafe = null;
-                LtitoolAdminComponent.staticRef.onRefreshAppList.emit();
+                LtitoolAdminComponent.staticRef.refreshAppList.emit();
             }
         };
         window.addEventListener('message', eventListener);
@@ -60,7 +60,7 @@ export class LtitoolAdminComponent implements OnInit {
         this.ltiPlatformService
             .manualRegistration({ body: this.manualRegistrationData })
             .subscribe((s) => {
-                this.onRefreshAppList.emit();
+                this.refreshAppList.emit();
             });
     }
 

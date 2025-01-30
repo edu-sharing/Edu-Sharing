@@ -40,8 +40,8 @@ export class ShareDialogChooseTypeComponent implements AfterViewInit, OnDestroy 
     @Input() canPublish = true;
     @Input('aria-label') ariaLabel: string;
 
-    @Output() onCancel = new EventEmitter();
-    @Output() onType = new EventEmitter<TypeResult>();
+    @Output() cancelType = new EventEmitter<void>();
+    @Output() typeChosen = new EventEmitter<TypeResult>();
 
     readonly _options = [
         {
@@ -110,7 +110,7 @@ export class ShareDialogChooseTypeComponent implements AfterViewInit, OnDestroy 
     }
 
     _cancel() {
-        this.onCancel.emit();
+        this.cancelType.emit();
     }
 
     _setType(type: string) {
@@ -121,7 +121,7 @@ export class ShareDialogChooseTypeComponent implements AfterViewInit, OnDestroy 
         }
         this._selected.push(type);
         setTimeout(() => this._checkPublish(), 10);
-        this.onType.emit({ permissions: this._selected, wasMain: true });
+        this.typeChosen.emit({ permissions: this._selected, wasMain: true });
     }
 
     _contains(type: string) {
@@ -144,7 +144,7 @@ export class ShareDialogChooseTypeComponent implements AfterViewInit, OnDestroy 
             if (!this._contains('CCPublish')) return;
             this._selected.splice(this._selected.indexOf('CCPublish'), 1);
         }
-        this.onType.emit({ permissions: this._selected, wasMain: false });
+        this.typeChosen.emit({ permissions: this._selected, wasMain: false });
     }
 
     private _getActiveIndex(): number {
