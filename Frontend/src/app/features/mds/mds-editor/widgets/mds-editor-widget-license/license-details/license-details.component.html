@@ -11,7 +11,7 @@
     class="license-additional-data"
     *ngIf="(type === 'CC_BY' || type === 'CC_BY_SA') && displayMode === 'full'"
   >
-    <div *ngIf="ccVersion != '4.0'" class="licenseLocale">
+    <div *ngIf="ccVersion !== '4.0'" class="licenseLocale">
       {{ 'COUNTRY_CODE.' + (ccCountry ? ccCountry : 'INTERNATIONAL') | translate }}
     </div>
     <div class="licenseVersion">
@@ -43,7 +43,7 @@
       <div *ngIf="ccCommercial">
         {{ 'LICENSE.DESCRIPTION.CC_COMMERCIAL_' + ccCommercial | translate }}
       </div>
-      <div *ngIf="ccVersion != '4.0'">
+      <div *ngIf="ccVersion !== '4.0'">
         {{ 'WORKSPACE.LICENSE.LOCALE' | translate : { locale: ccCountry } }}
         {{ 'COUNTRY_CODE.' + (ccCountry ? ccCountry : 'INTERNATIONAL') | uppercase | translate }}.
       </div>

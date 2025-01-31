@@ -83,7 +83,7 @@
     'ACCESSIBILITY.TOAST_DURATION_INFINITE' | translate
   }}</mat-radio-button> -->
   </mat-radio-group>
-  <p *ngIf="settings.toastDuration == TOAST_DURATION.Infinite">
+  <p *ngIf="settings.toastDuration === TOAST_DURATION.Infinite">
     {{ 'ACCESSIBILITY.TOAST_DURATION_INFINITE_INFO' | translate }}
   </p>
 </ng-container>

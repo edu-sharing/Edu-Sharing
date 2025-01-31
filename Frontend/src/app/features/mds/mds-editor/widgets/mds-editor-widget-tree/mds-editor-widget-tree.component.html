@@ -130,7 +130,7 @@
       [values]="chipsControl?.value"
       [indeterminateValues]="indeterminateValues$ | async"
       [parentImpliesChildren]="editorMode === 'search'"
-      (close)="closeOverlay()"
+      (closeTree)="closeOverlay()"
       (valuesChange)="onValuesChange($event)"
       (indeterminateValuesChange)="indeterminateValues$.next($event)"
     ></es-mds-editor-widget-tree-core>

@@ -5,11 +5,11 @@
     mat-menu-item
     (click)="setSort(item)"
     class="collection-item"
-    [class.active]="sortBy == item.name"
+    [class.active]="sortBy === item.name"
   >
     <span class="title" *ngIf="item.label">{{ item.label }}</span>
     <span class="title" *ngIf="!item.label">{{ item.type + '.' + item.name | translate }}</span>
-    <ng-container *ngIf="sortBy == item.name && item.name !== 'ccm:collection_ordered_position'">
+    <ng-container *ngIf="sortBy === item.name && item.name !== 'ccm:collection_ordered_position'">
       <i class="material-icons" *ngIf="sortAscending" [altText]="'ASCENDING' | translate">
         arrow_upward
       </i>

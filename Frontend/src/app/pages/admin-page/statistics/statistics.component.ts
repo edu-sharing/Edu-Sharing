@@ -48,7 +48,7 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { ScaleOptionsByType } from 'chart.js/dist/types';
+
 Chart.register(
     BarController,
     BarElement,
@@ -108,7 +108,7 @@ export class AdminStatisticsComponent implements OnInit {
         this._mediacenter = mediacenter;
         this.refresh();
     }
-    @Output() onOpenNode = new EventEmitter();
+    @Output() openNode = new EventEmitter<Node>();
     static DAY_OFFSET = 1000 * 60 * 60 * 24;
     static DEFAULT_OFFSET = AdminStatisticsComponent.DAY_OFFSET * 7; // 7 days
     static DEFAULT_OFFSET_SINGLE = AdminStatisticsComponent.DAY_OFFSET * 3; // 3 days
@@ -319,7 +319,7 @@ export class AdminStatisticsComponent implements OnInit {
         this.refresh();
     }
     refresh() {
-        this.refreshArchived();
+        void this.refreshArchived();
         this.refreshGroups();
         this.refreshSingle();
         this.refreshCustomGroups();
@@ -917,7 +917,7 @@ export class AdminStatisticsComponent implements OnInit {
                 to = this.nodesEnd;
                 // counts by node including custom properties
                 const properties = this.exportProperties.split('\n').map((e) => e.trim());
-                this.storage.set('admin_statistics_properties', this.exportProperties);
+                void this.storage.set('admin_statistics_properties', this.exportProperties);
                 //csvHeaders = properties.concat(Helper.uniqueArray(this.nodes.map((n) => Object.keys(n.counts)).reduce((a: any, b: any) => a.concat(b))));
                 const countHeaders = [
                     // 'OVERALL',
@@ -1056,7 +1056,7 @@ export class AdminStatisticsComponent implements OnInit {
     }
 
     downloadArchivedNode(element: Node) {
-        this.nodeHelperService.downloadNodes([element]);
+        void this.nodeHelperService.downloadNodes([element]);
     }
 
     toggleModes() {

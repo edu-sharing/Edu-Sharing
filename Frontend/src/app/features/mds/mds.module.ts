@@ -44,7 +44,7 @@ import { MdsEditorWidgetTreeCoreComponent } from './mds-editor/widgets/mds-edito
 import { MdsEditorWidgetTreeComponent } from './mds-editor/widgets/mds-editor-widget-tree/mds-editor-widget-tree.component';
 import { MdsEditorWidgetVCardComponent } from './mds-editor/widgets/mds-editor-widget-vcard/mds-editor-widget-vcard.component';
 import { MdsEditorWidgetVersionComponent } from './mds-editor/widgets/mds-editor-widget-version/mds-editor-widget-version.component';
-import { MdsEditorWidgetTinyMCE } from './mds-editor/widgets/mds-editor-widget-wysiwyg-html/mds-editor-widget-tinymce.component';
+import { MdsEditorWidgetTinyMCEComponent } from './mds-editor/widgets/mds-editor-widget-wysiwyg-html/mds-editor-widget-tinymce.component';
 import { MdsViewerComponent } from './mds-viewer/mds-viewer.component';
 import { MdsWidgetComponent } from './mds-viewer/widget/mds-widget.component';
 import { EduSharingUiModule } from 'ngx-edu-sharing-ui';
@@ -84,7 +84,7 @@ import { LicenseAiPipe } from './mds-editor/widgets/mds-editor-widget-license/li
         MdsEditorWidgetSliderRangeComponent,
         MdsEditorWidgetSuggestionChipsComponent,
         MdsEditorWidgetTextComponent,
-        MdsEditorWidgetTinyMCE,
+        MdsEditorWidgetTinyMCEComponent,
         MdsEditorWidgetTreeComponent,
         MdsEditorWidgetTreeCoreComponent,
         MdsEditorWidgetVCardComponent,

@@ -3,8 +3,8 @@
   [@fromRight]="nodeSidebar"
   class="metadata-sidebar"
   [node]="nodeSidebar"
-  (onRestore)="restoreVersion($event)"
-  (onDisplay)="goToNode($event)"
-  (onEditMetadata)="openMdsEditor([$event])"
-  (onClose)="closeSidebar()"
+  (restore)="restoreVersion($event)"
+  (display)="goToNode($event)"
+  (editMetadata)="openMdsEditor([$event])"
+  (closeMetadata)="closeSidebar()"
 ></es-workspace-metadata>

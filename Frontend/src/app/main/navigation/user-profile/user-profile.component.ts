@@ -45,15 +45,15 @@ export class UserProfileComponent {
      * Will be emitted when the users cancels the dialog
      * @type {EventEmitter}
      */
-    @Output() onCancel = new EventEmitter();
+    @Output() cancelProfile = new EventEmitter<void>();
 
     constructor(private iam: RestIamService, private toast: Toast) {
-        this.iam.getCurrentUserAsync().then((data: IamUser) => {
+        void this.iam.getCurrentUserAsync().then((data: IamUser) => {
             this.user = data.person;
         });
     }
     public cancel() {
-        this.onCancel.emit();
+        this.cancelProfile.emit();
     }
     public save() {
         this.form.nativeElement.reportValidity();

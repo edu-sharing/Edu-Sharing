@@ -42,11 +42,11 @@
         *ngIf="isOpen(node)"
         [node]="node.ref.id"
         [currentPath]="currentPath"
-        (onLoading)="setLoadingState($event, i)"
-        (onUpdateOptions)="updateOptions($event)"
+        (loading)="setLoadingState($event, i)"
+        (updateOptions)="doUpdateOptions($event)"
         (hasChildren)="_hasChildren[node.ref.id] = $event"
-        (onClick)="openPathEvent($event)"
-        (onDrop)="dropToParent($event)"
+        (clickElement)="openPathEvent($event)"
+        (dropElement)="dropToParent($event)"
         [depth]="depth + 1"
       ></es-workspace-sub-tree>
     </div>
@@ -66,7 +66,7 @@
       [style.marginLeft.px]="50 + depth * 20"
     ></es-spinner>
   </div>
-  <div class="spinner" *ngIf="loading">
+  <div class="spinner" *ngIf="isLoading">
     <es-spinner-small></es-spinner-small>
   </div>
 </div>

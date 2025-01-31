@@ -3,8 +3,8 @@
   [subtitle]="name"
   [buttons]="buttons"
   width="xlarge"
-  [isCancelable]="changing.length == 0"
-  (onCancel)="close()"
+  [isCancelable]="changing.length === 0"
+  (cancel)="close()"
   height="xlarge"
 >
   <div class="heading-group">
@@ -60,7 +60,7 @@
             </div>
             <div class="checkboxDiv checkboxInput">
               <mat-checkbox
-                [disabled]="changing.indexOf(key) != -1"
+                [disabled]="changing.indexOf(key) !== -1"
                 [(ngModel)]="allow[key]"
                 name="allow{{ key }}"
                 (change)="deny[key] = false; change(key)"
@@ -68,7 +68,7 @@
             </div>
             <div class="checkboxDiv checkboxInput" *ngIf="_authority.authorityType !== 'EVERYONE'">
               <mat-checkbox
-                [disabled]="changing.indexOf(key) != -1"
+                [disabled]="changing.indexOf(key) !== -1"
                 [(ngModel)]="deny[key]"
                 name="deny{{ key }}"
                 (change)="allow[key] = false; change(key)"
@@ -79,9 +79,9 @@
               [class.allowed]="getEffective(key) === 'ALLOWED'"
               [class.denied]="getEffective(key) !== 'ALLOWED'"
             >
-              <div *ngIf="changing.indexOf(key) != -1"><es-spinner-small></es-spinner-small></div>
+              <div *ngIf="changing.indexOf(key) !== -1"><es-spinner-small></es-spinner-small></div>
               <div
-                *ngIf="changing.indexOf(key) == -1"
+                *ngIf="changing.indexOf(key) === -1"
                 [matTooltip]="isImplicit(key) ? getImplicitDetail(key) : ''"
                 matTooltipClass="toolpermission-tooltip"
               >

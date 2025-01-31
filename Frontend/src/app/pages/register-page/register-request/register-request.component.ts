@@ -13,8 +13,8 @@ import { RegisterService } from 'ngx-edu-sharing-api';
     styleUrls: ['register-request.component.scss'],
 })
 export class RegisterRequestComponent implements OnDestroy {
-    @Output() onDone = new EventEmitter();
-    @Output() onStateChanged = new EventEmitter<void>();
+    @Output() done = new EventEmitter<void>();
+    @Output() stateChanged = new EventEmitter<void>();
     private destroyed$: ReplaySubject<void> = new ReplaySubject(1);
     emailFormControl = new UntypedFormControl('', [
         Validators.required,
@@ -23,7 +23,7 @@ export class RegisterRequestComponent implements OnDestroy {
     constructor(private toast: Toast, private register: RegisterService) {
         this.emailFormControl.statusChanges
             .pipe(takeUntil(this.destroyed$))
-            .subscribe(() => this.onStateChanged.emit());
+            .subscribe(() => this.stateChanged.emit());
     }
     ngOnDestroy() {
         this.destroyed$.next();
@@ -36,7 +36,7 @@ export class RegisterRequestComponent implements OnDestroy {
             () => {
                 this.toast.closeProgressSpinner();
                 this.toast.toast('REGISTER.TOAST');
-                this.onDone.emit();
+                this.done.emit();
             },
             (error) => {
                 this.toast.closeProgressSpinner();

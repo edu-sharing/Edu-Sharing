@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogButton, SessionStorageService } from '../../../core-module/core.module';
 import { Toast } from '../../../services/toast';
@@ -17,7 +17,7 @@ type LuceneTemplates = { [key: string]: LuceneTemplate };
     templateUrl: './lucene-template-memory.component.html',
     styleUrls: ['./lucene-template-memory.component.scss'],
 })
-export class LuceneTemplateMemoryComponent implements OnInit {
+export class LuceneTemplateMemoryComponent {
     private static readonly STORAGE_KEY = 'admin_lucene_templates';
     private static readonly DEFAULT_TEMPLATES: LuceneTemplates = {
         GROUPS: {
@@ -130,8 +130,6 @@ export class LuceneTemplateMemoryComponent implements OnInit {
             });
     }
 
-    ngOnInit(): void {}
-
     createNewTemplate(): void {
         if (!this.newTemplateName) {
             // Do nothing
@@ -143,7 +141,7 @@ export class LuceneTemplateMemoryComponent implements OnInit {
                 );
                 return;
             }
-            this.confirmUpdateTemplate(this.newTemplateName).then((isUpdated) => {
+            void this.confirmUpdateTemplate(this.newTemplateName).then((isUpdated) => {
                 if (isUpdated) {
                     this.closeNewTemplateDialog();
                 }
@@ -233,6 +231,6 @@ export class LuceneTemplateMemoryComponent implements OnInit {
         Object.keys(this.templates)
             .filter((t) => !this.templates[t].isDefault)
             .forEach((t) => (storeTemplates[t] = this.templates[t]));
-        this.storage.set(LuceneTemplateMemoryComponent.STORAGE_KEY, storeTemplates);
+        void this.storage.set(LuceneTemplateMemoryComponent.STORAGE_KEY, storeTemplates);
     }
 }

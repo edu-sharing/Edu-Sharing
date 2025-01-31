@@ -113,8 +113,8 @@ export class ActionbarComponent implements OnChanges {
                 this.optionsAlways$.value,
             ),
         );
-        this.uiService.updateOptionEnabledState(this.optionsAlways$);
-        this.uiService.updateOptionEnabledState(this.optionsMenu$);
+        void this.uiService.updateOptionEnabledState(this.optionsAlways$);
+        void this.uiService.updateOptionEnabledState(this.optionsMenu$);
         // may causes weird looking
         /*if(this.optionsMenu.length<2) {
       this.optionsAlways = this.optionsAlways.concat(this.optionsMenu);

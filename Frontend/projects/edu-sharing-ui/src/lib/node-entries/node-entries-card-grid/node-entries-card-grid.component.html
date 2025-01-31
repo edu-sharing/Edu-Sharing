@@ -118,7 +118,7 @@
               [dropdown]="dropdown"
               role="listitem"
               cdkDrag
-              [cdkDragDisabled]="!(getDragEnabled() | async)"
+              [cdkDragDisabled]="(getDragEnabled() | async) === false"
               [cdkDragData]="getDragData(node)"
               esNodesDrag
               (cdkDragStarted)="onDragStarted(node)"
@@ -147,7 +147,7 @@
               [node]="node"
               role="listitem"
               cdkDrag
-              [cdkDragDisabled]="!(getDragEnabled() | async)"
+              [cdkDragDisabled]="(getDragEnabled() | async) === false"
               [cdkDragData]="[node]"
               esNodesDrag
             >

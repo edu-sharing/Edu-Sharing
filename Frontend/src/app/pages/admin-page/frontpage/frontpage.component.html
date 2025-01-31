@@ -1,5 +1,5 @@
 <es-info-message
-  *ngIf="!(configService.get('frontpage.enabled', true) | async)"
+  *ngIf="(configService.get('frontpage.enabled', true) | async) === false"
   class="info-disabled"
 >
   {{ 'ADMIN.FRONTPAGE.DISABLED' | translate }}
@@ -9,8 +9,8 @@
   *ngIf="chooseCollection"
   [@fromRight]="chooseCollection"
   title="WORKSPACE.SELECT_COLLECTION"
-  (onCancel)="chooseCollection = false"
-  (onChoose)="setCollection($event)"
+  (cancel)="chooseCollection = false"
+  (choose)="setCollection($event)"
 ></es-collection-chooser>
 <div class="frontpage" *ngIf="configService.get('frontpage.enabled', true) | async">
   <form *ngIf="config" [formGroup]="form">
@@ -202,8 +202,8 @@
       [checkbox]="false"
       [displayType]="NodeEntriesDisplayType.Grid"
       [elementInteractionType]="InteractionType.Emitter"
-      (clickItem)="this.onOpenNode.emit($event.element)"
-      (dblClickItem)="this.onOpenNode.emit($event.element)"
+      (clickItem)="this.openNode.emit($any($event.element))"
+      (dblClickItem)="this.openNode.emit($any($event.element))"
       [scope]="$any('dummy')"
     ></es-node-entries-wrapper>
   </div>

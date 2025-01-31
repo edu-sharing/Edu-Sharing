@@ -27,7 +27,7 @@ export class MainMenuDropdownComponent implements OnChanges, AfterViewInit, OnDe
 
     private readonly destroyed$ = new Subject<void>();
     optionItems$: Observable<OptionItem[]>;
-    @Output() onClose = new EventEmitter<void>();
+    @Output() closeDropdown = new EventEmitter<void>();
 
     constructor(private mainMenuEntries: MainMenuEntriesService) {}
 
@@ -39,7 +39,7 @@ export class MainMenuDropdownComponent implements OnChanges, AfterViewInit, OnDe
     ngAfterViewInit(): void {
         this.dropdown.menu.closed
             .pipe(takeUntil(this.destroyed$))
-            .subscribe(() => this.onClose.emit());
+            .subscribe(() => this.closeDropdown.emit());
     }
 
     ngOnChanges(changes: SimpleChanges): void {

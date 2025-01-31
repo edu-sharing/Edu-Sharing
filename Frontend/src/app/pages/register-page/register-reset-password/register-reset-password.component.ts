@@ -11,7 +11,7 @@ import { RegisterService } from 'ngx-edu-sharing-api';
     styleUrls: ['register-reset-password.component.scss'],
 })
 export class RegisterResetPasswordComponent {
-    @Output() onStateChanged = new EventEmitter<void>();
+    @Output() stateChanged = new EventEmitter<void>();
     public new_password = '';
     @Input() params: Params;
     public buttonCheck() {
@@ -30,14 +30,14 @@ export class RegisterResetPasswordComponent {
             () => {
                 this.toast.closeProgressSpinner();
                 this.toast.toast('REGISTER.RESET.TOAST');
-                this.router.navigate([UIConstants.ROUTER_PREFIX, 'login']);
+                void this.router.navigate([UIConstants.ROUTER_PREFIX, 'login']);
             },
             (error) => {
                 console.log('error', error);
                 this.toast.closeProgressSpinner();
                 if (error?.error?.error?.includes('DAOInvalidKeyException')) {
                     this.toast.error(null, 'REGISTER.TOAST_INVALID_RESET_KEY');
-                    this.router.navigate([UIConstants.ROUTER_PREFIX, 'register', 'request']);
+                    void this.router.navigate([UIConstants.ROUTER_PREFIX, 'register', 'request']);
                 } else {
                     this.toast.error(error);
                 }

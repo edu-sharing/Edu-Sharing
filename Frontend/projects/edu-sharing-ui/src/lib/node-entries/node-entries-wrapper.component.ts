@@ -177,7 +177,7 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
             } else {
                 console.warn('optionsHelper is not initalized correctly; data is empty');
             }
-            this.optionsHelper.refreshComponents();
+            void this.optionsHelper.refreshComponents();
         });
     }
 
@@ -214,7 +214,7 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
         this.entriesService.scrollGradientColor.set(this.scrollGradientColor);
 
         if (changes['initConfig']) {
-            this.initOptionsGenerator(this.initConfig);
+            void this.initOptionsGenerator(this.initConfig);
         }
         if (this.componentRef) {
             this.componentRef.instance.changeDetectorRef?.detectChanges();
@@ -374,12 +374,12 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
             parent: config.parent,
             customOptions: config.customOptions,
         });
-        this.optionsHelper.refreshComponents();
+        void this.optionsHelper.refreshComponents();
     }
 
     ngAfterViewInit(): void {
         // Prevent changed-after-checked error
-        Promise.resolve().then(() => this.updateTemplates());
+        void Promise.resolve().then(() => this.updateTemplates());
     }
 
     private updateTemplates(): void {

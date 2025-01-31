@@ -5,6 +5,7 @@ import {
     ActionbarComponent,
     CustomOptions,
     DefaultGroups,
+    ElementType,
     InteractionType,
     ListItem,
     ListItemSort,
@@ -22,7 +23,6 @@ import { RestConstants } from '../../../../core-module/rest/rest-constants';
 import { Toast } from '../../../../services/toast';
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { CardDialogUtilsService } from '../../card-dialog/card-dialog-utils.service';
-import { ElementType } from 'ngx-edu-sharing-ui';
 
 @Component({
     selector: 'es-search-node-store-dialog',
@@ -101,7 +101,7 @@ export class SearchNodeStoreDialogComponent implements OnInit, AfterViewInit, On
     }
 
     openNode(node: Node) {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id], {
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id], {
             state: {
                 nodes: this.list.getData(),
                 scope: 'node-store',

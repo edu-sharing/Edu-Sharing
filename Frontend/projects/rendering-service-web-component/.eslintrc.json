@@ -10,8 +10,8 @@
       ],
       "parserOptions": {
         "project": [
-          "projects/edu-sharing-ui/tsconfig.lib.json",
-          "projects/edu-sharing-ui/tsconfig.lint.json"
+          "projects/rendering-service-web-component/tsconfig.app.json",
+          "projects/rendering-service-web-component/tsconfig.spec.json"
         ],
         "createDefaultProgram": true
       },
@@ -20,7 +20,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": ["lib", "es"],
+            "prefix": "app",
             "style": "camelCase"
           }
         ],
@@ -28,7 +28,7 @@
           "error",
           {
             "type": "element",
-            "prefix": ["lib", "es"],
+            "prefix": "app",
             "style": "kebab-case"
           }
         ]

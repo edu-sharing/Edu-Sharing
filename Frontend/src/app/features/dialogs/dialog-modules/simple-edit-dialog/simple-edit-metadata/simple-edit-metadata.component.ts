@@ -36,7 +36,7 @@ export class SimpleEditMetadataComponent {
         this._nodes = value;
     }
     @Input() fromUpload: boolean;
-    @Output() onError = new EventEmitter<void>();
+    @Output() errorEvent = new EventEmitter<void>();
 
     constructor(private nodeApi: RestNodeService, private toast: Toast) {}
 

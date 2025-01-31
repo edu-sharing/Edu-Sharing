@@ -43,9 +43,8 @@ export class InfobarComponent {
     @Input() messageParameters: any;
     /**
      * Will be emitted when the users cancels the dialog
-     * @type {EventEmitter}
      */
-    @Output() onCancel = new EventEmitter();
+    @Output() cancelInfobar = new EventEmitter<void>();
     /** A list of buttons, see @DialogButton
      * Also use the DialogButton.getYesNo() and others if applicable!
      */
@@ -67,6 +66,6 @@ export class InfobarComponent {
         btn.callback();
     }
     public cancel() {
-        this.onCancel.emit();
+        this.cancelInfobar.emit();
     }
 }

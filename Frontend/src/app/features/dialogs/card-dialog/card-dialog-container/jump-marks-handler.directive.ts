@@ -80,7 +80,7 @@ export class JumpMarksHandlerDirective implements OnDestroy {
     }
 
     private onTriggerScrollToJumpMark({ jumpMark, expandAnimation }: ScrollToJumpMarkTrigger) {
-        this.ngZone.runOutsideAngular(async () => {
+        void this.ngZone.runOutsideAngular(async () => {
             if (typeof jumpMark === 'string') {
                 jumpMark = this.jumpMarks.find((j) => j.id === jumpMark);
             }

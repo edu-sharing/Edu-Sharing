@@ -1,8 +1,13 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { NetworkService, NodeService, RelationData, RelationService } from 'ngx-edu-sharing-api';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+    NetworkService,
+    Node,
+    NodeService,
+    RelationData,
+    RelationService,
+} from 'ngx-edu-sharing-api';
 import { ListItem } from 'ngx-edu-sharing-ui';
 import { forkJoin as observableForkJoin } from 'rxjs';
-import { Node } from '../../../core-module/rest/data-object';
 import { RestConstants } from '../../../core-module/rest/rest-constants';
 import { RestHelper } from '../../../core-module/rest/rest-helper';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,7 +18,7 @@ import { first } from 'rxjs/operators';
     templateUrl: 'node-relations-widget.component.html',
     styleUrls: ['node-relations-widget.component.scss'],
 })
-export class MdsNodeRelationsWidgetComponent implements OnInit, OnChanges {
+export class MdsNodeRelationsWidgetComponent implements OnChanges {
     loading = true;
     @Input() node: Node;
     relations: RelationData[];
@@ -29,8 +34,6 @@ export class MdsNodeRelationsWidgetComponent implements OnInit, OnChanges {
         private nodeService: NodeService,
         private networkService: NetworkService,
     ) {}
-
-    ngOnInit(): void {}
 
     async ngOnChanges(changes?: SimpleChanges) {
         if (this.node) {

@@ -1,24 +1,24 @@
 <es-add-stream
   *ngIf="addNodesStream"
   [nodes]="addNodesStream"
-  (onLoading)="globalProgress = $event"
-  (onCancel)="closeStream()"
-  (onDone)="closeStream()"
+  (loading)="globalProgress = $event"
+  (cancelStream)="closeStream()"
+  (done)="closeStream()"
 ></es-add-stream>
 <es-view-material-feedback
   *ngIf="materialViewFeedback"
   [node]="materialViewFeedback"
-  (onClose)="closeMaterialViewFeedback()"
+  (closeFeedback)="closeMaterialViewFeedback()"
 ></es-view-material-feedback>
 <es-collection-chooser
   class="dialog-right"
   *ngIf="addToCollection"
   [@fromRight]="addToCollection"
   [title]="'WORKSPACE.SELECT_COLLECTION'"
-  (onCancel)="cancelAddToCollection()"
-  (onDrop)="addToCollectionList($event.target, $event.source, false)"
-  (onCreateCollection)="addToCollectionCreate($event)"
-  (onChoose)="addToCollectionList($event)"
+  (cancel)="cancelAddToCollection()"
+  (dropElement)="addToCollectionList($event.target, $event.source, false)"
+  (createCollection)="addToCollectionCreate($event)"
+  (choose)="addToCollectionList($event)"
 >
   <ng-template #beforeRecent let-currentRoot>
     <ng-container

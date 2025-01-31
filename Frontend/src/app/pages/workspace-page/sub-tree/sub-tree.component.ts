@@ -33,7 +33,6 @@ import {
 } from '../../../core-module/core.module';
 import { Helper } from '../../../core-module/rest/helper';
 import { canDropOnNode } from '../workspace-utils';
-import { Event } from 'typedoc';
 
 @Component({
     selector: 'es-workspace-sub-tree',
@@ -74,14 +73,14 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
         this.refresh();
     }
 
-    @Output() onClick = new EventEmitter<Node>();
-    @Output() onLoading = new EventEmitter();
-    @Output() onDrop = new EventEmitter<{ target: Node; source: DropSource<Node> }>();
+    @Output() clickElement = new EventEmitter<Node>();
+    @Output() loading = new EventEmitter<boolean>();
+    @Output() dropElement = new EventEmitter<{ target: Node; source: DropSource<Node> }>();
     @Output() hasChildren = new EventEmitter<boolean>();
-    @Output() onUpdateOptions = new EventEmitter();
+    @Output() updateOptions = new EventEmitter<Node>();
 
     _node: string;
-    loading = true;
+    isLoading = true;
     _nodes: Node[];
     _hasChildren: { [nodeId: string]: boolean } = {};
     moreItems: number;
@@ -160,11 +159,11 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
         if (event instanceof MouseEvent) {
             ({ clientX: this.dropdownLeft, clientY: this.dropdownTop } = event);
         }
-        this.showDropdown(event, node);
+        void this.showDropdown(event, node);
     }
 
-    updateOptions(event: Node) {
-        this.onUpdateOptions.emit(event);
+    doUpdateOptions(event: Node) {
+        this.updateOptions.emit(event);
     }
 
     private async showDropdown(event: MouseEvent, node: Node) {
@@ -186,7 +185,7 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
     }
 
     dropToParent(event: any) {
-        this.onDrop.emit(event);
+        this.dropElement.emit(event);
     }
 
     isSelected(node: Node): boolean {
@@ -194,7 +193,7 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
     }
 
     openPathEvent(node: Node): void {
-        this.onClick.emit(node);
+        this.clickElement.emit(node);
     }
 
     isOpen(node: Node): boolean {
@@ -202,7 +201,7 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
     }
 
     openOrCloseNode(node: Node): void {
-        this.onClick.emit(node);
+        this.clickElement.emit(node);
     }
 
     toggleNodeExpansion(event: MouseEvent, node: Node): void {
@@ -230,15 +229,15 @@ export class WorkspaceSubTreeComponent implements OnInit, OnDestroy {
                 this.moreItems = data.pagination.total - data.pagination.count;
                 this.loadingStates = Helper.initArray(this._nodes.length, true);
                 this.hasChildren.emit(this._nodes?.length > 0);
-                this.onLoading.emit(false);
-                this.loading = false;
+                this.loading.emit(false);
+                this.isLoading = false;
                 this.expandCurrentPath();
             });
     }
 
     canDropOnNode = canDropOnNode;
     onDropped(dragData: DragData<Node>) {
-        this.onDrop.emit({
+        this.dropElement.emit({
             target: dragData.target,
             source: {
                 element: dragData.draggedNodes,

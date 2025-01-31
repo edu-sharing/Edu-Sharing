@@ -1,11 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges, OnChanges } from '@angular/core';
-import { MdsService, Node, Organization, RestConstants, ProposalNode } from 'ngx-edu-sharing-api';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import * as Constants from 'ngx-edu-sharing-api';
+import { MdsService, Node, Organization, ProposalNode, RestConstants } from 'ngx-edu-sharing-api';
 import { BehaviorSubject, merge } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ListItem } from '../../types/list-item';
 import { ListWidget } from '../list-widget';
 import { NodeHelperService } from '../../services/node-helper.service';
-import * as Constants from 'ngx-edu-sharing-api';
 import { MdsHelperService } from '../../mds/mds-helper.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { MdsHelperService } from '../../mds/mds-helper.service';
     templateUrl: './list-text.component.html',
     styleUrls: ['./list-text.component.scss'],
 })
-export class ListTextComponent extends ListWidget implements OnInit, OnChanges {
+export class ListTextComponent extends ListWidget implements OnInit {
     static supportedItems = [
         new ListItem('NODE', '*'),
         new ListItem('NODE_PROPOSAL', '*'),
@@ -33,8 +33,6 @@ export class ListTextComponent extends ListWidget implements OnInit, OnChanges {
     ) {
         super();
     }
-
-    async ngOnChanges(changes: SimpleChanges) {}
 
     async ngOnInit() {
         merge([this.nodeSubject, this.itemSubject])

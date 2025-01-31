@@ -71,7 +71,7 @@ export class NodeSearchSelectorComponent implements AfterViewInit {
      * count of items to search
      */
     @Input() itemCount = 25;
-    @Output() onSelect = new EventEmitter<Node>();
+    @Output() selectNode = new EventEmitter<Node>();
     searchStatus: Status = {
         loading: false,
     };
@@ -91,7 +91,7 @@ export class NodeSearchSelectorComponent implements AfterViewInit {
     ) {}
 
     setOption(event: MatAutocompleteSelectedEvent) {
-        this.onSelect.emit(event.option.value);
+        this.selectNode.emit(event.option.value);
         this.input.setValue('');
     }
 

@@ -54,7 +54,7 @@ export class MdsEditorWidgetTreeCoreComponent implements OnInit, OnChanges, OnDe
      */
     @Input() parentImpliesChildren = false;
 
-    @Output() close = new EventEmitter<void>();
+    @Output() closeTree = new EventEmitter<void>();
     @Output() valuesChange = new EventEmitter<DisplayValue[]>();
     @Output() indeterminateValuesChange = new EventEmitter<string[]>();
 

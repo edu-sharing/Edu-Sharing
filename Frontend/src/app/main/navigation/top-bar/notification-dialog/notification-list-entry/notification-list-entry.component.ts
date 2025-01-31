@@ -2,7 +2,7 @@
  * Created by Torsten on 13.01.2017.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { UIService } from '../../../../../core-module/rest/services/ui.service';
 import { Node } from '../../../../../core-module/rest/data-object';
 import { Notification } from 'ngx-edu-sharing-api';
@@ -13,7 +13,7 @@ import { RestConstants } from '../../../../../core-module/rest/rest-constants';
     templateUrl: 'notification-list-entry.component.html',
     styleUrls: ['notification-list-entry.component.scss'],
 })
-export class NotificationListEntryComponent implements OnInit {
+export class NotificationListEntryComponent {
     static readonly icons = {
         AddToCollectionEvent: 'layers',
         ProposeForCollectionEvent: 'layers',
@@ -37,8 +37,6 @@ export class NotificationListEntryComponent implements OnInit {
     };*/
     @Output() statusChange = new EventEmitter<'PENDING' | 'SENT' | 'READ'>();
     constructor(private uiService: UIService) {}
-
-    ngOnInit() {}
 
     getIcon() {
         return (NotificationListEntryComponent.icons as any)[this.entry._class];

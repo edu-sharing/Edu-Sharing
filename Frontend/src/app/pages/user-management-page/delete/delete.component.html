@@ -205,7 +205,7 @@
           <h4 class="mat-heading-4">{{ 'PERMISSIONS.DELETE.RECEIVER_CAPTION' | translate }}</h4>
           <!-- @TODO: The component does currently not support searching ONLY for users -->
           <es-authority-search-input
-            (onChooseAuthority)="receiver = $event"
+            (chooseAuthority)="receiver = $event"
             [globalSearchAllowed]="true"
             [showRecent]="false"
             placeholder="{{ 'PERMISSIONS.DELETE.RECEIVER' | translate }}"
@@ -224,7 +224,7 @@
             hint="{{ 'PERMISSIONS.DELETE.RECEIVER_GROUP_HINT' | translate }}"
             [globalSearchAllowed]="true"
             [showRecent]="false"
-            (onChooseAuthority)="receiverGroup = $event"
+            (chooseAuthority)="receiverGroup = $event"
             placeholder="{{ 'PERMISSIONS.DELETE.RECEIVER_GROUP' | translate }}"
           ></es-authority-search-input>
           <mat-chip-listbox>
@@ -304,7 +304,7 @@
     <button
       mat-flat-button
       color="primary"
-      [disabled]="!(canSubmit$ | async)"
+      [disabled]="(canSubmit$ | async) === false"
       (click)="prepareStart()"
     >
       {{ 'PERMISSIONS.DELETE.START' | translate }}

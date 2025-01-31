@@ -8,10 +8,9 @@ import {
     RestNodeService,
 } from '../../../core-module/core.module';
 import { TranslateService } from '@ngx-translate/core';
-import { Node } from 'ngx-edu-sharing-api';
+import { ConfigService, Node } from 'ngx-edu-sharing-api';
 import { DurationHelper, FormatDatePipe, NodeImageSizePipe, VCard } from 'ngx-edu-sharing-ui';
 import { NodeHelperService } from '../../../services/node-helper.service';
-import { ConfigService } from 'ngx-edu-sharing-api';
 
 // Charts.js
 declare var Chart: any;
@@ -23,10 +22,10 @@ declare var Chart: any;
 })
 export class WorkspaceMetadataBlockComponent {
     @Input() set node(node: Node) {
-        this.load(node);
+        void this.load(node);
     }
-    @Output() onEditMetadata = new EventEmitter();
-    @Output() onDisplay = new EventEmitter();
+    @Output() editMetadata = new EventEmitter();
+    @Output() display = new EventEmitter();
     permissions: any;
     data: any;
     _node: Node;

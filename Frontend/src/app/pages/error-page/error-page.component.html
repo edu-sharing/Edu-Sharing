@@ -1,9 +1,9 @@
 <div class="message-bg">
   <div *ngIf="message" class="message-container">
-    <img *ngIf="error == '404'" [src]="'assets/images/message/404.svg' | esAssetsPath" alt="" />
-    <img *ngIf="error == '500'" [src]="'assets/images/message/500.svg' | esAssetsPath" alt="" />
+    <img *ngIf="error === '404'" [src]="'assets/images/message/404.svg' | esAssetsPath" alt="" />
+    <img *ngIf="error === '500'" [src]="'assets/images/message/500.svg' | esAssetsPath" alt="" />
     <img
-      *ngIf="error != '500' && error != '404'"
+      *ngIf="error !== '500' && error !== '404'"
       [src]="'assets/images/message/invalid.svg' | esAssetsPath"
       alt=""
     />

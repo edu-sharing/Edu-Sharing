@@ -58,7 +58,7 @@ function delay<T>(f: () => T): () => T {
             const newValue = f.apply(this);
             if (newValue !== previousValue) {
                 updating = true;
-                Promise.resolve().then(() => {
+                void Promise.resolve().then(() => {
                     previousValue = newValue;
                     updating = false;
                 });

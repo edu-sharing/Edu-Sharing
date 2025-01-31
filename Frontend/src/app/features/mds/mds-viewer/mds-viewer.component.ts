@@ -1,12 +1,10 @@
 import {
-    ChangeDetectorRef,
     Component,
     ComponentFactoryResolver,
     ElementRef,
     Injector,
     Input,
     OnChanges,
-    NgZone,
     QueryList,
     SimpleChanges,
     ViewChildren,
@@ -20,7 +18,7 @@ import { ViewInstanceService } from '../mds-editor/mds-editor-view/view-instance
 import { replaceElementWithDiv } from '../mds-editor/util/replace-element-with-div';
 import { Values } from '../types/types';
 import { MdsWidgetComponent } from './widget/mds-widget.component';
-import { MdsView, MdsDefinition, MdsService } from 'ngx-edu-sharing-api';
+import { MdsDefinition, MdsService, MdsView } from 'ngx-edu-sharing-api';
 
 @Component({
     selector: 'es-mds-viewer',
@@ -174,7 +172,7 @@ export class MdsViewerComponent implements OnChanges {
             inflate = true;
         }
         if (inflate) {
-            this.inflate();
+            void this.inflate();
         }
     }
 }

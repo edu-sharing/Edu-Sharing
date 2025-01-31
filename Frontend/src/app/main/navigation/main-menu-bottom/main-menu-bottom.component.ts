@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ConfigEntry } from '../../../services/node-helper.service';
 import { MainMenuEntriesService } from '../main-menu-entries.service';
@@ -8,7 +8,7 @@ import { MainMenuEntriesService } from '../main-menu-entries.service';
     templateUrl: './main-menu-bottom.component.html',
     styleUrls: ['./main-menu-bottom.component.scss'],
 })
-export class MainMenuBottomComponent implements OnInit {
+export class MainMenuBottomComponent {
     @Input() currentScope: string;
 
     entries$: Observable<ConfigEntry[]>;
@@ -16,6 +16,4 @@ export class MainMenuBottomComponent implements OnInit {
     constructor(mainMenuEntries: MainMenuEntriesService) {
         this.entries$ = mainMenuEntries.entries$;
     }
-
-    ngOnInit(): void {}
 }

@@ -284,7 +284,7 @@ export class LicenseDialogContentComponent implements OnInit {
                 this.initNodes(this.data.nodes);
                 break;
             case 'properties':
-                this.initProperties(this.data.properties);
+                void this.initProperties(this.data.properties);
                 break;
         }
     }

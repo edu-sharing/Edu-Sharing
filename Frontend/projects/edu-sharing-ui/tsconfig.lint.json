@@ -5,13 +5,18 @@
     "outDir": "../../out-tsc/spec",
     "types": [
       "jasmine"
-    ]
+    ],
+    "paths": {
+      "ngx-edu-sharing-api": [
+        "dist/edu-sharing-api/edu-sharing-api",
+        "dist/edu-sharing-api"
+      ]
+    }
   },
   "files": [
-    "src/test.ts",
-    "src/polyfills.ts"
+    "src/test.ts"
   ],
   "include": [
-    "src/**/*.ts"
+    "**/*.ts"
   ]
 }

@@ -173,7 +173,7 @@ export class ToolpermissionManagerComponent {
         this.name = new AuthorityNamePipe(this.translate).transform(authority, null);
         this.refresh();
     }
-    @Output() onClose = new EventEmitter();
+    @Output() closeManager = new EventEmitter<void>();
     permissions: ToolPermission | any;
     allow: any;
     allowInit: any;
@@ -190,7 +190,7 @@ export class ToolpermissionManagerComponent {
         this.buttons = DialogButton.getSingleButton('CLOSE', () => this.close(), 'standard');
     }
     close() {
-        this.onClose.emit();
+        this.closeManager.emit();
     }
     change(key: string) {
         this.changing.push(key);

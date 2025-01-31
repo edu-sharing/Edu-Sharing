@@ -86,7 +86,7 @@ export class MdsEditorCommonService {
         values: string[],
         //versionComment?: string,
     ): Promise<void> {
-        this.restNode.editNodeProperty(node.ref.id, property, values).toPromise();
+        void this.restNode.editNodeProperty(node.ref.id, property, values).toPromise();
     }
 
     /**

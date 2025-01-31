@@ -5,9 +5,9 @@ import { TranslateService } from '@ngx-translate/core';
 import {
     ConfigService,
     HOME_REPOSITORY,
-    Node,
     MdsDefinition,
     MdsService,
+    Node,
     UserService,
 } from 'ngx-edu-sharing-api';
 import {
@@ -374,9 +374,9 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
 
     handleDropOnBreadcrumb(event: { target: Node | 'HOME'; source: DropSource<Node> }) {
         if (event.target === 'HOME') {
-            this.handleDrop({ target: this.root, source: event.source });
+            void this.handleDrop({ target: this.root, source: event.source });
         } else {
-            this.handleDrop(event as { target: Node; source: DropSource<Node> });
+            void this.handleDrop(event as { target: Node; source: DropSource<Node> });
         }
     }
 
@@ -661,7 +661,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
                 TemporaryStorageService.NODE_RENDER_PARAMETER_DATA_SOURCE,
                 this.dataSource,
             );
-            this.router.navigate(
+            void this.router.navigate(
                 [
                     UIConstants.ROUTER_PREFIX + 'render',
                     list[0].ref.id,
@@ -699,7 +699,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
     setRoot(root: NodeRoot) {
         this.root = root;
         this.searchQuery = null;
-        this.routeTo(root, null, null);
+        void this.routeTo(root, null, null);
         this.actionbarRef.invalidate();
     }
 
@@ -721,11 +721,11 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
     }
 
     private openDirectory(id: string, { replaceUrl = false } = {}) {
-        this.routeTo(this.root, id, null, { replaceUrl });
+        void this.routeTo(this.root, id, null, { replaceUrl });
     }
 
     searchGlobal(query: string) {
-        this.routeTo(this.root, null, query);
+        void this.routeTo(this.root, null, query);
     }
 
     private openDirectoryFromRoute(params: any = null) {
@@ -866,7 +866,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
             ) {
                 this.showSelectRoot = true;
             } else {
-                this.routeTo(this.root);
+                void this.routeTo(this.root);
             }
         }
     }
@@ -1049,7 +1049,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
                 toggle.icon = this.toMeSharedToggle
                     ? 'edu-content_shared_me_all'
                     : 'edu-content_shared_me_private';
-                this.session.set('toMeSharedGroup', this.toMeSharedToggle);
+                void this.session.set('toMeSharedGroup', this.toMeSharedToggle);
                 this.openDirectoryFromRoute();
                 //this.treeComponent.reload = Boolean(true);
                 this.toast.toast(
@@ -1114,7 +1114,7 @@ export class WorkspacePageComponent implements EventListener, OnInit, OnDestroy 
     }
 
     onDeleteNodes(nodes: Node[]): void {
-        this.dialogs.openDeleteNodesDialog({ nodes });
+        void this.dialogs.openDeleteNodesDialog({ nodes });
         // this.mainNavService.getDialogs().nodeDelete = nodes;
     }
 }

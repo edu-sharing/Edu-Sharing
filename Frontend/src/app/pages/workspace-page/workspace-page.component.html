@@ -6,8 +6,8 @@
         [searchQuery]="searchQuery?.query"
         [home]="'WORKSPACE.' + root"
         [canDropNodes]="canDropOnBreadcrumb"
-        (onDrop)="handleDropOnBreadcrumb($event)"
-        (onClick)="openBreadcrumb($event)"
+        (dropElement)="handleDropOnBreadcrumb($event)"
+        (clickBreadcrumb)="openBreadcrumb($event)"
       ></es-breadcrumbs>
       <es-actionbar #actionbar></es-actionbar>
     </div>
@@ -63,10 +63,10 @@
         [root]="root"
         [workspace]="this"
         [isSafe]="isSafe"
-        (onDrop)="handleDrop($event)"
-        (onSetRoot)="setRoot($event)"
-        (onOpenNode)="openNode($event)"
-        (onDeleteNodes)="onDeleteNodes($event)"
+        (dropElement)="handleDrop($event)"
+        (setRoot)="setRoot($event)"
+        (openNode)="openNode($event)"
+        (deleteNodes)="onDeleteNodes($event)"
       ></es-workspace-tree>
       <es-user-quota *ngIf="user.person.quota.enabled" [quota]="user.person.quota"></es-user-quota>
     </div>
@@ -90,11 +90,11 @@
       [preventKeyevents]="cardHasOpenModals$ | async"
       [dataSource]="dataSource"
       [actionbar]="actionbar"
-      (onSearchGlobal)="searchGlobal($event)"
-      (onDrop)="handleDrop($event)"
-      (onViewNode)="openNode($any($event), false)"
-      (onOpenNode)="openNode($any($event), false)"
-      (onReset)="resetWorkspace()"
+      (searchGlobal)="searchGlobal($event)"
+      (dropElement)="handleDrop($event)"
+      (viewNode)="openNode($any($event), false)"
+      (openNode)="openNode($any($event), false)"
+      (resetDataSource)="resetWorkspace()"
     ></es-workspace-explorer>
   </div>
   <es-global-progress *ngIf="globalProgress"></es-global-progress>

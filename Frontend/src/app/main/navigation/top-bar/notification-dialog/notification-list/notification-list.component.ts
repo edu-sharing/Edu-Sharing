@@ -48,7 +48,7 @@ export class NotificationListComponent implements OnInit {
                 login.statusCode === RestConstants.STATUS_CODE_OK &&
                 this.about.plugins?.filter((s) => s.id === 'kafka-notification-plugin').length > 0;
             if (this.show) {
-                this.loadNotifications();
+                void this.loadNotifications();
             }
         });
 
@@ -56,7 +56,7 @@ export class NotificationListComponent implements OnInit {
         // this.ngZone.runOutsideAngular(() => {
         setInterval(() => {
             if (this.show && !this.menuTrigger?.menuOpen) {
-                this.loadNotifications();
+                void this.loadNotifications();
             }
         }, NotificationListComponent.NOTIFICATION_REFRESH_INTERVAL);
         // })

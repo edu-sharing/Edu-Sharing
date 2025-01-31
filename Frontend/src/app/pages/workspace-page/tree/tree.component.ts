@@ -30,11 +30,11 @@ export class WorkspaceTreeComponent {
     }
     @Input() options: OptionItem[] = [];
 
-    @Output() onOpenNode = new EventEmitter();
-    @Output() onUpdateOptions = new EventEmitter();
-    @Output() onSetRoot = new EventEmitter();
-    @Output() onDrop = new EventEmitter<{ target: Node; source: DropSource<Node> }>();
-    @Output() onDeleteNodes = new EventEmitter();
+    @Output() openNode = new EventEmitter<Node>();
+    @Output() updateOptions = new EventEmitter<Node>();
+    @Output() setRoot = new EventEmitter<NodeRoot>();
+    @Output() dropElement = new EventEmitter<{ target: Node; source: DropSource<Node> }>();
+    @Output() deleteNodes = new EventEmitter();
 
     @ViewChild(WorkspaceSubTreeComponent) subTree: WorkspaceSubTreeComponent;
 
@@ -51,34 +51,34 @@ export class WorkspaceTreeComponent {
         this.optionsHelperDataService.setData({
             scope: Scope.WorkspaceTree,
         });
-        this.optionsHelperDataService.initComponents();
+        void this.optionsHelperDataService.initComponents();
     }
 
     canDropOnRecycle = (dragData: DragData<'RECYCLE'>): CanDrop => {
         return { accept: dragData.action === 'move' };
     };
 
-    setRoot(root: string) {
-        this.onSetRoot.emit(root);
+    doSetRoot(root: NodeRoot) {
+        this.setRoot.emit(root);
         this.currentPath = [];
     }
 
     onNodesDrop(dragData: DragData<'RECYCLE'>) {
         if (dragData.target === this.RECYCLE && dragData.action === 'move') {
-            this.onDeleteNodes.emit(dragData.draggedNodes);
+            this.deleteNodes.emit(dragData.draggedNodes);
         }
     }
 
     drop(event: any) {
-        this.onDrop.emit(event);
+        this.dropElement.emit(event);
     }
 
-    updateOptions(event: Node) {
-        this.onUpdateOptions.emit(event);
+    doUpdateOptions(event: Node) {
+        this.updateOptions.emit(event);
     }
 
-    openNode(event: Node) {
-        this.onOpenNode.emit(event);
+    doOpenNode(event: Node) {
+        this.openNode.emit(event);
     }
 
     public refresh() {

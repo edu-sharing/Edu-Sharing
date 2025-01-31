@@ -112,13 +112,13 @@ describe('MainMenuEntriesService', () => {
 
     it('should be created', () => {
         setUp();
-        expect(service).toBeTruthy();
+        void expect(service).toBeTruthy();
     });
 
     it('should provide an empty array when not logged in', async () => {
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries).toEqual([]);
+        void expect(entries).toEqual([]);
     });
 
     xit('should provide entries', async () => {
@@ -129,7 +129,7 @@ describe('MainMenuEntriesService', () => {
             });
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries).toEqual([
+        void expect(entries).toEqual([
             jasmine.objectContaining({
                 name: 'SIDEBAR.WORKSPACE',
                 icon: 'cloud',
@@ -166,7 +166,7 @@ describe('MainMenuEntriesService', () => {
             });
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries).toEqual([
+        void expect(entries).toEqual([
             jasmine.objectContaining({
                 name: 'SIDEBAR.SEARCH',
                 icon: 'search',
@@ -203,7 +203,7 @@ describe('MainMenuEntriesService', () => {
         uiStub.isMobile = () => true;
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries).toEqual([
+        void expect(entries).toEqual([
             jasmine.objectContaining({
                 name: 'SIDEBAR.SEARCH',
                 icon: 'search',
@@ -232,7 +232,7 @@ describe('MainMenuEntriesService', () => {
             });
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries).toEqual([
+        void expect(entries).toEqual([
             jasmine.objectContaining({
                 name: 'SIDEBAR.SEARCH',
                 icon: 'search',
@@ -271,7 +271,7 @@ describe('MainMenuEntriesService', () => {
             });
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries).toEqual([]);
+        void expect(entries).toEqual([]);
     });
 
     it('should insert custom entries', async () => {
@@ -289,8 +289,8 @@ describe('MainMenuEntriesService', () => {
             });
         setUp();
         const entries = await service.entries$.toPromise();
-        expect(entries.length).toBe(1);
-        expect(entries[0]).toEqual(
+        void expect(entries.length).toBe(1);
+        void expect(entries[0]).toEqual(
             jasmine.objectContaining({
                 name: 'test name',
                 icon: 'test icon',

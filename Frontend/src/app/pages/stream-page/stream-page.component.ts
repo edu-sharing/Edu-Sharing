@@ -308,11 +308,14 @@ export class StreamPageComponent implements OnInit, AfterViewInit, OnDestroy {
             o.group = DefaultGroups.Primary;
             return o;
         });
-        this.updateOptions(this.streams?.[0]);
+        void this.updateOptions(this.streams?.[0]);
     }
 
     goToOption(option: string) {
-        this.router.navigate(['./'], { queryParams: { mode: option }, relativeTo: this.route });
+        void this.router.navigate(['./'], {
+            queryParams: { mode: option },
+            relativeTo: this.route,
+        });
     }
 
     getStreamDataByStatus(streamStatus: any) {
@@ -357,9 +360,9 @@ export class StreamPageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (node.nodes) {
             this.seen(node.id);
             document.cookie = 'jumpToScrollPosition=' + window.pageYOffset;
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.nodes[0].ref.id]);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.nodes[0].ref.id]);
         } else {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id]);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id]);
         }
     }
 

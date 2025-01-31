@@ -9,7 +9,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { User, Node } from 'ngx-edu-sharing-api';
+import { Node, User } from 'ngx-edu-sharing-api';
 import { Observable } from 'rxjs';
 import { ConfigurationService, RestConnectorService } from '../../../core-module/core.module';
 import { OptionItem } from 'ngx-edu-sharing-ui';
@@ -53,7 +53,7 @@ export class TopBarComponent {
     @Output() createNotAllowed = new EventEmitter<void>();
     @Output() openChat = new EventEmitter<void>();
     @Output() showLicenses = new EventEmitter<void>();
-    @Output() onCloseScopeSelector = new EventEmitter<void>();
+    @Output() closeScopeSelector = new EventEmitter<void>();
 
     createMenuX: number;
     createMenuY: number;
@@ -89,7 +89,7 @@ export class TopBarComponent {
         this.createMenuX = x;
         this.createMenuY = y;
 
-        this.createMenu.updateOptions();
+        void this.createMenu.updateOptions();
         this.createMenuTrigger.openMenu();
         this.createMenuTrigger.onMenuClose;
     }

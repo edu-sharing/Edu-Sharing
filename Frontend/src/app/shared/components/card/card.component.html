@@ -31,7 +31,7 @@
       <mat-card-title [class.no-subtitle]="!subtitle">{{ title }}</mat-card-title>
       <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
       <div class="cancel">
-        <button mat-button *ngIf="isCancelable" (click)="cancel()">
+        <button mat-button *ngIf="isCancelable" (click)="doCancel()">
           <i esIcon="close" [aria]="true"></i>
         </button>
       </div>
@@ -41,7 +41,7 @@
         mat-button
         color="primary"
         *ngFor="let jumpmark of jumpmarks"
-        [class.active]="jumpmark == jumpmarkActive"
+        [class.active]="jumpmark === jumpmarkActive"
         (click)="scrollToJumpMark(jumpmark)"
       >
         <i [esIcon]="jumpmark.icon"></i> {{ jumpmark.label }}
@@ -53,7 +53,7 @@
       infinite-scroll
       [class.card-content-header]="header"
       [scrollWindow]="false"
-      (scrolled)="scrolled()"
+      (scrolled)="doScroll()"
       (scroll)="onScroll()"
       ><ng-content></ng-content>
     </mat-card-content>

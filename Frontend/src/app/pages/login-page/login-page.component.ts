@@ -87,7 +87,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.config.register = { local: true };
                 }
                 if (this.bridge.getCordova().isRunningCordova()) {
-                    this.router.navigate([UIConstants.ROUTER_PREFIX, 'app'], {
+                    void this.router.navigate([UIConstants.ROUTER_PREFIX, 'app'], {
                         replaceUrl: true,
                     });
                     return;
@@ -95,7 +95,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.updateButtons();
                 this.username = this.configService.instant('defaultUsername', '');
                 this.password = this.configService.instant('defaultPassword', '');
-                this.route.queryParams.forEach((params: Params) => {
+                void this.route.queryParams.forEach((params: Params) => {
                     if (params.username) {
                         this.username = params.username;
                     }
@@ -175,7 +175,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
                                                 this.username = data.authorityName;
                                             } else {
                                                 this.toast.error(null, 'LOGIN.NO_ACCESS');
-                                                this.router.navigate([
+                                                void this.router.navigate([
                                                     UIConstants.ROUTER_PREFIX + 'workspace',
                                                 ]);
                                                 // window.history.back();
@@ -288,7 +288,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     register() {
         if (this.config.register.local) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
         } else {
             window.location.href = this.config.register.registerUrl;
         }
@@ -322,7 +322,7 @@ export class LoginPageComponent implements OnInit, OnDestroy, AfterViewInit {
             this.next = Helper.addGetParameter('fromLogin', 'true', this.next);
             RouterHelper.navigateToAbsoluteUrl(this.platformLocation, this.router, this.next);
         } else if (data.currentScope === RestConstants.SAFE_SCOPE) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX, 'workspace', 'safe']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX, 'workspace', 'safe']);
         } else {
             UIHelper.goToDefaultLocation(this.router, this.platformLocation, this.configService);
         }

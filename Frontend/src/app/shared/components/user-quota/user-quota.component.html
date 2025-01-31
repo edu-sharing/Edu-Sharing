@@ -1,10 +1,10 @@
 <div
   class="quota"
-  [class.quota-health-medium]="getHealth() == 1"
-  [class.quota-health-bad]="getHealth() == 2"
+  [class.quota-health-medium]="getHealth() === 1"
+  [class.quota-health-bad]="getHealth() === 2"
 >
   <div class="quota-icon">
-    <i class="material-icons">{{ getHealth() == 2 ? 'warning' : 'storage' }}</i>
+    <i class="material-icons">{{ getHealth() === 2 ? 'warning' : 'storage' }}</i>
   </div>
   <div class="quota-details">
     <div class="quota-title">{{ 'QUOTA.TITLE' | translate }}</div>

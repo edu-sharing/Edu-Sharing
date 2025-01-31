@@ -5,7 +5,7 @@
   [allowBinary]="create.allowBinary"
   [parent]="create.parent"
   [folder]="create.folder"
-  (onCreate)="created.emit($event)"
+  (createElement)="created.emit($event)"
 ></es-create-menu>
 
 <div class="mobile-move-top2">
@@ -16,7 +16,7 @@
       <es-main-menu-sidebar
         #mainMenuSidebar
         [currentScope]="currentScope"
-        (onClose)="onCloseScopeSelector.emit()"
+        (closeSidebar)="closeScopeSelector.emit()"
         (showLicenses)="showLicenses.emit()"
       ></es-main-menu-sidebar>
       <ng-container
@@ -35,7 +35,7 @@
         <es-main-menu-dropdown
           #mainMenuDropdown
           [currentScope]="currentScope"
-          (onClose)="onCloseScopeSelector.emit()"
+          (closeDropdown)="closeScopeSelector.emit()"
         ></es-main-menu-dropdown>
         <button
           *ngIf="showScope"
@@ -57,7 +57,7 @@
           #mainMenuSidebar
           [currentScope]="currentScope"
           (showLicenses)="showLicenses.emit()"
-          (onClose)="onCloseScopeSelector.emit()"
+          (closeSidebar)="closeScopeSelector.emit()"
         ></es-main-menu-sidebar>
         <button
           *ngIf="showScope"

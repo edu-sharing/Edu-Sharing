@@ -38,7 +38,7 @@ export class NodeTemplateDialogComponent implements OnInit {
                 new DialogButton('SAVE', { color: 'primary' }, () => this.save()),
             ],
         });
-        this.initNode();
+        void this.initNode();
     }
 
     private async initNode() {

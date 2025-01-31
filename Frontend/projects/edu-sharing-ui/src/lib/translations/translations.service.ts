@@ -159,7 +159,7 @@ export class TranslationsService {
                 // Set fallback language
                 tap(({ supportedLanguages, selectedLanguage, useStored }) => {
                     if (!useStored) {
-                        this.storage.set('language', selectedLanguage);
+                        void this.storage.set('language', selectedLanguage);
                     }
                     if (selectedLanguage === 'none') {
                         this.translate.setDefaultLang('none');

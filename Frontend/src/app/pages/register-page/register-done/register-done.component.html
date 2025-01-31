@@ -31,7 +31,7 @@
           id="key"
           name="key"
           [(ngModel)]="keyInput"
-          (ngModelChange)="onStateChanged.emit()"
+          (ngModelChange)="stateChanged.emit()"
         />
         <mat-hint>{{ 'REGISTER.DONE.ACTIVATE_HINT' | translate }}</mat-hint>
       </mat-form-field>

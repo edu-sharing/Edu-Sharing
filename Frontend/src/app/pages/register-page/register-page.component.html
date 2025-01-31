@@ -14,33 +14,33 @@
   subtitle="{{ 'REGISTER.ORGANIZATION_TITLE' | translate }}"
   width="normal"
   height="auto"
-  (onCancel)="cancel()"
+  (cancel)="cancel()"
   [isCancelable]="false"
 >
   <div class="register-content card-content-padding">
     <h1 esTitle class="cdk-visually-hidden">{{ 'REGISTER.TITLE' | translate }}</h1>
     <es-register-form
       [class.display-none]="!(state === 'register')"
-      (onStateChanged)="updateButtons()"
-      (onRegisterDone)="onRegisterDone()"
+      (stateChanged)="updateButtons()"
+      (registerDone)="onRegisterDone()"
       #registerForm
     ></es-register-form>
     <es-register-done
       *ngIf="state === 'done' || state === 'done-reset'"
-      (onStateChanged)="updateButtons()"
-      (onModify)="modifyData()"
+      (stateChanged)="updateButtons()"
+      (modify)="modifyData()"
       [inputState]="state"
       #registerDone
     ></es-register-done>
     <es-register-request
       *ngIf="state === 'request'"
-      (onStateChanged)="updateButtons()"
-      (onDone)="onPasswordRequested()"
+      (stateChanged)="updateButtons()"
+      (done)="onPasswordRequested()"
       #request
     ></es-register-request>
     <es-register-reset-password
       *ngIf="state === 'reset-password'"
-      (onStateChanged)="updateButtons()"
+      (stateChanged)="updateButtons()"
       #resetPassword
       [params]="params"
     ></es-register-reset-password>

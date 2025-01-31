@@ -1,8 +1,8 @@
 <header
-  *ngIf="banner && banner.url && banner.components.indexOf(scope) != -1"
+  *ngIf="banner && banner.url && banner.components.indexOf(scope) !== -1"
   class="banner"
   [class.clickable]="banner.href"
   (click)="clickBanner()"
   [style.background-image]="'url(' + banner.url + ')'"
 ></header>
-<es-header *ngIf="banner && banner.components.indexOf(scope) != -1" [scope]="scope"></es-header>
+<es-header *ngIf="banner && banner.components.indexOf(scope) !== -1" [scope]="scope"></es-header>

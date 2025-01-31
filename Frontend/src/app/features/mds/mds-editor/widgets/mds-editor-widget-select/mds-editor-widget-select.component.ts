@@ -4,7 +4,6 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MdsWidget, MdsWidgetValue } from '../../../types/types';
 import { MdsEditorWidgetBase, ValueType } from '../mds-editor-widget-base';
 import { MatSelect } from '@angular/material/select';
-import { skip } from 'rxjs/operators';
 
 @Component({
     selector: 'es-mds-editor-widget-select',
@@ -39,7 +38,7 @@ export class MdsEditorWidgetSelectComponent extends MdsEditorWidgetBase implemen
         const initialValue = (await this.widget.getInitalValuesAsync()).jointValues[0];
         this.values = this.widget.getSuggestedValues();
         if (initialValue) {
-            this.values.then((values) => {
+            void this.values.then((values) => {
                 const value = values.find((v) => v.id === initialValue);
                 if (value) {
                     this.formControl.setValue(value);

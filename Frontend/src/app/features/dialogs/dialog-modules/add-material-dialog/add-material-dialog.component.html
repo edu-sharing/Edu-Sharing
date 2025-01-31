@@ -11,8 +11,8 @@
   <div
     class="dropArea"
     [class.dropActive]="isFileOver"
-    fileDrop
-    (onFileDrop)="closeWithFiles($event)"
+    esFileDrop
+    (fileDrop)="closeWithFiles($event)"
     (click)="selectFile()"
     (fileOver)="isFileOver = $event"
     esFocusState
@@ -23,7 +23,7 @@
       {{ 'WORKSPACE.ADD_OBJECT_MESSAGE' | translate }}
       <es-mat-link
         [highlight]="dropArea.hovering"
-        (click)="selectFile()"
+        (clickOnLink)="selectFile()"
         data-test="browse-files-button"
         >{{ 'WORKSPACE.ADD_OBJECT_BROWSE' | translate }}</es-mat-link
       >

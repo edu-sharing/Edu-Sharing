@@ -18,7 +18,7 @@ export class ToolpermissionCheckDirective implements OnChanges {
     }
 
     async ngOnChanges() {
-        this.handlePermission();
+        await this.handlePermission();
     }
 
     async handlePermission() {

@@ -14,7 +14,7 @@ import { take } from 'rxjs/operators';
 })
 export class BannerComponent {
     @Input() scope: string;
-    @Output() onUpdate = new EventEmitter();
+    @Output() update = new EventEmitter();
     public banner: any;
     constructor(private config: ConfigService) {
         this.banner = ConfigurationHelper.getBanner(this.config);
@@ -23,7 +23,7 @@ export class BannerComponent {
             .pipe(take(1))
             .subscribe(() => {
                 this.banner = ConfigurationHelper.getBanner(this.config);
-                this.onUpdate.emit(this.banner);
+                this.update.emit(this.banner);
             });
     }
 

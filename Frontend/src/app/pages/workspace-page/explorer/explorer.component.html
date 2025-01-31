@@ -19,18 +19,18 @@
   [singleClickHint]="'static'"
   (sortChange)="setSorting($event)"
   (clickItem)="clickItem($event)"
-  (dblClickItem)="onOpenNode.emit($event.element)"
+  (dblClickItem)="openNode.emit($event.element)"
   (virtualNodesAdded)="syncTreeViewOnAdd($event)"
 >
   <ng-template #empty>
-    <h5 class="noElementsInfo" *ngIf="searchQuery$.value == null || searchQuery$.value === ''">
+    <h5 class="noElementsInfo" *ngIf="searchQuery$.value === null || searchQuery$.value === ''">
       {{ 'WORKSPACE.NO_NODES_IN_FOLDER' | translate }}
     </h5>
-    <h5 class="noElementsInfo" *ngIf="!(searchQuery$.value == null || searchQuery$.value === '')">
+    <h5 class="noElementsInfo" *ngIf="!(searchQuery$.value === null || searchQuery$.value === '')">
       <div *ngIf="node$.value">
         {{ 'WORKSPACE.NO_MATCHING_ITEMS_FOLDER' | translate : { name: node$.value.name } }}
       </div>
-      <div *ngIf="node$.value" class="clickable" (click)="searchGlobal()">
+      <div *ngIf="node$.value" class="clickable" (click)="doSearchGlobal()">
         {{ 'WORKSPACE.SEARCH_GLOBAL' | translate }}
       </div>
       <div *ngIf="!node$.value">{{ 'WORKSPACE.NO_MATCHING_ITEMS' | translate }}</div>

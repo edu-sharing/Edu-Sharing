@@ -7,8 +7,7 @@ import {
     OnInit,
     ViewChild,
 } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, Params, Router, UrlSerializer } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslationsService, UIConstants } from 'ngx-edu-sharing-ui';
 import {
     ConfigurationService,
@@ -50,7 +49,7 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
         this.request.submit();
     }
     public linkRegister() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
     }
     public newPassword() {
         this.resetPassword.newPassword();
@@ -90,7 +89,7 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
                     this.state = params.status;
                     this.changes.detectChanges();
                 } else {
-                    this.router.navigate([UIConstants.ROUTER_PREFIX, 'register']);
+                    void this.router.navigate([UIConstants.ROUTER_PREFIX, 'register']);
                 }
             }
         });

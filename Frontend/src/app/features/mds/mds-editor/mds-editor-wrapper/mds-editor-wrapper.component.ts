@@ -64,9 +64,9 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
     }
 
     @Output() extendedChange = new EventEmitter();
-    @Output() onCancel = new EventEmitter();
-    @Output() onDone = new EventEmitter<Node[] | Values>();
-    @Output() onMdsLoaded = new EventEmitter();
+    @Output() cancelMds = new EventEmitter();
+    @Output() done = new EventEmitter<Node[] | Values>();
+    @Output() mdsLoaded = new EventEmitter();
     @Output() openContributor = new EventEmitter();
     /**
      * @DEPRECATED old mds only
@@ -98,7 +98,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
         // TODO: Make sure that inputs are ready when this component is initialized and remove calls
         // to `loadMds()`.
         if (this.graphqlIds || this.nodes || this.currentValues) {
-            this.init();
+            void this.init();
         }
         this.mdsEditorInstance.values.subscribe((values) => (this.values = values));
 
@@ -147,7 +147,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
         switch (this.editorType) {
             case 'angular':
                 const values = await this.mdsEditorInstance.getValues();
-                this.onDone.emit(values);
+                this.done.emit(values);
                 return values;
             default:
                 console.warn('saveValues() was called before init finished');
@@ -187,7 +187,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
                 // Don't need to re-init
                 this.loadMdsAfterInit(onlyLegacy);
             } else {
-                this.init().then(() => {
+                void this.init().then(() => {
                     this.loadMdsAfterInit(onlyLegacy);
                 });
             }
@@ -202,7 +202,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
                 }
                 this.mdsEditorInstance.mdsDefinition$
                     .pipe(first((definition) => definition !== null))
-                    .subscribe((definition) => this.onMdsLoaded.emit(definition));
+                    .subscribe((definition) => this.mdsLoaded.emit(definition));
         }
     }
 
@@ -212,7 +212,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
             if (!this.mdsEditorInstance.getCanSave()) {
                 // no changes, behave like close
                 if (this.mdsEditorInstance.getIsValid()) {
-                    this.onDone.emit(this.nodes);
+                    this.done.emit(this.nodes);
                     return;
                 } else {
                     console.warn(
@@ -230,7 +230,7 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
             if (this.toastOnSave) {
                 this.toast.toast(this.toastOnSave);
             }
-            this.onDone.emit(updatedNodes);
+            this.done.emit(updatedNodes);
         } catch (error) {
             if (
                 error?.error?.error?.endsWith(
@@ -303,6 +303,6 @@ export class MdsEditorWrapperComponent implements OnInit, OnDestroy {
         } else {
             this.toast.error(error);
         }
-        this.onCancel.emit();
+        this.cancelMds.emit();
     }
 }

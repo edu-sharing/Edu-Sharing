@@ -160,8 +160,8 @@ export class CardComponent implements AfterContentInit, OnDestroy {
      */
     @Input() captureFocus = true;
 
-    @Output() onCancel = new EventEmitter();
-    @Output() onScrolled = new EventEmitter();
+    @Output() cancel = new EventEmitter<void>();
+    @Output() scrolled = new EventEmitter<void>();
 
     /** A list of buttons, see @DialogButton
      * Also use the DialogButton.getYesNo() and others if applicable!
@@ -217,7 +217,7 @@ export class CardComponent implements AfterContentInit, OnDestroy {
     @HostListener('window:resize')
     onResize() {
         if (document.activeElement && this.cardContainer && this.cardContainer.nativeElement) {
-            this.uiService.scrollSmoothElementToChild(
+            void this.uiService.scrollSmoothElementToChild(
                 document.activeElement,
                 this.cardContainer.nativeElement,
             );
@@ -236,7 +236,7 @@ export class CardComponent implements AfterContentInit, OnDestroy {
         if (event.key === 'Escape') {
             event.stopPropagation();
             event.preventDefault();
-            this.cancel();
+            this.doCancel();
             return true;
         }
         if (this.modal === 'always') {
@@ -252,12 +252,12 @@ export class CardComponent implements AfterContentInit, OnDestroy {
         btn.callback();
     }
 
-    cancel() {
-        this.onCancel.emit();
+    doCancel() {
+        this.cancel.emit();
     }
 
-    scrolled() {
-        this.onScrolled.emit();
+    doScroll() {
+        this.scrolled.emit();
     }
 
     onScroll() {

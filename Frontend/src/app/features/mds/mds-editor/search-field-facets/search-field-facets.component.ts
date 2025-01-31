@@ -117,7 +117,7 @@ export class SearchFieldFacetsComponent implements OnInit, OnDestroy {
 
     private init(info: Partial<InitInfo>): void {
         if (info.repository && info.metadataSet && info.group) {
-            this.mdsEditorInstance
+            void this.mdsEditorInstance
                 .initWithoutNodes(info.group, info.metadataSet, info.repository)
                 .then(() => (this.views = this.mdsEditorInstance.views));
         } else {

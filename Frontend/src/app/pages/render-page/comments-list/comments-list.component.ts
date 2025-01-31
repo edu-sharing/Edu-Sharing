@@ -5,7 +5,6 @@ import {
     Comment,
     Comments,
     LoginResult,
-    Node,
     RestCommentsService,
     RestConnectorService,
     RestConstants,
@@ -15,7 +14,7 @@ import {
 import { Toast } from '../../../services/toast';
 import { YES_OR_NO } from '../../../features/dialogs/dialog-modules/generic-dialog/generic-dialog-data';
 import { DialogsService } from '../../../features/dialogs/dialogs.service';
-import { NetworkService } from 'ngx-edu-sharing-api';
+import { NetworkService, Node } from 'ngx-edu-sharing-api';
 import { first } from 'rxjs/operators';
 
 @Component({
@@ -38,22 +37,21 @@ export class CommentsListComponent {
     public newComment = '';
     public editComment: Comment = null;
     public editCommentText: string;
-    loading: boolean;
+    isLoading: boolean;
     sending: boolean;
     hasPermission: boolean;
     isFromHomeRepo: boolean;
 
     @Input() set node(node: Node) {
         this._node = node;
-        this.refresh();
+        void this.refresh();
     }
-    @Output() onCancel = new EventEmitter();
-    @Output() onLoading = new EventEmitter();
+    @Output() cancelComment = new EventEmitter<void>();
+    @Output() loading = new EventEmitter<boolean>();
     /**
      * Some data has changed, may be a new, removed or edited comment
-     * @type {EventEmitter<any>}
      */
-    @Output() onChange = new EventEmitter();
+    @Output() changeComment = new EventEmitter<void>();
     dropdown = -1;
 
     constructor(
@@ -67,7 +65,7 @@ export class CommentsListComponent {
         this.connector.isLoggedIn(false).subscribe((data: LoginResult) => {
             this.isGuest = data.isGuest;
             if (!data.isGuest) {
-                this.iam.getCurrentUserAsync().then((data) => {
+                void this.iam.getCurrentUserAsync().then((data) => {
                     this.user = data.person;
                     this.hasPermission = this.connector.hasToolPermissionInstant(
                         RestConstants.TOOLPERMISSION_COMMENT_WRITE,
@@ -77,19 +75,19 @@ export class CommentsListComponent {
         });
     }
     saveEditComment() {
-        this.onLoading.emit(true);
+        this.loading.emit(true);
         this.commentsApi
             .editComment(this.editComment.ref.id, this.editCommentText.trim())
             .subscribe(
                 () => {
-                    this.onLoading.emit(false);
-                    this.onChange.emit();
+                    this.loading.emit(false);
+                    this.changeComment.emit();
                     this.editComment = null;
-                    this.refresh();
+                    void this.refresh();
                 },
                 (error: any) => {
                     this.toast.error(error);
-                    this.onLoading.emit(false);
+                    this.loading.emit(false);
                 },
             );
     }
@@ -114,17 +112,17 @@ export class CommentsListComponent {
                     });
                     dialogRef.afterClosed().subscribe((response) => {
                         if (response === 'YES') {
-                            this.onLoading.emit(true);
+                            this.loading.emit(true);
                             this.toast.closeProgressSpinner();
                             this.commentsApi.deleteComment(comment.ref.id).subscribe(
                                 () => {
-                                    this.refresh();
-                                    this.onChange.emit();
-                                    this.onLoading.emit(false);
+                                    void this.refresh();
+                                    this.changeComment.emit();
+                                    this.loading.emit(false);
                                 },
                                 (error: any) => {
                                     this.toast.error(error);
-                                    this.onLoading.emit(false);
+                                    this.loading.emit(false);
                                 },
                             );
                         }
@@ -144,30 +142,30 @@ export class CommentsListComponent {
             return;
         }
         this.sending = true;
-        this.onLoading.emit(true);
+        this.loading.emit(true);
         this.commentsApi.addComment(this._node.ref.id, this.newComment.trim()).subscribe(
             () => {
                 this.sending = false;
-                this.onLoading.emit(false);
-                this.onChange.emit();
+                this.loading.emit(false);
+                this.changeComment.emit();
                 this.newComment = '';
-                this.refresh();
+                void this.refresh();
             },
             (error: any) => {
                 this.sending = false;
                 this.toast.error(error);
-                this.onLoading.emit(false);
+                this.loading.emit(false);
             },
         );
     }
     public cancel() {
-        this.onCancel.emit();
+        this.cancelComment.emit();
     }
 
     private async refresh() {
         this.comments = null;
         if (!this._node) return;
-        if (this.loading) {
+        if (this.isLoading) {
             setTimeout(() => this.refresh(), 100);
             return;
         }
@@ -176,18 +174,18 @@ export class CommentsListComponent {
             .pipe(first())
             .toPromise();
         if (!this.isFromHomeRepo) {
-            this.loading = false;
+            this.isLoading = false;
             this.comments = [];
             return;
         }
-        this.loading = true;
+        this.isLoading = true;
         this.commentsApi.getComments(this._node.ref.id, this._node.ref.repo).subscribe(
             (data: Comments) => {
-                this.loading = false;
+                this.isLoading = false;
                 this.comments = data && data.comments ? data.comments.reverse() : [];
             },
             (error: any) => {
-                this.loading = false;
+                this.isLoading = false;
                 this.toast.error(error);
             },
         );

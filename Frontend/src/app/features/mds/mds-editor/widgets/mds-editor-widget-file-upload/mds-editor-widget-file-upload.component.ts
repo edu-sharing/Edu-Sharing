@@ -1,22 +1,14 @@
-import {
-    ApplicationRef,
-    ChangeDetectorRef,
-    Component,
-    EventEmitter,
-    OnInit,
-    Output,
-} from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { NativeWidgetComponent } from '../../mds-editor-view/mds-editor-view.component';
 import { InputStatus, Values } from '../../../types/types';
-import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'es-mds-editor-widget-file-upload',
     templateUrl: './mds-editor-widget-file-upload.component.html',
     styleUrls: ['./mds-editor-widget-file-upload.component.scss'],
 })
-export class MdsEditorWidgetFileUploadComponent implements OnInit, NativeWidgetComponent {
+export class MdsEditorWidgetFileUploadComponent implements NativeWidgetComponent {
     static readonly constraints = {
         requiresNode: false,
         supportsBulk: false,
@@ -35,14 +27,12 @@ export class MdsEditorWidgetFileUploadComponent implements OnInit, NativeWidgetC
     }
     status = new BehaviorSubject<InputStatus>('INVALID');
 
-    @Output() onSetLink = new EventEmitter<string>();
+    @Output() setLink = new EventEmitter<string>();
 
     constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
-    ngOnInit(): void {}
-
-    setLink() {
-        this.onSetLink.emit(this.link);
+    doSetLink() {
+        this.setLink.emit(this.link);
     }
 
     setFilesByFileList(fileList: FileList) {

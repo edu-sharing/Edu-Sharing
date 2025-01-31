@@ -1,93 +1,93 @@
-<div class="rootNode" [class.rootNodeSelected]="root == MY_FILES" (click)="setRoot(MY_FILES)">
+<div class="rootNode" [class.rootNodeSelected]="root === MY_FILES" (click)="doSetRoot(MY_FILES)">
   <i class="material-icons typeIcon">person</i>{{ 'WORKSPACE.MY_FILES' | translate }}
-  <i class="material-icons" *ngIf="root == MY_FILES">keyboard_arrow_down</i>
-  <i class="arrow" class="material-icons" *ngIf="root != MY_FILES">keyboard_arrow_right</i>
+  <i class="material-icons" *ngIf="root === MY_FILES">keyboard_arrow_down</i>
+  <i class="arrow" class="material-icons" *ngIf="root !== MY_FILES">keyboard_arrow_right</i>
 </div>
-<div class="tree" *ngIf="root == MY_FILES">
+<div class="tree" *ngIf="root === MY_FILES">
   <es-workspace-sub-tree
     [node]="'-userhome-'"
     [currentPath]="currentPath"
-    (onUpdateOptions)="updateOptions($event)"
-    (onDrop)="drop($event)"
-    (onClick)="openNode($event)"
+    (updateOptions)="doUpdateOptions($event)"
+    (dropElement)="drop($event)"
+    (clickElement)="doOpenNode($event)"
   ></es-workspace-sub-tree>
 </div>
 <div
   class="rootNode"
-  [class.rootNodeSelected]="root == SHARED_FILES"
-  (click)="setRoot(SHARED_FILES)"
+  [class.rootNodeSelected]="root === SHARED_FILES"
+  (click)="doSetRoot(SHARED_FILES)"
 >
   <i class="material-icons typeIcon">group</i>{{ 'WORKSPACE.SHARED_FILES' | translate }}
-  <i class="material-icons" *ngIf="root == SHARED_FILES">keyboard_arrow_down</i>
-  <i class="arrow" class="material-icons" *ngIf="root != SHARED_FILES">keyboard_arrow_right</i>
+  <i class="material-icons" *ngIf="root === SHARED_FILES">keyboard_arrow_down</i>
+  <i class="arrow" class="material-icons" *ngIf="root !== SHARED_FILES">keyboard_arrow_right</i>
 </div>
-<div class="tree" *ngIf="root == SHARED_FILES">
+<div class="tree" *ngIf="root === SHARED_FILES">
   <es-workspace-sub-tree
     [node]="'-shared_files-'"
     [currentPath]="currentPath"
-    (onUpdateOptions)="updateOptions($event)"
-    (onDrop)="drop($event)"
-    (onClick)="openNode($event)"
+    (updateOptions)="doUpdateOptions($event)"
+    (dropElement)="drop($event)"
+    (clickElement)="doOpenNode($event)"
   ></es-workspace-sub-tree>
 </div>
 <div
   class="rootNode"
-  [class.rootNodeSelected]="root == MY_SHARED_FILES"
-  (click)="setRoot(MY_SHARED_FILES)"
+  [class.rootNodeSelected]="root === MY_SHARED_FILES"
+  (click)="doSetRoot(MY_SHARED_FILES)"
 >
   <i class="material-icons typeIcon">share</i>{{ 'WORKSPACE.MY_SHARED_FILES' | translate }}
-  <i class="material-icons" *ngIf="root == MY_SHARED_FILES">keyboard_arrow_down</i>
-  <i class="arrow" class="material-icons" *ngIf="root != MY_SHARED_FILES">keyboard_arrow_right</i>
+  <i class="material-icons" *ngIf="root === MY_SHARED_FILES">keyboard_arrow_down</i>
+  <i class="arrow" class="material-icons" *ngIf="root !== MY_SHARED_FILES">keyboard_arrow_right</i>
 </div>
-<div class="tree" *ngIf="root == MY_SHARED_FILES">
+<div class="tree" *ngIf="root === MY_SHARED_FILES">
   <es-workspace-sub-tree
     [node]="'-my_shared_files-'"
     [currentPath]="currentPath"
-    (onUpdateOptions)="updateOptions($event)"
-    (onDrop)="drop($event)"
-    (onClick)="openNode($event)"
+    (updateOptions)="doUpdateOptions($event)"
+    (dropElement)="drop($event)"
+    (clickElement)="doOpenNode($event)"
   ></es-workspace-sub-tree>
 </div>
 <div
   class="rootNode"
-  [class.rootNodeSelected]="root == TO_ME_SHARED_FILES"
-  (click)="setRoot(TO_ME_SHARED_FILES)"
+  [class.rootNodeSelected]="root === TO_ME_SHARED_FILES"
+  (click)="doSetRoot(TO_ME_SHARED_FILES)"
 >
   <i class="material-icons typeIcon">send</i>{{ 'WORKSPACE.TO_ME_SHARED_FILES' | translate }}
-  <i class="material-icons" *ngIf="root == TO_ME_SHARED_FILES">keyboard_arrow_down</i>
-  <i class="arrow" class="material-icons" *ngIf="root != TO_ME_SHARED_FILES"
+  <i class="material-icons" *ngIf="root === TO_ME_SHARED_FILES">keyboard_arrow_down</i>
+  <i class="arrow" class="material-icons" *ngIf="root !== TO_ME_SHARED_FILES"
     >keyboard_arrow_right</i
   >
 </div>
-<div class="tree" *ngIf="root == TO_ME_SHARED_FILES">
+<div class="tree" *ngIf="root === TO_ME_SHARED_FILES">
   <es-workspace-sub-tree
     [node]="workspace.getRootFolderInternalId()"
     [currentPath]="currentPath"
-    (onUpdateOptions)="updateOptions($event)"
-    (onDrop)="drop($event)"
-    (onClick)="openNode($event)"
+    (updateOptions)="doUpdateOptions($event)"
+    (dropElement)="drop($event)"
+    (clickElement)="doOpenNode($event)"
   ></es-workspace-sub-tree>
 </div>
 <div
   class="rootNode"
-  [class.rootNodeSelected]="root == WORKFLOW_RECEIVE"
-  (click)="setRoot(WORKFLOW_RECEIVE)"
+  [class.rootNodeSelected]="root === WORKFLOW_RECEIVE"
+  (click)="doSetRoot(WORKFLOW_RECEIVE)"
 >
   <i class="material-icons typeIcon">inbox</i>{{ 'WORKSPACE.WORKFLOW_RECEIVE' | translate }}
 </div>
-<div class="tree" *ngIf="root == WORKFLOW_RECEIVE">
+<div class="tree" *ngIf="root === WORKFLOW_RECEIVE">
   <es-workspace-sub-tree
     [node]="'-workflow_receive-'"
     [currentPath]="currentPath"
-    (onUpdateOptions)="updateOptions($event)"
-    (onDrop)="drop($event)"
-    (onClick)="openNode($event)"
+    (updateOptions)="doUpdateOptions($event)"
+    (dropElement)="drop($event)"
+    (clickElement)="doOpenNode($event)"
   ></es-workspace-sub-tree>
 </div>
 <div
   class="rootNode"
-  [class.rootNodeSelected]="root == RECYCLE"
-  (click)="setRoot(RECYCLE)"
+  [class.rootNodeSelected]="root === RECYCLE"
+  (click)="doSetRoot(RECYCLE)"
   [esNodesDropTarget]="RECYCLE"
   [canDropNodes]="canDropOnRecycle"
   (nodeDropped)="onNodesDrop($event)"

@@ -168,7 +168,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         if (event.code == 'Escape') {
             event.preventDefault();
             event.stopPropagation();
-            this.goBack();
+            void this.goBack();
             return;
         }
     }
@@ -213,8 +213,8 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
             const imageData = data.preview?.data;
             if (imageData) {
                 this.imageData = this.sanitizer.bypassSecurityTrustUrl(imageData);
-                this.updateImageOptions();
-                fetch(imageData)
+                void this.updateImageOptions();
+                void fetch(imageData)
                     .then((res) => res.blob())
                     .then((blob) => {
                         this.imageFile = blob as File;
@@ -280,7 +280,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                             'TOOLPERMISSION_ERROR',
                         );
                         UIHelper.getCommonParameters(this.route).subscribe((params) => {
-                            this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
+                            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
                                 queryParams: params,
                             });
                         });
@@ -310,7 +310,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                         RestConstants.TOOLPERMISSION_COLLECTION_CHANGE_OWNER,
                     );
 
-                    this.iamService
+                    void this.iamService
                         .getCurrentUserAsync()
                         .then((user: IamUser) => (this.user = user.person));
                     this.route.queryParams.subscribe((queryParams) => {
@@ -337,7 +337,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                                         .subscribe((node: EduData.NodeWrapper) => {
                                             this.setCollection(node.node).subscribe(() => {
                                                 this.updateAvailableSteps();
-                                                this.updateImageOptions();
+                                                void this.updateImageOptions();
                                                 this.isLoading = false;
                                                 if (!this.loadingTask.isDone) {
                                                     this.loadingTask.done();
@@ -542,7 +542,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         // remember file for upload
         this.imageFile = file;
         this.imageData = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(file));
-        this.updateImageOptions();
+        void this.updateImageOptions();
     }
     handleError(error: any) {
         if (error.status == RestConstants.DUPLICATE_NODE_RESPONSE) {
@@ -642,7 +642,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
             this.switchToAuthorFreetext();
         }
         this.updateAvailableSteps();
-        this.goToNextStep();
+        void this.goToNextStep();
     }
     public getAvailableSteps(): Step[] {
         let steps: Step[] = [];
@@ -747,7 +747,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
             if (id !== RestConstants.ROOT) {
                 params.id = id;
             }
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'collections'], {
                 queryParams: params,
             });
         });
@@ -783,7 +783,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         if (this.newCollectionType == RestConstants.GROUP_TYPE_EDITORIAL) {
             // user has access to editorial group but can't invite (strange setting but may happens)
             if (!this.canInvite) {
-                this.save4(collection);
+                void this.save4(collection);
                 return;
             }
             this.permissions = this.getEditorialGroupPermissions() as ExtendedAcl;
@@ -808,7 +808,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                 })
                 .subscribe(
                     () => {
-                        this.save4(collection);
+                        void this.save4(collection);
                     },
                     (error) => {
                         this.toast.error(error);
@@ -816,7 +816,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
                     },
                 );
         } else {
-            this.save4(collection);
+            void this.save4(collection);
         }
     }
 
@@ -907,7 +907,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
             this.setCollectionType(RestConstants.COLLECTIONTYPE_EDITORIAL);
         }
         this.updateAvailableSteps();
-        this.updateImageOptions();
+        void this.updateImageOptions();
         this.isLoading = false;
         if (!this.loadingTask.isDone) {
             this.loadingTask.done();
@@ -954,7 +954,7 @@ export class CollectionNewComponent implements EventListener, OnInit, OnDestroy 
         this.imageFile = null;
         this.imageFileRef.nativeElement.value = null;
         this.currentCollection.preview = null;
-        this.updateImageOptions();
+        void this.updateImageOptions();
     }
 
     private updateButtons() {

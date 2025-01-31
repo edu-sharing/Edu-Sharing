@@ -6,7 +6,7 @@ import { RestAdminService } from '../../../core-module/rest/services/rest-admin.
 declare var Chart: any;
 
 @Component({
-    selector: 'app-admin-plugins',
+    selector: 'es-admin-plugins',
     templateUrl: 'plugins.component.html',
     styleUrls: ['plugins.component.scss'],
 })

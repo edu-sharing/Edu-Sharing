@@ -67,8 +67,8 @@ export class SimpleEditInviteComponent {
         }
     }
     @Input() fromUpload: boolean;
-    @Output() onInitFinished = new EventEmitter<boolean>();
-    @Output() onError = new EventEmitter<any>();
+    @Output() initFinished = new EventEmitter<boolean>();
+    @Output() errorEvent = new EventEmitter<any>();
 
     constructor(
         private nodeApi: RestNodeService,
@@ -252,7 +252,7 @@ export class SimpleEditInviteComponent {
                 if (error.status === RestConstants.HTTP_FORBIDDEN) {
                     this.missingNodePermissions = true;
                 } else {
-                    this.onError.emit(error);
+                    this.errorEvent.emit(error);
                 }
             },
         );
@@ -312,15 +312,15 @@ export class SimpleEditInviteComponent {
                             }),
                         ).subscribe((o) => {
                             this.organizations = o;
-                            this.detectPermissionState();
+                            void this.detectPermissionState();
                         });
                     } else {
-                        this.detectPermissionState();
+                        void this.detectPermissionState();
                     }
                 });
             },
             (error) => {
-                this.onError.emit(error);
+                this.errorEvent.emit(error);
             },
         );
     }
@@ -473,9 +473,9 @@ export class SimpleEditInviteComponent {
                     .filter((a) => this.getAvailableGlobalGroups().indexOf(a.authorityName) === -1)
                     .slice(0, 6);
                 this.initialState = this.getSelectedAuthority();
-                this.onInitFinished.emit(true);
+                this.initFinished.emit(true);
             },
-            (error) => this.onError.emit(error),
+            (error) => this.errorEvent.emit(error),
         );
     }
 

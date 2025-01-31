@@ -12,16 +12,16 @@ export class ViewMaterialFeedbackComponent {
     @Input()
     set node(node: Node) {
         this._node = node;
-        this.fetch();
+        void this.fetch();
     }
-    @Output() onClose = new EventEmitter<void>();
+    @Output() closeFeedback = new EventEmitter<void>();
     _node: Node;
     feedbacks: FeedbackData[];
     feedbackViewButtons: DialogButton[];
     constructor(private feedbackService: FeedbackV1Service, private toast: Toast) {
         this.feedbackViewButtons = DialogButton.getSingleButton(
             'CLOSE',
-            () => this.onClose.emit(),
+            () => this.closeFeedback.emit(),
             'standard',
         );
     }
@@ -40,7 +40,7 @@ export class ViewMaterialFeedbackComponent {
                 })
                 .toPromise();
         } catch (e) {
-            this.onClose.emit();
+            this.closeFeedback.emit();
         }
         this.toast.closeProgressSpinner();
     }

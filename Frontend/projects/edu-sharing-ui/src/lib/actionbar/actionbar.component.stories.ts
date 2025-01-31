@@ -2,7 +2,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { applicationConfig, moduleMetadata, type Meta, type StoryObj } from '@storybook/angular';
+import { applicationConfig, type Meta, moduleMetadata, type StoryObj } from '@storybook/angular';
 import { ApiRequestConfiguration, EduSharingApiModule } from 'ngx-edu-sharing-api';
 import { translateProvider } from '../../../../../src/app/features/mds/mds-editor/storybook-utils';
 import { EduSharingUiCommonModule } from '../common/edu-sharing-ui-common.module';
@@ -58,7 +58,7 @@ const actionbar: Meta<ActionbarComponent> = {
     },
     argTypes: {
         appearance: {
-            control: 'button',
+            control: 'select',
             options: ['button', 'round', 'icon-button'],
         },
     },

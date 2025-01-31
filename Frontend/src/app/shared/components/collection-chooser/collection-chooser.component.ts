@@ -18,9 +18,9 @@ import {
 } from '../../../core-module/core.module';
 import {
     DEFAULT,
-    Node,
     GenericAuthority,
     HOME_REPOSITORY,
+    Node,
     PROPERTY_FILTER_ALL,
     SearchService,
 } from 'ngx-edu-sharing-api';
@@ -56,16 +56,17 @@ export class CollectionChooserComponent implements OnInit {
     /**
      * Fired when an element is choosen, a (collection) Node will be send as a result
      */
-    @Output() onChoose = new EventEmitter<Node>();
-    @Output() onCreateCollection = new EventEmitter<Node>();
+    @Output() choose = new EventEmitter<Node>();
+    @Output() createCollection = new EventEmitter<Node>();
     /**
+     * @TODO: Currently NOT implemented!
      * Fired when a list of nodes is dropped on a collection item
      */
-    @Output() onDrop = new EventEmitter();
+    @Output() dropElement = new EventEmitter();
     /**
      * Fired when the dialog should be closed
      */
-    @Output() onCancel = new EventEmitter();
+    @Output() cancel = new EventEmitter();
 
     searchQueryInput = '';
     searchQuery = '';
@@ -74,7 +75,7 @@ export class CollectionChooserComponent implements OnInit {
     dataSourceLatest = new NodeDataSource();
     dataSourceTree = new NodeDataSource();
     createCollectionOptionItem = new OptionItem('OPTIONS.NEW_COLLECTION', 'add', () =>
-        this.createCollection(),
+        this.doCreateCollection(),
     );
 
     private hasMoreToLoad: boolean;
@@ -118,13 +119,13 @@ export class CollectionChooserComponent implements OnInit {
         if (event.code == 'Escape') {
             event.preventDefault();
             event.stopPropagation();
-            this.cancel();
+            this.doCancel();
             return;
         }
     }
 
-    createCollection() {
-        this.onCreateCollection.emit(this.currentRoot ? this.currentRoot : null);
+    doCreateCollection() {
+        this.createCollection.emit(this.currentRoot ? this.currentRoot : null);
     }
 
     loadLatest(reset = false) {
@@ -190,8 +191,8 @@ export class CollectionChooserComponent implements OnInit {
         }
     }
 
-    cancel() {
-        this.onCancel.emit();
+    doCancel() {
+        this.cancel.emit();
     }
 
     navigateBack() {
@@ -199,13 +200,6 @@ export class CollectionChooserComponent implements OnInit {
             this.currentRoot = this.breadcrumbs[this.breadcrumbs.length - 2] as any;
         else this.currentRoot = null;
         this.loadMy();
-    }
-
-    drop(event: any) {
-        if (!this.checkPermissions(event.target)) {
-            return;
-        }
-        this.onDrop.emit(event);
     }
 
     private checkPermissions(node: Node) {
@@ -240,7 +234,7 @@ export class CollectionChooserComponent implements OnInit {
         if (!this.checkPermissions(node as Node)) {
             return;
         }
-        this.onChoose.emit(node as Node);
+        this.choose.emit(node as Node);
     }
 
     private loadMy() {

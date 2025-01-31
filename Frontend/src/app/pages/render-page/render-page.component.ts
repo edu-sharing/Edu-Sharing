@@ -42,7 +42,6 @@ import {
     TemporaryStorageService,
     TranslationsService,
     UIAnimation,
-    UIConstants,
 } from 'ngx-edu-sharing-ui';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { filter, first, skipWhile, takeUntil } from 'rxjs/operators';
@@ -104,7 +103,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         const id = (node as Node).ref ? (node as Node).ref.id : (node as string);
         jQuery('#nodeRenderContent').html('');
         this._nodeId = id;
-        this.loadRenderData();
+        void this.loadRenderData();
     }
     constructor(
         private translate: TranslateService,
@@ -198,7 +197,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     }
 
     ngAfterViewInit(): void {
-        this.mainNavService.getDialogs().onStoredAddToCollection.subscribe((event) => {
+        this.mainNavService.getDialogs().storedAddToCollection.subscribe((event) => {
             this.refresh();
         });
     }
@@ -262,13 +261,13 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     _node: Node;
     _fromHomeRepository: boolean;
     _nodeId: string;
-    @Output() onClose = new EventEmitter();
+    @Output() closePage = new EventEmitter<void>();
     similarNodeColumns: ListItem[] = [];
 
     @HostListener('window:beforeunload', ['$event'])
     beforeunloadHandler(event: any) {
         if (this.isSafe) {
-            this.connector.logout().toPromise();
+            void this.connector.logout().toPromise();
         }
     }
     @HostListener('window:resize', ['$event'])
@@ -333,7 +332,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                                 this.mainNavService.getMainNav().topBar?.toggleMenuSidebar();
                                 this.mainNavService
                                     .getMainNav()
-                                    .topBar.onCloseScopeSelector.pipe(takeUntil(this.destroyed$))
+                                    .topBar.closeScopeSelector.pipe(takeUntil(this.destroyed$))
                                     .subscribe(() => {
                                         this.mainNavService.patchMainNavConfig({
                                             showNavigation: false,
@@ -344,7 +343,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                     }, 250);
                 }
             }
-        } else this.onClose.emit();
+        } else this.closePage.emit();
     }
 
     showDetails() {
@@ -409,7 +408,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     }
     viewParent() {
         this.isChildobject = false;
-        this.router.navigate([], {
+        void this.router.navigate([], {
             relativeTo: this.route,
             queryParamsHandling: 'merge',
             queryParams: {
@@ -420,7 +419,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     }
     viewChildobject(node: Node, pos: number) {
         this.isChildobject = true;
-        this.router.navigate([], {
+        void this.router.navigate([], {
             relativeTo: this.route,
             queryParamsHandling: 'merge',
             queryParams: {
@@ -522,7 +521,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                                 set,
                                 'search',
                             );
-                            this.linkSearchableWidgets();
+                            void this.linkSearchableWidgets();
                         });
                         this.mdsService
                             .getMetadataSet({
@@ -538,11 +537,11 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                             nodeRenderContent.html(data.detailsSnippet);
                             this.moveInnerStyleToHead(nodeRenderContent);
                             this.postprocessHtml();
-                            this.handleProposal();
+                            void this.handleProposal();
                             this.renderHelper.doAll(this._node);
                             this.loadNode();
                             // this.loadSimilarNodes();
-                            this.linkSearchableWidgets();
+                            void this.linkSearchableWidgets();
                             this.specialTemplate = null;
                             if (this.nodeHelper.isNodeRevoked(this._node)) {
                                 this.specialTemplate = 'revoked';
@@ -597,7 +596,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     }
     private downloadSequence() {
         const nodes = [this.sequenceParent].concat(this.sequence.nodes);
-        this.nodeHelper.downloadNodes(nodes, this.sequenceParent.name + '.zip');
+        void this.nodeHelper.downloadNodes(nodes, this.sequenceParent.name + '.zip');
     }
 
     private downloadCurrentNode() {
@@ -607,7 +606,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                 triggerTrackingEvent: true,
             });
         } else {
-            this.nodeHelper.downloadNode(this._node, this.isChildobject ? null : this.version);
+            void this.nodeHelper.downloadNode(this._node, this.isChildobject ? null : this.version);
         }
     }
 
@@ -651,7 +650,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         this.optionsHelper.refreshComponents();
         this.postprocessHtml();
         this.isBuildingPage = false;
-        this.handleQueryAction();
+        void void this.handleQueryAction();
     }
 
     private isCollectionRef() {
@@ -682,7 +681,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                     options.splice(1, 0, downloadAll);
                 }
                 this.currentOptions = options;
-                this.initOptions();
+                void this.initOptions();
             });
     }
     setDownloadUrl(url: string) {
@@ -692,7 +691,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         }
 
         this.downloadUrl = url;
-        this.initOptions();
+        void this.initOptions();
     }
 
     private getSequence(onFinish: () => void) {
@@ -742,7 +741,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     scroll(direction: string) {
         const element = this.sequencediv.nativeElement;
         const width = window.innerWidth / 2;
-        this.uiService
+        void this.uiService
             .scrollSmoothElement(
                 element.scrollLeft + (direction == 'left' ? -width : width),
                 element,
@@ -913,7 +912,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
     }
 
     reportRevokeFeedback() {
-        this.dialogsService.openNodeReportDialog({
+        void this.dialogsService.openNodeReportDialog({
             node: this._node,
             mode: 'REVOKE_FEEDBACK',
             showOptions: false,

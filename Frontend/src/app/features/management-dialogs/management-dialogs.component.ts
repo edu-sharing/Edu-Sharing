@@ -58,17 +58,15 @@ export class WorkspaceManagementDialogsComponent {
     collectionChooserBeforeRecentRef: TemplateRef<any>;
     @Input() addToCollection: Node[];
     @Output() addToCollectionChange = new EventEmitter();
-    @Output() onEvent = new EventEmitter<ManagementEvent>();
+    @Output() eventTriggered = new EventEmitter<ManagementEvent>();
     @Input() addNodesStream: Node[];
     @Output() addNodesStreamChange = new EventEmitter();
     @Input() nodeSimpleEditChange = new EventEmitter<Node[]>();
     @Input() materialViewFeedback: Node;
     @Output() materialViewFeedbackChange = new EventEmitter<Node>();
-    @Output() onClose = new EventEmitter();
-    @Output() onCreate = new EventEmitter();
-    @Output() onRefresh = new EventEmitter<Node[] | void>();
-    @Output() onCloseAddToCollection = new EventEmitter();
-    @Output() onStoredAddToCollection = new EventEmitter<{
+    @Output() refresh = new EventEmitter<Node[] | void>();
+    @Output() closeAddToCollection = new EventEmitter();
+    @Output() storedAddToCollection = new EventEmitter<{
         collection: Node;
         references: CollectionReference[];
     }>();
@@ -122,14 +120,14 @@ export class WorkspaceManagementDialogsComponent {
     cancelAddToCollection() {
         this.addToCollection = null;
         this.addToCollectionChange.emit(null);
-        this.onCloseAddToCollection.emit();
+        this.closeAddToCollection.emit();
     }
     public addToCollectionCreate(parent: Node = null) {
         this.temporaryStorage.set(TemporaryStorageService.COLLECTION_ADD_NODES, {
             nodes: this.addToCollection,
-            callback: this.onStoredAddToCollection,
+            callback: this.storedAddToCollection,
         });
-        this.router.navigate([
+        void this.router.navigate([
             UIConstants.ROUTER_PREFIX,
             'collections',
             'collection',
@@ -206,7 +204,7 @@ export class WorkspaceManagementDialogsComponent {
             asProposal,
             (nodes) => {
                 this.toast.closeProgressSpinner();
-                this.onStoredAddToCollection.emit({ collection, references: nodes });
+                this.storedAddToCollection.emit({ collection, references: nodes });
                 if (callback) {
                     callback();
                 }
@@ -220,7 +218,7 @@ export class WorkspaceManagementDialogsComponent {
     }
 
     declineProposals(nodes: ProposalNode[]) {
-        this.errorProcessing
+        void this.errorProcessing
             .handleRestRequest(
                 observableForkJoin(
                     nodes.map((n) =>
@@ -242,7 +240,7 @@ export class WorkspaceManagementDialogsComponent {
     }
 
     addProposalsToCollection(nodes: ProposalNode[]) {
-        this.errorProcessing
+        void this.errorProcessing
             .handleRestRequest(
                 observableForkJoin(
                     nodes.map((n) =>
@@ -258,7 +256,7 @@ export class WorkspaceManagementDialogsComponent {
                 ),
             )
             .then(() => {
-                this.errorProcessing
+                void this.errorProcessing
                     .handleRestRequest(
                         observableForkJoin(
                             nodes.map((n) =>
@@ -273,7 +271,7 @@ export class WorkspaceManagementDialogsComponent {
                     .then((results) => {
                         this.toast.toast('COLLECTIONS.PROPOSALS.TOAST.ACCEPTED');
                         this.localEvents.nodesDeleted.emit(nodes);
-                        this.onEvent.emit({
+                        this.eventTriggered.emit({
                             event: ManagementEventType.AddCollectionNodes,
                             data: {
                                 collection: nodes[0].proposalCollection,

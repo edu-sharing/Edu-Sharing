@@ -1,4 +1,4 @@
-import { Component, DebugElement, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -40,6 +40,6 @@ describe('IconDirective', () => {
 
     // FIXME: this works on a fresh angular 9 installation but crashes here.
     xit('should have four icon elements', () => {
-        expect(elements.length).toBe(4);
+        void expect(elements.length).toBe(4);
     });
 });

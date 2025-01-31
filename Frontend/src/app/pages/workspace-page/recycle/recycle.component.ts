@@ -132,13 +132,13 @@ export class RecycleMainComponent implements OnInit, AfterViewInit, OnDestroy {
                     .pipe(takeUntil(this.destroyed))
                     .subscribe(({ searchString }) => {
                         this.searchQuery = searchString;
-                        this.refresh();
+                        void this.refresh();
                     }),
             );
     }
 
     ngAfterViewInit(): void {
-        this.refresh();
+        void this.refresh();
         this.list.initOptionsGenerator({
             actionbar: this.actionbar,
             customOptions: this.options,
@@ -181,7 +181,7 @@ export class RecycleMainComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             this.toast.toast('RECYCLE.TOAST.RESTORE_FINISHED');
         }
-        this.refresh();
+        void this.refresh();
     }
 
     private openRestoreDialog(restoreResults: RestoreResults): void {
@@ -220,7 +220,7 @@ export class RecycleMainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.closeProgressSpinner();
         this.toast.toast('RECYCLE.TOAST.DELETE_FINISHED');
         this.list.getSelection().clear();
-        this.refresh();
+        void this.refresh();
     }
     private deleteNodes(list: Node[]) {
         if (this.service.get('recycleSkipDeleteConfirmation', false)) {
@@ -283,7 +283,7 @@ export class RecycleMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     updateSort(sort: ListSortConfig) {
         this.sort = sort;
-        this.refresh();
+        void this.refresh();
     }
 
     private prepareResults(results: RestoreResults) {

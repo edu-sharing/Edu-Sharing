@@ -12,5 +12,5 @@ import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/co
 export class LinkComponent {
     @Input() @HostBinding('class.highlight') highlight: boolean;
 
-    @Output() click = new EventEmitter();
+    @Output() clickOnLink = new EventEmitter<void>();
 }

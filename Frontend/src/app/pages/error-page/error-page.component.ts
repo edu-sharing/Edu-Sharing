@@ -49,7 +49,7 @@ export class ErrorPageComponent {
     }
 
     public openSearch() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'search']);
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'search']);
     }
     public closeWindow() {
         window.close();

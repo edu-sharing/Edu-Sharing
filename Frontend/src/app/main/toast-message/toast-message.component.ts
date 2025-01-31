@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Inject, Output } from '@angular/core';
-import { MAT_SNACK_BAR_DATA, MatSnackBar } from '@angular/material/snack-bar';
-import { ToastDuration } from 'ngx-edu-sharing-ui';
+import { Component, Inject } from '@angular/core';
+import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { ToastMessage } from '../../services/toast';
 
 @Component({
@@ -13,10 +12,5 @@ import { ToastMessage } from '../../services/toast';
  * Will handle keyup.enter automatically for the click binding
  */
 export class ToastMessageComponent {
-    readonly TOAST_DURATION = ToastDuration;
-    @Output() click = new EventEmitter();
-    constructor(
-        @Inject(MAT_SNACK_BAR_DATA) public data: ToastMessage,
-        public snackBar: MatSnackBar,
-    ) {}
+    constructor(@Inject(MAT_SNACK_BAR_DATA) public data: ToastMessage) {}
 }

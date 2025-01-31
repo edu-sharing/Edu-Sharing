@@ -33,7 +33,7 @@ export class RocketchatComponent implements EventListener {
             event == FrameEventsService.EVENT_USER_LOGGED_IN ||
             event == FrameEventsService.EVENT_USER_LOGGED_OUT
         )
-            this.initalize();
+            void this.initalize();
     }
     @ViewChild('frame') frame: ElementRef;
     @HostListener('document:keydown', ['$event'])
@@ -59,7 +59,7 @@ export class RocketchatComponent implements EventListener {
         public rocketChat: RocketChatService,
     ) {
         this.events.addSelfListener(this);
-        this.initalize();
+        void this.initalize();
         this.ngZone.runOutsideAngular(() => {
             window.addEventListener(
                 'message',

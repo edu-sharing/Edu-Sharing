@@ -29,7 +29,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="getPosition() != -1">
+<div *ngIf="getPosition() !== -1">
   <button
     class="previous"
     *ngIf="canSwitchBack()"
@@ -62,7 +62,7 @@
         (keyup.enter)="viewParent()"
       >
         <span class="itemTitle">{{ getNodeTitle(sequenceParent) }}</span>
-        <div class="wrapper" [class.selected]="_nodeId == sequenceParent.ref.id">
+        <div class="wrapper" [class.selected]="_nodeId === sequenceParent.ref.id">
           <img src="{{ sequenceParent.preview.url }}&crop=true&width=100&height=75" />
         </div>
       </div>
@@ -74,7 +74,7 @@
         (keyup.enter)="viewChildobject(item, i)"
       >
         <span class="itemTitle">{{ getNodeTitle(item) }}</span>
-        <div class="wrapper" [class.selected]="_nodeId == item.ref.id">
+        <div class="wrapper" [class.selected]="_nodeId === item.ref.id">
           <img src="{{ item.preview.url }}&crop=true&width=100&height=75" />
         </div>
       </div>

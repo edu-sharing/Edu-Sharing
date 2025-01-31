@@ -37,7 +37,7 @@ export class AddWithConnectorDialogComponent {
         private cordova: CordovaService,
         private translate: TranslateService,
     ) {
-        this.initDialogConfig();
+        void this.initDialogConfig();
     }
 
     private cancel() {

@@ -151,7 +151,7 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.refreshBanner();
+        void this.refreshBanner();
     }
 
     ngOnDestroy(): void {
@@ -229,14 +229,14 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
             this.canOpen = false;
         }
         if (queryParams.connector) {
-            this.topBar.createMenu?.showCreateConnector({
+            void this.topBar.createMenu?.showCreateConnector({
                 connector: this.topBar.createMenu?.connectorList?.filter(
                     (c) => c.id === queryParams.connector,
                 )[0],
             });
         }
         if (queryParams.nodeStore === 'true') {
-            this.openNodeStore();
+            void this.openNodeStore();
         } else {
             this.closeNodeStore();
         }
@@ -311,7 +311,7 @@ export class MainNavComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     openProfile() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'profiles', RestConstants.ME]);
+        void this.router.navigate([UIConstants.ROUTER_PREFIX + 'profiles', RestConstants.ME]);
     }
 
     async refreshBanner(): Promise<void> {

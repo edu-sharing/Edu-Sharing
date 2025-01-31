@@ -12,7 +12,7 @@ import { MdsEditorWidgetLinkComponent } from '../mds-editor/widgets/mds-editor-w
 import { MdsEditorWidgetLicenseComponent } from '../mds-editor/widgets/mds-editor-widget-license/mds-editor-widget-license.component';
 import { MdsEditorWidgetFileUploadComponent } from '../mds-editor/widgets/mds-editor-widget-file-upload/mds-editor-widget-file-upload.component';
 import { MdsEditorWidgetTextComponent } from '../mds-editor/widgets/mds-editor-widget-text/mds-editor-widget-text.component';
-import { MdsEditorWidgetTinyMCE } from '../mds-editor/widgets/mds-editor-widget-wysiwyg-html/mds-editor-widget-tinymce.component';
+import { MdsEditorWidgetTinyMCEComponent } from '../mds-editor/widgets/mds-editor-widget-wysiwyg-html/mds-editor-widget-tinymce.component';
 import { MdsEditorWidgetVCardComponent } from '../mds-editor/widgets/mds-editor-widget-vcard/mds-editor-widget-vcard.component';
 import { MdsEditorWidgetCheckboxComponent } from '../mds-editor/widgets/mds-editor-widget-checkbox/mds-editor-widget-checkbox.component';
 import { MdsEditorWidgetRadioButtonComponent } from '../mds-editor/widgets/mds-editor-widget-radio-button/mds-editor-widget-radio-button.component';
@@ -80,7 +80,7 @@ export const WidgetComponents: {
     [MdsWidgetType.Month]: MdsEditorWidgetTextComponent,
     [MdsWidgetType.Color]: MdsEditorWidgetTextComponent,
     [MdsWidgetType.Textarea]: MdsEditorWidgetTextComponent,
-    [MdsWidgetType.TinyMCE]: MdsEditorWidgetTinyMCE,
+    [MdsWidgetType.TinyMCE]: MdsEditorWidgetTinyMCEComponent,
     [MdsWidgetType.VCard]: MdsEditorWidgetVCardComponent,
     [MdsWidgetType.Checkbox]: MdsEditorWidgetCheckboxComponent,
     [MdsWidgetType.RadioHorizontal]: MdsEditorWidgetRadioButtonComponent,

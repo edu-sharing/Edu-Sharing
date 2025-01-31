@@ -49,7 +49,7 @@ export class DropdownComponent implements OnChanges {
         if (changes == null || changes?.options || changes?.callbackObjects) {
             this.options$.next(this.ui.filterValidOptions(Helper.deepCopyArray(this.options)));
             if (this.callbackObjects) {
-                this.ui.updateOptionEnabledState(this.options$, this.callbackObjects);
+                void this.ui.updateOptionEnabledState(this.options$, this.callbackObjects);
             }
         }
     }

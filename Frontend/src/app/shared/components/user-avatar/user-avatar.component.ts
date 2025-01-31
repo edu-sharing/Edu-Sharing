@@ -70,7 +70,10 @@ export class UserAvatarComponent {
         );
     }
     openProfile() {
-        this.router.navigate([UIConstants.ROUTER_PREFIX + 'profiles', this._user.authorityName]);
+        void this.router.navigate([
+            UIConstants.ROUTER_PREFIX + 'profiles',
+            this._user.authorityName,
+        ]);
     }
 
     getLetter(user: UserSimple) {

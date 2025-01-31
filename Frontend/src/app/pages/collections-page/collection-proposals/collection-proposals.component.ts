@@ -49,14 +49,14 @@ export class CollectionProposalsComponent implements OnChanges {
     @Input() collection: Node;
     @Input() canEdit: boolean;
 
-    @Output() onContentClick = new EventEmitter<ProposalNode>();
+    @Output() contentClick = new EventEmitter<ProposalNode>();
 
     constructor(
         private collectionService: RestCollectionService,
         private mainNavService: MainNavService,
         private optionsHelperService: OptionsHelperService,
     ) {
-        this.mainNavService.getDialogs().onEvent.subscribe((event: ManagementEvent) => {
+        this.mainNavService.getDialogs().eventTriggered.subscribe((event: ManagementEvent) => {
             if (event.event === ManagementEventType.AddCollectionNodes) {
                 this.refreshProposals();
             }

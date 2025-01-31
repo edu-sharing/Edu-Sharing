@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { Toast } from '../../services/toast';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,7 +30,7 @@ enum StateUI {
     styleUrls: ['app-login-page.component.scss'],
 })
 // tslint:disable:no-console
-export class AppLoginPageComponent implements OnInit {
+export class AppLoginPageComponent {
     public isLoading = true;
     public disabled = true;
 
@@ -63,7 +63,7 @@ export class AppLoginPageComponent implements OnInit {
 
         // WHEN RUNNING ON DESKTOP --> FORWARD TO BASIC LOGIN PAGE
         if (!this.cordova.isRunningCordova()) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'login']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'login']);
             return;
         }
 
@@ -91,7 +91,7 @@ export class AppLoginPageComponent implements OnInit {
     }
     private recoverPassword() {
         if (this.config.register.local) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'register', 'request']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'register', 'request']);
         } else {
             window.location.href = this.config.register.recoverUrl;
         }
@@ -99,8 +99,6 @@ export class AppLoginPageComponent implements OnInit {
     buttonExitApp(): void {
         this.cordova.exitApp();
     }
-
-    ngOnInit() {}
 
     checkConditions(): void {
         this.disabled = !this.username; // || !this.password;
@@ -199,13 +197,13 @@ export class AppLoginPageComponent implements OnInit {
                 }
                 this.isLoading = false;
 
-                this.handleCurrentState();
+                void this.handleCurrentState();
             });
         });
     }
     register() {
         if (this.config.register.local) {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'register']);
         } else {
             UIHelper.openUrl(
                 this.config.register.registerUrl,

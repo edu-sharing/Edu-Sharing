@@ -330,7 +330,7 @@
   <h4 *ngIf="type !== 'MULTI'">{{ 'WORKSPACE.LICENSE.CURRENT' | translate }}</h4>
   <img *ngIf="type !== 'MULTI'" class="currentLicenseIcon" src="{{ getLicenseIcon() }}" />
   <div class="license-additional-data" *ngIf="type.startsWith('CC_BY')">
-    <div *ngIf="ccVersion != '4.0'" class="licenseLocale">
+    <div *ngIf="ccVersion !== '4.0'" class="licenseLocale">
       <mat-form-field>
         <mat-label>{{ 'WORKSPACE.LICENSE.LOCALE' | translate }}</mat-label>
         <mat-select id="localeCountry" [(ngModel)]="ccCountry">
@@ -379,7 +379,7 @@
       <div *ngIf="ccCommercial">
         {{ 'LICENSE.DESCRIPTION.CC_COMMERCIAL_' + ccCommercial | translate }}
       </div>
-      <div *ngIf="ccVersion != '4.0'">
+      <div *ngIf="ccVersion !== '4.0'">
         {{ 'WORKSPACE.LICENSE.LOCALE' | translate : { locale: ccCountry } }}
         {{ 'COUNTRY_CODE.' + (ccCountry ? ccCountry : 'INTERNATIONAL') | uppercase | translate }}.
       </div>

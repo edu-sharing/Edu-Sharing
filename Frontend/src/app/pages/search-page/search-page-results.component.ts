@@ -57,7 +57,7 @@ export class SearchPageResultsComponent implements OnInit, OnDestroy {
                 ),
             )
             .subscribe((elementsLoadedTranslation) => {
-                this.announcer.announce(elementsLoadedTranslation);
+                void this.announcer.announce(elementsLoadedTranslation);
             });
     }
 

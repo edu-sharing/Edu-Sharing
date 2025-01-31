@@ -1,6 +1,6 @@
 <div class="title">
   <div class="label">{{ title | translate }}</div>
-  <button mat-icon-button (click)="cancel()"><i esIcon="close"></i></button>
+  <button mat-icon-button (click)="doCancel()"><i esIcon="close"></i></button>
 </div>
 <div class="content" infinite-scroll [scrollWindow]="false" (scrolled)="loadLatest()">
   <ng-container

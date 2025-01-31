@@ -13,8 +13,8 @@ export class CreateLtitoolComponent implements OnInit {
     public _tool: Tool;
     public _parent: Node;
     buttons: DialogButton[];
-    @Output() onCancel = new EventEmitter();
-    @Output() onCreate = new EventEmitter();
+    @Output() cancel = new EventEmitter();
+    @Output() create = new EventEmitter();
     public _name = '';
     nodes: Node[] = [];
 
@@ -25,8 +25,8 @@ export class CreateLtitoolComponent implements OnInit {
         private ltiPlatformService: LtiPlatformService,
     ) {
         this.buttons = [
-            new DialogButton('CANCEL', { color: 'standard' }, () => this.cancel()),
-            new DialogButton('CREATE', { color: 'primary' }, () => this.create()),
+            new DialogButton('CANCEL', { color: 'standard' }, () => this.doCancel()),
+            new DialogButton('CREATE', { color: 'primary' }, () => this.doCreate()),
         ];
         (window as any)['angularComponentReference'] = {
             component: this,
@@ -61,12 +61,12 @@ export class CreateLtitoolComponent implements OnInit {
         this._parent = parent;
     }
 
-    public cancel() {
-        this.onCancel.emit({ nodes: this.nodes });
+    public doCancel() {
+        this.cancel.emit({ nodes: this.nodes });
     }
 
-    public create() {
-        this.onCreate.emit({ nodes: this.nodes, name: this._name });
+    public doCreate() {
+        this.create.emit({ nodes: this.nodes, name: this._name });
     }
 
     public openDeepLinkFlow() {

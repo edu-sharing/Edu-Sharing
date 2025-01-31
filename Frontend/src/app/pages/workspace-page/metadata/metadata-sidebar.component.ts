@@ -103,13 +103,13 @@ export class MetadataSidebarComponent {
 
     goToNode(node: Node) {
         if (node.content.version) {
-            this.router.navigate([
+            void this.router.navigate([
                 UIConstants.ROUTER_PREFIX + 'render',
                 node.ref.id,
                 node.content.version,
             ]);
         } else {
-            this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id]);
+            void this.router.navigate([UIConstants.ROUTER_PREFIX + 'render', node.ref.id]);
         }
     }
 
