@@ -16,7 +16,7 @@ import java.util.UUID;
 @Slf4j
 public class JwtTokenUtil {
 
-    public static String generateToken(String username, String nodeId, List<String> permissions, String mimeType, String mediaType, String replicationSource) throws GeneralSecurityException {
+    public static String generateToken(String username, String nodeId, List<String> permissions, String mimeType, String mediaType, String replicationSource, String resourceType) throws GeneralSecurityException {
         Key privateKey = new Signing().getPemPrivateKey(ApplicationInfoList.getHomeRepository().getPrivateKey(), CCConstants.SECURITY_KEY_ALGORITHM);
 
         Date date = new Date();
@@ -36,6 +36,7 @@ public class JwtTokenUtil {
                 .claim("mimeType", mimeType)
                 .claim("mediaType", mediaType)
                 .claim("replicationSource", replicationSource)
+                .claim("resourceType", resourceType)
                 .signWith(privateKey)
                 .compact();
 

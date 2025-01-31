@@ -2352,7 +2352,11 @@ public class NodeDao {
                 .findFirst()
                 .orElse(null);
 
-        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimetype(), getMediatype(), replicationSource);
+        String resourceType = Arrays.stream(getProperties().getOrDefault(CCConstants.getValidLocalName(CCConstants.CCM_PROP_CCRESSOURCETYPE), new String[0]))
+                .findFirst()
+                .orElse(null);
+
+        return JwtTokenUtil.generateToken(user, nodeId, nodePermissions, getMimetype(), getMediatype(), replicationSource, resourceType);
     }
 
     private String getMimetype() {
