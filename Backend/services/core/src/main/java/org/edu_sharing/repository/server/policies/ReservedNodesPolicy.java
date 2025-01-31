@@ -1,6 +1,8 @@
 package org.edu_sharing.repository.server.policies;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.model.ContentModel;
@@ -26,6 +28,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -50,7 +53,7 @@ public class ReservedNodesPolicy implements NodeServicePolicies.OnCreateNodePoli
 
     @Override
     public void onCreateNode(ChildAssociationRef childAssocRef) {
-        checkForResveredNames(childAssocRef.getParentRef(), childAssocRef.getChildRef());
+        checkForReservedNames(childAssocRef.getParentRef(), childAssocRef.getChildRef());
     }
 
     @Override
@@ -59,19 +62,28 @@ public class ReservedNodesPolicy implements NodeServicePolicies.OnCreateNodePoli
             return;
         }
         ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
-        checkForResveredNames(primaryParent.getParentRef(),  nodeRef);
+        checkForReservedNames(primaryParent.getParentRef(),  nodeRef);
     }
 
     @Override
     public CopyBehaviourCallback getCopyCallback(QName classRef, CopyDetails copyDetails) {
-        checkForResveredNames(copyDetails.getTargetParentNodeRef(), copyDetails.getSourceNodeRef());
+        checkForReservedNames(copyDetails.getTargetParentNodeRef(), copyDetails.getSourceNodeRef());
         return new DefaultCopyBehaviourCallback();
     }
 
-    private void checkForResveredNames(NodeRef parentRef, NodeRef childRef) {
+    private void checkForReservedNames(NodeRef parentRef, NodeRef childRef) {
         try {
 
-            String userName = new AuthenticationToolAPI().getAuthentication(Context.getCurrentInstance().getRequest().getSession()).get(CCConstants.AUTH_USERNAME);
+            HttpSession httpSession = Optional.ofNullable(Context.getCurrentInstance())
+                    .map(Context::getRequest)
+                    .map(HttpServletRequest::getSession)
+                    .orElse(null);
+
+            if(httpSession == null) {
+                return;
+            }
+
+            String userName = new AuthenticationToolAPI().getAuthentication(httpSession).get(CCConstants.AUTH_USERNAME);
             MCAlfrescoAPIClient baseClient = new MCAlfrescoAPIClient();
             String homeFolderID = baseClient.getHomeFolderID(userName);
             if (!parentRef.getId().equals(homeFolderID)) {
