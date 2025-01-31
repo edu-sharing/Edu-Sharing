@@ -1,5 +1,7 @@
 package org.edu_sharing.alfresco.repository.server.authentication;
 
+import com.drew.lang.annotations.NotNull;
+import com.drew.lang.annotations.Nullable;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,17 +37,23 @@ public class Context {
         this.response = response;
     }
 
+    @Nullable
     public static Context getCurrentInstance() {
         return instance.get();
     }
 
+    @Nullable
     public static ServletContext getGlobalContext() {
         return globalContext;
     }
+
+    @Nullable
     public static Context setInstance(Context context){
         instance.set(context);
         return context;
     }
+
+    @NotNull
     public static Context newInstance(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) {
         Context context = new Context(request,response);
         if(globalContext==null)
@@ -124,18 +132,22 @@ public class Context {
         instance.remove();
     }
 
+    @Nullable
     public HttpServletRequest getRequest() {
         return request;
     }
 
+    @Nullable
     public B3 getB3() {
         return b3;
     }
 
+    @Nullable
     public HttpServletResponse getResponse() {
         return response;
     }
 
+    @Nullable
     public String getSessionAttribute(String key){
         String sessionAtt = null;
         if(this.getRequest() != null
@@ -183,6 +195,7 @@ public class Context {
         this.getRequest().getSession().setAttribute(CCConstants.AUTH_SINGLE_USE_NODEIDS, list);
     }
 
+    @Nullable
     public String getSessionId(){
         if(this.getRequest() != null
                 && this.getRequest().getSession() != null){
@@ -191,27 +204,34 @@ public class Context {
         return null;
     }
 
+    @Nullable
     public String getLocale(){
         return getSessionAttribute(CCConstants.AUTH_LOCALE);
     }
 
+    @Nullable
     public String getAuthType(){
         return getSessionAttribute(CCConstants.AUTH_TYPE);
     }
 
+    @Nullable
     public String getAccessToken(){
         return getSessionAttribute(CCConstants.AUTH_ACCESS_TOKEN);
     }
 
     public interface B3 {
+
+        @Nullable
         default String getTraceId() {
             return null;
         }
 
+        @Nullable
         default String getClientTraceId() {
             return null;
         }
 
+        @Nullable
         default String getSpanId() {
             return null;
         }
