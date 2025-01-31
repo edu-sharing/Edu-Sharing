@@ -140,10 +140,15 @@ export class UIService {
         options.next(options.value);
     }
 
-    public filterToggleOptions(options: OptionItem[], toggle: boolean) {
+    public filterToggleOptions(
+        options: OptionItem[],
+        toggle: boolean,
+        togglePosition: 'before' | 'after' = 'after',
+    ) {
         let result: OptionItem[] = [];
         for (let option of options) {
-            if (option.isToggle == toggle) result.push(option);
+            if (option.isToggle === toggle && (!toggle || togglePosition === option.togglePosition))
+                result.push(option);
         }
         return result;
     }

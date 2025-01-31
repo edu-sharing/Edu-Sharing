@@ -31,6 +31,15 @@ export class OptionItem {
      */
     public isToggle = false;
     /**
+     * Only when @isToggle. is the toggle currently visible
+     */
+    public isToggleVisible = true;
+    /**
+     * Only when @isToggle. Where to place the toggle, before or after all other actions
+     * @type {boolean}
+     */
+    public togglePosition: 'before' | 'after' = 'after';
+    /**
      * If true, shows a line at the top.
      *
      * This feature is usually handled now by associating an entry to a `group`

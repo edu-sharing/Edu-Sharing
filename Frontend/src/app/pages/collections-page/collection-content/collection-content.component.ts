@@ -244,7 +244,8 @@ export class CollectionContentComponent implements OnChanges, OnInit, OnDestroy 
             'collectionReferences',
         );
 
-        this.optionsService.clearComponents(this.actionbarReferences);
+        // check: this sometimes caused missing actionbar data, why is it here?
+        //this.optionsService.clearComponents(this.actionbarReferences);
         this.registerMainNav();
         this.mainNavUpdateTrigger.next();
     }

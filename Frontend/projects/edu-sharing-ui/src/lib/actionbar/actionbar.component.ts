@@ -82,7 +82,8 @@ export class ActionbarComponent implements OnChanges {
     optionsIn: OptionItem[] = [];
     optionsAlways$ = new BehaviorSubject<OptionItem[]>([]);
     optionsMenu$ = new BehaviorSubject<OptionItem[]>([]);
-    optionsToggle: OptionItem[] = [];
+    optionsToggleBefore: OptionItem[] = [];
+    optionsToggleAfter: OptionItem[] = [];
 
     constructor(private uiService: UIService, private translate: TranslateService) {}
 
@@ -93,7 +94,8 @@ export class ActionbarComponent implements OnChanges {
             this.optionsMenu$.next([]);
             return;
         }
-        this.optionsToggle = this.uiService.filterToggleOptions(options, true);
+        this.optionsToggleBefore = this.uiService.filterToggleOptions(options, true, 'before');
+        this.optionsToggleAfter = this.uiService.filterToggleOptions(options, true, 'after');
         this.optionsAlways$.next(
             this.getActionOptions(this.uiService.filterToggleOptions(options, false)).slice(
                 0,

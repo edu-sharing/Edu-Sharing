@@ -9,6 +9,7 @@ import {
     DefaultGroups,
     ElementType,
     HideMode,
+    ListEventInterface,
     LocalEventsService,
     NodeEntriesDisplayType,
     NodesRightMode,
@@ -68,6 +69,7 @@ import { ConfigOptionItem, NodeHelperService } from './node-helper.service';
 import { Toast } from './toast';
 import { UIHelper } from '../core-ui-module/ui-helper';
 import { GlobalOptionsService } from './global-options.service';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Injectable()
 export class OptionsHelperService extends OptionsHelperServiceAbstract implements OnDestroy {
@@ -378,7 +380,10 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
     }
 
     private async isOptionAvailable(option: OptionItem, objects: Node[] | any[], data: OptionData) {
-        if (!this.getType(objects).every((t) => option.elementType.includes(t))) {
+        if (
+            option.elementType?.length > 0 &&
+            !this.getType(objects).every((t) => option.elementType.includes(t))
+        ) {
             // console.log('types not matching', objects, this.getType(objects), option);
             return false;
         }
@@ -1459,6 +1464,41 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         metadataSidebar.constrains = [Constrain.NoBulk];
         metadataSidebar.group = DefaultGroups.Toggles;
         metadataSidebar.isToggle = true;
+        const registerSelectionChange = (list: ListEventInterface<any>) => {
+            const updateVisibility = () => {
+                toggleSelection.isToggleVisible =
+                    list?.getDisplayType() !== NodeEntriesDisplayType.Table;
+            };
+            const updateSelectionState = (selection: SelectionModel<any>) => {
+                if (selection?.isEmpty()) {
+                    toggleSelection.name = 'OPTIONS.SELECT_ALL';
+                    toggleSelection.icon = 'select_all';
+                } else {
+                    toggleSelection.name = 'OPTIONS.DESELECT';
+                    toggleSelection.icon = 'deselect';
+                }
+            };
+            list?.getSelection()
+                .changed.pipe(map((s) => s.source))
+                .subscribe(updateSelectionState);
+            list?.onDisplayTypeChange().subscribe(updateVisibility);
+            updateSelectionState(list?.getSelection());
+            updateVisibility();
+        };
+        const toggleSelection = new OptionItem('', '', () => {
+            if (components.list?.getSelection()?.isEmpty()) {
+                components.list?.selectAll();
+            } else {
+                components.list?.getSelection().clear();
+            }
+        });
+        registerSelectionChange(components?.list);
+        toggleSelection.scopes = [Scope.WorkspaceList, Scope.Search, Scope.CollectionsReferences];
+        toggleSelection.group = DefaultGroups.Toggles;
+        toggleSelection.elementType = [];
+        toggleSelection.priority = 10;
+        toggleSelection.isToggle = true;
+        toggleSelection.togglePosition = 'before';
 
         options.push(applyNode);
         options.push(debugNode);
@@ -1504,6 +1544,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         options.push(removeNodeRef);
         options.push(reportNode);
         options.push(toggleViewType);
+        options.push(toggleSelection);
         options.push(metadataSidebar);
 
         if (data?.postPrepareOptions) {

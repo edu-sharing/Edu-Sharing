@@ -6,6 +6,7 @@ import { ListItem, ListItemSort } from '../types/list-item';
 import { CanDrop, DragData, DropAction } from '../types/drag-drop';
 import { Node, GenericAuthority } from 'ngx-edu-sharing-api';
 import { ActionbarComponent } from '../actionbar/actionbar.component';
+import { Observable } from 'rxjs';
 
 export type NodeRoot =
     | 'MY_FILES'
@@ -98,6 +99,8 @@ export type GridConfig = {
 export interface ListEventInterface<T extends NodeEntriesDataType> {
     updateNodes(nodes: void | T[]): void;
 
+    onDisplayTypeChange(): Observable<NodeEntriesDisplayType>;
+
     getDisplayType(): NodeEntriesDisplayType;
 
     setDisplayType(displayType: NodeEntriesDisplayType): void;
@@ -112,6 +115,8 @@ export interface ListEventInterface<T extends NodeEntriesDataType> {
      * activate option (dropdown) generation
      */
     initOptionsGenerator(config: ListOptionsConfig): void | Promise<void>;
+
+    selectAll(): void;
 
     getSelection(): SelectionModel<T>;
 

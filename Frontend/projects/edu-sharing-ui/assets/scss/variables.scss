@@ -1,5 +1,5 @@
 /**
-    declarations of dynamic css variabled
+    declarations of dynamic css variables
     will only be included once via angular to prevent duplicate :root entries
  */
 :root {
@@ -18,8 +18,6 @@
     --transitionNormal: 0.2s;
     --focusWidth: 2px;
     --fontSizeXSmall: 85%;
-    --mobileWidth: 700px;
-    --mobileStage: 100px;
     --itemSelectedTextColor: var(--palette-primary-700);
     --listItemSelectedBackground: var(--palette-primary-50);
     --listItemSelectedBackgroundEffect: linear-gradient(
