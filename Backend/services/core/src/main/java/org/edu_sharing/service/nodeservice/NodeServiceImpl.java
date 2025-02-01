@@ -1699,7 +1699,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             }else if(value.getClass().isArray() && Array.getLength(value) > 0){
                 return (Serializable) Array.get(value, 0);
             }
-            return null;
+            return value;
         }
         return value;
     }
@@ -1725,7 +1725,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
                         HashMap::putAll
                 );
                 properties.put(property, value);
-                for (PropertiesSetInterceptor i : PropertiesInterceptorFactory.getPropertiesSetInterceptors()) {
+                 for (PropertiesSetInterceptor i : PropertiesInterceptorFactory.getPropertiesSetInterceptors()) {
                     try {
                         properties = i.beforeSetProperties(PropertiesInterceptorFactory.getPropertiesContext(
                                 nodeRef,
