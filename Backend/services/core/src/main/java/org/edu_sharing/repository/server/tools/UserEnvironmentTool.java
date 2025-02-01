@@ -140,9 +140,9 @@ public class UserEnvironmentTool {
         }
 
         String systemFolderId = getEdu_SharingSystemFolderBase();
-        Map<String, Object> edu_SharingSystemFolderUpdate = mcBaseClient.getChild(systemFolderId, CCConstants.CCM_TYPE_MAP, CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_UPDATE);
+        NodeRef edu_SharingSystemFolderUpdate = nodeService.getChild(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, systemFolderId, CCConstants.CCM_TYPE_MAP,
+                CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_UPDATE);
 
-        String result = null;
         if (edu_SharingSystemFolderUpdate == null) {
             String systemFolderName = I18nServer.getTranslationDefaultResourcebundle(CCConstants.I18n_SYSTEMFOLDER_UPDATE);
             HashMap newEdu_SharingSysMapProps = new HashMap();
@@ -155,11 +155,10 @@ public class UserEnvironmentTool {
 
             newEdu_SharingSysMapProps.put(CCConstants.CM_PROP_C_TITLE, i18nTitle);
             newEdu_SharingSysMapProps.put(CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_EDU_SHARING_SYSTEM_UPDATE);
-            result = mcBaseClient.createNode(systemFolderId, CCConstants.CCM_TYPE_MAP, newEdu_SharingSysMapProps);
+            return mcBaseClient.createNode(systemFolderId, CCConstants.CCM_TYPE_MAP, newEdu_SharingSysMapProps);
         } else {
-            result = (String) edu_SharingSystemFolderUpdate.get(CCConstants.SYS_PROP_NODE_UID);
+            return edu_SharingSystemFolderUpdate.getId();
         }
-        return result;
     }
 
     public String getEdu_SharingNotifyFolder() throws Exception {
@@ -172,7 +171,7 @@ public class UserEnvironmentTool {
         String systemFolderName = I18nServer.getTranslationDefaultResourcebundle(CCConstants.I18n_SYSTEMFOLDER_NOTIFY);
         systemFolderName = (currentScope == null || currentScope.trim().isEmpty()) ? systemFolderName : systemFolderName + "_" + currentScope;
         NodeRef edu_SharingSystemFolderNotify = nodeService.getChild(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, systemFolderId, CCConstants.CCM_TYPE_MAP, CCConstants.CM_NAME, systemFolderName);
-        String result = null;
+        String result;
         if (edu_SharingSystemFolderNotify == null) {
 
             HashMap newEdu_SharingSysMapProps = new HashMap();

@@ -4,10 +4,12 @@ import com.typesafe.config.Optional;
 import lombok.Setter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.update.Protocol;
+import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,9 +179,9 @@ public class UpdaterService implements ApplicationContextAware, ApplicationListe
         currentlyRunningUpdates.add(x.getId());
         try {
             Protocol protocol = beanFactory.getBean(Protocol.class);
-            Map<String, Object> updateInfo = protocol.getSysUpdateEntry(x.getId());
-            if (updateInfo != null) {
-                log.info("Update" + x.getId() + " already done at " + updateInfo.get(CCConstants.CCM_PROP_SYSUPDATE_DATE));
+            NodeRef updateInfoRef = protocol.getSysUpdateEntry(x.getId());
+            if (updateInfoRef != null) {
+                log.info("Update" + x.getId() + " already done at " + NodeServiceHelper.getPropertyNative(updateInfoRef, CCConstants.CCM_PROP_SYSUPDATE_DATE));
                 return;
             }
 
