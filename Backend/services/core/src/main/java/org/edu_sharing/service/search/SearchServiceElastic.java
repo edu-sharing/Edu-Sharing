@@ -219,6 +219,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
         // @TODO: FIX after DESP-840
         BoolQuery collectionPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.read")
                 .should(s -> s.match(m -> m.field("collections.owner").query(user)))
+                .must(must -> must.match(match -> match.field("collections.relation.type").query("ccm:usage")))
                 .build();
 
         BoolQuery proposalPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.Coordinator", getUserAuthorities().stream().filter(a -> !a.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)).collect(Collectors.toSet()))
