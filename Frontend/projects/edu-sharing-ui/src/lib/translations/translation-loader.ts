@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Optional } from '@angular/core';
 import { TranslateLoader } from '@ngx-translate/core';
-import { ConfigService, LANGUAGES, TranslationsDict } from 'ngx-edu-sharing-api';
+import { ConfigService, LANGUAGES } from 'ngx-edu-sharing-api';
 import * as rxjs from 'rxjs';
-import { concat, Observable, of } from 'rxjs';
-import { catchError, filter, first, map, reduce, switchMap, tap } from 'rxjs/operators';
+import { concat, forkJoin, Observable, of } from 'rxjs';
+import { catchError, filter, first, map, reduce, switchMap } from 'rxjs/operators';
 import { EduSharingUiConfiguration } from '../edu-sharing-ui-configuration';
-import { ASSETS_BASE_PATH } from '../types/injection-tokens';
+import { ADDITIONAL_I18N_PROVIDER, ASSETS_BASE_PATH } from '../types/injection-tokens';
 import { TranslationSource } from './translation-source';
 
 export const TRANSLATION_LIST = [
@@ -35,12 +35,24 @@ export class TranslationLoader implements TranslateLoader {
         configService: ConfigService,
         configuration: EduSharingUiConfiguration,
         @Optional() @Inject(ASSETS_BASE_PATH) assetsBasePath?: string,
+        @Optional()
+        @Inject(ADDITIONAL_I18N_PROVIDER)
+        additionalI18nProvider?: (lang: string) => string[],
     ) {
-        return new TranslationLoader(assetsBasePath, http, configService, configuration);
+        return new TranslationLoader(
+            assetsBasePath,
+            additionalI18nProvider,
+            http,
+            configService,
+            configuration,
+        );
     }
 
     private constructor(
         @Optional() @Inject(ASSETS_BASE_PATH) private assetsBasePath: string,
+        @Optional()
+        @Inject(ADDITIONAL_I18N_PROVIDER)
+        private additionalI18nProvider: (lang: string) => string[],
         private http: HttpClient,
         private configService: ConfigService,
         private configuration: EduSharingUiConfiguration,
@@ -80,6 +92,23 @@ export class TranslationLoader implements TranslateLoader {
                 map(({ originalTranslations, translationOverrides }) => {
                     // FIXME: This will alter the object returned by `getOriginalTranslations`.
                     return this.applyOverrides(originalTranslations, translationOverrides);
+                }),
+                switchMap((translations) => {
+                    if (!this.additionalI18nProvider) {
+                        return of(translations);
+                    }
+                    const files = this.additionalI18nProvider(lang);
+                    console.info('additional i18n provided', files);
+                    return forkJoin(
+                        files.map((f) => this.http.get(f) as Observable<Dictionary>),
+                    ).pipe(
+                        map((value) => {
+                            for (let dictionary of value) {
+                                translations = this.overrideWithObject(translations, dictionary);
+                            }
+                            return translations;
+                        }),
+                    );
                 }),
                 map((translations) => this.replaceGenderCharacter(translations)),
                 catchError((error, obs) => {
@@ -211,5 +240,22 @@ export class TranslationLoader implements TranslateLoader {
         }
 
         return translations;
+    }
+
+    private overrideWithObject(source: Dictionary, override: Dictionary) {
+        if (!source) {
+            source = {};
+        }
+        for (let key of Object.keys(override)) {
+            if (typeof override[key] === 'object') {
+                source[key] = this.overrideWithObject(
+                    source[key] as Dictionary,
+                    override[key] as Dictionary,
+                );
+            } else {
+                source[key] = override[key];
+            }
+        }
+        return source;
     }
 }
