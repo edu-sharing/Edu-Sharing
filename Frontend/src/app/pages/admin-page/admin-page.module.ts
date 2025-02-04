@@ -14,6 +14,7 @@ import { AdminMediacenterComponent } from './mediacenter/mediacenter.component';
 import { AdminPluginsComponent } from './plugins/plugins.component';
 import { AdminStatisticsComponent } from './statistics/statistics.component';
 import { CodeEditorComponent } from './code-editor/code-editor';
+import { AdminContextComponent } from './context/context.component';
 
 @NgModule({
     declarations: [
@@ -22,6 +23,7 @@ import { CodeEditorComponent } from './code-editor/code-editor';
         AdminMediacenterComponent,
         AdminPageComponent,
         AdminPluginsComponent,
+        AdminContextComponent,
         AdminStatisticsComponent,
         AutocompleteComponent,
         CodeEditorComponent,
