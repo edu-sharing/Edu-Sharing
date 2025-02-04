@@ -21,6 +21,7 @@ const PROXY_CONFIG = [
             '/edu-sharing/ccimages',
             '/edu-sharing/oauth2',
             '/edu-sharing/shibboleth',
+            '/edu-sharing/services',
         ],
         target: process.env.BACKEND_URL,
         secure: false,
