@@ -12,7 +12,9 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Plugin(
@@ -33,6 +35,7 @@ public class JobLogger extends AbstractAppender {
     static {
         IGNORABLE_JOBS.add(SystemStatisticJob.class.getName());
         IGNORABLE_JOBS.add(TimedPermissionJob.class.getName());
+        IGNORABLE_JOBS.add(LTISessionObjectCleanupJob.class.getName());
         IGNORABLE_JOBS.add("org.edu_sharing.repository.server.jobs.quartz.ClusterInfoJob");
     }
 
