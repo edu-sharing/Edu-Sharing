@@ -1,0 +1,63 @@
+@import '../../../core-ui-module/styles/variables';
+
+$radius: 25px;
+:host {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    es-info-message {
+        display: flex;
+        margin-bottom: 30px;
+    }
+}
+
+form.create,
+.current {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: $radius;
+    padding: 20px;
+    margin: 20px;
+}
+form.create {
+    background-color: $cardLightBackground;
+}
+form.edit {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.open-close {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+    border-radius: $radius;
+    &.context {
+        background-color: $cardLightBackground;
+    }
+    &.opened {
+        border-radius: $radius $radius 0 0;
+    }
+    .active {
+        color: $colorStatusPositive;
+    }
+    padding: 15px 20px;
+    background-color: #fff;
+    > span {
+        flex-grow: 1;
+    }
+}
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.context-details {
+    padding: 20px;
+    background-color: $cardLightBackground;
+    border-radius: 0 0 $radius $radius;
+}

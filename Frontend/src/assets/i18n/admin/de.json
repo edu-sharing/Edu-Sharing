@@ -18,7 +18,8 @@
       "JOBS": "Aufgaben",
       "TOOLKIT": "Tool Kit (Caches, Logfiles)",
       "BROWSER": "Node Browser & Solr-Debugging",
-      "FOLDERTEMPLATES": "Ordnervorlagen"
+      "FOLDERTEMPLATES": "Ordnervorlagen",
+      "CONTEXT": "Kontexte/Domains"
     },
     "PLUGINS": {
       "TITLE": "Erweiterungen",
@@ -668,6 +669,30 @@
         "keysetUrl": "Keyset Url",
         "clientName": "Tool Bezeichnung"
       }
+    },
+    "CONTEXT": {
+      "CREATE": "Neuen Kontext anlegen",
+      "CREATE_SAVE": "Kontext erstellen",
+      "CREATE_INFO": "Mit einem Kontext können domainspezifisch Konfigurationswerte für das Frontend (client.config.xml) inkl. Sprach-Anpassungen festgelegt werden. Diese Konfiguration bietet die Möglichkeit, Kontexte zur Laufzeit hinzuzufügen, zu bearbeiten oder zu löschen. Die Einstellungen bleiben dauerhaft erhalten und überschreiben ggf. vorhandene Informationen aus der mitgelieferten client.config.xml. Änderungen werden sofort aktiv.",
+      "CONTEXT_ID": "Interne Id des Kontexts",
+      "CONTEXT_DOMAIN": "Domainname(n) des Kontexts",
+      "ACTIVE": "Dieser Kontext ist für die aktuelle Domain/Sitzung aktiv",
+      "ACTIVATE": "In Kontext wechseln",
+      "CURRENT": "Vorhandene Kontexte",
+      "CONTEXT_CONFIG_VALUES": "Werte / Konfiguration des Kontexts",
+      "CONTEXT_CONFIG_LANGUAGE": "Sprach-Overrides des Kontexts",
+      "CONTEXT_CONFIG_VARIABLES": "Variablen des Kontexts",
+      "VALUES_SAMPLE": "Beispielwerte/Dokumentationsvorlage",
+      "ERROR_PARSING": "Mindestens eine der Konfigurationen konnte nicht als JSON gelesen werden. Bitte überprüfen die den Syntax",
+      "REFRESH_TITLE": "Seite neuladen?",
+      "REFRESH_MESSAGE": "Es wurden Änderungen am derzeit aktiven Kontext vorgenommen. Damit diese sichtbar werden, muss die Angular-Anwendung neu initialisiert werden\n\nSoll die Seite hierfür neu geladen werden?",
+      "SAVED": "Kontext gespeichert",
+      "DELETE": "Kontext löschen",
+      "TEMPLATE": "Als Vorlage verwenden",
+      "DELETED": "Kontext wurde gelöscht",
+      "DELETE_TITLE": "Kontext löschen?",
+      "DELETE_MESSAGE": "Möchten Sie den Kontext (Id: {{id}}, Domains: {{domain}}) wirklich löschen?",
+      "MISSING_VALUES": "Bitte alle Felder ausfüllen"
     }
   },
   "Key": "DE FORMAL",

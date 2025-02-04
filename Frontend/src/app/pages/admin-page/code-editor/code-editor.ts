@@ -30,7 +30,11 @@ export class CodeEditorComponent implements ControlValueAccessor {
     writeValue(obj: any): void {
         this.ngModel = obj;
     }
-    registerOnChange(fn: any): void {}
+    registerOnChange(fn: any): void {
+        this.ngModelChange.subscribe((v) => {
+            fn(v);
+        });
+    }
     registerOnTouched(fn: any): void {}
     setDisabledState?(isDisabled: boolean): void {
         if (isDisabled) {

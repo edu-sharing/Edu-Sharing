@@ -20,7 +20,8 @@
       "JOBS": "Jobs",
       "TOOLKIT": "Tool Kit (Caches, Logfiles)",
       "BROWSER": "Node Browser & Solr-Debugging",
-      "FOLDERTEMPLATES": "Folder templates"
+      "FOLDERTEMPLATES": "Folder templates",
+      "CONTEXT": "Context & domains"
     },
     "PLUGINS": {
       "TITLE": "Extensions",
@@ -641,6 +642,30 @@
         "auth_token_url": "Auth Token Url",
         "CREATED": "Platform registered"
       }
+    },
+    "CONTEXT": {
+      "CREATE": "Create new context",
+      "CREATE_SAVE": "Create context",
+      "CREATE_INFO": "Mit einem Kontext können domainspezifisch Konfigurationswerte für das Frontend (client.config.xml) inkl. Sprach-Anpassungen festgelegt werden. Diese Konfiguration bietet die Möglichkeit, Kontexte zur Laufzeit hinzuzufügen, zu bearbeiten oder zu löschen. Die Einstellungen bleiben dauerhaft erhalten und überschreiben ggf. vorhandene Informationen aus der mitgelieferten client.config.xml. Änderungen werden sofort aktiv.",
+      "CONTEXT_ID": "Internal id of context",
+      "CONTEXT_DOMAIN": "domain name(s) of context",
+      "ACTIVE": "This context is active for the current domain",
+      "ACTIVATE": "Switch to context",
+      "CURRENT": "Existing contexts",
+      "CONTEXT_CONFIG_VALUES": "Values/Configuration for context",
+      "CONTEXT_CONFIG_LANGUAGE": "Language-Overrides for context",
+      "CONTEXT_CONFIG_VARIABLES": "Variables for context",
+      "VALUES_SAMPLE": "Example values/Documentation template",
+      "ERROR_PARSING": "At least one configuration could not be parsed as JSON. Please check the syntax",
+      "REFRESH_TITLE": "Reload page?",
+      "REFRESH_MESSAGE": "The current context has been modified. In order to apply these modifications, the angular application has to be re-initialized.\n\nShould the page be reloaded?",
+      "SAVED": "Context saved",
+      "DELETE": "Delete Context",
+      "TEMPLATE": "Use as template",
+      "DELETED": "Context deleted",
+      "DELETE_TITLE": "Delete Context?",
+      "DELETE_MESSAGE": "Do you really want to delete the context (Id: {{id}}, Domains: {{domain}})?",
+      "MISSING_VALUES": "Please fill out all fields"
     }
   },
   "LTITOOL": {
