@@ -12,8 +12,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.repository.server.authentication.Context;
-import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
-import org.edu_sharing.metadataset.v2.*;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.client.tools.I18nAngular;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
@@ -36,6 +34,8 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -151,6 +151,7 @@ public class MetadataTemplateRenderer {
 			html += "<div class='mdsGroup mdsGroup-" + template.getId() + "'>" + "<h2 class='mdsCaption " + template.getId() + "'>" + template.getCaption() + "</h2>" + "<div class='mdsContent'>";
 		}
 		String content=template.getHtml();
+		content = replaceI18nStrings(content);
 		for(MetadataWidget srcWidget : mds.getWidgets()){
 			MetadataWidget widget=mds.findWidgetForTemplateAndCondition(srcWidget.getId(),template.getId(),properties);
 			int start=content.indexOf("<"+srcWidget.getId());
@@ -466,6 +467,22 @@ public class MetadataTemplateRenderer {
 			result.add(info);
 		}
 		return result;
+	}
+
+	private static String replaceI18nStrings(String content) {
+		Pattern pattern = Pattern.compile("<i18n ([^>]+)>");
+		Matcher matcher = pattern.matcher(content);
+		content = matcher.replaceAll(matchResult -> {
+			if(matchResult.groupCount() == 1) {
+                try {
+                    return MetadataHelper.getTranslation(matchResult.group(1));
+                } catch (Exception e) {
+                    return matchResult.group(1);
+                }
+            }
+			return "";
+		});
+		return content;
 	}
 
 	private boolean renderMaterialFeedback(MetadataWidget widget, StringBuffer widgetHtml) {

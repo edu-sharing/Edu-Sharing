@@ -2,6 +2,7 @@ package org.edu_sharing.service.handleservicedoi;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
@@ -11,6 +12,7 @@ import org.edu_sharing.metadataset.v2.MetadataWidget;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.tools.VCardConverter;
+import org.edu_sharing.repository.tools.URLHelper;
 import org.edu_sharing.service.handleservice.HandleService;
 import org.edu_sharing.service.handleservice.HandleServiceNotConfiguredException;
 import org.edu_sharing.service.handleservicedoi.model.*;
@@ -247,7 +249,7 @@ public class DOIService implements HandleService {
 
         List<String> publisherList = (List<String>) properties.get(QName.createQName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_PUBLISHER));
         String publisher;
-        if ((publisherList == null || publisherList.isEmpty())) {
+        if((publisherList == null || publisherList.isEmpty())){
             if (failOnMissing) {
                 throw new DOIServiceMissingAttributeException(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_PUBLISHER), "Publisher");
             }
@@ -286,6 +288,15 @@ public class DOIService implements HandleService {
         DOI doi = helper.getDoi();
         doi.getData().getAttributes().setUrl(getContentLink(properties));
         return doi;
+    }
+
+    @Override
+    public String getContentLink(Map<QName, Serializable> properties) {
+        if(StringUtils.isNotBlank(doiConfig.getRepoUrl())){
+            return URLHelper.getNgRenderNodeUrl(doiConfig.getRepoUrl(), (String)properties.get(ContentModel.PROP_NODE_UUID), null);
+        }
+
+        return URLHelper.getNgRenderNodeUrl((String)properties.get(ContentModel.PROP_NODE_UUID), null, false);
     }
 
     private HttpHeaders getHttpHeaders() {

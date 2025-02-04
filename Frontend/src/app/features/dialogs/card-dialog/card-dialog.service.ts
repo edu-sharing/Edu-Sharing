@@ -6,7 +6,7 @@ import * as rxjs from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 import { filter, map, pairwise, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { DialogsService } from '../dialogs.service';
-import { CardDialogConfig, CARD_DIALOG_DATA } from './card-dialog-config';
+import { CARD_DIALOG_DATA, CardDialogConfig } from './card-dialog-config';
 import { CardDialogContainerComponent } from './card-dialog-container/card-dialog-container.component';
 import { CardDialogRef } from './card-dialog-ref';
 import { CardDialogState, ViewMode } from './card-dialog-state';
@@ -31,6 +31,9 @@ export class CardDialogService {
     private focusTraps: ConfigurableFocusTrap[] = [];
     get openDialogs(): readonly CardDialogRef[] {
         return this.openDialogsSubject.value;
+    }
+    get openDialogs$() {
+        return this.openDialogsSubject;
     }
     private readonly viewModeSubject = new BehaviorSubject<ViewMode>('default');
 
