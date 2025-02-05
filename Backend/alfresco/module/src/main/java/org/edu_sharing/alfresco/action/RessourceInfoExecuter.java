@@ -2,6 +2,7 @@ package org.edu_sharing.alfresco.action;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import lombok.RequiredArgsConstructor;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
@@ -22,6 +23,8 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tika.Tika;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.repository.client.tools.CCConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,8 +37,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
-
+	private final LightbendConfigLoader configLoader;
 	private static final long MAX_JSON_PARSE_SIZE = 1024 * 1024 * 1;
 	/** The logger */
 	private static Log logger = LogFactory.getLog(RessourceInfoExecuter.class);
@@ -66,7 +70,7 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 	public static final String CCM_RESSOURCETYPE_SERLO = "serlo";
 	public static final String CCM_RESSOURCETYPE_EDUHTML = "eduhtml";
 
-	public static ArchiveInputStream getZipInputStream(ContentReader contentreader) throws IOException {
+    public static ArchiveInputStream getZipInputStream(ContentReader contentreader) throws IOException {
 		InputStream is = contentreader.getContentInputStream();
 
 		Tika tika = new Tika();
@@ -108,7 +112,7 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 				ArchiveInputStream zip = getZipInputStream(contentreader);
 				ArchiveEntry current = null;
 				if(zip!=null) {
-					boolean genericHtmlFallback = false;
+					String genericHtmlFile = null;
 					while ((current = zip.getNextEntry()) != null) {
 						if (current.getName().equals("imsmanifest.xml")) {
 
@@ -117,8 +121,8 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 							return;
 
 						}
-						if (current.getName().equalsIgnoreCase("index.html") || current.getName().equalsIgnoreCase("index.htm")) {
-							genericHtmlFallback = true;
+						if (current.getName().matches(configLoader.getConfig().getString("repository.parsers.eduhtml.indexPattern"))) {
+							genericHtmlFile = current.getName();
 						}
 
 						if (current.getName().equals("moodle.xml")) {
@@ -146,8 +150,8 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 					}
 
 					zip.close();
-                    if(genericHtmlFallback){
-                        proccessGenericHTML(actionedUponNodeRef);
+                    if(genericHtmlFile != null){
+                        proccessGenericHTML(actionedUponNodeRef, genericHtmlFile);
                     }
 				} else {
 					if(Arrays.asList("application/json", "text/plain", "application/octet-stream").contains(contentreader.getMimetype()) &&
@@ -190,12 +194,13 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 		return false;
 	}
 
-	private void proccessGenericHTML(NodeRef nodeRef) {
+	private void proccessGenericHTML(NodeRef nodeRef, String genericHtmlFile) {
 		nodeService.addAspect(nodeRef, QName.createQName(CCM_ASPECT_RESSOURCEINFO),
 				null);
 		nodeService.setProperty(nodeRef, QName.createQName(CCM_PROP_IO_RESSOURCETYPE),
 				CCM_RESSOURCETYPE_EDUHTML);
-
+		nodeService.setProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_CCRESSOURCE_MAIN_ENTITY),
+				genericHtmlFile);
 		// check if file contains unity content (web gl)
 		try{
 			ContentReader contentreader = this.contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
@@ -290,6 +295,9 @@ public class RessourceInfoExecuter extends ActionExecuterAbstractBase {
 							ressourceType);
 					nodeService.setProperty(actionedUponNodeRef, QName.createQName(CCM_PROP_IO_RESSOURCEVERSION),
 							ressourceVersion);
+
+					String href = "/manifest/resources/resource[position()=1]/@href";
+					nodeService.setProperty(actionedUponNodeRef, QName.createQName(CCConstants.CCM_PROP_CCRESSOURCE_MAIN_ENTITY), xpath.evaluate(href, doc));
 					if (isQtiList.size() > 0) {
 						ArrayList<String> qtiInfoSubtypeList = new ArrayList<>();
 						for (RessourceInfoTool.QTIInfo qtiInfo : isQtiList) {
