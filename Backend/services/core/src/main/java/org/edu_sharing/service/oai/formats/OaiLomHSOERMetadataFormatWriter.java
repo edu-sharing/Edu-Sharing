@@ -97,8 +97,8 @@ public class OaiLomHSOERMetadataFormatWriter extends AbstractMetadataFormatWrite
     private final static String LANG_ATTRIBUTE = "xml:lang";
 
     private final NodeService nodeService;
-    private final GuestService guestService;
-    private final PermissionService permissionService;
+    protected final GuestService guestService;
+    protected final PermissionService permissionService;
 
     @Value("${exporter.oai.lom.identifier.catalog:#{T(org.edu_sharing.repository.server.tools.ApplicationInfoList).getHomeRepository().getAppId()}}")
     protected String identifierCatalog;
@@ -296,7 +296,7 @@ public class OaiLomHSOERMetadataFormatWriter extends AbstractMetadataFormatWrite
     }
 
 
-    private void addContributor(Context context, Element eleParent, String contributorProperty, String role, String datePropertyId, String description) {
+    protected void addContributor(Context context, Element eleParent, String contributorProperty, String role, String datePropertyId, String description) {
         Element contributor = addContributor(context, eleParent, contributorProperty, role);
         addDateTime(context, "date", contributor, datePropertyId, description);
     }
@@ -550,11 +550,11 @@ public class OaiLomHSOERMetadataFormatWriter extends AbstractMetadataFormatWrite
     }
 
 
-    private void createSourceValue(Context context, String name, Element parent, Object value) {
+    protected void createSourceValue(Context context, String name, Element parent, Object value) {
         createSourceValue(context, name, parent, value, "LOMv1.0");
     }
 
-    private void createSourceValue(Context context, String name, Element parent, Object value, String source) {
+    protected void createSourceValue(Context context, String name, Element parent, Object value, String source) {
         if (value == null) {
             return;
         }
