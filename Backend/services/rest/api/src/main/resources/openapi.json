@@ -1165,6 +1165,53 @@
         },
         "type": "object"
       },
+      "ContentDisposition": {
+        "properties": {
+          "attachment": {
+            "type": "boolean"
+          },
+          "charset": {
+            "properties": {
+              "registered": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "creationDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "formData": {
+            "type": "boolean"
+          },
+          "inline": {
+            "type": "boolean"
+          },
+          "modificationDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "readDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "size": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Context": {
         "properties": {
           "domain": {
@@ -1312,6 +1359,31 @@
         "properties": {
           "onlyMetadata": {
             "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "CreateQAEntryRequestDTO": {
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CreateQANodeRequestDTO": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/CreateQAEntryRequestDTO"
+            },
+            "type": "array"
+          },
+          "usedText": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -1840,6 +1912,412 @@
               "delete"
             ],
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "HttpHeaders": {
+        "additionalProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "properties": {
+          "accept": {
+            "items": {
+              "$ref": "#/components/schemas/MediaType"
+            },
+            "type": "array"
+          },
+          "acceptCharset": {
+            "items": {
+              "properties": {
+                "registered": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "acceptLanguage": {
+            "items": {
+              "properties": {
+                "range": {
+                  "type": "string"
+                },
+                "weight": {
+                  "format": "double",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "acceptLanguageAsLocales": {
+            "items": {
+              "properties": {
+                "country": {
+                  "type": "string"
+                },
+                "displayCountry": {
+                  "type": "string"
+                },
+                "displayLanguage": {
+                  "type": "string"
+                },
+                "displayName": {
+                  "type": "string"
+                },
+                "displayScript": {
+                  "type": "string"
+                },
+                "displayVariant": {
+                  "type": "string"
+                },
+                "extensionKeys": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "iso3Country": {
+                  "type": "string"
+                },
+                "iso3Language": {
+                  "type": "string"
+                },
+                "language": {
+                  "type": "string"
+                },
+                "script": {
+                  "type": "string"
+                },
+                "unicodeLocaleAttributes": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "unicodeLocaleKeys": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "acceptPatch": {
+            "items": {
+              "$ref": "#/components/schemas/MediaType"
+            },
+            "type": "array"
+          },
+          "accessControlAllowCredentials": {
+            "type": "boolean"
+          },
+          "accessControlAllowHeaders": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "accessControlAllowMethods": {
+            "items": {
+              "$ref": "#/components/schemas/HttpMethod"
+            },
+            "type": "array"
+          },
+          "accessControlAllowOrigin": {
+            "type": "string"
+          },
+          "accessControlExposeHeaders": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "accessControlMaxAge": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "accessControlRequestHeaders": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "accessControlRequestMethod": {
+            "$ref": "#/components/schemas/HttpMethod"
+          },
+          "all": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "writeOnly": true
+          },
+          "allow": {
+            "items": {
+              "$ref": "#/components/schemas/HttpMethod"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "basicAuth": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "bearerAuth": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "cacheControl": {
+            "type": "string"
+          },
+          "connection": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "contentDisposition": {
+            "$ref": "#/components/schemas/ContentDisposition"
+          },
+          "contentLanguage": {
+            "properties": {
+              "country": {
+                "type": "string"
+              },
+              "displayCountry": {
+                "type": "string"
+              },
+              "displayLanguage": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "displayScript": {
+                "type": "string"
+              },
+              "displayVariant": {
+                "type": "string"
+              },
+              "extensionKeys": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "iso3Country": {
+                "type": "string"
+              },
+              "iso3Language": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "script": {
+                "type": "string"
+              },
+              "unicodeLocaleAttributes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "unicodeLocaleKeys": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "variant": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "contentLength": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "contentType": {
+            "$ref": "#/components/schemas/MediaType"
+          },
+          "date": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "empty": {
+            "type": "boolean"
+          },
+          "etag": {
+            "type": "string"
+          },
+          "expires": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "host": {
+            "properties": {
+              "address": {
+                "properties": {
+                  "address": {
+                    "format": "byte",
+                    "type": "string"
+                  },
+                  "anyLocalAddress": {
+                    "type": "boolean"
+                  },
+                  "canonicalHostName": {
+                    "type": "string"
+                  },
+                  "hostAddress": {
+                    "type": "string"
+                  },
+                  "hostName": {
+                    "type": "string"
+                  },
+                  "linkLocalAddress": {
+                    "type": "boolean"
+                  },
+                  "loopbackAddress": {
+                    "type": "boolean"
+                  },
+                  "mcglobal": {
+                    "type": "boolean"
+                  },
+                  "mclinkLocal": {
+                    "type": "boolean"
+                  },
+                  "mcnodeLocal": {
+                    "type": "boolean"
+                  },
+                  "mcorgLocal": {
+                    "type": "boolean"
+                  },
+                  "mcsiteLocal": {
+                    "type": "boolean"
+                  },
+                  "multicastAddress": {
+                    "type": "boolean"
+                  },
+                  "siteLocalAddress": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "hostName": {
+                "type": "string"
+              },
+              "hostString": {
+                "type": "string"
+              },
+              "port": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "unresolved": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "ifMatch": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "ifModifiedSince": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "ifNoneMatch": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "ifUnmodifiedSince": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "lastModified": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "location": {
+            "format": "uri",
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "pragma": {
+            "type": "string"
+          },
+          "range": {
+            "items": {
+              "$ref": "#/components/schemas/HttpRange"
+            },
+            "type": "array"
+          },
+          "upgrade": {
+            "type": "string"
+          },
+          "vary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "HttpMethod": {
+        "type": "object"
+      },
+      "HttpRange": {
+        "type": "object"
+      },
+      "HttpStatusCode": {
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "is1xxInformational": {
+            "type": "boolean"
+          },
+          "is2xxSuccessful": {
+            "type": "boolean"
+          },
+          "is3xxRedirection": {
+            "type": "boolean"
+          },
+          "is4xxClientError": {
+            "type": "boolean"
+          },
+          "is5xxServerError": {
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -3004,6 +3482,47 @@
           "type",
           "value"
         ],
+        "type": "object"
+      },
+      "MediaType": {
+        "properties": {
+          "charset": {
+            "properties": {
+              "registered": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "concrete": {
+            "type": "boolean"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "qualityValue": {
+            "format": "double",
+            "type": "number"
+          },
+          "subtype": {
+            "type": "string"
+          },
+          "subtypeSuffix": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "wildcardSubtype": {
+            "type": "boolean"
+          },
+          "wildcardType": {
+            "type": "boolean"
+          }
+        },
         "type": "object"
       },
       "Mediacenter": {
@@ -4704,6 +5223,57 @@
         },
         "type": "object"
       },
+      "QAEntry": {
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "edited": {
+            "type": "boolean"
+          },
+          "lastReviewed": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "reviewed": {
+            "type": "boolean"
+          },
+          "reviewedBy": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "QANode": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/QAEntry"
+            },
+            "type": "array"
+          },
+          "generatedDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "nodeId": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "usedText": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Query": {
         "properties": {
           "condition": {
@@ -5049,6 +5619,1580 @@
           },
           "version": {
             "$ref": "#/components/schemas/Version"
+          }
+        },
+        "type": "object"
+      },
+      "ResponseEntityListQAEntry": {
+        "properties": {
+          "body": {
+            "items": {
+              "$ref": "#/components/schemas/QAEntry"
+            },
+            "type": "array"
+          },
+          "headers": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "properties": {
+              "accept": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "acceptCharset": {
+                "items": {
+                  "properties": {
+                    "registered": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguage": {
+                "items": {
+                  "properties": {
+                    "range": {
+                      "type": "string"
+                    },
+                    "weight": {
+                      "format": "double",
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguageAsLocales": {
+                "items": {
+                  "properties": {
+                    "country": {
+                      "type": "string"
+                    },
+                    "displayCountry": {
+                      "type": "string"
+                    },
+                    "displayLanguage": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "displayScript": {
+                      "type": "string"
+                    },
+                    "displayVariant": {
+                      "type": "string"
+                    },
+                    "extensionKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "iso3Country": {
+                      "type": "string"
+                    },
+                    "iso3Language": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "script": {
+                      "type": "string"
+                    },
+                    "unicodeLocaleAttributes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "unicodeLocaleKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "variant": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptPatch": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "accessControlAllowCredentials": {
+                "type": "boolean"
+              },
+              "accessControlAllowHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlAllowMethods": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array"
+              },
+              "accessControlAllowOrigin": {
+                "type": "string"
+              },
+              "accessControlExposeHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlMaxAge": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "accessControlRequestHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlRequestMethod": {
+                "$ref": "#/components/schemas/HttpMethod"
+              },
+              "all": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object",
+                "writeOnly": true
+              },
+              "allow": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "basicAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "bearerAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "cacheControl": {
+                "type": "string"
+              },
+              "connection": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "contentDisposition": {
+                "$ref": "#/components/schemas/ContentDisposition"
+              },
+              "contentLanguage": {
+                "properties": {
+                  "country": {
+                    "type": "string"
+                  },
+                  "displayCountry": {
+                    "type": "string"
+                  },
+                  "displayLanguage": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "displayScript": {
+                    "type": "string"
+                  },
+                  "displayVariant": {
+                    "type": "string"
+                  },
+                  "extensionKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "iso3Country": {
+                    "type": "string"
+                  },
+                  "iso3Language": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "unicodeLocaleAttributes": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "unicodeLocaleKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "variant": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "contentLength": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "contentType": {
+                "$ref": "#/components/schemas/MediaType"
+              },
+              "date": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "empty": {
+                "type": "boolean"
+              },
+              "etag": {
+                "type": "string"
+              },
+              "expires": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "host": {
+                "properties": {
+                  "address": {
+                    "properties": {
+                      "address": {
+                        "format": "byte",
+                        "type": "string"
+                      },
+                      "anyLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "canonicalHostName": {
+                        "type": "string"
+                      },
+                      "hostAddress": {
+                        "type": "string"
+                      },
+                      "hostName": {
+                        "type": "string"
+                      },
+                      "linkLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "loopbackAddress": {
+                        "type": "boolean"
+                      },
+                      "mcglobal": {
+                        "type": "boolean"
+                      },
+                      "mclinkLocal": {
+                        "type": "boolean"
+                      },
+                      "mcnodeLocal": {
+                        "type": "boolean"
+                      },
+                      "mcorgLocal": {
+                        "type": "boolean"
+                      },
+                      "mcsiteLocal": {
+                        "type": "boolean"
+                      },
+                      "multicastAddress": {
+                        "type": "boolean"
+                      },
+                      "siteLocalAddress": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "hostName": {
+                    "type": "string"
+                  },
+                  "hostString": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "unresolved": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "ifMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifModifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "ifNoneMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifUnmodifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lastModified": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "location": {
+                "format": "uri",
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "pragma": {
+                "type": "string"
+              },
+              "range": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpRange"
+                },
+                "type": "array"
+              },
+              "upgrade": {
+                "type": "string"
+              },
+              "vary": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "statusCode": {
+            "$ref": "#/components/schemas/HttpStatusCode"
+          },
+          "statusCodeValue": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ResponseEntityListQANode": {
+        "properties": {
+          "body": {
+            "items": {
+              "$ref": "#/components/schemas/QANode"
+            },
+            "type": "array"
+          },
+          "headers": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "properties": {
+              "accept": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "acceptCharset": {
+                "items": {
+                  "properties": {
+                    "registered": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguage": {
+                "items": {
+                  "properties": {
+                    "range": {
+                      "type": "string"
+                    },
+                    "weight": {
+                      "format": "double",
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguageAsLocales": {
+                "items": {
+                  "properties": {
+                    "country": {
+                      "type": "string"
+                    },
+                    "displayCountry": {
+                      "type": "string"
+                    },
+                    "displayLanguage": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "displayScript": {
+                      "type": "string"
+                    },
+                    "displayVariant": {
+                      "type": "string"
+                    },
+                    "extensionKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "iso3Country": {
+                      "type": "string"
+                    },
+                    "iso3Language": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "script": {
+                      "type": "string"
+                    },
+                    "unicodeLocaleAttributes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "unicodeLocaleKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "variant": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptPatch": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "accessControlAllowCredentials": {
+                "type": "boolean"
+              },
+              "accessControlAllowHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlAllowMethods": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array"
+              },
+              "accessControlAllowOrigin": {
+                "type": "string"
+              },
+              "accessControlExposeHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlMaxAge": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "accessControlRequestHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlRequestMethod": {
+                "$ref": "#/components/schemas/HttpMethod"
+              },
+              "all": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object",
+                "writeOnly": true
+              },
+              "allow": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "basicAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "bearerAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "cacheControl": {
+                "type": "string"
+              },
+              "connection": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "contentDisposition": {
+                "$ref": "#/components/schemas/ContentDisposition"
+              },
+              "contentLanguage": {
+                "properties": {
+                  "country": {
+                    "type": "string"
+                  },
+                  "displayCountry": {
+                    "type": "string"
+                  },
+                  "displayLanguage": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "displayScript": {
+                    "type": "string"
+                  },
+                  "displayVariant": {
+                    "type": "string"
+                  },
+                  "extensionKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "iso3Country": {
+                    "type": "string"
+                  },
+                  "iso3Language": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "unicodeLocaleAttributes": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "unicodeLocaleKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "variant": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "contentLength": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "contentType": {
+                "$ref": "#/components/schemas/MediaType"
+              },
+              "date": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "empty": {
+                "type": "boolean"
+              },
+              "etag": {
+                "type": "string"
+              },
+              "expires": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "host": {
+                "properties": {
+                  "address": {
+                    "properties": {
+                      "address": {
+                        "format": "byte",
+                        "type": "string"
+                      },
+                      "anyLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "canonicalHostName": {
+                        "type": "string"
+                      },
+                      "hostAddress": {
+                        "type": "string"
+                      },
+                      "hostName": {
+                        "type": "string"
+                      },
+                      "linkLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "loopbackAddress": {
+                        "type": "boolean"
+                      },
+                      "mcglobal": {
+                        "type": "boolean"
+                      },
+                      "mclinkLocal": {
+                        "type": "boolean"
+                      },
+                      "mcnodeLocal": {
+                        "type": "boolean"
+                      },
+                      "mcorgLocal": {
+                        "type": "boolean"
+                      },
+                      "mcsiteLocal": {
+                        "type": "boolean"
+                      },
+                      "multicastAddress": {
+                        "type": "boolean"
+                      },
+                      "siteLocalAddress": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "hostName": {
+                    "type": "string"
+                  },
+                  "hostString": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "unresolved": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "ifMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifModifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "ifNoneMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifUnmodifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lastModified": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "location": {
+                "format": "uri",
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "pragma": {
+                "type": "string"
+              },
+              "range": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpRange"
+                },
+                "type": "array"
+              },
+              "upgrade": {
+                "type": "string"
+              },
+              "vary": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "statusCode": {
+            "$ref": "#/components/schemas/HttpStatusCode"
+          },
+          "statusCodeValue": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ResponseEntityQANode": {
+        "properties": {
+          "body": {
+            "$ref": "#/components/schemas/QANode"
+          },
+          "headers": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "properties": {
+              "accept": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "acceptCharset": {
+                "items": {
+                  "properties": {
+                    "registered": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguage": {
+                "items": {
+                  "properties": {
+                    "range": {
+                      "type": "string"
+                    },
+                    "weight": {
+                      "format": "double",
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguageAsLocales": {
+                "items": {
+                  "properties": {
+                    "country": {
+                      "type": "string"
+                    },
+                    "displayCountry": {
+                      "type": "string"
+                    },
+                    "displayLanguage": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "displayScript": {
+                      "type": "string"
+                    },
+                    "displayVariant": {
+                      "type": "string"
+                    },
+                    "extensionKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "iso3Country": {
+                      "type": "string"
+                    },
+                    "iso3Language": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "script": {
+                      "type": "string"
+                    },
+                    "unicodeLocaleAttributes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "unicodeLocaleKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "variant": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptPatch": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "accessControlAllowCredentials": {
+                "type": "boolean"
+              },
+              "accessControlAllowHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlAllowMethods": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array"
+              },
+              "accessControlAllowOrigin": {
+                "type": "string"
+              },
+              "accessControlExposeHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlMaxAge": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "accessControlRequestHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlRequestMethod": {
+                "$ref": "#/components/schemas/HttpMethod"
+              },
+              "all": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object",
+                "writeOnly": true
+              },
+              "allow": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "basicAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "bearerAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "cacheControl": {
+                "type": "string"
+              },
+              "connection": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "contentDisposition": {
+                "$ref": "#/components/schemas/ContentDisposition"
+              },
+              "contentLanguage": {
+                "properties": {
+                  "country": {
+                    "type": "string"
+                  },
+                  "displayCountry": {
+                    "type": "string"
+                  },
+                  "displayLanguage": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "displayScript": {
+                    "type": "string"
+                  },
+                  "displayVariant": {
+                    "type": "string"
+                  },
+                  "extensionKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "iso3Country": {
+                    "type": "string"
+                  },
+                  "iso3Language": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "unicodeLocaleAttributes": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "unicodeLocaleKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "variant": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "contentLength": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "contentType": {
+                "$ref": "#/components/schemas/MediaType"
+              },
+              "date": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "empty": {
+                "type": "boolean"
+              },
+              "etag": {
+                "type": "string"
+              },
+              "expires": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "host": {
+                "properties": {
+                  "address": {
+                    "properties": {
+                      "address": {
+                        "format": "byte",
+                        "type": "string"
+                      },
+                      "anyLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "canonicalHostName": {
+                        "type": "string"
+                      },
+                      "hostAddress": {
+                        "type": "string"
+                      },
+                      "hostName": {
+                        "type": "string"
+                      },
+                      "linkLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "loopbackAddress": {
+                        "type": "boolean"
+                      },
+                      "mcglobal": {
+                        "type": "boolean"
+                      },
+                      "mclinkLocal": {
+                        "type": "boolean"
+                      },
+                      "mcnodeLocal": {
+                        "type": "boolean"
+                      },
+                      "mcorgLocal": {
+                        "type": "boolean"
+                      },
+                      "mcsiteLocal": {
+                        "type": "boolean"
+                      },
+                      "multicastAddress": {
+                        "type": "boolean"
+                      },
+                      "siteLocalAddress": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "hostName": {
+                    "type": "string"
+                  },
+                  "hostString": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "unresolved": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "ifMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifModifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "ifNoneMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifUnmodifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lastModified": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "location": {
+                "format": "uri",
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "pragma": {
+                "type": "string"
+              },
+              "range": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpRange"
+                },
+                "type": "array"
+              },
+              "upgrade": {
+                "type": "string"
+              },
+              "vary": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "statusCode": {
+            "$ref": "#/components/schemas/HttpStatusCode"
+          },
+          "statusCodeValue": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ResponseEntityVoid": {
+        "properties": {
+          "body": {
+            "type": "object"
+          },
+          "headers": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "properties": {
+              "accept": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "acceptCharset": {
+                "items": {
+                  "properties": {
+                    "registered": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguage": {
+                "items": {
+                  "properties": {
+                    "range": {
+                      "type": "string"
+                    },
+                    "weight": {
+                      "format": "double",
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptLanguageAsLocales": {
+                "items": {
+                  "properties": {
+                    "country": {
+                      "type": "string"
+                    },
+                    "displayCountry": {
+                      "type": "string"
+                    },
+                    "displayLanguage": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "displayScript": {
+                      "type": "string"
+                    },
+                    "displayVariant": {
+                      "type": "string"
+                    },
+                    "extensionKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "iso3Country": {
+                      "type": "string"
+                    },
+                    "iso3Language": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "script": {
+                      "type": "string"
+                    },
+                    "unicodeLocaleAttributes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "unicodeLocaleKeys": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "variant": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "acceptPatch": {
+                "items": {
+                  "$ref": "#/components/schemas/MediaType"
+                },
+                "type": "array"
+              },
+              "accessControlAllowCredentials": {
+                "type": "boolean"
+              },
+              "accessControlAllowHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlAllowMethods": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array"
+              },
+              "accessControlAllowOrigin": {
+                "type": "string"
+              },
+              "accessControlExposeHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlMaxAge": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "accessControlRequestHeaders": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "accessControlRequestMethod": {
+                "$ref": "#/components/schemas/HttpMethod"
+              },
+              "all": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object",
+                "writeOnly": true
+              },
+              "allow": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpMethod"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "basicAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "bearerAuth": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "cacheControl": {
+                "type": "string"
+              },
+              "connection": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "contentDisposition": {
+                "$ref": "#/components/schemas/ContentDisposition"
+              },
+              "contentLanguage": {
+                "properties": {
+                  "country": {
+                    "type": "string"
+                  },
+                  "displayCountry": {
+                    "type": "string"
+                  },
+                  "displayLanguage": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "displayScript": {
+                    "type": "string"
+                  },
+                  "displayVariant": {
+                    "type": "string"
+                  },
+                  "extensionKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "iso3Country": {
+                    "type": "string"
+                  },
+                  "iso3Language": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "unicodeLocaleAttributes": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "unicodeLocaleKeys": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "variant": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "contentLength": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "contentType": {
+                "$ref": "#/components/schemas/MediaType"
+              },
+              "date": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "empty": {
+                "type": "boolean"
+              },
+              "etag": {
+                "type": "string"
+              },
+              "expires": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "host": {
+                "properties": {
+                  "address": {
+                    "properties": {
+                      "address": {
+                        "format": "byte",
+                        "type": "string"
+                      },
+                      "anyLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "canonicalHostName": {
+                        "type": "string"
+                      },
+                      "hostAddress": {
+                        "type": "string"
+                      },
+                      "hostName": {
+                        "type": "string"
+                      },
+                      "linkLocalAddress": {
+                        "type": "boolean"
+                      },
+                      "loopbackAddress": {
+                        "type": "boolean"
+                      },
+                      "mcglobal": {
+                        "type": "boolean"
+                      },
+                      "mclinkLocal": {
+                        "type": "boolean"
+                      },
+                      "mcnodeLocal": {
+                        "type": "boolean"
+                      },
+                      "mcorgLocal": {
+                        "type": "boolean"
+                      },
+                      "mcsiteLocal": {
+                        "type": "boolean"
+                      },
+                      "multicastAddress": {
+                        "type": "boolean"
+                      },
+                      "siteLocalAddress": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "hostName": {
+                    "type": "string"
+                  },
+                  "hostString": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "unresolved": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              },
+              "ifMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifModifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "ifNoneMatch": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "ifUnmodifiedSince": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lastModified": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "location": {
+                "format": "uri",
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "pragma": {
+                "type": "string"
+              },
+              "range": {
+                "items": {
+                  "$ref": "#/components/schemas/HttpRange"
+                },
+                "type": "array"
+              },
+              "upgrade": {
+                "type": "string"
+              },
+              "vary": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "statusCode": {
+            "$ref": "#/components/schemas/HttpStatusCode"
+          },
+          "statusCodeValue": {
+            "format": "int32",
+            "type": "integer"
           }
         },
         "type": "object"
@@ -6151,6 +8295,17 @@
           },
           "node": {
             "$ref": "#/components/schemas/Node"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateQAEntriesRequestDTO": {
+        "properties": {
+          "qaEntries": {
+            "items": {
+              "$ref": "#/components/schemas/QAEntry"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -31753,6 +33908,299 @@
         ]
       }
     },
+    "/qa/v1/nodes/{nodeId}": {
+      "get": {
+        "operationId": "getAllQANodes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityListQANode"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Get all QA Nodes of a specific nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      }
+    },
+    "/qa/v1/{nodeId}": {
+      "get": {
+        "operationId": "getQAEntriesOf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityListQAEntry"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Get all QA Entries of a specific nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      }
+    },
+    "/qa/v1/{nodeId}/node": {
+      "delete": {
+        "operationId": "deleteAllQANodes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityVoid"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Delete all QA Nodes by nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      }
+    },
+    "/qa/v1/{sourceId}/{nodeId}": {
+      "delete": {
+        "operationId": "deleteQANodes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sourceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityVoid"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Delete QA Node by sourceId and nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      },
+      "get": {
+        "operationId": "getQAEntries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sourceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityListQAEntry"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Get QA Entries of a specific sourceId and nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      },
+      "post": {
+        "operationId": "createQANode",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sourceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQANodeRequestDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          }
+        },
+        "summary": "Create a new QANode",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      },
+      "put": {
+        "operationId": "updateQAEntries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sourceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQAEntriesRequestDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityVoid"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Update QA Entries of a specific sourceId and nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      }
+    },
+    "/qa/v1/{sourceId}/{nodeId}/node": {
+      "get": {
+        "operationId": "getQANodes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sourceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "nodeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityQANode"
+                }
+              }
+            },
+            "description": "Ok"
+          }
+        },
+        "summary": "Get QA Node of a specific sourceId and nodeId",
+        "tags": [
+          "QUESTION ANSWER v1"
+        ]
+      }
+    },
     "/rating/v1/ratings/{repository}/nodes/altered": {
       "get": {
         "description": "requires admin",
@@ -37668,6 +40116,12 @@
   "servers": [
     {
       "url": "/edu-sharing/rest"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Question answers storage endpoint",
+      "name": "QUESTION ANSWER v1"
     }
   ]
 }

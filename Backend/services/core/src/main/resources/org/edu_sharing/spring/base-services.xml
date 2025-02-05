@@ -103,4 +103,5 @@
   <bean id="contextRefresher" class="org.edu_sharing.spring.scope.refresh.ContextRefresher">
     <constructor-arg name="scope" ref="refreshScope"/>
   </bean>
+  <bean id="qaService" class="org.edu_sharing.service.qa.DefaultQaService"/>
 </beans>
