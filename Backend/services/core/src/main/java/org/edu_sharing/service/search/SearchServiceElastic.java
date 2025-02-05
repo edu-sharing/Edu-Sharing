@@ -329,6 +329,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
     @NotNull
     private SearchResultNodeRef parseAggregations(SearchToken searchToken, Map<String, Aggregation> aggregations) throws Exception {
 //        logger.info("query aggs: "+searchSourceBuilderAggs.toString());
+        checkClient();
         SearchResponse<Map> resp = LogTime.log("Searching elastic for facets", () -> client.search(req -> req
                         .index(WORKSPACE_INDEX)
                         .from(0)
