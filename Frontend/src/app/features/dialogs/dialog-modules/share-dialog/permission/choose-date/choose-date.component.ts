@@ -13,7 +13,8 @@ import { FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatDatepicker, MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatInput } from '@angular/material/input';
-import { Toast } from 'ngx-edu-sharing-ui';
+import { Toast, TranslationsService } from 'ngx-edu-sharing-ui';
+import { DateAdapter } from '@angular/material/core';
 
 @Component({
     selector: 'es-share-dialog-choose-date',
@@ -29,7 +30,13 @@ export class ShareDialogChooseDateComponent implements OnInit, OnChanges {
     @Output() dateTimeChange = new EventEmitter<number>();
 
     timeControl = new FormControl('', [Validators.pattern(/\d\d:\d\d/)]);
-    constructor(private toast: Toast) {}
+    constructor(
+        private toast: Toast,
+        private translationsService: TranslationsService,
+        private dateAdapter: DateAdapter<any>,
+    ) {
+        this.dateAdapter.setLocale(this.translationsService.getLocale());
+    }
     toDate(value: number) {
         return value ? new Date(value) : null;
     }

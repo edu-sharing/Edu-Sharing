@@ -70,7 +70,7 @@
               <mat-checkbox
                 [ngModel]="!!timebased.to"
                 (ngModelChange)="
-                  $event ? (timebased.to = getDateTomorrow()) : (timebased.to = null)
+                  $event ? (timebased.to = getDateTomorrow(timebased.from)) : (timebased.to = null)
                 "
                 >{{ 'WORKSPACE.SHARE.TIMEBASED.TO_CHECKBOX' | translate }}</mat-checkbox
               >
