@@ -108,6 +108,10 @@ export class TranslationLoader implements TranslateLoader {
                             }
                             return translations;
                         }),
+                        catchError((e) => {
+                            console.error('Error loading custom languages', e);
+                            return of(translations);
+                        }),
                     );
                 }),
                 map((translations) => this.replaceGenderCharacter(translations)),
