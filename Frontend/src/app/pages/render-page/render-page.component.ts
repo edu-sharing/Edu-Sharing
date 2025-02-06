@@ -504,11 +504,13 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                                 .pipe(first())
                                 .toPromise();
                             if (this._fromHomeRepository) {
-                                this.nodeApi
-                                    .getNodeParents(this._nodeId)
-                                    .subscribe((nodes) =>
+                                this.nodeApi.getNodeParents(this._nodeId).subscribe(
+                                    (nodes) =>
                                         this.breadcrumbsService.setNodePath(nodes.nodes.reverse()),
-                                    );
+                                    (error) => {
+                                        console.info("Parent can' be fetched", error);
+                                    },
+                                );
                             }
                             this.isOpenable =
                                 this.connectors.connectorSupportsEdit(this._node) != null;
