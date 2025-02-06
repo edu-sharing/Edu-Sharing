@@ -74,7 +74,7 @@
     "ng2-pdfjs-viewer": "^18.0.0",
     "ngx-monaco-editor-v2": "^18.1.0",
     "ngx-rendering-service-api": "^0.0.21",
-    "ngx-rendering-service-lib": "^0.0.27",
+    "ngx-rendering-service-lib": "^0.0.34",
     "rxjs": "^7.8.1",
     "tslib": "^2.3.1",
     "uuid": "^3.3.2",
