@@ -19,7 +19,7 @@ import { RestConstants } from '../../../../core-module/rest/rest-constants';
 import { MdsWidgetType } from '../../types/types';
 import { UIService } from '../../../../core-module/rest/services/ui.service';
 import { MatRipple } from '@angular/material/core';
-import { filter } from 'rxjs/operators';
+import { filter, first, map } from 'rxjs/operators';
 import { MdsValue } from 'ngx-edu-sharing-api';
 import { UIHelper } from '../../../../core-ui-module/ui-helper';
 
@@ -52,6 +52,8 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
 
     @ViewChild('editWrapper') editWrapper: ElementRef;
     @ViewChild(MatRipple) matRipple: MatRipple;
+    basicType: string;
+    rawValue: { path: MdsValue[]; id: string }[];
 
     get headingLevel() {
         return this.viewInstance.headingLevel;
@@ -73,7 +75,7 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
         this.value = this.getNodeValue();
     }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.value = this.getNodeValue();
         this.widget
             .getInitialDisplayValues()
@@ -81,9 +83,11 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
             .subscribe(async (value) => {
                 this.value = value.values.map((v) => v.displayString);
             });
+        this.basicType = this.getBasicType();
+        this.rawValue = await this.getRawValue().toPromise();
     }
 
-    getBasicType() {
+    private getBasicType() {
         switch (this.widget.definition.type) {
             case 'text':
             case 'email':
@@ -242,7 +246,7 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
     /**
      * return the path for a given value in a tree
      */
-    getPath(v: string) {
+    private getPath(v: string) {
         if (!this.widget.definition.values) {
             return [
                 {
@@ -269,8 +273,18 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
      * fetch the raw node value
      * Note: Will not work in a bulk state!
      */
-    getRawValue() {
-        return this.mdsEditorInstance.nodes$.value?.[0].properties[this.widget.definition.id];
+    private getRawValue() {
+        return this.mdsEditorInstance.nodes$.pipe(
+            first(),
+            map((v) =>
+                (v?.[0].properties[this.widget.definition.id] as string[]).map((id) => {
+                    return {
+                        id,
+                        path: this.getPath(id),
+                    };
+                }),
+            ),
+        );
     }
 
     protected readonly UIHelper = UIHelper;
