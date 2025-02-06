@@ -7,6 +7,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigCache;
+import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +25,10 @@ class RessourceInfoExecuterTest {
     private RessourceInfoExecuter underTest;
 
     private final NodeService mockedNodeService = Mockito.mock(NodeService.class);
+    private final LightbendConfigLoader mockedLightbendConfigLoader = Mockito.mock(LightbendConfigLoader.class);
     @BeforeEach
     void setUp() {
-        underTest = new RessourceInfoExecuter();
+        underTest = new RessourceInfoExecuter(mockedLightbendConfigLoader);
         underTest.setNodeService(mockedNodeService);
     }
 

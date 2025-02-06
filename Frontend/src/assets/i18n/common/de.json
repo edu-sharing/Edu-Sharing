@@ -726,7 +726,9 @@
     "METADATA_SIDEBAR": "Materialinformationen",
     "ACCESSIBILITY": "Barrierefreiheit",
     "LTI": "In LTI Plattform übernehmen",
-    "RELATIONS": "Beziehungen verwalten"
+    "RELATIONS": "Beziehungen verwalten",
+    "SELECT_ALL": "Alle auswählen",
+    "DESELECT": "Alle abwählen"
   },
   "LTI": {
     "REGISTERED": {

@@ -778,8 +778,8 @@ public class MetadataReader {
                             ? key.getKey()
                             : cap,
                     fallback));
-            key.setDescription(getTranslation(key, description));
-            key.setAbbreviation(getTranslation(key, abbreviation));
+            key.setDescription(getTranslation(key, description, ""));
+            key.setAbbreviation(getTranslation(key, abbreviation, ""));
             keys.add(key);
         }
         return keys;

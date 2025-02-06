@@ -598,6 +598,10 @@
         <property name="ccm:ccressourcetype">
           <type>d:text</type>
         </property>
+        <!-- the main entity of the resource, i.e. the path to an index.html for web zips or scorm packages -->
+        <property name="ccm:ccressourcemainentity">
+          <type>d:text</type>
+        </property>
         <property name="ccm:ccresourcesubtype">
           <type>d:text</type>
           <multiple>true</multiple>

@@ -217,6 +217,11 @@
 
     <!-- compile -->
     <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.axis</groupId>
       <artifactId>axis</artifactId>
     </dependency>

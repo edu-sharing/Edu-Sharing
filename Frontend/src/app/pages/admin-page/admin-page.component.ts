@@ -1,7 +1,7 @@
 import { trigger } from '@angular/animations';
 import { PlatformLocation } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AboutService, NetworkService, Store } from 'ngx-edu-sharing-api';
 import {
@@ -49,14 +49,13 @@ import { Closable } from '../../features/dialogs/card-dialog/card-dialog-config'
 import {
     DELETE_OR_CANCEL,
     OK_OR_CANCEL,
-    YES_OR_NO,
 } from '../../features/dialogs/dialog-modules/generic-dialog/generic-dialog-data';
 import { XmlAppPropertiesDialogData } from '../../features/dialogs/dialog-modules/xml-app-properties-dialog/xml-app-properties-dialog-data';
 import { DialogsService } from '../../features/dialogs/dialogs.service';
 import { MainNavService } from '../../main/navigation/main-nav.service';
 import { AuthoritySearchMode } from '../../shared/components/authority-search-input/authority-search-input.component';
 import { WorkspaceExplorerComponent } from '../workspace-page/explorer/explorer.component';
-import { delay, filter, repeat, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { delay, repeat, takeUntil, tap } from 'rxjs/operators';
 
 type LuceneData = {
     mode: 'NODEREF' | 'SOLR' | 'ELASTIC';
@@ -92,6 +91,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
     elasticResponse: NodeListElastic;
     cancelJobInfo: Job;
     private readonly destroyed$ = new Subject();
+    private queryParams: Params;
 
     constructor(
         private about: AboutService,
@@ -1285,6 +1285,10 @@ export class AdminPageComponent implements OnInit, OnDestroy {
                     icon: 'extension',
                 },
                 {
+                    id: 'CONTEXT',
+                    icon: 'public',
+                },
+                {
                     id: 'FRONTPAGE',
                     icon: 'home',
                 },
@@ -1369,7 +1373,8 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             )
             .forEach((s) => (s.visible = true));
 
-        this.route.queryParams.subscribe((data: any) => {
+        this.route.queryParams.subscribe((data: Params) => {
+            this.queryParams = data;
             if (data.mode) {
                 this.mode = data.mode;
                 if (this.getModeButton().factory) {
@@ -1382,7 +1387,9 @@ export class AdminPageComponent implements OnInit, OnDestroy {
             } else this.setMode(this.buttons[0].id, true);
         });
         if (this.loginResult.isAdmin) {
-            void this.showWarningDialog();
+            if (this.queryParams?.skipWarning !== 'true') {
+                void this.showWarningDialog();
+            }
             this.admin.getServerUpdates().subscribe((data: ServerUpdate[]) => {
                 this.updates = data;
             });

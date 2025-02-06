@@ -23,8 +23,8 @@
             | translate : { permissions: _permission.permissions.join(', ') }
         }}"
         *ngIf="
-          (permissionTimebased && inherit) ||
-          ((isEditable === 'timebasedOnly' || isEditable === true) && timebasedAllowed)
+          permissionTimebased &&
+          (inherit || ((isEditable === 'timebasedOnly' || isEditable === true) && timebasedAllowed))
         "
         cdkOverlayOrigin
         #timebasedTrigger="cdkOverlayOrigin"

@@ -96,14 +96,29 @@ public class EduSharingItemRepository implements ItemRepository {
 
         String nodeId = getNodeId(identifier);
         NodeRef nodeRef = searchFor(nodeId);
-        Instant date = ((Date) nodeRef.getProperties().get(CCConstants.CM_PROP_C_MODIFIED)).toInstant();
+        Instant date = getDate(nodeRef);
         return new EduItemIdentifier(identifier, date);
     }
 
 
     private ItemIdentifier getItemIdentifier(NodeRef nodeRef) {
-        Instant date = ((Date) nodeRef.getProperties().get(CCConstants.CM_PROP_C_MODIFIED)).toInstant();
+        Instant date = getDate(nodeRef);
         return new EduItemIdentifier(getIdentifier(nodeRef), date);
+    }
+
+    private static Instant getDate(NodeRef nodeRef) {
+        Object dateValue = nodeRef.getProperties().get(CCConstants.CM_PROP_C_MODIFIED);
+
+        Date date;
+        if(dateValue instanceof Date) {
+            date = (Date) dateValue;
+        }else if (dateValue instanceof Long){
+            date = new Date((Long)dateValue);
+        }else {
+            throw new RuntimeException("Invalid date value: " + dateValue + " for nodeRef: " + nodeRef);
+        }
+
+        return  date.toInstant();
     }
 
     @Override

@@ -12,6 +12,15 @@
   [class.actionbar-round]="appearance === 'round'"
   [class.actionbar-icon-button]="appearance === 'icon-button'"
 >
+  <div
+    *ngIf="optionsToggleBefore.length"
+    class="actionToggle before"
+    [class.actionToggleDivider]="(optionsAlways$ | async).length"
+  >
+    <ng-container
+      *ngTemplateOutlet="toggle; context: { optionsToggle: optionsToggleBefore }"
+    ></ng-container>
+  </div>
   <ng-container *ngFor="let option of optionsAlways$ | async; let i = index">
     <button
       *ngIf="shouldHighlight(i, option)"
@@ -58,20 +67,31 @@
     <i esIcon="more_vert" [aria]="false"></i>
   </button>
   <div
-    *ngIf="optionsToggle.length"
-    class="actionToggle"
+    *ngIf="optionsToggleAfter.length"
+    class="actionToggle after"
     [class.actionToggleDivider]="(optionsAlways$ | async).length"
   >
+    <ng-container
+      *ngTemplateOutlet="toggle; context: { optionsToggle: optionsToggleAfter }"
+    ></ng-container>
+  </div>
+</div>
+<ng-template #toggle let-optionsToggle="optionsToggle">
+  <ng-container *ngFor="let option of optionsToggle">
     <button
-      *ngFor="let option of optionsToggle"
+      *ngIf="option.isToggleVisible"
       mat-icon-button
       matTooltip="{{ option.name | translate }}"
       [attr.aria-label]="option.ariaLabel || option.name | translate"
       (click)="click(option)"
-      [class.disabled]="!option.isEnabled"
+      [class]="
+        'toggle-' +
+        (option.name | replaceChars : { search: '.', replace: '-' }) +
+        (option.isEnabled ? '' : ' disabled')
+      "
       attr.data-test="toggle-{{ option.name }}"
     >
       <i [esIcon]="option.icon" [aria]="false"></i>
     </button>
-  </div>
-</div>
+  </ng-container>
+</ng-template>

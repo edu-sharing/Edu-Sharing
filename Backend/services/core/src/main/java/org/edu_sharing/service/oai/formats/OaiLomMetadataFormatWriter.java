@@ -217,7 +217,7 @@ public class OaiLomMetadataFormatWriter extends AbstractMetadataFormatWriter {
         addContributor(context, lifeCycle, CCConstants.CCM_PROP_IO_REPL_LIFECYCLECONTRIBUTER_VALIDATOR, "validator");
     }
 
-    protected void addContributor(Context context, Element eleParent, String contributorProperty, String role) {
+    protected Element addContributor(Context context, Element eleParent, String contributorProperty, String role) {
         PropertyMapper propertyMapper = context.getPropertyMapper();
         List<String> contributer = propertyMapper.getStringList(contributorProperty);
         contributer = prepareContributor(context, contributer);
@@ -226,8 +226,9 @@ public class OaiLomMetadataFormatWriter extends AbstractMetadataFormatWriter {
             Element eleContribute = context.createAndAppendElement("contribute", eleParent);
             context.createAndAppendElement("value", context.createAndAppendElement("role", eleContribute), role);
             context.createAndAppendElementAsCData("entity", eleContribute, contributer);
+            return eleContribute;
         }
-
+        return null;
     }
 
     protected List<String> prepareContributor(Context context, List<String> contrib) {

@@ -124,6 +124,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         }
 
     }
+
     public void updateNode(String nodeId, Map<String, String[]> props) throws Throwable {
         String nodeType = getType(nodeId);
         String[] aspects = getAspects(StoreRef.PROTOCOL_WORKSPACE, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId);
@@ -206,15 +207,17 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         } else {
             toSafeProps = props.entrySet().stream()
                     .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), validatePropertyByDefinition(QName.createQName(entry.getKey()), entry.getValue())))
-                    .filter(x->x.getValue() != null)
+                    .filter(x -> x.getValue() != null)
                     .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         }
         return this.createNodeBasic(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentId, nodeType, childAssociation, toSafeProps);
     }
+
     @Override
     public String createNodeBasic(String parentID, String nodeTypeString, Map<String, ?> _props) {
         return this.createNodeBasic(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentID, nodeTypeString, CCConstants.CM_ASSOC_FOLDER_CONTAINS, _props);
     }
+
     @Override
     public String createNodeBasic(StoreRef store, String parentID, String nodeTypeString, String childAssociation, Map<String, ?> _props) {
         childAssociation = (childAssociation == null) ? CCConstants.CM_ASSOC_FOLDER_CONTAINS : childAssociation;
@@ -337,8 +340,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
                     continue;
                 toSafe.put(id + "_from", valuesFrom[0]);
                 toSafe.put(id + "_to", valuesTo[0]);
-			}
-			else if("defaultvalue".equals(widget.getType())) {
+            } else if ("defaultvalue".equals(widget.getType())) {
                 logger.info("will save property " + widget.getId() + " with predefined defaultvalue " + widget.getDefaultvalue());
                 toSafe.put(id, widget.getDefaultvalue());
                 continue;
@@ -389,8 +391,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
                 throw new IllegalArgumentException("Multiple values given for a non-multivalue widget: ID " + id + ", widget type " + widget.getType());
             if (widget.isMultivalue()) {
                 toSafe.put(id, values.isEmpty() ? null : new ArrayList<>(values));
-			}
-			else{
+            } else {
                 toSafe.put(id, values.isEmpty() ? null : values.get(0));
             }
 
@@ -456,6 +457,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         safe.addAll(CCConstants.getMetadataContributerPropsMap().values());
         return safe;
     }
+
     @Override
     public Map<String, String[]> getNameProperty(String name) {
         Map<String, String[]> map = new HashMap<>();
@@ -476,6 +478,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         }
         return null;
     }
+
     private List<ChildAssociationRef> getChildrenAssocsByType(StoreRef store, String nodeId, String type) {
         return this.getChildAssocs(new NodeRef(store, nodeId), Collections.singleton(QName.createQName(type)));
     }
@@ -491,6 +494,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         }
         return result;
     }
+
     @Override
     public List<NodeRef> getChildrenRecursive(StoreRef store, String nodeId, List<String> types, RecurseMode recurseMode) {
         // this method uses nodeServiceAlfresco instead of nodeService
@@ -557,7 +561,6 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         }
         return null;
     }
-
 
 
     private Map<String, Object> getPropertiesWithoutChildren(NodeRef nodeRef) {
@@ -844,7 +847,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 
     /**
      * set's permission for one authority, leaves permissions already set for the authority
-	 *
+     * <p>
      * check ToolPermissions in the callers
      */
     public void setPermissions(String nodeId, String authority, String[] permissions, Boolean inheritPermission) throws Exception {
@@ -863,6 +866,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         }
 
     }
+
     @Override
     public String getUserInbox(boolean createIfNotExists) {
         NodeRef userhome = repositoryHelper.getUserHome(repositoryHelper.getPerson());
@@ -870,13 +874,21 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         if (inbox != null && !inbox.isEmpty())
             return inbox.get(0).getChildRef().getId();
         if (createIfNotExists) {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CCConstants.CM_NAME, "Inbox");
-            properties.put(CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_USERINBOX);
-            return createNodeBasic(userhome.getId(), CCConstants.CCM_TYPE_MAP, properties);
+            return serviceRegistry.getRetryingTransactionHelper().doInTransaction(() -> {
+                policyBehaviourFilter.disableBehaviour();
+                try {
+                    Map<String, Object> properties = new HashMap<>();
+                    properties.put(CCConstants.CM_NAME, "Inbox");
+                    properties.put(CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_USERINBOX);
+                    return createNodeBasic(userhome.getId(), CCConstants.CCM_TYPE_MAP, properties);
+                } finally {
+                    policyBehaviourFilter.enableBehaviour();
+                }
+            });
         }
         return null;
     }
+
     @Override
     public String getUserSavedSearch(boolean createIfNotExists) {
         NodeRef userhome = repositoryHelper.getUserHome(repositoryHelper.getPerson());
@@ -884,10 +896,17 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         if (savedSearch != null && !savedSearch.isEmpty())
             return savedSearch.get(0).getChildRef().getId();
         if (createIfNotExists) {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CCConstants.CM_NAME, "SavedSearch");
-            properties.put(CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_USERSAVEDSEARCH);
-            return createNodeBasic(userhome.getId(), CCConstants.CCM_TYPE_MAP, properties);
+            return serviceRegistry.getRetryingTransactionHelper().doInTransaction(() -> {
+                policyBehaviourFilter.disableBehaviour();
+                try {
+                    Map<String, Object> properties = new HashMap<>();
+                    properties.put(CCConstants.CM_NAME, "SavedSearch");
+                    properties.put(CCConstants.CCM_PROP_MAP_TYPE, CCConstants.CCM_VALUE_MAP_TYPE_USERSAVEDSEARCH);
+                    return createNodeBasic(userhome.getId(), CCConstants.CCM_TYPE_MAP, properties);
+                } finally {
+                    policyBehaviourFilter.enableBehaviour();
+                }
+            });
         }
         return null;
     }
@@ -924,14 +943,11 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         NodeRef node;
         if (obj instanceof ChildAssociationRef) {
             node = ((ChildAssociationRef) obj).getChildRef();
-		}
-		else if(obj instanceof AssociationRef){
+        } else if (obj instanceof AssociationRef) {
             node = ((AssociationRef) obj).getTargetRef();
-		}
-		else if(obj instanceof NodeRef){
+        } else if (obj instanceof NodeRef) {
             node = (NodeRef) obj;
-		}
-		else{
+        } else {
             throw new IllegalArgumentException("Given type not supported");
         }
         return node;
@@ -944,15 +960,13 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         String type1, type2;
         if (cache.containsKey(keyType1)) {
             type1 = (String) cache.get(keyType1);
-		}
-		else{
+        } else {
             type1 = nodeServiceAlfresco.getType(n1).toString();
             cache.put(keyType1, type1);
         }
         if (cache.containsKey(keyType2)) {
             type2 = (String) cache.get(keyType2);
-		}
-		else{
+        } else {
             type2 = nodeServiceAlfresco.getType(n2).toString();
             cache.put(keyType2, type2);
         }
@@ -968,15 +982,13 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             String key2 = n2.toString() + prop.toString();
             if (cache.containsKey(key1)) {
                 prop1 = cache.get(key1);
-			}
-			else{
+            } else {
                 prop1 = getSortPropertyValue(n1, prop);
                 cache.put(key1, prop1);
             }
             if (cache.containsKey(key2)) {
                 prop2 = cache.get(key2);
-			}
-			else{
+            } else {
                 prop2 = getSortPropertyValue(n2, prop);
                 cache.put(key2, prop2);
             }
@@ -984,18 +996,18 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             if (prop1 == null && prop2 != null) {
                 try {
                     prop1 = prop2.getClass().getConstructor().newInstance();
-				}catch(Throwable ignored){}
-
+                } catch (Throwable ignored) {
                 }
-			else if(prop1!=null && prop2==null) {
+
+            } else if (prop1 != null && prop2 == null) {
                 try {
                     prop2 = prop1.getClass().getConstructor().newInstance();
-				}catch(Throwable ignored){}
+                } catch (Throwable ignored) {
+                }
             }
             if (prop1 == null && prop2 == null) {
                 continue;
-			}
-			else {
+            } else {
                 // some int fields are parsed as string. make sure to compare them correctly
                 // e.g. for collection sorting
 
@@ -1053,8 +1065,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         List<ChildAssociationRef> result;
         if (assocName == null || assocName.isEmpty()) {
             result = this.getChildAssocs(parentNodeRef);
-		}
-		else{
+        } else {
             // special handling for series objects inside collections
             if (assocName.equals(CCConstants.CCM_ASSOC_CHILDIO)) {
                 if (hasAspect(StoreRef.PROTOCOL_WORKSPACE,
@@ -1102,13 +1113,13 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 
         return new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, parentID);
     }
+
     @Override
     public List<ChildAssociationRef> getChildrenChildAssociationRefType(String parentID, String childType) {
         NodeRef parentNodeRef = getParentRef(parentID);
         if (childType == null) {
             return this.getChildAssocs(parentNodeRef);
-		}
-		else {
+        } else {
             return this.getChildAssocs(parentNodeRef, new HashSet<>(List.of(QName.createQName(childType))));
         }
 
@@ -1117,9 +1128,11 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
     private List<ChildAssociationRef> getChildAssocs(NodeRef parentNodeRef, QName qName, QNamePattern matchAll) {
         return nodeService.getChildAssocs(parentNodeRef, qName, matchAll);
     }
+
     private List<ChildAssociationRef> getChildAssocs(NodeRef parentNodeRef) {
         return nodeService.getChildAssocs(mapParentNodeLink(parentNodeRef));
     }
+
     private List<ChildAssociationRef> getChildAssocs(NodeRef parentNodeRef, Set<QName> qNames) {
         return nodeService.getChildAssocs(mapParentNodeLink(parentNodeRef), qNames);
     }
@@ -1200,6 +1213,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
     public Map<String, Object> getPropertiesDynamic(String storeProtocol, String storeId, String nodeId) throws Throwable {
         throw new NotImplementedException("getPropertiesDynamic may not be called for the local repository (was the remote repo removed?)");
     }
+
     @Override
     public Map<String, Object> getPropertiesPersisting(String storeProtocol, String storeId, String nodeId) throws Throwable {
         throw new NotImplementedException("getPropertiesPersisting may not be called for the local repository (was the remote repo removed or is it missing the remote_provider setting?)");
@@ -1209,6 +1223,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
     public String getProperty(String storeProtocol, String storeId, String nodeId, String property) {
         return apiClient.getProperty(new StoreRef(storeProtocol, storeId), nodeId, property);
     }
+
     @Override
     public Serializable getPropertyNative(String storeProtocol, String storeId, String nodeId, String property) {
         return nodeService.getProperty(new NodeRef(new StoreRef(storeProtocol, storeId), nodeId), QName.createQName(property));
@@ -1225,6 +1240,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             return null;
         });
     }
+
     public void revokeNode(String storeProtocol, String storeId, String nodeId, RevokeDetails details) throws Throwable {
         if (!getType(storeProtocol, storeId, nodeId).equals(CCConstants.CCM_TYPE_IO)) {
             throw new IllegalArgumentException("Only allowed for elements of type " + CCConstants.CCM_TYPE_IO);
@@ -1525,6 +1541,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         addAspect(id, CCConstants.CCM_ASPECT_METADATA_PRESETTING_TEMPLATE);
         return id;
     }
+
     @Override
     public void setTemplateProperties(String nodeId, Map<String, String[]> props) throws Throwable {
         //updateNode(getOrCreateTemplateNode(nodeId),props);
@@ -1560,8 +1577,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             if (cr != null) {
                 return cr.getReader();
             } else return null;
-		}
-		else{
+        } else {
             VersionHistory versionHistory = serviceRegistry.getVersionService().getVersionHistory(nodeRef);
             Version versionObj = versionHistory.getVersion(version);
             ContentReader cr = contentService.getReader(versionObj.getFrozenStateNodeRef(), QName.createQName(contentProp)).getReader();
@@ -1570,6 +1586,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             } else return null;
         }
     }
+
     @Override
     public InputStream getContent(String storeProtocol, String storeId, String nodeId, String version, String contentProp) throws Throwable {
         ContentReader cr = getContentReader(storeProtocol, storeId, nodeId, version, contentProp);
@@ -1597,6 +1614,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
     public void removeAspect(String nodeId, String aspect) {
         apiClient.removeAspect(nodeId, aspect);
     }
+
     @Override
     public void removeProperty(String storeProtocol, String storeId, String nodeId, String property) {
         // when interceptors are active, use set instead to trigger interceptors
@@ -1606,6 +1624,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
             nodeService.removeProperty(new NodeRef(new StoreRef(storeProtocol, storeId), nodeId), QName.createQName(property));
         }
     }
+
     @Override
     public String[] getAspects(String storeProtocol, String storeId, String nodeId) {
         return apiClient.getAspects(new NodeRef(new StoreRef(storeProtocol, storeId), nodeId));
@@ -1660,6 +1679,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
     public void removeNode(String protocol, String store, String nodeId) {
         apiClient.removeNode(new StoreRef(protocol, store), nodeId);
     }
+
     @Override
     public boolean exists(String protocol, String store, String nodeId) {
         return nodeService.exists(new NodeRef(new StoreRef(protocol, store), nodeId));
@@ -1672,13 +1692,13 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         else
             throw new AccessDeniedException("No " + CCConstants.PERMISSION_READ + " permission on node " + nodeId);
     }
+
     @Override
     public List<AssociationRef> getNodesByAssoc(String nodeId, AssocInfo assoc) {
         NodeRef ref = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId);
         if (assoc.getDirection().equals(AssocInfo.Direction.SOURCE)) {
             return nodeService.getSourceAssocs(ref, QName.createQName(assoc.getAssocName()));
-		}
-		else{
+        } else {
             return nodeService.getTargetAssocs(ref, QName.createQName(assoc.getAssocName()));
         }
     }
@@ -1690,16 +1710,16 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         }
 
         if (!propertyDefinition.isMultiValued()) {
-            if(value instanceof Iterable) {
+            if (value instanceof Iterable) {
                 Iterator<?> iterator = ((Iterable<?>) value).iterator();
                 if (iterator.hasNext()) {
                     return (Serializable) iterator.next();
                 }
 
-            }else if(value.getClass().isArray() && Array.getLength(value) > 0){
+            } else if (value.getClass().isArray() && Array.getLength(value) > 0) {
                 return (Serializable) Array.get(value, 0);
             }
-            return null;
+            return value;
         }
         return value;
     }
@@ -1709,9 +1729,9 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
         property = NameSpaceTool.transformToLongQName(property);
         QName prop = QName.createQName(property);
         if (!skipDefinitionChecks) {
-            try{
+            try {
                 value = validatePropertyByDefinition(prop, value);
-            }catch (IllegalArgumentException ex){
+            } catch (IllegalArgumentException ex) {
                 logger.error("property " + property + " is not defined in content model");
                 return;
             }
@@ -1779,6 +1799,7 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
      * maps to the original node id for:
      * collection refs
      * published copies
+     *
      * @param nodeId the source node to map
      * @return the mapped node ref
      */

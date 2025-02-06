@@ -14,7 +14,9 @@
     flex-grow: 1;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 10px;
+    flex-wrap: wrap;
     h2 {
         flex-grow: 1;
         margin: 1rem 0;

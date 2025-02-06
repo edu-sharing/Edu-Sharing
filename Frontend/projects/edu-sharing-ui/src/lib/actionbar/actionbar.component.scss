@@ -1,4 +1,5 @@
 @import '../../../assets/scss/mixins';
+@import '../../../assets/scss/variables-scss';
 
 .actionbar {
     display: flex;
@@ -23,9 +24,16 @@ button {
     color: #fff;
 }
 
-.actionToggleDivider {
-    padding-left: 10px;
-    border-left: 1px solid #ddd;
+.actionToggle {
+    &.after.actionToggleDivider {
+        padding-left: 10px;
+        border-left: 1px solid #ddd;
+    }
+    &.before.actionToggleDivider {
+        padding-right: 10px;
+        margin-right: 10px;
+        border-right: 1px solid #ddd;
+    }
 }
 .more {
     color: var(--primary);
@@ -106,7 +114,7 @@ button {
     .action-always {
         padding: 0 1rem;
     }
-    .action-always-caption {
+    ::ng-deep .action-always-caption {
         display: none;
     }
     .mat-flat-button {
@@ -114,7 +122,10 @@ button {
     }
 }
 
-@media screen and (max-width: (calc(var(--mobileWidth) + var(--mobileStage) * 4))) {
+@media screen and (max-width: ($mobileWidth + $mobileStage * 4)) {
+    .action-always-caption {
+        display: none;
+    }
     @include icon-button();
 }
 

@@ -25,44 +25,42 @@
         [class.value-wrapper-edit]="isEditable()"
         (click)="isEditable() ? view.injectEditField(this, editWrapper.children[0]) : null"
       >
-        <div *ngIf="isEmpty()" class="widget-data widget-no-data widget-type-{{ getBasicType() }}">
+        <div *ngIf="isEmpty()" class="widget-data widget-no-data widget-type-{{ basicType }}">
           -
         </div>
         <div
           *ngIf="!isEmpty()"
-          class="widget-data widget-type-{{ getBasicType() }} {{
+          class="widget-data widget-type-{{ basicType }} {{
             widget.definition.link ? 'widget-link' : ''
           }}"
           (click)="click()"
         >
-          <div *ngIf="getBasicType() === 'text'">{{ formatText() }}</div>
-          <div *ngIf="getBasicType() === 'number'">{{ formatNumber() }}</div>
-          <div *ngIf="getBasicType() === 'date'">{{ formatDate() }}</div>
-          <div *ngIf="getBasicType() === 'array'">
+          <div *ngIf="basicType === 'text'">{{ formatText() }}</div>
+          <div *ngIf="basicType === 'number'">{{ formatNumber() }}</div>
+          <div *ngIf="basicType === 'date'">{{ formatDate() }}</div>
+          <div *ngIf="basicType === 'array'">
             <div class="array-entry" *ngFor="let v of value">{{ v }}</div>
           </div>
-          <div *ngIf="getBasicType() === 'tree'">
-            <div class="tree-entry" *ngFor="let v of getRawValue()">
-              <ng-container
-                *ngTemplateOutlet="treeEntry; context: { path: getPath(v) }"
-              ></ng-container>
+          <div *ngIf="basicType === 'tree'">
+            <div class="tree-entry" *ngFor="let v of rawValue">
+              <ng-container *ngTemplateOutlet="treeEntry; context: { path: v.path }"></ng-container>
             </div>
           </div>
-          <div *ngIf="getBasicType() === 'vcard'">
+          <div *ngIf="basicType === 'vcard'">
             <div class="array-entry" *ngFor="let v of value">{{ v | vcardName }}</div>
           </div>
-          <div *ngIf="getBasicType() === 'slider'">
+          <div *ngIf="basicType === 'slider'">
             <span class="slider-value">{{ value }}</span
             ><span> / </span><span class="slider-max">{{ widget.definition.max }}</span>
           </div>
-          <div *ngIf="getBasicType() === 'duration'">
+          <div *ngIf="basicType === 'duration'">
             <span class="duration-value">{{ value[0] | appMdsDuration }}</span>
           </div>
-          <div *ngIf="getBasicType() === 'range'">
+          <div *ngIf="basicType === 'range'">
             <span class="slider-value">{{ value[0] }}</span
             >-<span class="slider-value">{{ value[1] }}</span>
           </div>
-          <div *ngIf="getBasicType() === 'unknown'">
+          <div *ngIf="basicType === 'unknown'">
             The widget type {{ widget.definition.type }} is currently not supported via angular
             rendering
           </div>

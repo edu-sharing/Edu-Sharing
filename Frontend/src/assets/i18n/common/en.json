@@ -697,7 +697,9 @@
     "EMBED": "Embed",
     "OPEN_ORIGINAL_NODE": "Open original",
     "COLLECTION_PROPOSAL_DECLINE": "Decline proposal",
-    "RELATIONS": "Manage relations"
+    "RELATIONS": "Manage relations",
+    "SELECT_ALL": "Select all",
+    "DESELECT": "Deselect all"
   },
   "NO_SIZE": "-",
   "VERSION_COMMENT": "Version comment",

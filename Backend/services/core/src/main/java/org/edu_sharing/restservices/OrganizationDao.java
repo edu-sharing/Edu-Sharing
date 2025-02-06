@@ -3,12 +3,14 @@ package org.edu_sharing.restservices;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.apache.commons.lang.StringUtils;
 import org.edu_sharing.alfresco.authentication.HttpContext;
 import org.edu_sharing.alfresco.service.OrganisationService;
 import org.edu_sharing.alfresco.service.search.CMISSearchHelper;
+import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.rpc.EduGroup;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
@@ -25,6 +27,7 @@ import org.edu_sharing.service.search.SearchServiceFactory;
 import org.edu_sharing.spring.ApplicationContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -250,7 +253,11 @@ public class OrganizationDao {
 
             if(deprovisioning != null) {
                 if(deprovisioning.getMode() == OrganizationUserDeprovisioning.Mode.assign) {
-                    if(StringUtils.isBlank(deprovisioning.getReceiver())) {
+					ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
+					ServiceRegistry serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
+
+
+					if(StringUtils.isBlank(deprovisioning.getReceiver())) {
                         throw new RuntimeException("invalid parameters. Missing receiver for mode == assign");
                     }
                     Map<String, Object> filter = new HashMap<>() {{
@@ -264,7 +271,11 @@ public class OrganizationDao {
                     PersonDeleteOptions options = new PersonDeleteOptions();
                     options.cleanupMetadata = false;
                     options.receiver = deprovisioning.getReceiver();
-                    pls.setOwnerAndPermissions(refs, member, options);
+                    options.receiverGroup = authorityName;
+                    pls.setOwnerAndPermissions(refs, member, options, (ref) -> {
+						serviceRegistry.getPermissionService().clearPermission(ref, member);
+						return null;
+					});
                 }
             }
 

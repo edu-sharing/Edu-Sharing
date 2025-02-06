@@ -1210,6 +1210,7 @@ public class CCConstants {
 
 	public final static String CCM_PROP_CCRESSOURCETYPE ="{http://www.campuscontent.de/model/1.0}ccressourcetype";
 	public final static String CCM_PROP_CCRESSOURCESUBTYPE ="{http://www.campuscontent.de/model/1.0}ccresourcesubtype";
+	public final static String CCM_PROP_CCRESSOURCE_MAIN_ENTITY ="{http://www.campuscontent.de/model/1.0}ccressourcemainentity";
 
 	public final static String CCM_PROP_CCRESSOURCEVERSION ="{http://www.campuscontent.de/model/1.0}ccressourceversion";
 

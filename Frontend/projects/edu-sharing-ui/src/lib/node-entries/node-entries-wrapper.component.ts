@@ -265,6 +265,10 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
         return this.displayType;
     }
 
+    onDisplayTypeChange() {
+        return this.displayTypeChange.asObservable();
+    }
+
     setDisplayType(displayType: NodeEntriesDisplayType): void {
         this.displayType = displayType;
         this.entriesService.displayType = displayType;
@@ -360,6 +364,9 @@ export class NodeEntriesWrapperComponent<T extends NodeEntriesDataType>
         this.ngOnChanges();
     }
 
+    selectAll() {
+        this.entriesService.selection.select(...this.entriesService.dataSource.getData());
+    }
     getSelection(): CustomSelectionModel<T> {
         return this.entriesService.selection;
     }

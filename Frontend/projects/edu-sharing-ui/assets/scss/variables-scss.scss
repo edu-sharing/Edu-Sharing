@@ -1,0 +1,6 @@
+/**
+    declarations of static scss variables
+ */
+$mobileWidth: 700px !default;
+$mobileStage: 100px !default;
+$mobileTabSwitchWidth: $mobileWidth + $mobileStage * 2 !default;

@@ -3,6 +3,7 @@ package org.edu_sharing.repository.update;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.edu_sharing.repository.client.tools.CCConstants;
@@ -10,6 +11,7 @@ import org.edu_sharing.repository.server.MCAlfrescoAPIClient;
 import org.edu_sharing.repository.server.MCAlfrescoBaseClient;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.repository.server.tools.UserEnvironmentToolFactory;
+import org.edu_sharing.service.nodeservice.NodeServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -46,20 +48,24 @@ public class Protocol {
 		this.userEnvironmentToolFactory = userEnvironmentToolFactory;
 	}
 	
-	public Map<String,Object> getSysUpdateEntry(String updaterId) throws Throwable{
+	public NodeRef getSysUpdateEntry(String updaterId) throws Throwable{
 		
 		Map<String,String> authInfo = new HashMap<>();
 		authInfo.put(CCConstants.AUTH_USERNAME, authenticationService.getCurrentUserName());
 		authInfo.put(CCConstants.AUTH_TICKET, authenticationService.getCurrentTicket());
 		String eduSystemFolderUpdate;
-		Map<String,Object> updateInfo;
+		NodeRef updateInfoRef;
 		eduSystemFolderUpdate = userEnvironmentToolFactory.createEnvironmentTool(ApplicationInfoList.getHomeRepository().getAppId(), authInfo)
 				.getEdu_SharingSystemFolderUpdate();
+		updateInfoRef = NodeServiceFactory.getLocalService().getChild(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
+				eduSystemFolderUpdate,
+				CCConstants.CCM_TYPE_SYSUPDATE,
+				CCConstants.CCM_PROP_SYSUPDATE_ID,
+				updaterId
+		);
 
-		updateInfo = mcAlfrescoBaseClient.getChild(eduSystemFolderUpdate, CCConstants.CCM_TYPE_SYSUPDATE, CCConstants.CCM_PROP_SYSUPDATE_ID, updaterId);
-			
 		
-		return updateInfo;
+		return updateInfoRef;
 	}
 	
 	public void writeSysUpdateEntry(String updaterId) throws Throwable{

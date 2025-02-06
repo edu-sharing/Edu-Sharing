@@ -198,6 +198,9 @@
     <div *ngIf="modeIsActive('FRONTPAGE')" class="content frontpage">
       <es-admin-frontpage (onOpenNode)="openNodeRender($event)"></es-admin-frontpage>
     </div>
+    <div *ngIf="modeIsActive('CONTEXT')" class="content context">
+      <es-admin-context-editor></es-admin-context-editor>
+    </div>
     <div *ngIf="modeIsActive('GLOBAL_CONFIG')" class="content global-config">
       <es-admin-config></es-admin-config>
     </div>

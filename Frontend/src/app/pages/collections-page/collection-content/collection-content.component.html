@@ -85,6 +85,7 @@
       <es-actionbar
         #actionbarReferences
         class="actionbarMaterials"
+        [class.display-none]="dataSourceReferences.isLoading"
         [numberOfAlwaysVisibleOptions]="1"
       ></es-actionbar>
       <div

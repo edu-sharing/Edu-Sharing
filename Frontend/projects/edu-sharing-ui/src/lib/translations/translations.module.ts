@@ -3,7 +3,7 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ConfigService } from 'ngx-edu-sharing-api';
 import { EduSharingUiConfiguration } from '../edu-sharing-ui-configuration';
-import { ASSETS_BASE_PATH } from '../types/injection-tokens';
+import { ADDITIONAL_I18N_PROVIDER, ASSETS_BASE_PATH } from '../types/injection-tokens';
 import { FallbackTranslationHandler } from './fallback-translation-handler';
 import { TranslationLoader } from './translation-loader';
 
@@ -24,6 +24,7 @@ import { TranslationLoader } from './translation-loader';
                     ConfigService,
                     EduSharingUiConfiguration,
                     [new Optional(), ASSETS_BASE_PATH],
+                    [new Optional(), ADDITIONAL_I18N_PROVIDER],
                 ],
             },
             missingTranslationHandler: {

@@ -18,5 +18,7 @@ public class DoiConfig {
     private String prefix;
     @Optional
     private String password;
+    @Optional
+    private String repoUrl;
 
 }

@@ -31,7 +31,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
-import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.alfresco.service.guest.GuestConfig;
 import org.edu_sharing.alfresco.service.guest.GuestService;
 import org.edu_sharing.alfresco.workspace_administration.NodeServiceInterceptor;
@@ -41,6 +40,7 @@ import org.edu_sharing.metadataset.v2.tools.MetadataElasticSearchHelper;
 import org.edu_sharing.metadataset.v2.tools.MetadataHelper;
 import org.edu_sharing.metadataset.v2.tools.MetadataSearchHelper;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.alfresco.repository.server.authentication.Context;
 import org.edu_sharing.repository.client.tools.metadata.ValueTool;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.SearchResultNodeRef;
@@ -264,6 +264,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
     private CollectionPermissionQueries getCollectionPermissionQueries(String user) {
         BoolQuery collectionPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.read")
                 .should(s -> s.match(m -> m.field("collections.owner").query(user)))
+                .must(must -> must.match(match -> match.field("collections.relation.type").query("ccm:usage")))
                 .build();
 
         BoolQuery proposalPermissions = getPermissionsQuery(QueryBuilders.bool(), "collections.permissions.Coordinator", getUserAuthorities().stream().filter(a -> !a.equals(CCConstants.AUTHORITY_GROUP_EVERYONE)).collect(Collectors.toSet()))
@@ -328,6 +329,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
     @NotNull
     private SearchResultNodeRef parseAggregations(SearchToken searchToken, Map<String, Aggregation> aggregations) throws Exception {
 //        logger.info("query aggs: "+searchSourceBuilderAggs.toString());
+        checkClient();
         SearchResponse<Map> resp = LogTime.log("Searching elastic for facets", () -> client.search(req -> req
                         .index(WORKSPACE_INDEX)
                         .from(0)
