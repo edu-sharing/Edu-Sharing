@@ -83,7 +83,7 @@ class MetadataElasticSearchHelperTest {
     void getElasticSearchQueryMultipleParameter() {
         SearchToken token = new SearchToken();
         List<MetadataQueryParameter> parameters = new ArrayList<>();
-        MetadataQueryParameter parameter = new MetadataQueryParameter(query.getSyntax());
+        MetadataQueryParameter parameter = new MetadataQueryParameter(query.getSyntax(), null);
         parameter.setMultiple(true);
         parameter.setMultiplejoin("AND");
         parameter.setName("parameter");
@@ -112,7 +112,7 @@ class MetadataElasticSearchHelperTest {
 
 
         // 2 Parameters AND combined
-        MetadataQueryParameter parameter2 = new MetadataQueryParameter(query.getSyntax());
+        MetadataQueryParameter parameter2 = new MetadataQueryParameter(query.getSyntax(), null);
         parameter2.setMultiple(true);
         parameter2.setMultiplejoin("AND");
         parameter2.setName("parameter2");
@@ -141,7 +141,7 @@ class MetadataElasticSearchHelperTest {
     @Test
     void getAggregations() {
         SearchToken token = new SearchToken();
-        MetadataQueryParameter parameter = new MetadataQueryParameter(query.getSyntax());
+        MetadataQueryParameter parameter = new MetadataQueryParameter(query.getSyntax(), null);
         parameter.setName("test_facet");
 
         query.setParameters(Collections.singletonList(parameter));
@@ -160,7 +160,7 @@ class MetadataElasticSearchHelperTest {
         );
 
         // 2 facets
-        MetadataQueryParameter parameter2 = new MetadataQueryParameter(query.getSyntax());
+        MetadataQueryParameter parameter2 = new MetadataQueryParameter(query.getSyntax(), null);
         parameter2.setName("test_facet2");
         query.setParameters(Arrays.asList(parameter, parameter2));
 
@@ -214,7 +214,7 @@ class MetadataElasticSearchHelperTest {
     void getAggregationsSearchToken() {
         SearchToken token = new SearchToken();
         token.setQueryString("A B C");
-        MetadataQueryParameter parameter = new MetadataQueryParameter(query.getSyntax());
+        MetadataQueryParameter parameter = new MetadataQueryParameter(query.getSyntax(), null);
         parameter.setName("test_facet");
         MetadataWidget widget = new MetadataWidget();
         widget.setId("test_facet");
