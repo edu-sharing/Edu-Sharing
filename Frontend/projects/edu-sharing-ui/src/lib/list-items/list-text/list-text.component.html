@@ -162,7 +162,7 @@
         {{ displayName$ | async }}
       </ng-container>
       <ng-container *ngIf="DATE_FIELDS.includes(item.name)">
-        {{ $any(getNode()).properties[item.name]?.[0] | formatDate: { async: true, time: true, relative: true } | async }}
+        {{ ($any(getNode()).properties[item.name + '_LONG']?.[0] || $any(getNode()).properties[item.name]?.[0]) | formatDate: { async: true, time: true, relative: true } | async }}
       </ng-container>
       <ng-container *ngIf="VCARD_FIELDS.includes(item.name)">
         {{

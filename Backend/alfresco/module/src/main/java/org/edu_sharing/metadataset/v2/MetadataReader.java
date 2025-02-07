@@ -744,7 +744,7 @@ public class MetadataReader {
                             ? key.getKey()
                             : cap,
                     fallback));
-            key.setDescription(getTranslation(key, description));
+            key.setDescription(getTranslation(key, description, ""));
             keys.add(key);
         }
         return keys;

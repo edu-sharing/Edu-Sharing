@@ -27,9 +27,8 @@ import java.net.URISyntaxException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Profile("samlEnabled")
@@ -64,9 +63,13 @@ public class SecurityConfigurationSamlRelyingParties {
                 throw new RuntimeException("no IDP metadata configured");
             }
 
+            Map<String, AtomicInteger> rpIds = new HashMap<>();
+
             List<RelyingPartyRegistration> relyingPartyRegistration = b
                     .stream().map((builder) -> {
                         String relyingPartyId = getRelyingPartyId(builder);
+                        int count = rpIds.computeIfAbsent(relyingPartyId, k -> new AtomicInteger(0)).incrementAndGet();
+                        relyingPartyId = (count > 1) ? relyingPartyId + "-" + count : relyingPartyId;
                         return builder.registrationId(relyingPartyId)
                                 .entityId("{baseUrl}/saml2/service-provider-metadata/" + globalSPRegistrationId)
                                 .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/" + globalSPRegistrationId)
