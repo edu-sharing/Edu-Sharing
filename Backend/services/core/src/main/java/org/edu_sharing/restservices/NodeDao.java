@@ -2716,7 +2716,7 @@ public class NodeDao {
     }
 
     private static void setPropertyInternal(NodeService nodeService, String nodeId, String property, Serializable value) {
-        if (value == null) {
+        if (value == null || (value instanceof java.util.Collection && ((java.util.Collection<?>) value).isEmpty())) {
             nodeService.removeProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId, property);
         } else {
             nodeService.setProperty(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol(), StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getIdentifier(), nodeId, property, value, false);
