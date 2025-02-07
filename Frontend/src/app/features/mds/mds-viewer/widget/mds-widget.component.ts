@@ -228,11 +228,10 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
     }
 
     async focus() {
-        if (this.isEditable()) {
-            this.matRipple.launch({});
-            await this.ui.scrollSmoothElementToChild(this.editWrapper.nativeElement);
-            //const result = await this.view.injectEditField(this, this.editWrapper.nativeElement.children[0]);
-            //await this.ui.scrollSmoothElementToChild(result.htmlElement);
-        }
+        // this.matRipple.launch({});
+        await this.ui.scrollSmoothElementToChild(this.editWrapper.nativeElement);
+        this.matRipple.launch({});
+        //const result = await this.view.injectEditField(this, this.editWrapper.nativeElement.children[0]);
+        //await this.ui.scrollSmoothElementToChild(result.htmlElement);
     }
 }

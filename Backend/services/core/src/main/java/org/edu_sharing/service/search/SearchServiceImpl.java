@@ -845,7 +845,7 @@ public class SearchServiceImpl implements SearchService {
 			
 		}
 
-		String finalQuery;
+		String finalQuery = "";
 		if(type==null) {
 			finalQuery="";
 			if(findUsersQuery!=null)
@@ -854,6 +854,11 @@ public class SearchServiceImpl implements SearchService {
 				if(findUsersQuery != null){
 					finalQuery += " OR ";
 				}
+				if(customProperties!=null){
+					for(Map.Entry<String, String> entry : customProperties.entrySet()){
+						findGroupsQuery.append(" AND @"+entry.getKey().replace(":", "\\:")+":\""+QueryParser.escape(entry.getValue())+"\"");
+					}
+				}
 				finalQuery += "(" + findGroupsQuery + ")";
 			}
 		}
@@ -861,21 +866,22 @@ public class SearchServiceImpl implements SearchService {
 			finalQuery=findUsersQuery.toString();
 		}
 		else if(type.equals(AuthorityType.GROUP)) {
+			if(customProperties!=null){
+				for(Map.Entry<String, String> entry : customProperties.entrySet()){
+					findGroupsQuery.append(" AND @"+entry.getKey().replace(":", "\\:")+":\""+QueryParser.escape(entry.getValue())+"\"");
+				}
+			}
 			if(findGroupsQuery==null)
 				finalQuery="";
 			else
-				finalQuery=findGroupsQuery.toString();
+					finalQuery = findGroupsQuery.toString();
+
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported authority type "+type);
 		}
 		if(finalQuery.isEmpty())
 			return new SearchResult<String>();
-		if(customProperties!=null){
-			for(Map.Entry<String, String> entry : customProperties.entrySet()){
-				finalQuery+=(" AND @"+entry.getKey().replace(":", "\\:")+":\""+QueryParser.escape(entry.getValue())+"\"");
-			}
-		}
 
 		logger.debug("finalQuery:" + finalQuery);
 

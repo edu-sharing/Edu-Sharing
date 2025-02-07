@@ -685,6 +685,7 @@ public class SearchServiceElastic extends SearchServiceImpl {
             BoolQuery.Builder permissionsFilter = QueryBuilders.bool().must(must -> must.bool(queryGlobalConditionsFactory::apply));
             String user = serviceRegistry.getAuthenticationService().getCurrentUserName();
             permissionsFilter.should(should -> should.match(match -> match.field("owner").query(user)));
+            permissionsFilter.minimumShouldMatch("1");
             for (String permission : permissions) {
                 permissionsFilter.should(s -> s.bool(bool -> getPermissionsQuery(bool, "permissions." + permission)));
             }

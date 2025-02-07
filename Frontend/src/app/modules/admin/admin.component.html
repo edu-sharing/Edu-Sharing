@@ -435,6 +435,11 @@
             <div *ngIf="parentNode">{{ parentNode.name }} ({{ parentNode.ref.id }})</div>
           </div>
         </div>
+        <div class="inputGroup">
+          <mat-checkbox [(ngModel)]="excelAddToCollection">{{
+            'ADMIN.IMPORT.EXCEL_COLLECTION' | translate
+          }}</mat-checkbox>
+        </div>
         <button mat-raised-button color="primary" (click)="importExcel()">
           {{ 'ADMIN.IMPORT.EXCEL_START' | translate }}
         </button>

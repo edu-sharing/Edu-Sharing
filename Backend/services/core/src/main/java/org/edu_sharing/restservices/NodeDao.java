@@ -213,7 +213,13 @@ public class NodeDao {
                     .forEach(defaultProps::remove);
 
             for (String prop : defaultProps) {
-                if (!props.containsKey(prop) && CCConstants.getValidGlobalName(prop) != null) {
+                if (!props.containsKey(prop) && CCConstants.getValidGlobalName(prop) != null &&
+                    // protected publish props
+                    !Arrays.asList(
+                            CCConstants.CCM_PROP_IO_PUBLISHED_ORIGINAL, CCConstants.CCM_PROP_IO_PUBLISHED_MODE,
+                            CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID, CCConstants.CCM_PROP_IO_PUBLISHED_DATE
+                    ).contains(CCConstants.getValidGlobalName(prop))
+                ) {
                     // delete removed properties
                     nodeService.removeProperty(getStoreProtocol(), getStoreIdentifier(), getId(), CCConstants.getValidGlobalName(prop));
                 }

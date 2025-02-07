@@ -734,6 +734,10 @@ public class NodeServiceImpl implements org.edu_sharing.service.nodeservice.Node
 					(m,entry)-> m.put(QName.createQName(entry.getKey()), (Serializable) entry.getValue()),
 					HashMap::putAll
 			);
+
+			// check that no interceptor has set a previously null variable
+			propsNull.removeIf(prop -> propsStore.get(prop) != null);
+
 			nodeService.setProperties(nodeRef, propsStore);
 			// do in transaction to disable behaviour
 			// otherwise interceptors might be called multiple times -> the final update props is enough!

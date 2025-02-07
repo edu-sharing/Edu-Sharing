@@ -77,8 +77,13 @@ public class RecordHandlerDublinCoreDMG implements RecordHandlerInterface {
 		
 		
 		String lomCatalogId = null;
-		if(replicationId != null && replicationId.split(":").length == 3){
-			lomCatalogId = replicationId.substring(0,replicationId.lastIndexOf(":"));
+		if(replicationId != null){
+			if(replicationId.split(":").length == 3) {
+				lomCatalogId = replicationId.substring(0, replicationId.lastIndexOf(":"));
+			}
+			if(replicationId.split(":").length == 2){
+				lomCatalogId = replicationId.split(":")[0];
+			}
 		}
 		
 		HashMap<String, Object> generalIdentifierToSafeMap = new HashMap<String, Object>();
