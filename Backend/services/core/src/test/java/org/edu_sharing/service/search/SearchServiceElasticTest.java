@@ -70,14 +70,87 @@ class SearchServiceElasticTest {
         BoolQuery.Builder conditions = underTest.getGlobalConditions(Collections.singletonList("scope"), Collections.singletonList("read"), new MetadataQuery());
 
         SearchServiceElasticTestUtils.assertQuery(
-                "{\n  \"bool\" : {\n    \"must\" : [\n      {\n        \"bool\" : {\n          " +
-                        "\"minimum_should_match\" : \"1\"," +
-                        "\"must\" : [\n            {\n              \"match\" : {\n                \"nodeRef.storeRef.protocol\" : {\n                  \"query\" : \"workspace\"  }\n              }\n            }\n          ],\n          \"should\" : [\n            {\n              \"match\" : {\n                \"permissions.read\" : {\n                  \"query\" : \"scope\"                }\n              }\n            }\n          ]" +
-                        "    }\n      }\n    ],\n    \"must_not\" : [\n      {\n        \"exists\" : {\n          \"field\" : \"properties.ccm:eduscopename\"\n        }\n      }\n    ],\n    \"should\" : [\n      {\n        \"match\" : {\n          \"owner\" : {\n            \"query\" : \"tester\"}\n        }\n      },\n      {\n        " +
-                        "\"bool\" : {\n          " +
-                        "\"minimum_should_match\" : \"1\"," +
-                        "\"should\" : [\n            {\n              \"match\" : {\n                \"permissions.read\" : {\n                  \"query\" : \"test_group1\"}\n              }\n            },\n            {\n              \"match\" : {\n                \"permissions.read\" : {\n                  \"query\" : \"GROUP_EVERYONE\"}\n              }\n            },\n            {\n              \"match\" : {\n                \"permissions.read\" : {\n                  \"query\" : \"tester\"}\n              }\n            },\n            {\n              \"match\" : {\n                \"permissions.read\" : {\n                  \"query\" : \"test_group2\"}\n              }\n            }\n          ]" +
-                        "}\n      }\n    ]}}",
+                "{\n" +
+                        "  \"bool\": {\n" +
+                        "    \"minimum_should_match\": \"1\",\n" +
+                        "    \"must\": [\n" +
+                        "      {\n" +
+                        "        \"bool\": {\n" +
+                        "          \"minimum_should_match\": \"1\",\n" +
+                        "          \"must\": [\n" +
+                        "            {\n" +
+                        "              \"match\": {\n" +
+                        "                \"nodeRef.storeRef.protocol\": {\n" +
+                        "                  \"query\": \"workspace\"\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            }\n" +
+                        "          ],\n" +
+                        "          \"should\": [\n" +
+                        "            {\n" +
+                        "              \"match\": {\n" +
+                        "                \"permissions.read\": {\n" +
+                        "                  \"query\": \"scope\"\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        }\n" +
+                        "      }\n" +
+                        "    ],\n" +
+                        "    \"must_not\": [\n" +
+                        "      {\n" +
+                        "        \"exists\": {\n" +
+                        "          \"field\": \"properties.ccm:eduscopename\"\n" +
+                        "        }\n" +
+                        "      }\n" +
+                        "    ],\n" +
+                        "    \"should\": [\n" +
+                        "      {\n" +
+                        "        \"match\": {\n" +
+                        "          \"owner\": {\n" +
+                        "            \"query\": \"tester\"\n" +
+                        "          }\n" +
+                        "        }\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "        \"bool\": {\n" +
+                        "          \"minimum_should_match\": \"1\",\n" +
+                        "          \"should\": [\n" +
+                        "            {\n" +
+                        "              \"match\": {\n" +
+                        "                \"permissions.read\": {\n" +
+                        "                  \"query\": \"test_group1\"\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "              \"match\": {\n" +
+                        "                \"permissions.read\": {\n" +
+                        "                  \"query\": \"GROUP_EVERYONE\"\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "              \"match\": {\n" +
+                        "                \"permissions.read\": {\n" +
+                        "                  \"query\": \"tester\"\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "              \"match\": {\n" +
+                        "                \"permissions.read\": {\n" +
+                        "                  \"query\": \"test_group2\"\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        }\n" +
+                        "      }\n" +
+                        "    ]\n" +
+                        "  }\n" +
+                        "}",
                 conditions
         );
     }
