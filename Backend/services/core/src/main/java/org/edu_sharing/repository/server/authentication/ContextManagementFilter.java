@@ -2,11 +2,13 @@ package org.edu_sharing.repository.server.authentication;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -24,6 +26,7 @@ import org.edu_sharing.repository.TrackingApplicationInfo;
 import org.edu_sharing.repository.client.tools.CCConstants;
 import org.edu_sharing.repository.server.AuthenticationToolAPI;
 import org.edu_sharing.repository.server.tools.ApplicationInfoList;
+import org.edu_sharing.repository.server.tools.security.HMac;
 import org.edu_sharing.repository.server.tools.security.SignatureVerifier;
 import org.edu_sharing.restservices.NodeDao;
 import org.edu_sharing.restservices.RepositoryDao;
@@ -35,10 +38,13 @@ import org.edu_sharing.alfresco.service.config.model.AvailableMds;
 import org.edu_sharing.service.usage.Usage;
 import org.edu_sharing.service.usage.Usage2Service;
 import org.edu_sharing.service.usage.Usage2Exception;
+import org.edu_sharing.spring.ApplicationContextFactory;
 import org.edu_sharing.webservices.util.AuthenticationUtils;
 
 import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
 import org.springframework.context.ApplicationContext;
+import org.apache.logging.log4j.ThreadContext;
+import org.edu_sharing.service.version.VersionService;
 
 
 public class ContextManagementFilter implements jakarta.servlet.Filter {
@@ -54,6 +60,12 @@ public class ContextManagementFilter implements jakarta.servlet.Filter {
 	AuthenticationService authservice = serviceRegistry.getAuthenticationService();
 	AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
 
+	HMac hMac = null;
+
+	SimpleDateFormat logEventDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+
+	private VersionService versionService;
+
 	@Override
 	public void destroy() {
 	}
@@ -61,6 +73,9 @@ public class ContextManagementFilter implements jakarta.servlet.Filter {
 	@Override
 	public void init(FilterConfig config) throws ServletException {
 		this.context=config.getServletContext();
+		hMac = HMac.getInstance();
+
+		versionService = ApplicationContextFactory.getApplicationContext().getBean(VersionService.class);
 	}
 
 	@Override
@@ -76,12 +91,37 @@ public class ContextManagementFilter implements jakarta.servlet.Filter {
 			ScopeAuthenticationServiceFactory.getScopeAuthenticationService().setScopeForCurrentThread();
 
 			try{
+				String user = (String) ((HttpServletRequest) req).getSession().getAttribute(CCConstants.AUTH_USERNAME);
 				// Run as System because there is yet no session opened
 				Map<String, Serializable> info = AuthenticationUtil.runAsSystem(() ->
 						AuthorityServiceFactory.getLocalService().getUserInfo(
-								(String) ((HttpServletRequest) req).getSession().getAttribute(CCConstants.AUTH_USERNAME))
+								user)
 				);
 				QueryUtils.setUserInfo(info);
+
+				String remoteAdress = ((HttpServletRequest) req).getHeader("x-forwarded-for");
+				if(remoteAdress == null){
+					remoteAdress = req.getRemoteAddr();
+				}
+				if(remoteAdress != null) {
+					ThreadContext.put("RemoteAddr", remoteAdress);
+				}
+
+				String ua = ((HttpServletRequest) req).getHeader("user-agent");
+				if(ua != null){
+					ThreadContext.put("UserAgent",ua);
+				}
+
+				if(user != null){
+					String hmac = hMac.calculateHmac(user.trim());
+					ThreadContext.put("UserPlain",user);
+					ThreadContext.put("User",hmac);
+				}
+
+				ThreadContext.put("Url",((HttpServletRequest)req).getRequestURL().toString());
+				ThreadContext.put("EduVersion", versionService.getVersionNoException(VersionService.Type.REPOSITORY));
+				ThreadContext.put("LogEventDate",logEventDateFormat.format(new Date()));
+
 			}catch(Exception e){
 				logger.info("Could not set user info: "+e.getMessage());
 			}
@@ -145,6 +185,8 @@ public class ContextManagementFilter implements jakarta.servlet.Filter {
 
 			//for soap api
 			AuthenticationUtils.setAuthenticationDetails(null);
+
+			ThreadContext.clearAll();
 
 		}
 

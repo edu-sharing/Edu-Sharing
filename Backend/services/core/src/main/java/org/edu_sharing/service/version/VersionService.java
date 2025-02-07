@@ -115,7 +115,7 @@ public class VersionService implements ApplicationListener<RefreshScopeRefreshed
         RENDERSERVICE
     }
 	private String VERSION_FILE="version.json";
-	public String getVersionNoException(Type type){
+	public String  getVersionNoException(Type type){
         try {
             return getVersion(type);
         } catch (Exception e) {

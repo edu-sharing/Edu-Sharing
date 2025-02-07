@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
 import org.edu_sharing.alfrescocontext.gate.AlfAppContextGate;
 import org.edu_sharing.repository.client.tools.CCConstants;
+import org.edu_sharing.repository.server.tools.security.HMac;
 import org.springframework.context.ApplicationContext;
 
 import javax.naming.CommunicationException;
@@ -40,9 +41,6 @@ import java.nio.charset.CodingErrorAction;
 import java.util.*;
 
 
-/**
- * Servlet Filter implementation class CockpitAuthenticationFilter
- */
 /**
  * Servlet Filter implementation class CockpitAuthenticationFilter
  */
@@ -107,6 +105,8 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 	private Properties env = null;
 	private String ldapUidProp = null;
 	private String ldapUrl = null;
+
+	HMac hMac = null;
 
 
 	/**
@@ -188,6 +188,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		env.put(Context.SECURITY_PRINCIPAL, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_USER));
 		env.put(Context.SECURITY_CREDENTIALS, eduConfig.getString(LDAPAuthenticationFilter.INIT_LDAP_SEC_PWD));
 
+        hMac = HMac.getInstance();
 	}
 
 	/**
@@ -341,7 +342,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 
 						// Authenticate the user
 						try{
-							logger.info("webdav ldap authentication: starting. loginName:####");
+								logger.info("webdav ldap authentication: starting. loginName:"+hMac.calculateHmac(username));
 							user = searchForUser(username,password);
 						}catch(CommunicationException e){
 							logger.error(e.getMessage() +" Will create new InitialDirContext and retry.");
@@ -570,7 +571,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 				dn = r.getNameInNamespace();
 
 			}else{
-				throw new AuthenticationException("webdav ldap authentication: user not found in directory. loginName:###");
+				throw new AuthenticationException("webdav ldap authentication: user not found in directory. loginName:" + hMac.calculateHmac(loginName));
 			}
 			rs.close();
 
@@ -591,7 +592,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 					return true;
 				});
 				if(!allowed){
-					throw new AuthenticationException("webdav ldap authentication: USER_BLOCKED. loginName: ###  / userName: ###");
+					throw new AuthenticationException("webdav ldap authentication: USER_BLOCKED. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username) );
 				}
 			}
 
@@ -625,10 +626,10 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		} catch (AuthenticationException ex) {
 			// Do nothing, user object will be null
 			if(ex.getMessage() != null && ex.getMessage().contains("Invalid Credentials")){
-				logger.warn("webdav ldap authentication: failed with Invalid Credentials. loginName: ### / userName: ###");
+				logger.warn("webdav ldap authentication: failed with Invalid Credentials. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username));
 			}
 			if (ex.getMessage() != null && ex.getMessage().contains("DN with no password")) {
-				logger.warn("webdav ldap authentication: no password provided. loginName: ### / userName: ###");
+				logger.warn("webdav ldap authentication: no password provided. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username));
 			}else {
 				logger.warn(ex.getMsgId());
 				if (logger.isDebugEnabled()) {
@@ -669,7 +670,7 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 				ApplicationContext context = AlfAppContextGate.getApplicationContext();
 				AuthenticationComponent authComp = (AuthenticationComponent)context.getBean("authenticationComponent");
 				authComp.setCurrentUser(username);
-				logger.info("webdav ldap authentication: sucessfull. loginName: ###  / userName: ###");
+				logger.info("webdav ldap authentication: sucessfull. loginName:" + hMac.calculateHmac(loginName) +" / userName:" + hMac.calculateHmac(username));
 				return;
 			}catch(javax.naming.AuthenticationException e){
 				logger.debug(e.getMessage(), e);
