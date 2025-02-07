@@ -221,6 +221,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             // console.info('options helper refresh called but no data previously bound');
             return;
         }
+        this.enabledCache = {};
         if (this.subscriptions?.length) {
             this.subscriptions.forEach((s) => s.unsubscribe());
             this.subscriptions = [];

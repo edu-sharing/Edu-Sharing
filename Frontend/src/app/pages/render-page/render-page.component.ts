@@ -42,7 +42,6 @@ import {
     TemporaryStorageService,
     TranslationsService,
     UIAnimation,
-    UIConstants,
 } from 'ngx-edu-sharing-ui';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { filter, first, skipWhile, takeUntil } from 'rxjs/operators';
@@ -441,11 +440,11 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         download.elementType = OptionsHelperService.DownloadElementTypes;
         // use callback since isEnabled gets ignored
         download.customEnabledCallback = async (nodes) => {
-            return (
-                this._node.downloadUrl != null &&
-                (!this._node.properties[RestConstants.CCM_PROP_IO_WWWURL] ||
-                    !this._fromHomeRepository)
-            );
+            return this.downloadUrl
+                ? true
+                : this._node.downloadUrl != null &&
+                      (!this._node.properties[RestConstants.CCM_PROP_IO_WWWURL] ||
+                          !this._fromHomeRepository);
         };
         download.group = DefaultGroups.View;
         download.priority = 25;
@@ -664,6 +663,7 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
         this.nodeApi
             .getNodeChildobjects(this.sequenceParent.ref.id, this.sequenceParent.ref.repo)
             .subscribe((data: NodeList) => {
+                console.log('add', 'download', download);
                 this.downloadButton = download;
                 const options: OptionItem[] = [];
                 options.splice(0, 0, download);
@@ -687,14 +687,11 @@ export class RenderPageComponent implements EventListener, OnInit, OnDestroy, Af
                 this.initOptions();
             });
     }
-    setDownloadUrl(url: string) {
-        console.info('url from rendering', url);
-        if (this.downloadButton != null) {
-            this.downloadButton.customEnabledCallback = async () => url != null;
-        }
 
+    async setDownloadUrl(url: string) {
+        console.info('url from rendering', url);
         this.downloadUrl = url;
-        this.initOptions();
+        this.optionsHelper.refreshComponents();
     }
 
     private getSequence(onFinish: () => void) {
