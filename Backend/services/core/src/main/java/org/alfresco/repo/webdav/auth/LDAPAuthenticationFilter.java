@@ -626,12 +626,12 @@ public class LDAPAuthenticationFilter implements Filter, DependencyInjectedFilte
 		} catch (AuthenticationException ex) {
 			// Do nothing, user object will be null
 			if(ex.getMessage() != null && ex.getMessage().contains("Invalid Credentials")){
-				logger.warn("webdav ldap authentication: failed with Invalid Credentials. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username));
+				logger.error("webdav ldap authentication: failed with Invalid Credentials. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username));
 			}
 			if (ex.getMessage() != null && ex.getMessage().contains("DN with no password")) {
-				logger.warn("webdav ldap authentication: no password provided. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username));
+				logger.error("webdav ldap authentication: no password provided. loginName:" + hMac.calculateHmac(loginName) + " / userName:" + hMac.calculateHmac(username));
 			}else {
-				logger.warn(ex.getMsgId());
+				logger.error(ex.getMsgId());
 				if (logger.isDebugEnabled()) {
 					logger.error(ex.getMessage(), ex);
 				}
