@@ -5,6 +5,7 @@ import { BehaviorSubject, from, Observable, of as observableOf } from 'rxjs';
 import { first, map, switchMap, tap } from 'rxjs/operators';
 import { ConfigService, LANGUAGES, SessionStorageService } from 'ngx-edu-sharing-api';
 import { AppService } from '../services/abstract/app.service';
+import moment, { Locale } from 'moment';
 
 // 'none' means that only labels should be shown (for dev)
 const DEFAULT_SUPPORTED_LANGUAGES = [
@@ -217,5 +218,9 @@ export class TranslationsService {
 
     getISOLanguage(): string {
         return LANGUAGES[this.language];
+    }
+
+    getLocale(): string {
+        return this.getISOLanguage().replace('_', '-');
     }
 }

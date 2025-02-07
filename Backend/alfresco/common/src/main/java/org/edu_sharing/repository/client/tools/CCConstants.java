@@ -2278,6 +2278,9 @@ public class CCConstants {
 	public static final String ELASTICSEARCH_SYNONYMSET_PREFIX = "es-synonym-set";
 	public static final String ELASTICSEARCH_ANALYZER_PREFIX = "synonyms";
 
+	public static final String EDU_PASSWORD_KEYSTORE_NAME = "edupasswords";
+	public static final String EDU_PASSWORD_USERNAMEHASH = "usernamehash";
+
 	/**
 	 * Methos that set all the Properties for ProfileSettings
 	 * @return (List) list of all properties we want to be in ProfileSettings

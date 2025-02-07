@@ -26,6 +26,9 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
+import org.edu_sharing.repository.server.tools.KeyTool;
+import org.edu_sharing.repository.server.tools.security.KeyStoreService;
+
 @Slf4j
 public class KeyGenerator {
 
@@ -93,7 +96,41 @@ public class KeyGenerator {
 
 			}
 
+			/**
+			 * Keystore for username hashing in logs
+			 */
+			KeyTool keyTool = new KeyTool();
+			//check if keystore password is set
+			if(homeRepo.getKeyStorePassword() == null){
+				log.info("will generate keystore password and default passwords");
+				if(!test){
+					String keyStorePw = keyTool.getRandomPassword();
+					PropertiesHelper.setProperty(ApplicationInfo.KEY_KEYSTORE_PW,
+							keyStorePw,
+							file, PropertiesHelper.XML);
 			ApplicationInfoList.refresh();
+					homeRepo = ApplicationInfoList.getHomeRepository();
+				}
+			}
+
+			//create keystore if not exists
+			KeyStoreService keyStoreService = new KeyStoreService();
+			keyStoreService.getKeyStore(CCConstants.EDU_PASSWORD_KEYSTORE_NAME,homeRepo.getKeyStorePassword());
+
+			//check for keystore entry
+			String pwUserNameHash = keyStoreService.readPasswordFromKeyStore(CCConstants.EDU_PASSWORD_KEYSTORE_NAME, homeRepo.getKeyStorePassword(), "", CCConstants.EDU_PASSWORD_USERNAMEHASH);
+			if(pwUserNameHash == null){
+				log.info("pwUserNameHash does not exist. adding...");
+				keyStoreService.writePasswordToKeyStore(CCConstants.EDU_PASSWORD_KEYSTORE_NAME,
+						homeRepo.getKeyStorePassword(),
+						"",
+						CCConstants.EDU_PASSWORD_USERNAMEHASH,
+						keyTool.getRandomPassword());
+			}
+
+
+
+
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

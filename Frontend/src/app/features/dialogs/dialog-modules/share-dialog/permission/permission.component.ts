@@ -3,7 +3,7 @@ import { Ace, AuthenticationService } from 'ngx-edu-sharing-api';
 import { RestConstants } from '../../../../../core-module/core.module';
 import { ExtendedAce } from '../share-dialog.component';
 import { TypeResult } from '../choose-type/choose-type.component';
-import { Helper } from 'ngx-edu-sharing-ui';
+import { Helper, Toast } from 'ngx-edu-sharing-ui';
 
 @Component({
     selector: 'es-share-dialog-permission',
@@ -17,7 +17,7 @@ export class ShareDialogPermissionComponent implements OnInit {
     permissionTimebased: boolean;
     timebased: ExtendedAce;
 
-    constructor(private authenticationService: AuthenticationService) {}
+    constructor(private authenticationService: AuthenticationService, private toast: Toast) {}
 
     async ngOnInit() {
         this.permissionTimebased = await this.authenticationService.hasToolpermission(
@@ -76,8 +76,8 @@ export class ShareDialogPermissionComponent implements OnInit {
         if (type.wasMain) this.showChooseType = false;
     }
 
-    getDateTomorrow() {
-        return new Date().getTime() + 1000 * 60 * 60 * 24;
+    getDateTomorrow(from?: number) {
+        return Math.max(from || new Date().getTime()) + 1000 * 60 * 60 * 24;
     }
 
     openTimebased() {
@@ -86,6 +86,10 @@ export class ShareDialogPermissionComponent implements OnInit {
     }
 
     saveTimebased() {
+        if (this.timebased.from && this.timebased.to && this.timebased.from > this.timebased.to) {
+            this.toast.error(null, 'WORKSPACE.SHARE.TIMEBASED.INVALID_DATE');
+            return;
+        }
         this._permission.from = this.timebased.from;
         this._permission.to = this.timebased.to;
         this.timebasedOpen = false;

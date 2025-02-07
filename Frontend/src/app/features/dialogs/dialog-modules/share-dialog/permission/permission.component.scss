@@ -78,7 +78,7 @@
         color: $textLight;
     }
     .timebased-active {
-        color: mix($colorStatusWarning, $colorStatusNeutral, 30%);
+        color: mix(darken($colorStatusWarning, 10%), $colorStatusNeutral, 30%);
     }
 }
 .permission {
@@ -126,7 +126,7 @@
     }
 }
 .timebased-active {
-    color: $colorStatusWarning;
+    color: darken($colorStatusWarning, 10%);
 }
 .timebased-invalid {
     color: $colorStatusNegative;
