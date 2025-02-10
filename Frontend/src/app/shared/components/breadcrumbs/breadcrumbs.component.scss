@@ -100,6 +100,7 @@ button {
 
 .breadcrumb-element-home {
     text-decoration: none;
+    @include clickable();
 }
 
 .breadcrumb-inner {

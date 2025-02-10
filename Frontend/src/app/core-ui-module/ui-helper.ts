@@ -13,7 +13,7 @@ import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Ace, LoginInfo } from 'ngx-edu-sharing-api';
 import { ListItem, OPEN_URL_MODE, UIConstants } from 'ngx-edu-sharing-ui';
-import { Observable, Observer, forkJoin as observableForkJoin, of } from 'rxjs';
+import { forkJoin as observableForkJoin, Observable, Observer, of } from 'rxjs';
 import { catchError, first, take } from 'rxjs/operators';
 import { BridgeService } from '../services/bridge.service';
 import {
@@ -25,7 +25,6 @@ import {
     NodeLock,
     NodeWrapper,
     ParentList,
-    Permission,
 } from '../core-module/rest/data-object';
 import { Helper } from '../core-module/rest/helper';
 import { RestConstants } from '../core-module/rest/rest-constants';
@@ -50,7 +49,13 @@ import { ExtendedAce } from '../features/dialogs/dialog-modules/share-dialog/sha
 export class UIHelper {
     // TODO: check, whether these parameters are still used and remove or include them in
     // `PRESERVED_QUERY_PARAMS` in `main/location-strategy.ts` accordingly.
-    static COPY_URL_PARAMS = ['reurlTypes', 'reurlCreate', 'applyDirectories', 'onlyDownloadable'];
+    static COPY_URL_PARAMS = [
+        'reurl',
+        'reurlTypes',
+        'reurlCreate',
+        'applyDirectories',
+        'onlyDownloadable',
+    ];
     public static getBlackWhiteContrast(color: string) {}
 
     static changeQueryParameter(router: Router, route: ActivatedRoute, name: string, value: any) {
