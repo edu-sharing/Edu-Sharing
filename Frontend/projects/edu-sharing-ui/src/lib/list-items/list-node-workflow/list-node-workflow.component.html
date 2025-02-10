@@ -1,3 +1,3 @@
-<div class="workflowStatus" [style.background-color]="getWorkflowStatus().color">
-  {{ 'WORKFLOW.' + getWorkflowStatus().id | translate }}
+<div class="workflowStatus" [style.background-color]="getWorkflowStatus()?.color">
+  {{ 'WORKFLOW.' + getWorkflowStatus()?.id | translate }}
 </div>

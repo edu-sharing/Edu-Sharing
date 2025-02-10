@@ -112,7 +112,11 @@
           <es-breadcrumbs
             class="collections-breadcrumb"
             [home]="'COLLECTIONS.TAB.' + tabSelected"
-            [homeRouterLink]="{ routerLink: ['.'], queryParams: { scope: tabSelected } }"
+            [homeRouterLink]="{
+              routerLink: ['.'],
+              queryParams: { scope: tabSelected, id: null },
+              queryParamsHandling: 'merge'
+            }"
             [invisibleDescription]="true"
             [canDropNodes]="collectionContentComponent.canDropOnCollectionBreadcrumbs"
             (onDrop)="collectionContentComponent.dropOnCollection($event.target, $event.source)"

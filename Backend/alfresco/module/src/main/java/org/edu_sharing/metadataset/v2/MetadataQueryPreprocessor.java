@@ -34,6 +34,20 @@ public class MetadataQueryPreprocessor {
     }
 
 
+    /**
+     * DO NOT DELETE. Used via Reflection by mds
+     */
+    private static String alternative_id(MetadataQueryParameter parameter,String value){
+        try {
+             return parameter.getMds().findWidget(parameter.getName()).getValuesAsMap().get(value).getAlternativeKeys().get(0);
+        }catch (Throwable t){
+            logger.info("Could not resolve alternative_id at " + parameter.getName() + ": " + t.getMessage());
+            return value;
+        }
+    }
+    /**
+     * DO NOT DELETE. Used via Reflection by mds
+     */
     private String node_path(MetadataQueryParameter parameter,String value){
         return AuthenticationUtil.runAsSystem(()-> {
             ApplicationContext applicationContext = AlfAppContextGate.getApplicationContext();
@@ -58,6 +72,10 @@ public class MetadataQueryPreprocessor {
             return serviceRegistry.getNodeService().getPath(nodeRef).toPrefixString(serviceRegistry.getNamespaceService());
         });
     }
+
+    /**
+     * DO NOT DELETE. Used via Reflection by mds
+     */
     // convert values like YYYY-MM-DD to a unix millis string (e.g. for elastic)
     private String date_millis(MetadataQueryParameter parameter,String value){
         try {
