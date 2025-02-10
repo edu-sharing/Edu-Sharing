@@ -693,7 +693,7 @@ export class WorkspaceMainComponent implements EventListener, OnInit, OnDestroy 
     }
 
     searchGlobal(query: string) {
-        this.routeTo(this.root, null, query);
+        this.routeTo('MY_FILES', null, query);
     }
 
     private openDirectoryFromRoute(params: any = null) {
