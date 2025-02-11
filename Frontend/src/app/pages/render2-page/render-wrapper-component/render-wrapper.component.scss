@@ -20,6 +20,18 @@ rs-root {
                     overflow: auto;
                 }
             }
+            &.module-EDUHTML,
+            &.module-H5P,
+            &.module-PDF,
+            &.module-DOCUMENT {
+                width: 70%;
+                height: auto;
+                aspect-ratio: 16 / 9;
+            }
+            &.module-IMAGE {
+                width: 70%;
+                max-height: 100%;
+            }
             // some modules should get 100% of the browser height
             rs-module-pdf {
                 height: $maxHeight;
