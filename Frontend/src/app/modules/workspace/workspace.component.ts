@@ -728,7 +728,7 @@ export class WorkspaceMainComponent implements EventListener, OnInit, OnDestroy 
                     },
                     (error: any) => {
                         // no access to full path, try to "fake" current folder
-                        if (error.status === RestConstants.HTTP_FORBIDDEN) {
+                        if (error.status === RestConstants.HTTP_FORBIDDEN && this.currentFolder) {
                             this.path = [this.currentFolder];
                         } else {
                             this.path = [];
