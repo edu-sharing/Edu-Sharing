@@ -3,18 +3,23 @@ package org.edu_sharing.alfresco.action;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.LongSerializationPolicy;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigCache;
 import org.edu_sharing.alfresco.lightbend.LightbendConfigLoader;
+import org.edu_sharing.repository.client.tools.CCConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.io.ByteArrayInputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -69,5 +74,35 @@ class RessourceInfoExecuterTest {
         Mockito.verify(mockedNodeService, times(0)).addAspect(nodeRef, QName.createQName(RessourceInfoExecuter.CCM_ASPECT_RESSOURCEINFO), null);
         Mockito.reset(mockedNodeService);
 
+    }
+
+    @Test
+    void processScormTest() throws IOException {
+        NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, UUID.randomUUID().toString());
+        ContentReader contentReader = Mockito.mock(ContentReader.class);
+        Mockito.doReturn("application/zip").when(contentReader).getMimetype();
+        Mockito.doReturn("UTF-8").when(contentReader).getEncoding();
+        Mockito.doAnswer(invocationOnMock -> new BufferedInputStream(new FileInputStream(getClass().getClassLoader().getResource("Articulate_Storyline_Scorm.zip").getFile()))).when(contentReader).getContentInputStream();
+
+        ArchiveInputStream zip = RessourceInfoExecuter.getZipInputStream(contentReader);
+        if(RessourceInfoExecuter.goToFileInZip(zip, "imsmanifest.xml") != null) {
+            Assertions.assertTrue(underTest.processScorm(zip, contentReader, nodeRef));
+            underTest.detectScormApplication(contentReader, nodeRef);
+            Mockito.verify(mockedNodeService, times(1)).addAspect(nodeRef, QName.createQName(RessourceInfoExecuter.CCM_ASPECT_RESSOURCEINFO), null);
+            Mockito.verify(mockedNodeService, times(1)).setProperty(nodeRef, QName.createQName(RessourceInfoExecuter.CCM_PROP_IO_RESSOURCETYPE), "ADL SCORM");
+            Mockito.verify(mockedNodeService, times(1)).setProperty(nodeRef, QName.createQName(CCConstants.CCM_PROP_CCRESSOURCE_MAIN_ENTITY), "index_lms.html");
+            Mockito.verify(mockedNodeService, times(1)).setProperty(nodeRef, QName.createQName(RessourceInfoExecuter.CCM_PROP_IO_RESOURCESUBTYPE), RessourceInfoExecuter.CCM_RESOURCESUBTYPE_ARTICULATE_STORYLINE);
+            Mockito.verify(mockedNodeService, times(1)).setProperty(nodeRef, QName.createQName(RessourceInfoExecuter.CCM_PROP_IO_RESSOURCEVERSION), "1.2");
+        } else {
+            Assertions.fail("scorm xml not found");
+        }
+
+        while(true) {
+            ArchiveEntry entry = zip.getNextEntry();
+            if (entry == null)
+                break;
+            if (entry.getName().equals("imsmanifest.xml")) {
+                           }
+        }
     }
 }
