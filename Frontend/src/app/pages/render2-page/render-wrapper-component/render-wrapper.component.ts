@@ -146,11 +146,12 @@ export class RenderWrapperComponent implements OnChanges {
                 nodeId: this.node().ref.id,
                 size: parseInt(this.node().size),
                 hash: this.node().content.hash,
-                mimeType: this.node().mimetype,
+                mimeType: this.node().mimetype ?? '',
                 type: this.node().mediatype,
                 repoId: this.node().ref.repo,
                 version: this.node().content.version,
                 resourceType: resourceType,
+                url: this.node().properties?.['ccm:wwwurl']?.[0] || '',
                 // the replication source flag can be set in order to trigger special treatments
                 // in the backend. For example, it can be used for sodix paid media in order to
                 // fetch two instead of one url. This logic has to be implemented
