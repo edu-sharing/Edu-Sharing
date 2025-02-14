@@ -33,6 +33,7 @@ import org.edu_sharing.service.clientutils.ClientUtilsService;
 import org.edu_sharing.service.clientutils.WebsiteInformation;
 import org.edu_sharing.service.editlock.EditLockServiceFactory;
 import org.edu_sharing.service.editlock.LockedException;
+import org.edu_sharing.service.github.GitHubService;
 import org.edu_sharing.service.nodeservice.AssocInfo;
 import org.edu_sharing.service.nodeservice.NodeServiceHelper;
 import org.edu_sharing.service.notification.NotificationService;
@@ -46,11 +47,13 @@ import org.edu_sharing.service.search.model.SortDefinition;
 import org.edu_sharing.service.share.ShareService;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,6 +65,10 @@ import java.util.stream.Collectors;
 @Produces({"application/json"})
 public class NodeApi  {
 
+	public static final String CCM_RESSOURCETYPE_BINDER = "binder";
+
+	@Autowired
+	private GitHubService gitHubService;
 	
 	private static Logger logger = Logger.getLogger(NodeApi.class);
 	  @GET
@@ -1313,8 +1320,16 @@ public class NodeApi  {
 
 	public void resolveURLTitle(HashMap<String, String[]> properties) {
 		String[] url=(String[])properties.get(CCConstants.getValidLocalName(CCConstants.CCM_PROP_IO_WWWURL));
+
 		if(url==null)
 			return;
+
+		List<String> gitHubUrls = Arrays.stream(url).filter(x->x.contains("github.com")).collect(Collectors.toList());
+
+		if (gitHubUrls.stream().anyMatch(gitHubService::checkForJupyterNotebooks)) {
+			properties.put(CCConstants.getValidLocalName(CCConstants.CCM_PROP_CCRESSOURCETYPE), new String[]{CCM_RESSOURCETYPE_BINDER});
+		}
+
 		// Don't resolve url if name is already given by client
 		if(properties.get(CCConstants.getValidLocalName(CCConstants.CM_NAME))!=null) {
 			properties.put(CCConstants.getValidLocalName(CCConstants.CM_NAME),
