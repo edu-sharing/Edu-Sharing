@@ -357,7 +357,7 @@ public class CollectionServiceImpl implements CollectionService {
         AuthenticationUtil.runAsSystem(() -> {
             NodeRef nodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, finalId);
             if (getChildren(collectionId, null, new SortDefinition(), Collections.singletonList("files")).stream().anyMatch((ref) ->
-                    nodeRef.getId().equals(NodeServiceHelper.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeRef.getId()), CCConstants.CCM_PROP_IO_ORIGINAL))
+                    nodeRef.getId().equals(NodeServiceHelper.getProperty(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, ref.getNodeId()), CCConstants.CCM_PROP_IO_ORIGINAL))
             )) {
                 throw new DuplicateNodeException("Node id " + nodeRef.getId() + " is already in this collection");
             }
