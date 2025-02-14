@@ -1217,6 +1217,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             node = this.getObjects(node, data)[0];
             this.dialogs.openQrDialog({ node });
         });
+        qrCodeNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         qrCodeNode.constrains = [Constrain.NoBulk];
         qrCodeNode.scopes = [Scope.Render, Scope.CollectionsCollection];
         qrCodeNode.group = DefaultGroups.View;
