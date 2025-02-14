@@ -11,7 +11,10 @@
     <i esIcon="delete"></i>
     {{ 'WORKSPACE.EDITOR.PREVIEW_DELETED' | translate }}
   </div>
-  <img [src]="src" />
+  <img [src]="src$ | async" />
+  <div class="card-image-backdrop">
+    <img [src]="src$ | async" alt="" />
+  </div>
   <div class="button-group">
     <button
       mat-fab

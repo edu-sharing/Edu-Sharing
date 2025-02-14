@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RepoUrlService } from 'ngx-edu-sharing-ui';
@@ -24,7 +24,7 @@ export class MdsEditorWidgetPreviewComponent implements NativeWidgetComponent {
     };
 
     hasChanges = new BehaviorSubject<boolean>(false);
-    src: SafeResourceUrl | string;
+    src$ = new BehaviorSubject<SafeResourceUrl | string>(null);
     nodeSrc: string;
     file: File;
     node: Node;
@@ -35,6 +35,7 @@ export class MdsEditorWidgetPreviewComponent implements NativeWidgetComponent {
         private nodeService: RestNodeService,
         private toast: Toast,
         private repoUrlService: RepoUrlService,
+        private changeDetectorRef: ChangeDetectorRef,
         private sanitizer: DomSanitizer,
     ) {
         forkJoin([this.mdsEditorValues.nodes$.pipe(take(1))])
@@ -58,25 +59,28 @@ export class MdsEditorWidgetPreviewComponent implements NativeWidgetComponent {
             });
     }
 
-    setPreview(event: Event): void {
+    async setPreview(event: Event) {
         this.file = (event.target as HTMLInputElement).files[0];
         this.delete = false;
-        this.updateSrc();
+        await this.updateSrc();
     }
 
     async updateSrc() {
         if (this.file) {
-            this.src = this.sanitizer.bypassSecurityTrustResourceUrl(
-                window.URL.createObjectURL(this.file),
+            this.src$.next(
+                this.sanitizer.bypassSecurityTrustResourceUrl(
+                    window.URL.createObjectURL(this.file),
+                ),
             );
         } else {
             const src = this.nodeSrc.replace(':cache', new Date().getTime().toString());
             if (this.node) {
-                this.src = await this.repoUrlService.getRepoUrl(src, this.node);
+                this.src$.next(await this.repoUrlService.getRepoUrl(src, this.node));
             } else {
-                this.src = src;
+                this.src$.next(src);
             }
         }
+        this.changeDetectorRef.detectChanges();
         this.hasChanges.next(this.file != null || this.delete);
     }
 
