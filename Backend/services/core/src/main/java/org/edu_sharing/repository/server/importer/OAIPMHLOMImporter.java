@@ -133,7 +133,7 @@ public class OAIPMHLOMImporter implements Importer{
 		
 		//take identifiers list cause some of the sets don't work: XML-Verarbeitungsfehler: nicht wohlgeformt
 		String url = this.oai_base_url+"?verb=ListIdentifiers&metadataPrefix="+this.metadataPrefix;
-		String setUrl = url+"&set="+set;
+		String setUrl = set.equals("-none-") ? url :  url+"&set="+set;
 		if(this.from != null && this.until != null){
 			String fromString = OAIConst.DATE_FORMAT.format(this.from);
 			String untilString = OAIConst.DATE_FORMAT.format(this.until);

@@ -266,6 +266,7 @@
       "PARENT_COLLECTION_ROOT": "Auf Hauptebene importieren",
       "PARENT_COLLECTION_CHOOSE": "Gewünschte Hauptsammlung wählen",
       "EXCEL_START": "Import Starten",
+      "EXCEL_COLLECTION": "Importierte Objekte zu collections hinzufügen. Wenn nicht gesetzt, werden die Spalten mit prefix \"collection\" ignoriert.",
       "COLLECTION_START": "Import starten",
       "OAI": "Datenimport OAI-Quelle",
       "OAI_STARTED": "OAI Import-Job gestartet",

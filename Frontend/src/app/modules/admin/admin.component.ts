@@ -226,6 +226,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     buttons: any[] = [];
     availableJobs: JobDescription[];
     excelFile: File;
+    excelAddToCollection: string;
     collectionsFile: File;
     uploadTempFile: File;
     uploadJobsFile: File;
@@ -445,17 +446,19 @@ export class AdminComponent implements OnInit, OnDestroy {
             return;
         }
         this.globalProgress = true;
-        this.admin.importExcel(this.excelFile, this.parentNode.ref.id).subscribe(
-            (data: any) => {
-                this.toast.toast('ADMIN.IMPORT.EXCEL_IMPORTED', { rows: data.rows });
-                this.globalProgress = false;
-                this.excelFile = null;
-            },
-            (error: any) => {
-                this.toast.error(error);
-                this.globalProgress = false;
-            },
-        );
+        this.admin
+            .importExcel(this.excelFile, this.parentNode.ref.id, this.excelAddToCollection)
+            .subscribe(
+                (data: any) => {
+                    this.toast.toast('ADMIN.IMPORT.EXCEL_IMPORTED', { rows: data.rows });
+                    this.globalProgress = false;
+                    this.excelFile = null;
+                },
+                (error: any) => {
+                    this.toast.error(error);
+                    this.globalProgress = false;
+                },
+            );
     }
     public configApp(app: Application) {
         window.open(app.configUrl);

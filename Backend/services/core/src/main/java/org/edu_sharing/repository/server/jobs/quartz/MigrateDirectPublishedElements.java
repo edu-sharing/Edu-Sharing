@@ -28,6 +28,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,8 @@ public class MigrateDirectPublishedElements extends AbstractJobMapAnnotationPara
 
 	@JobFieldDescription(description = "Single node to migrate")
 	private String nodeId;
+	@JobFieldDescription(description = "nodes to explicitly exclude")
+	private List<String> ignoredNodeIds;
 	private NodeService nodeService;
 	private BehaviourFilter policyBehaviourFilter;
 	private ServiceRegistry serviceRegistry;
@@ -63,7 +66,7 @@ public class MigrateDirectPublishedElements extends AbstractJobMapAnnotationPara
 		runner.setTask(this::migrate);
 		runner.setRunAsSystem(true);
 		runner.setThreaded(false);
-		runner.setLucene("ISNOTNULL:\"ccm:published_handle_id\" AND ISNULL:\"ccm:published_original\" AND NOT ASPECT:\"ccm:collection_io_reference\"");
+		runner.setLucene("ISNOTNULL:\"ccm:published_handle_id\" AND ISNULL:\"ccm:published_original\" AND NOT ASPECT:\"ccm:collection_io_reference\" AND NOT @ccm\\:published_mode:\"copy\"");
 		runner.setKeepModifiedDate(false);
 		runner.setTransaction(NodeRunner.TransactionMode.None);
 		int count=runner.run();
@@ -71,6 +74,10 @@ public class MigrateDirectPublishedElements extends AbstractJobMapAnnotationPara
 	}
 
 	private void migrate(NodeRef ref) {
+		if(ignoredNodeIds != null && ignoredNodeIds.contains(ref.getId())) {
+			logger.warn("Node " + ref + " shall be ignored");
+			return;
+		}
 		Serializable handleId = NodeServiceHelper.getPropertyNative(ref, CCConstants.CCM_PROP_PUBLISHED_HANDLE_ID);
 		if(handleId == null) {
 			logger.warn("Can not migrate node " + ref + " since it has no handle id");

@@ -733,7 +733,12 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
         addNodeToLTIPlatform.permissionsRightMode = NodesRightMode.Original;
         addNodeToLTIPlatform.showAsAction = true;
         addNodeToLTIPlatform.showAlways = true;
-        addNodeToLTIPlatform.constrains = [Constrain.Files, Constrain.User, Constrain.LTIMode];
+        addNodeToLTIPlatform.constrains = [
+            Constrain.NoBulk,
+            Constrain.Files,
+            Constrain.User,
+            Constrain.LTIMode,
+        ];
         addNodeToLTIPlatform.group = DefaultGroups.Primary;
         addNodeToLTIPlatform.priority = 11;
         addNodeToLTIPlatform.permissions = [RestConstants.ACCESS_CC_PUBLISH];
@@ -1212,6 +1217,7 @@ export class OptionsHelperService extends OptionsHelperServiceAbstract implement
             node = this.getObjects(node, data)[0];
             this.dialogs.openQrDialog({ node });
         });
+        qrCodeNode.elementType = [ElementType.Node, ElementType.NodePublishedCopy];
         qrCodeNode.constrains = [Constrain.NoBulk];
         qrCodeNode.scopes = [Scope.Render, Scope.CollectionsCollection];
         qrCodeNode.group = DefaultGroups.View;

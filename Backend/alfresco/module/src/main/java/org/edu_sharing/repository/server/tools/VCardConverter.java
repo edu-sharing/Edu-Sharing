@@ -171,6 +171,11 @@ public class VCardConverter {
 	 */
 	public static List<String> cleanupVcard(String vcardString, Function<VCard, VCard> cleanup ){
 		try{
+
+			// fix parser won't unescape \, correctly
+			// TODO we should use a better lib here maybe https://github.com/mangstadt/ez-vcard/tree/master
+			vcardString = vcardString.replace("\\,", ",");
+
 			VCardEngine engine = new VCardEngine();
 			// unfortunately, the multi vcard string method is only private, so we need to make it accessible
 			Method method = engine.getClass().getDeclaredMethod("parseManyInOneVCard", String.class);

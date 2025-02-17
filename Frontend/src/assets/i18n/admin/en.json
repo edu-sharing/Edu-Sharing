@@ -258,6 +258,7 @@
       "PARENT_COLLECTION_ROOT": "Import to root level",
       "PARENT_COLLECTION_CHOOSE": "Select desired main collection",
       "EXCEL_START": "Start Import",
+      "EXCEL_COLLECTION": "Add imported nodes to collections. If not set the columns with prefix \"collection\" will be ignored.",
       "COLLECTION_START": "Start Import",
       "OAI": "Datenimport OAI-source",
       "OAI_STARTED": "OAI import-job started",

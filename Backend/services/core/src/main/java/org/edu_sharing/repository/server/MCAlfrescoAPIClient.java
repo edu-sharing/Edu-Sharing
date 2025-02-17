@@ -1370,7 +1370,7 @@ public class MCAlfrescoAPIClient extends MCAlfrescoBaseClient {
 
 		// we can cache primary parent here, instead of parentid which differs
 		// from the content
-		if (nodeType.equals(CCConstants.CCM_TYPE_IO) || nodeType.equals(CCConstants.CCM_TYPE_MAP) || nodeType.equals(CCConstants.CM_TYPE_FOLDER) || nodeType.equals(CCConstants.CCM_TYPE_TOOL_INSTANCE)) {
+		if (nodeType.equals(CCConstants.CCM_TYPE_IO) || nodeType.equals(CCConstants.CCM_TYPE_MAP) || nodeType.equals(CCConstants.CM_TYPE_FOLDER) || nodeType.equals(CCConstants.CCM_TYPE_TOOL_INSTANCE) || nodeType.equals(CCConstants.CCM_TYPE_COLLECTION_PROPOSAL)) {
 			ChildAssociationRef parentNodeRef = nodeService.getPrimaryParent(nodeRef);
 			properties.put(CCConstants.VIRT_PROP_PRIMARYPARENT_NODEID, parentNodeRef.getParentRef().getId());
 		}
