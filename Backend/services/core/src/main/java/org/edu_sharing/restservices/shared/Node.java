@@ -51,7 +51,6 @@ public class Node implements Serializable {
 	 */
 	private java.util.Collection<String> accessEffective;
 
-	@JsonProperty(required = true)
 	private String downloadUrl = null;
 
 	private Map<String,String[]> properties = null;

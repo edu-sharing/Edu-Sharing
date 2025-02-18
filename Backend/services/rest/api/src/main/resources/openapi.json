@@ -787,7 +787,6 @@
           "access",
           "createdAt",
           "createdBy",
-          "downloadUrl",
           "name",
           "owner",
           "ref"
@@ -3867,7 +3866,6 @@
           "access",
           "createdAt",
           "createdBy",
-          "downloadUrl",
           "name",
           "owner",
           "ref"
@@ -4017,7 +4015,6 @@
           "access",
           "createdAt",
           "createdBy",
-          "downloadUrl",
           "name",
           "owner",
           "ref"
