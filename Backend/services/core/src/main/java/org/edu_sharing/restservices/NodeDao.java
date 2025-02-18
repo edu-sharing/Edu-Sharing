@@ -265,14 +265,17 @@ public class NodeDao {
     public String getSignedNode() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            String serializedNode = objectMapper.writeValueAsString(asNode());
+            Node node = asNode();
+            String serializedNode = objectMapper.writeValueAsString(node);
 
             Signing signing = new Signing();
             PrivateKey privateKey = signing.getPemPrivateKey(ApplicationInfoList.getHomeRepository().getPrivateKey(), CCConstants.SECURITY_KEY_ALGORITHM);
             byte[] signedNodeData = signing.sign(privateKey, serializedNode, CCConstants.SECURITY_SIGN_ALGORITHM);
 
+            SignedNode signedNode = new SignedNode(node, new String(signedNodeData));
+            String serializedSignedNode = objectMapper.writeValueAsString(signedNode);
             Base64.Encoder encoder = Base64.getEncoder();
-            return encoder.encodeToString(signedNodeData);
+            return encoder.encodeToString(serializedSignedNode.getBytes());
         } catch (Throwable t) {
             throw DAOException.mapping(t);
         }
