@@ -3,8 +3,16 @@
 mat-form-field {
     width: 100%;
 }
+/**
+       prevent to long text from overflow the widget
+*/
+mat-chip {
+    max-width: 225px;
+}
 .mat-chip-label {
-    @include limitLineLength(200px);
+    @include limitLineLength(180px);
+    display: inline-flex;
+    flex-grow: 1;
 }
 
 .input-wrapper {
