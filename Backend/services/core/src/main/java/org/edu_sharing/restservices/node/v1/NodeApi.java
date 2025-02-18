@@ -69,7 +69,7 @@ public class NodeApi  {
 
 	@Autowired
 	private GitHubService gitHubService;
-	
+
 	private static Logger logger = Logger.getLogger(NodeApi.class);
 	  @GET
 	    @Path("/nodes/{repository}/{node}/workflow")
@@ -402,6 +402,52 @@ public class NodeApi  {
     	}
 
     }
+
+	@GET
+	@Path("/nodes/{repository}/{node}/metadata/secured")
+
+	@Operation(summary = "Get signed metadata of node.", description = "Get metadata of node. The content is signed and includes jwt for permissions")
+
+	@ApiResponses(
+			value = {
+					@ApiResponse(responseCode="200", description=RestConstants.HTTP_200, content = @Content(schema = @Schema(implementation = SignedNodeEntry.class))),
+					@ApiResponse(responseCode="400", description=RestConstants.HTTP_400, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="401", description=RestConstants.HTTP_401, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="403", description=RestConstants.HTTP_403, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="404", description=RestConstants.HTTP_404, content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+					@ApiResponse(responseCode="500", description=RestConstants.HTTP_500, content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+			})
+
+	public Response getMetadataSigned(
+			@Parameter(description = RestConstants.MESSAGE_REPOSITORY_ID, required = true, schema = @Schema(defaultValue="-home-" )) @PathParam("repository") String repository,
+			@Parameter(description = RestConstants.MESSAGE_NODE_ID,required=true ) @PathParam("node") String node,
+			@Parameter(description = "property filter for result nodes (or \"-all-\" for all properties)", array = @ArraySchema(schema = @Schema(defaultValue="-all-")) ) @QueryParam("propertyFilter") List<String> propertyFilter,
+			@Context HttpServletRequest req) {
+
+		try {
+			RepoProxy.RemoteRepoDetails remote = RepoProxyFactory.getRepoProxy().myTurn(repository, node);
+			if(remote != null) {
+				return RepoProxyFactory.getRepoProxy().getMetadata(remote.getRepository(), remote.getNodeId(), propertyFilter, req);
+			}
+			Filter filter = new Filter(propertyFilter);
+
+			RepositoryDao repoDao = RepositoryDao.getRepository(repository);
+			node=NodeDao.mapNodeConstants(repoDao,node);
+
+			NodeDao nodeDao = NodeDao.getNode(repoDao, node, filter);
+
+			SignedNodeEntry response = new SignedNodeEntry();
+			response.setNode(nodeDao.asNode());
+			response.setJwt(nodeDao.getJWT());
+			response.setSignedNode(nodeDao.getSignedNode());
+
+			return Response.status(Response.Status.OK).entity(response).build();
+
+		} catch (Throwable t) {
+			return ErrorResponse.createResponse(t);
+		}
+
+	}
 
 
     @GET
