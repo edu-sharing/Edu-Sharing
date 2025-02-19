@@ -202,13 +202,10 @@ export class MdsEditorWidgetChipsComponent
     onBlurInput(event: FocusEvent): void {
         const target = event.relatedTarget as HTMLElement;
         // ignore mat option focus to prevent resetting before selection is done
-        if (
-            target == null ||
-            target?.tagName === 'MAT-OPTION' ||
-            target === this.input.nativeElement
-        ) {
+        if (target?.tagName === 'MAT-OPTION' || target === this.input.nativeElement) {
             return;
         }
+
         this.inputControl.setValue(null);
         // `matAutocomplete` doesn't seem to close the autocomplete panel in some situations,
         // including when focus goes to the component's own chips (breaks keyboard navigation) and

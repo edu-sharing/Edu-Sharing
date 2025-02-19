@@ -38,6 +38,13 @@ mat-chip {
     // Use the button color which respects disabled state.
     color: unset;
 }
+::ng-deep {
+    .mds-chip-autocomplete {
+        mat-option {
+            color: var(--primary);
+        }
+    }
+}
 .mat-chip-suggestions {
     padding-left: 8px;
     .mat-chip-suggestion {

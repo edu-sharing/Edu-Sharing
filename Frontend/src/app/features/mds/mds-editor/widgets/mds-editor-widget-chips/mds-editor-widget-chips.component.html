@@ -100,6 +100,7 @@
   </mat-chip-grid>
   <mat-autocomplete
     #auto="matAutocomplete"
+    class="mds-chip-autocomplete"
     (optionSelected)="selected($event)"
     (optionActivated)="showTooltip($any($event.option)?.tooltip)"
   >
@@ -112,8 +113,8 @@
       #option="matOption"
       [matTooltip]="text.hasTextOverflow() ? value.label : null"
       [esRegisterCustomProperty]="{ key: 'tooltip', value: tooltip, object: option }"
+      [innerHTML]="value.label | escapeHtml | highlight : inputControl.value"
     >
-      <span [innerHTML]="value.label | escapeHtml | highlight : inputControl.value"></span>
     </mat-option>
     <mat-option disabled *ngIf="shouldShowNoMatchingValuesNotice | async" aria-live="polite">
       {{ 'MDS.NO_MATCHING_VALUES' | translate }}
