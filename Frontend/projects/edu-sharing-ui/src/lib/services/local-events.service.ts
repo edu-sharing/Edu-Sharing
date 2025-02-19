@@ -9,6 +9,13 @@ import { Node } from 'ngx-edu-sharing-api';
 })
 export class LocalEventsService {
     /**
+     * One or more nodes have been created
+     *
+     * Triggers when the full creation process is done, i.e. the metadata/edit dialog after uploading
+     * is closed
+     */
+    readonly nodesCreated = new EventEmitter<Node[]>();
+    /**
      * The metadata of one or more nodes have been updated.
      *
      * The emitted value is the array of updated nodes.

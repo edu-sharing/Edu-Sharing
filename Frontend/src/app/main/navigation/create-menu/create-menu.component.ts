@@ -17,6 +17,7 @@ import {
     DefaultGroups,
     DropdownComponent,
     ElementType,
+    LocalEventsService,
     OptionItem,
     OptionsHelperDataService,
     Scope,
@@ -126,6 +127,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
         private iamService: RestIamService,
         private ltiPlatformService: LtiPlatformService, //private paste: PasteService,
         private nodeHelper: NodeHelperService,
+        private localEventsService: LocalEventsService,
         private nodeService: RestNodeService,
         private optionsService: OptionsHelperDataService,
         private paste: PasteService,
@@ -350,6 +352,7 @@ export class CreateMenuComponent implements OnInit, OnDestroy {
             chooseParent: this.showPicker,
         });
         if (nodes && Array.isArray(nodes)) {
+            this.localEventsService.nodesCreated.emit(nodes);
             this.onCreate.emit(nodes);
         }
     }
