@@ -277,7 +277,7 @@ export class MdsWidgetComponent extends MdsEditorWidgetBase implements OnInit, O
         return this.mdsEditorInstance.nodes$.pipe(
             first(),
             map((v) =>
-                (v?.[0].properties[this.widget.definition.id] as string[]).map((id) => {
+                (v?.[0]?.properties[this.widget.definition.id] as string[])?.map((id) => {
                     return {
                         id,
                         path: this.getPath(id),
