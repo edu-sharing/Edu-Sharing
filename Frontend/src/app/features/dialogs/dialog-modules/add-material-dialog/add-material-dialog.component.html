@@ -108,7 +108,7 @@
   <div *ngIf="data.chooseParent" class="location">
     <div class="caption">{{ 'WORKSPACE.FILE_LOCATION' | translate }}</div>
     <div class="picker-group">
-      <div class="no-breadcrumbs" *ngIf="!parent">
+      <div class="no-breadcrumbs" *ngIf="(parent$ | async) === null">
         {{ 'STORAGE_LOCATION_UNSET' | translate }}
       </div>
       <es-breadcrumbs

@@ -26,6 +26,7 @@ import { CARD_DIALOG_DATA, Closable } from '../../card-dialog/card-dialog-config
 import { CardDialogRef } from '../../card-dialog/card-dialog-ref';
 import { DialogsService } from '../../dialogs.service';
 import { AddMaterialDialogData, AddMaterialDialogResult } from './add-material-dialog-data';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'es-add-material-dialog',
@@ -63,7 +64,7 @@ export class AddMaterialDialogComponent implements OnInit {
         new ListItem('NODE', RestConstants.LOM_PROP_TITLE),
         new ListItem('NODE', RestConstants.CM_PROP_C_CREATED),
     ];
-    protected parent: Node;
+    protected parent$ = new BehaviorSubject<Node>(null);
 
     constructor(
         @Inject(CARD_DIALOG_DATA) public data: AddMaterialDialogData,
@@ -77,7 +78,8 @@ export class AddMaterialDialogComponent implements OnInit {
         private toast: Toast,
         private userService: UserService,
     ) {
-        this.parent = this.data.parent;
+        this.registerParentListener();
+        this.parent$.next(this.data.parent);
         this.setState('');
         this.userService
             .observeCurrentUser()
@@ -88,14 +90,27 @@ export class AddMaterialDialogComponent implements OnInit {
             .subscribe((ltiEnabled) => (this.ltiEnabled = ltiEnabled));
     }
 
+    private registerParentListener() {
+        this.parent$
+            .pipe(
+                takeUntilDestroyed(),
+                filter((p) => !!p),
+                tap((p) => console.log(p)),
+            )
+            .subscribe((parent) => {
+                this.breadcrumbs = null;
+                this.breadcrumbsService.setNodePath(null);
+                this.getBreadcrumbs(parent)
+                    .pipe(filter(notNull))
+                    .subscribe((breadcrumbs) => {
+                        this.breadcrumbs = breadcrumbs;
+                        this.breadcrumbsService.setNodePath(breadcrumbs.nodes);
+                    });
+            });
+    }
+
     ngOnInit(): void {
         this.registerLink();
-        this.getBreadcrumbs(this.parent)
-            .pipe(filter(notNull))
-            .subscribe((breadcrumbs) => {
-                this.breadcrumbs = breadcrumbs;
-                this.breadcrumbsService.setNodePath(breadcrumbs.nodes);
-            });
     }
 
     private registerLink(): void {
@@ -152,7 +167,7 @@ export class AddMaterialDialogComponent implements OnInit {
         this.dialogRef.close({
             kind: 'file',
             files: fileList,
-            parent: this.parent,
+            parent: this.parent$.value,
         });
     }
 
@@ -179,7 +194,7 @@ export class AddMaterialDialogComponent implements OnInit {
         this.dialogRef.close({
             kind: 'link',
             link: this.linkControl.value,
-            parent: this.parent,
+            parent: this.parent$.value,
             lti: this.ltiActivated
                 ? {
                       consumerKey: this.ltiConsumerKey,
@@ -211,14 +226,14 @@ export class AddMaterialDialogComponent implements OnInit {
 
     parentSelected(event: Node[]) {
         this.showSaveParent = true;
-        this.parent = event[0];
+        this.parent$.next(event[0]);
         this.updateButtons();
         this.dialogRef.patchConfig({ closable: Closable.Standard });
     }
 
     updateButtons() {
         const [okButton] = DialogButton.getOk(() => this.setLink());
-        okButton.disabled = this.disabled || (this.data.chooseParent && !this.parent);
+        okButton.disabled = this.disabled || (this.data.chooseParent && !this.parent$.value);
         const buttons = [...DialogButton.getCancel(() => this.cancel()), okButton];
         this.dialogRef.patchConfig({ buttons });
     }
@@ -277,8 +292,8 @@ export class AddMaterialDialogComponent implements OnInit {
 
     async setSaveParent(status: boolean) {
         if (status) {
-            await this.storageService.set('defaultInboxFolder', this.parent.ref.id);
-            this.toast.toast('TOAST.STORAGE_LOCATION_SAVED', { name: this.parent.name });
+            await this.storageService.set('defaultInboxFolder', this.parent$.value.ref.id);
+            this.toast.toast('TOAST.STORAGE_LOCATION_SAVED', { name: this.parent$.value.name });
         } else {
             await this.storageService.delete('defaultInboxFolder');
             this.toast.toast('TOAST.STORAGE_LOCATION_RESET');
