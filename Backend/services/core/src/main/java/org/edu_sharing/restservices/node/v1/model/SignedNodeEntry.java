@@ -14,4 +14,6 @@ public class SignedNodeEntry {
     private String jwt;
     @JsonProperty(required = true)
     private String signedNode;
+    @JsonProperty(required = true)
+    private String signature;
 }

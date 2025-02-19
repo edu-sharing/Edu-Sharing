@@ -7669,6 +7669,9 @@
           "node": {
             "$ref": "#/components/schemas/Node"
           },
+          "signature": {
+            "type": "string"
+          },
           "signedNode": {
             "type": "string"
           }
@@ -7676,6 +7679,7 @@
         "required": [
           "jwt",
           "node",
+          "signature",
           "signedNode"
         ],
         "type": "object"

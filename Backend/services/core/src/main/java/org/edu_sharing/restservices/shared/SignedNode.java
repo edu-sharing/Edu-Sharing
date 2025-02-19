@@ -7,6 +7,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 public class SignedNode {
-	private Node node;
+	private String node;
 	private String signature;
 }

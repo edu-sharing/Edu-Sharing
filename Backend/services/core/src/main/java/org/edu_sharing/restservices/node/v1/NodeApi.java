@@ -52,10 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Path("/node/v1")
@@ -436,10 +433,17 @@ public class NodeApi  {
 
 			NodeDao nodeDao = NodeDao.getNode(repoDao, node, filter);
 
+			Base64.Encoder encoder = Base64.getEncoder();
+			SignedNode signedNode = nodeDao.getSignedNode();
+
+			String encodedSignedNode = encoder.encodeToString(signedNode.getNode().getBytes());
+			String encodedSignature = encoder.encodeToString(signedNode.getSignature().getBytes());
+
 			SignedNodeEntry response = new SignedNodeEntry();
 			response.setNode(nodeDao.asNode());
 			response.setJwt(nodeDao.getJWT());
-			response.setSignedNode(nodeDao.getSignedNode());
+			response.setSignedNode(encodedSignedNode);
+			response.setSignature(encodedSignature);
 
 			return Response.status(Response.Status.OK).entity(response).build();
 
