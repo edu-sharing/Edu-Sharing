@@ -648,15 +648,24 @@ public class MetadataTemplateRenderer {
 			}
 		}
 		if(entry != null) {
-			value = "<span class=\"value-caption\">" + value + "</span>";
-			if(entry.getDescription() != null) {
-				value += " <span class=\"value-description\">" + entry.getDescription() + "</span>";
+			if (renderingMode.equals(RenderingMode.HTML)) {
+				value = "<span class=\"value-caption\">" + value + "</span>";
 			}
-			if(entry.getIcon() != null) {
-				value = "<img src=\"" + (entry.getIcon().startsWith("http://") || entry.getIcon().startsWith("https://") ? entry.getIcon() : "assets/images/" + entry.getIcon()) + "\" alt=\"\"><div class=\"value-group\">" + value + "</div>";
+
+			if(StringUtils.isNotBlank(entry.getDescription())) {
+				if (renderingMode.equals(RenderingMode.HTML)) {
+					value += " <span class=\"value-description\">" + entry.getDescription() + "</span>";
+				} else {
+					value += " (" + entry.getDescription() + ")";
+				}
 			}
-			if(entry.getUrl() != null) {
-				value = "<a href=\"" + entry.getUrl() + "\" target=\"_BLANK\">" + value + "</a>";
+			if(renderingMode.equals(RenderingMode.HTML)) {
+				if (entry.getIcon() != null) {
+					value = "<img src=\"" + (entry.getIcon().startsWith("http://") || entry.getIcon().startsWith("https://") ? entry.getIcon() : "assets/images/" + entry.getIcon()) + "\" alt=\"\"><div class=\"value-group\">" + value + "</div>";
+				}
+				if (entry.getUrl() != null) {
+					value = "<a href=\"" + entry.getUrl() + "\" target=\"_BLANK\">" + value + "</a>";
+				}
 			}
 		}
 
