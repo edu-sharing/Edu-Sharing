@@ -8,5 +8,5 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 public class SignedNode {
 	private String node;
-	private String signature;
+	private byte[] signature;
 }

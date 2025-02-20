@@ -272,7 +272,7 @@ public class NodeDao {
             PrivateKey privateKey = signing.getPemPrivateKey(ApplicationInfoList.getHomeRepository().getPrivateKey(), CCConstants.SECURITY_KEY_ALGORITHM);
             byte[] signedNodeData = signing.sign(privateKey, serializedNode, CCConstants.SECURITY_SIGN_ALGORITHM);
 
-            return new SignedNode(serializedNode, new String(signedNodeData));
+            return new SignedNode(serializedNode, signedNodeData);
         } catch (Throwable t) {
             throw DAOException.mapping(t);
         }

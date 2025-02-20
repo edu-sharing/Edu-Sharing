@@ -437,7 +437,7 @@ public class NodeApi  {
 			SignedNode signedNode = nodeDao.getSignedNode();
 
 			String encodedSignedNode = encoder.encodeToString(signedNode.getNode().getBytes());
-			String encodedSignature = encoder.encodeToString(signedNode.getSignature().getBytes());
+			String encodedSignature = encoder.encodeToString(signedNode.getSignature());
 
 			SignedNodeEntry response = new SignedNodeEntry();
 			response.setNode(nodeDao.asNode());
