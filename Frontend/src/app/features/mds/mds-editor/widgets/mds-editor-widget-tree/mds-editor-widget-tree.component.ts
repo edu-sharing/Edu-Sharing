@@ -29,6 +29,7 @@ import { UIService } from '../../../../../core-module/rest/services/ui.service';
 import { MatButton } from '@angular/material/button';
 import { UIHelper } from '../../../../../core-ui-module/ui-helper';
 import { MdsService } from 'ngx-edu-sharing-api';
+import { MdsEditorWidgetContainerComponent } from '../mds-editor-widget-container/mds-editor-widget-container.component';
 
 @Component({
     selector: 'es-mds-editor-widget-tree',
@@ -39,6 +40,7 @@ export class MdsEditorWidgetTreeComponent
     extends MdsEditorWidgetChipsSuggestionBase
     implements OnInit, AfterViewInit, OnDestroy
 {
+    private hasFocus = true;
     add(value: DisplayValue): void {
         const treeNode = this.tree.findById(value.key);
         // old values are may not available in tree, so check for null
@@ -57,6 +59,7 @@ export class MdsEditorWidgetTreeComponent
         return this.tree.toDisplayValue(value);
     }
     @ViewChild(CdkConnectedOverlay) overlay: CdkConnectedOverlay;
+    @ViewChild('container') container: MdsEditorWidgetContainerComponent;
     @ViewChild('chipList', { read: ElementRef }) chipList: ElementRef<HTMLElement>;
     @ViewChild('treeRef') treeRef: MdsEditorWidgetTreeCoreComponent;
     @ViewChild('openButton') openButtonRef: MatButton;
@@ -106,6 +109,20 @@ export class MdsEditorWidgetTreeComponent
     }
 
     async ngOnInit() {
+        if (this.mdsEditorInstance.editorMode === 'inline') {
+            this.onBlur.subscribe(() => (this.hasFocus = false));
+            // an host listener is not triggering
+            document.addEventListener(
+                'blur',
+                (e) => {
+                    if (!this.hasFocus) {
+                        return;
+                    }
+                    this.onBlurInput(e);
+                },
+                true,
+            );
+        }
         this.chipsControl = new UntypedFormControl(null, this.getStandardValidators());
         if (this.widget.definition.type === MdsWidgetType.SingleValueTree) {
             this.valueType = ValueType.String;
@@ -240,8 +257,16 @@ export class MdsEditorWidgetTreeComponent
         this.changeDetectorRef.detectChanges();
     }
 
-    blur(event: FocusEvent) {
+    onBlurInput(event: FocusEvent) {
         if (event.relatedTarget === this.treeRef.input.nativeElement) {
+            return;
+        }
+        if (
+            !UIHelper.isParentElementOfElement(
+                event.target as HTMLElement,
+                this.container.nativeElement.nativeElement,
+            )
+        ) {
             return;
         }
         this.onBlur.emit();

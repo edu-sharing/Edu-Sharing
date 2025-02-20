@@ -68,7 +68,7 @@ export class MdsEditorWidgetChipsComponent
     shouldShowNoMatchingValuesNotice: Observable<boolean>;
     indeterminateValues$: BehaviorSubject<string[]>;
     showDropdownArrow: boolean;
-
+    hasFocus = true;
     private autocompleteIsInhibited = new BehaviorSubject(false);
     private autoCompleteToggleTrigger = new Subject<'open' | 'close' | 'opened' | 'closed'>();
 
@@ -90,6 +90,20 @@ export class MdsEditorWidgetChipsComponent
     }
 
     async ngOnInit() {
+        if (this.mdsEditorInstance.editorMode === 'inline') {
+            this.onBlur.subscribe(() => (this.hasFocus = false));
+            // an host listener is not triggering
+            document.addEventListener(
+                'blur',
+                (e) => {
+                    if (!this.hasFocus) {
+                        return;
+                    }
+                    this.onBlurInput(e);
+                },
+                true,
+            );
+        }
         this.chipsControl = new UntypedFormControl(null, this.getStandardValidators());
         this.chipsControl = new UntypedFormControl(
             [

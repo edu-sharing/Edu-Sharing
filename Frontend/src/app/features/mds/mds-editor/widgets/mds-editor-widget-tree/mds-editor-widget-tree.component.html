@@ -81,7 +81,7 @@
           [placeholder]="chipsControl?.value?.length ? null : widget.definition.placeholder"
           [matChipInputFor]="chipList"
           (focus)="openOverlay($event)"
-          (blur)="blur($event)"
+          (blur)="onBlurInput($event)"
         />
         <button
           matSuffix
