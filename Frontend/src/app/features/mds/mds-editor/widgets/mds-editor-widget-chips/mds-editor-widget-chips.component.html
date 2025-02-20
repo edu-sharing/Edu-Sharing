@@ -111,6 +111,7 @@
       #text="esCheckTextOverflow"
       #tooltip="matTooltip"
       #option="matOption"
+      tabindex="0"
       [matTooltip]="text.hasTextOverflow() ? value.label : null"
       [esRegisterCustomProperty]="{ key: 'tooltip', value: tooltip, object: option }"
       [innerHTML]="value.label | escapeHtml | highlight : inputControl.value"
