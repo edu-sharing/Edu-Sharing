@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 /**
@@ -13,6 +13,8 @@ import { take } from 'rxjs/operators';
 })
 export class AppContainerService {
     private scrollContainer?: HTMLElement;
+
+    public scrollContainerChange = new Subject<HTMLElement>();
 
     constructor(private ngZone: NgZone) {}
 
@@ -64,6 +66,7 @@ export class AppContainerService {
 
     private registerScrollContainer(appElement: HTMLElement): void {
         this.scrollContainer = this.getNearestScrollingAncestor(appElement);
+        this.scrollContainerChange.next(this.scrollContainer);
     }
 
     private getNearestScrollingAncestor(element: HTMLElement): HTMLElement | null {

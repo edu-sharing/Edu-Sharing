@@ -22,6 +22,11 @@ export class ScrollToTopButtonComponent implements OnInit, OnDestroy {
     constructor(private appContainer: AppContainerService, private ngZone: NgZone) {}
 
     ngOnInit() {
+        this.appContainer.scrollContainerChange.subscribe(() => this.registerScroll());
+        this.registerScroll();
+    }
+
+    private registerScroll() {
         this.appContainer.registerScrollEvents(() => this.handleScroll(), this.destroyed$);
     }
 
