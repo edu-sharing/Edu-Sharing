@@ -138,11 +138,11 @@ test docker:
     - mkdir -p "$MAVEN_HOME"
     - mvn $MAVEN_CLI -s .mvn/settings.xml install
     - pushd deploy/docker/compose/target/compose
-    - docker compose -f 1_repository-common.yml up -d
+    - docker compose -f 1_repository-common.yml -f 1_redis-common.yml up -d
     - "until wait-for-it docker:8100 -t 3; do sleep 1; done"
     - "until [[ $(curl -sSf -w '%{http_code}\n' -o /dev/null -H 'Accept: application/json' http://docker:8100/edu-sharing/rest/_about/status/SERVICE?timeoutSeconds=3) -eq 200 ]]; do sleep 1; done"
     - "curl -m 300 -H 'Accept: application/json' --user 'admin:admin' http://docker:8100/edu-sharing/rest/openapi.json | jq -S . > openapi.json"
-    - docker compose -f 1_repository-common.yml down -v
+    - docker compose -f 1_repository-common.yml -f 1_redis-common.yml down -v
     - cmp -s openapi.json ../../../build/service/target/build/rest-api/openapi.json || exit 1
     - popd
   rules:
@@ -186,7 +186,7 @@ e2e:
     - mkdir -p "$MAVEN_HOME"
     - mvn $MAVEN_CLI -s .mvn/settings.xml install
     - pushd deploy/docker/compose/target/compose
-    - docker compose -f 1_repository-common.yml up -d
+    - docker compose -f 1_repository-common.yml -f 1_redis-common.yml up -d
     - pushd ../../../../../repository/Frontend
     - npx playwright install --with-deps
     - "until wait-for-it docker:8100 -t 3; do sleep 1; done"
@@ -194,7 +194,7 @@ e2e:
     - npm run e2e-prepare-edu-sharing
     - npm run e2e
     - popd
-    - docker compose -f 1_repository-common.yml down -v
+    - docker compose -f 1_repository-common.yml -f 1_redis-common.yml down -v
     - popd
   only:
     variables:
