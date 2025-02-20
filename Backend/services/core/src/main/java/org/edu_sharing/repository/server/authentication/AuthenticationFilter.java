@@ -103,7 +103,7 @@ public class AuthenticationFilter implements jakarta.servlet.Filter {
   					//if its APIClient user name is ignored and is figured out with authentication service
 
 					// Force a renew of all toolpermissions since they might have now changed!
-					ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions(true);
+					ToolPermissionServiceFactory.getInstance().invalidateSessionCache();
   					/**
   					 * auth type ticket means no profile editing allowed, 
   					 * authenticated by an lms or other connected system that

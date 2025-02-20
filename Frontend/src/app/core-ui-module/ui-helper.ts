@@ -628,11 +628,16 @@ export class UIHelper {
         configService: ConfigurationService,
         replaceUrl = false,
     ) {
+        let defaultLocation = this.getDefaultLocation(configService);
+        RouterHelper.navigateToAbsoluteUrl(platformLocation, router, defaultLocation, replaceUrl);
+    }
+
+    static getDefaultLocation(configService: ConfigurationService) {
         let defaultLocation = configService.instant('loginDefaultLocation', 'workspace');
         if (!defaultLocation.match(/https?:\/\/*/)) {
             defaultLocation = UIConstants.ROUTER_PREFIX + defaultLocation;
         }
-        RouterHelper.navigateToAbsoluteUrl(platformLocation, router, defaultLocation, replaceUrl);
+        return defaultLocation;
     }
 
     static openUrl(url: string, bridge: BridgeService, mode = OPEN_URL_MODE.Current) {

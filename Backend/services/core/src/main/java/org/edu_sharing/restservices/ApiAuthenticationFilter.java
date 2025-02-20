@@ -99,7 +99,7 @@ public class ApiAuthenticationFilter implements jakarta.servlet.Filter {
                 String ticket = authHdr.substring(10).trim();
                 if (authTool.validateTicket(ticket)) {
                     // Force a renew of all toolpermissions since they might have now changed!
-                    ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions(true);
+                    ToolPermissionServiceFactory.getInstance().invalidateSessionCache();
                     //if its APIClient username is ignored and is figured out with authentication service
                     authTool.storeAuthInfoInSession(authTool.getCurrentUser(), ticket, CCConstants.AUTH_TYPE_TICKET, httpReq.getSession());
                     validatedAuth = authTool.validateAuthentication(session);

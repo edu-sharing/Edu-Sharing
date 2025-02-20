@@ -233,11 +233,6 @@ public class AuthenticationToolAPI extends AuthenticationToolAbstract {
 		//i.e jession with ticket + basic auth in ApiAuthenticationFilter
 		authenticationService.validate(ticket);
 
-		// prewarm tp session cache
-		// not required since validateSession will do it anyway
-		// otherwise, every status probe call will build unnecessary a tp cache
-		//ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions();
-
 		try {
 			Map<String, String> userInfo = getUserInfo(authenticationService.getCurrentUserName(), ticket);
 			session.setAttribute(CCConstants.AUTH_USERNAME_CAPTION, userInfo.get(CCConstants.AUTH_USERNAME_CAPTION));

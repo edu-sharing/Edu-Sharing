@@ -1108,6 +1108,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void switchAuthentication(String authorityName) {
         HttpSession session = Context.getCurrentInstance().getRequest().getSession(true);
+        ToolPermissionServiceFactory.getInstance().invalidateSessionCache();
         //session.setMaxInactiveInterval(30);
         AuthenticationToolAPI authTool = new AuthenticationToolAPI();
         String ticket = authTool.setUser(authorityName);

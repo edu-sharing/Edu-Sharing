@@ -81,7 +81,7 @@ public class GuestFilter implements jakarta.servlet.Filter {
                         authTool.storeAuthInfoInSession(authInfoGuest.get(CCConstants.AUTH_USERNAME), authInfoGuest.get(CCConstants.AUTH_TICKET), CCConstants.AUTH_TYPE_DEFAULT, session);
 
                         // prewarm tp session cache
-                        ToolPermissionServiceFactory.getInstance().getAllAvailableToolPermissions();
+                        ToolPermissionServiceFactory.getInstance().invalidateSessionCache();
                     }
                 } else {
                     logger.debug("no guest defined");

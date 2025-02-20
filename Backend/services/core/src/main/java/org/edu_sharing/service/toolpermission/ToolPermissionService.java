@@ -16,6 +16,7 @@ import org.edu_sharing.repository.server.tools.ApplicationInfoList;
 import org.edu_sharing.service.connector.ConnectorServiceFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ToolPermissionService extends ToolPermissionBaseService {
 	private Logger logger = Logger.getLogger(ToolPermissionService.class);
@@ -35,9 +36,13 @@ public class ToolPermissionService extends ToolPermissionBaseService {
 	 */
 	public void invalidateSessionCache() {
 		try{
-			HttpSession session = Context.getCurrentInstance().getRequest().getSession();
-			for(String tp : this.getAllToolPermissions(false)){
-				session.removeAttribute(tp);
+			if(Context.getCurrentInstance() != null && Context.getCurrentInstance().getRequest() != null) {
+				HttpSession session = Context.getCurrentInstance().getRequest().getSession();
+				if(session != null) {
+					for (String tp : Collections.list(session.getAttributeNames()).stream().filter(s -> s.startsWith(CCConstants.CCM_VALUE_TOOLPERMISSION_PREFIX)).collect(Collectors.toList())) {
+						session.removeAttribute(tp);
+					}
+				}
 			}
 		}catch(Throwable t){
 			// may fails when no session is active, not an issue

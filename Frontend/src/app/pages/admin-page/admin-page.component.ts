@@ -1566,7 +1566,7 @@ export class AdminPageComponent implements OnInit, OnDestroy {
                 await this.admin
                     .switchAuthentication(this.authenticateAuthority.authorityName)
                     .toPromise();
-                UIHelper.goToDefaultLocation(this.router, this.platformLocation, this.config, true);
+                window.location.href = UIHelper.getDefaultLocation(this.config);
             }
         });
     }
